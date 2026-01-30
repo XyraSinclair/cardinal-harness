@@ -114,6 +114,9 @@ pub struct RerankMeta {
     pub comparisons_used: usize,
     /// Comparisons where model refused.
     pub comparisons_refused: usize,
+    /// Comparisons served from cache.
+    #[serde(default)]
+    pub comparisons_cached: usize,
     /// Budget that was set.
     pub comparison_budget: usize,
     /// Elapsed time.
@@ -347,6 +350,9 @@ pub struct MultiRerankMeta {
     pub comparisons_used: usize,
     /// Comparisons where model refused.
     pub comparisons_refused: usize,
+    /// Comparisons served from cache.
+    #[serde(default)]
+    pub comparisons_cached: usize,
     /// Budget that was set.
     pub comparison_budget: usize,
     /// Elapsed time.

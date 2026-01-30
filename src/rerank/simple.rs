@@ -120,6 +120,7 @@ pub async fn rerank<U: UsageSink>(
         comparisons_attempted: multi_resp.meta.comparisons_attempted,
         comparisons_used: multi_resp.meta.comparisons_used,
         comparisons_refused: multi_resp.meta.comparisons_refused,
+        comparisons_cached: multi_resp.meta.comparisons_cached,
         comparison_budget: multi_resp.meta.comparison_budget,
         latency_ms: multi_resp.meta.latency_ms,
         model_used: multi_resp.meta.model_used,

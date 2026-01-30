@@ -5,7 +5,7 @@
 use serde::Deserialize;
 use tracing::warn;
 
-use crate::cache::{CachedJudgement, PairwiseCache, PairwiseCacheKey};
+use crate::cache::{CacheError, CachedJudgement, PairwiseCache, PairwiseCacheKey};
 use crate::gateway::{
     Attribution, ChatModel, ChatRequest, ProviderError, ProviderGateway, UsageSink,
 };
@@ -64,6 +64,10 @@ pub enum ComparisonError {
     Provider(#[from] ProviderError),
     #[error("Parse error: {0}")]
     Parse(String),
+    #[error("Cache error: {0}")]
+    Cache(#[from] CacheError),
+    #[error("Cache miss: {0}")]
+    CacheMiss(String),
 }
 
 /// Usage info for a single LLM comparison call.
@@ -72,6 +76,7 @@ pub struct ComparisonUsage {
     pub input_tokens: u32,
     pub output_tokens: u32,
     pub provider_cost_nanodollars: i64,
+    pub cached: bool,
 }
 
 /// Parse LLM response JSON into a PairwiseJudgement.
@@ -175,6 +180,7 @@ fn extract_json(raw: &str) -> &str {
 pub async fn compare_pair<U: UsageSink>(
     gateway: &ProviderGateway<U>,
     cache: Option<&dyn PairwiseCache>,
+    cache_only: bool,
     model: &str,
     attribute_name: &str,
     attribute_prompt: &str,
@@ -192,10 +198,16 @@ pub async fn compare_pair<U: UsageSink>(
         .and_then(prompt_by_slug)
         .unwrap_or(DEFAULT_PROMPT);
     let prompt_slug = template.slug;
+    let template_hash = blake3::hash(
+        format!("{}\n{}", template.system, template.user).as_bytes(),
+    )
+    .to_hex()
+    .to_string();
     let cache_key = cache.map(|_| {
         PairwiseCacheKey::new(
             model,
             prompt_slug,
+            &template_hash,
             attribute_name,
             attribute_prompt,
             entity_a_id,
@@ -206,16 +218,31 @@ pub async fn compare_pair<U: UsageSink>(
     });
 
     if let (Some(cache), Some(ref key)) = (cache, &cache_key) {
-        if let Ok(Some(hit)) = cache.get(key).await {
-            if let Some(judgement) = cached_to_judgement(&hit) {
-                let usage = ComparisonUsage {
-                    input_tokens: 0,
-                    output_tokens: 0,
-                    provider_cost_nanodollars: 0,
-                };
-                return Ok((judgement, usage));
+        match cache.get(key).await {
+            Ok(Some(hit)) => {
+                if let Some(judgement) = cached_to_judgement(&hit) {
+                    let usage = ComparisonUsage {
+                        input_tokens: 0,
+                        output_tokens: 0,
+                        provider_cost_nanodollars: 0,
+                        cached: true,
+                    };
+                    return Ok((judgement, usage));
+                }
+            }
+            Ok(None) => {}
+            Err(err) => {
+                if cache_only {
+                    return Err(ComparisonError::Cache(err));
+                }
+                warn!(error = %err, "Cache read failed; falling back to live comparison");
             }
         }
+    }
+    if cache_only {
+        return Err(ComparisonError::CacheMiss(
+            "cache_only is enabled and no cached judgement was found".to_string(),
+        ));
     }
 
     let prompt_instance = template.render(attribute_name, attribute_prompt, entity_a, entity_b);
@@ -237,6 +264,7 @@ pub async fn compare_pair<U: UsageSink>(
         input_tokens: response.input_tokens,
         output_tokens: response.output_tokens,
         provider_cost_nanodollars: response.cost_nanodollars,
+        cached: false,
     };
 
     match parse_pairwise_response(&response.content) {

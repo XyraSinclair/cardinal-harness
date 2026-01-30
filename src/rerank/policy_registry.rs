@@ -64,8 +64,9 @@ impl PolicyRegistry {
     }
 }
 
-pub fn policy_from_spec(spec: &PolicySpec) -> Arc<dyn ModelPolicy> {
-    match spec {
+pub fn policy_from_spec(spec: &PolicySpec) -> Result<Arc<dyn ModelPolicy>, String> {
+    validate_policy_spec(spec)?;
+    Ok(match spec {
         PolicySpec::Fixed { model } => Arc::new(FixedPolicy::new(model)),
         PolicySpec::Ladder {
             high_model,
@@ -100,7 +101,7 @@ pub fn policy_from_spec(spec: &PolicySpec) -> Arc<dyn ModelPolicy> {
             }
             Arc::new(policy)
         }
-    }
+    })
 }
 
 pub fn load_policy_from_path(path: impl AsRef<Path>) -> Result<Arc<dyn ModelPolicy>, String> {
@@ -108,7 +109,63 @@ pub fn load_policy_from_path(path: impl AsRef<Path>) -> Result<Arc<dyn ModelPoli
         .map_err(|e| format!("failed to read policy config: {e}"))?;
     let config: PolicyConfig = serde_json::from_str(&raw)
         .map_err(|e| format!("failed to parse policy config: {e}"))?;
-    Ok(policy_from_spec(&config.policy))
+    policy_from_spec(&config.policy)
+}
+
+fn validate_policy_spec(spec: &PolicySpec) -> Result<(), String> {
+    match spec {
+        PolicySpec::Fixed { model } => {
+            if model.trim().is_empty() {
+                return Err("fixed policy model must be non-empty".to_string());
+            }
+        }
+        PolicySpec::Ladder {
+            high_model,
+            mid_model,
+            low_model,
+            global_error_switch,
+            similarity_ln_ratio,
+            max_pair_std,
+            min_comparisons,
+        } => {
+            if let Some(v) = high_model {
+                if v.trim().is_empty() {
+                    return Err("high_model must be non-empty".to_string());
+                }
+            }
+            if let Some(v) = low_model {
+                if v.trim().is_empty() {
+                    return Err("low_model must be non-empty".to_string());
+                }
+            }
+            if let Some(v) = mid_model {
+                if v.trim().is_empty() {
+                    return Err("mid_model must be non-empty when provided".to_string());
+                }
+            }
+            if let Some(v) = global_error_switch {
+                if !(0.0..=1.0).contains(v) {
+                    return Err("global_error_switch must be in [0,1]".to_string());
+                }
+            }
+            if let Some(v) = similarity_ln_ratio {
+                if *v < 0.0 {
+                    return Err("similarity_ln_ratio must be >= 0".to_string());
+                }
+            }
+            if let Some(v) = max_pair_std {
+                if *v < 0.0 {
+                    return Err("max_pair_std must be >= 0".to_string());
+                }
+            }
+            if let Some(v) = min_comparisons {
+                if *v == 0 {
+                    return Err("min_comparisons must be >= 1".to_string());
+                }
+            }
+        }
+    }
+    Ok(())
 }
 
 #[derive(Debug, Clone)]

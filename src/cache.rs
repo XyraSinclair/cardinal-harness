@@ -13,6 +13,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 pub struct PairwiseCacheKey {
     pub model: String,
     pub prompt_template_slug: String,
+    pub template_hash: String,
     pub attribute_id: String,
     pub attribute_prompt_hash: String,
     pub entity_a_id: String,
@@ -26,6 +27,7 @@ impl PairwiseCacheKey {
     pub fn new(
         model: &str,
         prompt_template_slug: &str,
+        template_hash: &str,
         attribute_id: &str,
         attribute_prompt: &str,
         entity_a_id: &str,
@@ -39,6 +41,7 @@ impl PairwiseCacheKey {
         let key_hash = hash_fields(&[
             model,
             prompt_template_slug,
+            template_hash,
             attribute_id,
             &attribute_prompt_hash,
             entity_a_id,
@@ -50,6 +53,7 @@ impl PairwiseCacheKey {
         Self {
             model: model.to_string(),
             prompt_template_slug: prompt_template_slug.to_string(),
+            template_hash: template_hash.to_string(),
             attribute_id: attribute_id.to_string(),
             attribute_prompt_hash,
             entity_a_id: entity_a_id.to_string(),
@@ -113,6 +117,7 @@ impl SqlitePairwiseCache {
                key_hash TEXT PRIMARY KEY,\
                model TEXT NOT NULL,\
                prompt_template_slug TEXT NOT NULL,\
+               template_hash TEXT NOT NULL,\
                attribute_id TEXT NOT NULL,\
                attribute_prompt_hash TEXT NOT NULL,\
                entity_a_id TEXT NOT NULL,\
@@ -131,6 +136,7 @@ impl SqlitePairwiseCache {
                hit_count INTEGER NOT NULL DEFAULT 0\
              );",
         )?;
+        ensure_column(&conn, "template_hash", "TEXT NOT NULL DEFAULT ''")?;
 
         Ok(Self {
             path,
@@ -160,6 +166,20 @@ impl SqlitePairwiseCache {
         let guard = self.conn.lock().map_err(|_| CacheError::Poisoned)?;
         f(&guard)
     }
+}
+
+fn ensure_column(conn: &Connection, name: &str, spec: &str) -> Result<(), CacheError> {
+    let mut stmt = conn.prepare("PRAGMA table_info(pairwise_cache)")?;
+    let mut rows = stmt.query([])?;
+    while let Some(row) = rows.next()? {
+        let col_name: String = row.get(1)?;
+        if col_name == name {
+            return Ok(());
+        }
+    }
+    let sql = format!("ALTER TABLE pairwise_cache ADD COLUMN {} {}", name, spec);
+    conn.execute(&sql, [])?;
+    Ok(())
 }
 
 #[async_trait]
@@ -214,12 +234,12 @@ impl PairwiseCache for SqlitePairwiseCache {
                 let now = now_epoch();
                 conn.execute(
                     "INSERT INTO pairwise_cache (\
-                        key_hash, model, prompt_template_slug, attribute_id, attribute_prompt_hash,\
+                        key_hash, model, prompt_template_slug, template_hash, attribute_id, attribute_prompt_hash,\
                         entity_a_id, entity_b_id, entity_a_hash, entity_b_hash,\
                         higher_ranked, ratio, confidence, refused,\
                         input_tokens, output_tokens, provider_cost_nanodollars,\
                         created_at, updated_at\
-                     ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18)\
+                     ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19)\
                      ON CONFLICT(key_hash) DO UPDATE SET\
                         higher_ranked = excluded.higher_ranked,\
                         ratio = excluded.ratio,\
@@ -233,6 +253,7 @@ impl PairwiseCache for SqlitePairwiseCache {
                         key.key_hash,
                         key.model,
                         key.prompt_template_slug,
+                        key.template_hash,
                         key.attribute_id,
                         key.attribute_prompt_hash,
                         key.entity_a_id,
@@ -282,6 +303,7 @@ pub struct CacheExportRow {
     pub key_hash: String,
     pub model: String,
     pub prompt_template_slug: String,
+    pub template_hash: String,
     pub attribute_id: String,
     pub attribute_prompt_hash: String,
     pub entity_a_id: String,
@@ -300,6 +322,12 @@ pub struct CacheExportRow {
     pub hit_count: i64,
 }
 
+#[derive(Debug, Clone, Serialize)]
+pub struct CachePruneStats {
+    pub deleted: usize,
+    pub remaining: usize,
+}
+
 impl SqlitePairwiseCache {
     pub async fn export_jsonl(&self, path: impl AsRef<Path>) -> Result<(), CacheError> {
         let path = path.as_ref().to_path_buf();
@@ -307,7 +335,7 @@ impl SqlitePairwiseCache {
         tokio::task::spawn_blocking(move || {
             conn.with_conn(|conn| {
                 let mut stmt = conn.prepare(
-                    "SELECT key_hash, model, prompt_template_slug, attribute_id, attribute_prompt_hash,\n                            entity_a_id, entity_b_id, entity_a_hash, entity_b_hash,\n                            higher_ranked, ratio, confidence, refused,\n                            input_tokens, output_tokens, provider_cost_nanodollars,\n                            created_at, updated_at, hit_count\n                     FROM pairwise_cache ORDER BY updated_at DESC",
+                    "SELECT key_hash, model, prompt_template_slug, template_hash, attribute_id, attribute_prompt_hash,\n                            entity_a_id, entity_b_id, entity_a_hash, entity_b_hash,\n                            higher_ranked, ratio, confidence, refused,\n                            input_tokens, output_tokens, provider_cost_nanodollars,\n                            created_at, updated_at, hit_count\n                     FROM pairwise_cache ORDER BY updated_at DESC",
                 )?;
                 let mut rows = stmt.query([])?;
                 let mut file = std::fs::File::create(path)?;
@@ -316,22 +344,23 @@ impl SqlitePairwiseCache {
                         key_hash: row.get(0)?,
                         model: row.get(1)?,
                         prompt_template_slug: row.get(2)?,
-                        attribute_id: row.get(3)?,
-                        attribute_prompt_hash: row.get(4)?,
-                        entity_a_id: row.get(5)?,
-                        entity_b_id: row.get(6)?,
-                        entity_a_hash: row.get(7)?,
-                        entity_b_hash: row.get(8)?,
-                        higher_ranked: row.get(9)?,
-                        ratio: row.get(10)?,
-                        confidence: row.get(11)?,
-                        refused: row.get::<_, i64>(12)? != 0,
-                        input_tokens: row.get::<_, Option<i64>>(13)?.map(|v| v as u32),
-                        output_tokens: row.get::<_, Option<i64>>(14)?.map(|v| v as u32),
-                        provider_cost_nanodollars: row.get(15)?,
-                        created_at: row.get(16)?,
-                        updated_at: row.get(17)?,
-                        hit_count: row.get(18)?,
+                        template_hash: row.get(3)?,
+                        attribute_id: row.get(4)?,
+                        attribute_prompt_hash: row.get(5)?,
+                        entity_a_id: row.get(6)?,
+                        entity_b_id: row.get(7)?,
+                        entity_a_hash: row.get(8)?,
+                        entity_b_hash: row.get(9)?,
+                        higher_ranked: row.get(10)?,
+                        ratio: row.get(11)?,
+                        confidence: row.get(12)?,
+                        refused: row.get::<_, i64>(13)? != 0,
+                        input_tokens: row.get::<_, Option<i64>>(14)?.map(|v| v as u32),
+                        output_tokens: row.get::<_, Option<i64>>(15)?.map(|v| v as u32),
+                        provider_cost_nanodollars: row.get(16)?,
+                        created_at: row.get(17)?,
+                        updated_at: row.get(18)?,
+                        hit_count: row.get(19)?,
                     };
                     let line = serde_json::to_string(&record)
                         .map_err(|e| CacheError::Serde(e.to_string()))?;
@@ -339,6 +368,60 @@ impl SqlitePairwiseCache {
                     writeln!(file, "{}", line)?;
                 }
                 Ok(())
+            })
+        })
+        .await
+        .map_err(|e| CacheError::Join(e.to_string()))?
+    }
+
+    pub async fn prune(
+        &self,
+        max_age_days: Option<u64>,
+        max_rows: Option<usize>,
+    ) -> Result<CachePruneStats, CacheError> {
+        let conn = self.clone();
+        tokio::task::spawn_blocking(move || {
+            conn.with_conn(|conn| {
+                let mut deleted: usize = 0;
+                if let Some(days) = max_age_days {
+                    let cutoff = now_epoch().saturating_sub((days as i64).saturating_mul(86_400));
+                    let removed = conn.execute(
+                        "DELETE FROM pairwise_cache WHERE updated_at < ?1",
+                        params![cutoff],
+                    )?;
+                    deleted = deleted.saturating_add(removed as usize);
+                }
+
+                if let Some(max_rows) = max_rows {
+                    if max_rows == 0 {
+                        return Ok(CachePruneStats {
+                            deleted,
+                            remaining: 0,
+                        });
+                    }
+                    let count: i64 =
+                        conn.query_row("SELECT COUNT(*) FROM pairwise_cache", [], |row| {
+                            row.get(0)
+                        })?;
+                    let keep = max_rows as i64;
+                    if count > keep {
+                        let removed = conn.execute(
+                            "DELETE FROM pairwise_cache WHERE key_hash IN (\
+                                SELECT key_hash FROM pairwise_cache \
+                                ORDER BY updated_at DESC LIMIT -1 OFFSET ?1\
+                             )",
+                            params![keep],
+                        )?;
+                        deleted = deleted.saturating_add(removed as usize);
+                    }
+                }
+
+                let remaining: i64 =
+                    conn.query_row("SELECT COUNT(*) FROM pairwise_cache", [], |row| row.get(0))?;
+                Ok(CachePruneStats {
+                    deleted,
+                    remaining: remaining.max(0) as usize,
+                })
             })
         })
         .await

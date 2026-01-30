@@ -11,6 +11,10 @@ pub struct ModelPolicyContext<'a> {
     pub comparisons_attempted: usize,
     /// Number of comparisons that yielded observations.
     pub comparisons_used: usize,
+    /// Number of comparisons attempted for this attribute.
+    pub attribute_comparisons_attempted: usize,
+    /// Number of comparisons used (observations) for this attribute.
+    pub attribute_comparisons_used: usize,
     /// Attribute being compared.
     pub attribute_id: &'a str,
     /// Index of entity A.
@@ -79,7 +83,7 @@ impl ModelLadderPolicy {
 
 impl ModelPolicy for ModelLadderPolicy {
     fn select_model(&self, ctx: &ModelPolicyContext<'_>) -> String {
-        if ctx.comparisons_used < self.min_comparisons {
+        if ctx.attribute_comparisons_used < self.min_comparisons {
             return self.high_model.clone();
         }
 
@@ -87,10 +91,14 @@ impl ModelPolicy for ModelLadderPolicy {
             return self.high_model.clone();
         }
 
-        if let Some((delta, pair_std)) = Self::pair_delta_and_std(ctx) {
-            if delta.abs() <= self.similarity_ln_ratio && pair_std <= self.max_pair_std {
-                return self.low_model.clone();
-            }
+        let Some((delta, pair_std)) = Self::pair_delta_and_std(ctx) else {
+            return self.high_model.clone();
+        };
+        if !delta.is_finite() || !pair_std.is_finite() {
+            return self.high_model.clone();
+        }
+        if delta.abs() <= self.similarity_ln_ratio && pair_std <= self.max_pair_std {
+            return self.low_model.clone();
         }
 
         if let Some(mid) = &self.mid_model {

@@ -341,6 +341,12 @@ pub async fn multi_rerank<U: UsageSink>(
         .comparison_budget
         .unwrap_or_else(|| default_comparison_budget(n_entities, n_attributes));
     let latency_budget = req.latency_budget_ms.map(Duration::from_millis);
+    let cache_only = run_options.map(|o| o.cache_only).unwrap_or(false);
+    if cache_only && cache.is_none() {
+        return Err(MultiRerankError::InvalidRequest(
+            "cache_only requires a cache instance".into(),
+        ));
+    }
 
     let base_model = req.model.as_deref().unwrap_or(DEFAULT_MODEL);
     let rater_id = req.rater_id.as_deref().unwrap_or(base_model);
@@ -422,6 +428,10 @@ pub async fn multi_rerank<U: UsageSink>(
     let mut comparisons_attempted: usize = 0;
     let mut comparisons_used: usize = 0;
     let mut comparisons_refused: usize = 0;
+    let mut comparisons_cached: usize = 0;
+
+    let mut attribute_attempted: Vec<usize> = vec![0; n_attributes];
+    let mut attribute_used: Vec<usize> = vec![0; n_attributes];
 
     let mut provider_input_tokens: u32 = 0;
     let mut provider_output_tokens: u32 = 0;
@@ -565,6 +575,8 @@ pub async fn multi_rerank<U: UsageSink>(
                 global_topk_error: current_error,
                 comparisons_attempted: comparisons_attempted_snapshot,
                 comparisons_used: comparisons_used_snapshot,
+                attribute_comparisons_attempted: attribute_attempted[task.attr_idx],
+                attribute_comparisons_used: attribute_used[task.attr_idx],
                 attribute_id: &attr.id,
                 i: task.i,
                 j: task.j,
@@ -580,6 +592,7 @@ pub async fn multi_rerank<U: UsageSink>(
                 let judgement = compare_pair(
                     gateway.as_ref(),
                     cache,
+                    cache_only,
                     &selected_model,
                     &attr.id,
                     &attr.prompt,
@@ -600,11 +613,15 @@ pub async fn multi_rerank<U: UsageSink>(
 
         for (task, judgement, selected_model) in batch_results {
             comparisons_attempted += 1;
+            attribute_attempted[task.attr_idx] = attribute_attempted[task.attr_idx].saturating_add(1);
             models_used.insert(selected_model);
             let attr_id = req.attributes[task.attr_idx].id.as_str();
 
             match judgement {
                 Ok((PairwiseJudgement::Refused, usage)) => {
+                    if usage.cached {
+                        comparisons_cached += 1;
+                    }
                     provider_input_tokens =
                         provider_input_tokens.saturating_add(usage.input_tokens);
                     provider_output_tokens =
@@ -622,6 +639,9 @@ pub async fn multi_rerank<U: UsageSink>(
                 },
                     usage,
                 )) => {
+                    if usage.cached {
+                        comparisons_cached += 1;
+                    }
                     provider_input_tokens =
                         provider_input_tokens.saturating_add(usage.input_tokens);
                     provider_output_tokens =
@@ -641,11 +661,16 @@ pub async fn multi_rerank<U: UsageSink>(
                         );
                     } else {
                         comparisons_used += 1;
+                        attribute_used[task.attr_idx] =
+                            attribute_used[task.attr_idx].saturating_add(1);
                     }
                     *pair_repeats.entry(task.key).or_insert(0.0) += 1.0;
 
                 }
                 Err(e) => {
+                    if cache_only {
+                        return Err(MultiRerankError::Comparison(e));
+                    }
                     tracing::warn!(
                         attribute_id = %attr_id,
                         i = task.i,
@@ -828,6 +853,7 @@ pub async fn multi_rerank<U: UsageSink>(
         comparisons_attempted,
         comparisons_used,
         comparisons_refused,
+        comparisons_cached,
         comparison_budget,
         latency_ms,
         model_used: if models_used.len() <= 1 {

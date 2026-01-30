@@ -18,6 +18,7 @@ pub struct RerankReportOptions {
     pub include_attribute_scores: bool,
     pub rng_seed: Option<u64>,
     pub model_policy: Option<String>,
+    pub cache_only: bool,
 }
 
 impl Default for RerankReportOptions {
@@ -28,6 +29,7 @@ impl Default for RerankReportOptions {
             include_attribute_scores: true,
             rng_seed: None,
             model_policy: None,
+            cache_only: false,
         }
     }
 }
@@ -51,6 +53,7 @@ pub struct ReportSummary {
     pub comparisons_attempted: usize,
     pub comparisons_used: usize,
     pub comparisons_refused: usize,
+    pub comparisons_cached: usize,
     pub comparison_budget: usize,
     pub latency_ms: u128,
     pub model_used: String,
@@ -81,6 +84,7 @@ pub struct ReportEntity {
 pub struct ReportStamp {
     pub rng_seed: Option<u64>,
     pub model_policy: Option<String>,
+    pub cache_only: bool,
 }
 
 pub fn build_report(
@@ -116,6 +120,7 @@ pub fn build_report(
         run_stamp: ReportStamp {
             rng_seed: opts.rng_seed,
             model_policy: opts.model_policy.clone(),
+            cache_only: opts.cache_only,
         },
     }
 }
@@ -130,6 +135,7 @@ impl ReportSummary {
             comparisons_attempted: meta.comparisons_attempted,
             comparisons_used: meta.comparisons_used,
             comparisons_refused: meta.comparisons_refused,
+            comparisons_cached: meta.comparisons_cached,
             comparison_budget: meta.comparison_budget,
             latency_ms: meta.latency_ms,
             model_used: meta.model_used.clone(),
@@ -182,10 +188,11 @@ pub fn render_report_markdown(report: &RerankReport) -> String {
         report.summary.tolerated_error
     ));
     out.push_str(&format!(
-        "- Comparisons used/attempted/refused: {}/{}/{}\n",
+        "- Comparisons used/attempted/refused/cached: {}/{}/{}/{}\n",
         report.summary.comparisons_used,
         report.summary.comparisons_attempted,
-        report.summary.comparisons_refused
+        report.summary.comparisons_refused,
+        report.summary.comparisons_cached
     ));
     out.push_str(&format!("- Model used: {}\n", report.summary.model_used));
     out.push_str(&format!("- Rater ID: {}\n", report.summary.rater_id_used));
@@ -195,6 +202,9 @@ pub fn render_report_markdown(report: &RerankReport) -> String {
     }
     if let Some(policy) = &report.run_stamp.model_policy {
         out.push_str(&format!("- Model policy: {}\n", policy));
+    }
+    if report.run_stamp.cache_only {
+        out.push_str("- Cache-only mode: true\n");
     }
 
     out.push_str("\n## Attributes\n\n");

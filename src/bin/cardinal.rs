@@ -31,6 +31,15 @@ enum Commands {
         #[arg(long)]
         out: PathBuf,
     },
+    /// Prune SQLite cache (by age and/or size)
+    CachePrune {
+        #[arg(long)]
+        db: Option<PathBuf>,
+        #[arg(long)]
+        max_age_days: Option<u64>,
+        #[arg(long)]
+        max_rows: Option<usize>,
+    },
     /// List or load model policies
     Policy {
         #[command(subcommand)]
@@ -65,6 +74,8 @@ enum Commands {
         rng_seed: Option<u64>,
         #[arg(long)]
         policy: Option<String>,
+        #[arg(long)]
+        cache_only: bool,
     },
     /// Run a rerank from JSON input (LLM calls)
     Rerank {
@@ -76,6 +87,8 @@ enum Commands {
         cache: Option<PathBuf>,
         #[arg(long)]
         lock_cache: bool,
+        #[arg(long)]
+        cache_only: bool,
         #[arg(long)]
         policy: Option<String>,
         #[arg(long)]
@@ -105,6 +118,26 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let path = db.unwrap_or_else(SqlitePairwiseCache::default_path);
             let cache = SqlitePairwiseCache::new(path)?;
             cache.export_jsonl(out).await?;
+        }
+        Commands::CachePrune {
+            db,
+            max_age_days,
+            max_rows,
+        } => {
+            if max_age_days.is_none() && max_rows.is_none() {
+                return Err("cache-prune requires --max-age-days and/or --max-rows".into());
+            }
+            if matches!(max_rows, Some(0)) {
+                return Err("--max-rows must be >= 1".into());
+            }
+            let path = db.unwrap_or_else(SqlitePairwiseCache::default_path);
+            let cache = SqlitePairwiseCache::new(path)?;
+            let _lock = cache.lock_exclusive()?;
+            let stats = cache.prune(max_age_days, max_rows).await?;
+            println!(
+                "pruned {} rows; {} rows remain",
+                stats.deleted, stats.remaining
+            );
         }
         Commands::Policy { command } => match command {
             PolicyCommands::List => {
@@ -146,6 +179,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             no_attr_scores,
             rng_seed,
             policy,
+            cache_only,
         } => {
             let req: MultiRerankRequest = read_json(&request)?;
             let resp: MultiRerankResponse = read_json(&response)?;
@@ -155,6 +189,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 include_attribute_scores: !no_attr_scores,
                 rng_seed,
                 model_policy: policy,
+                cache_only,
             };
             let report = build_report(&req, &resp, &opts);
             if format == "json" {
@@ -170,6 +205,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             out,
             cache,
             lock_cache,
+            cache_only,
             policy,
             policy_config,
             rng_seed,
@@ -184,12 +220,22 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 Some(load_policy_from_path(path)?)
             } else if let Some(name) = policy {
                 let registry = PolicyRegistry::default();
-                registry.get(&name)
+                match registry.get(&name) {
+                    Some(policy) => Some(policy),
+                    None => {
+                        let available = registry.list().join(", ");
+                        return Err(format!(
+                            "unknown policy '{}'; available policies: {}",
+                            name, available
+                        )
+                        .into());
+                    }
+                }
             } else {
                 None
             };
 
-            let options = RerankRunOptions { rng_seed };
+            let options = RerankRunOptions { rng_seed, cache_only };
             let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
             let resp = cardinal_harness::rerank::multi_rerank(
                 Arc::new(gateway),
@@ -211,6 +257,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     include_attribute_scores: true,
                     rng_seed,
                     model_policy: policy_obj.and_then(|p| p.describe()),
+                    cache_only,
                 };
                 let report = build_report(&req, &resp, &opts);
                 let markdown = render_report_markdown(&report);

@@ -9,7 +9,7 @@ LLMs-as-judge harness for cardinal latents via pairwise ratio comparisons and mu
 - Multi-attribute utility with gates + weighted top-k focus
 - Dynamic query planning: propose only the most informative pairs
 - Stopping rules based on global top-k uncertainty
-- SQLite cache for pairwise judgements
+- SQLite cache for pairwise judgements (with cache-hit reporting)
 - OpenRouter for model access
 
 The goal is to expose a clean, reusable research-grade core while staying practical for real use.
@@ -36,7 +36,7 @@ use cardinal_harness::gateway::NoopUsageSink;
 let cache = SqlitePairwiseCache::new(SqlitePairwiseCache::default_path())?;
 let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
 let model_policy = Arc::new(ModelLadderPolicy::default());
-let run_options = RerankRunOptions { rng_seed: None };
+let run_options = RerankRunOptions { rng_seed: None, cache_only: false };
 
 let req = MultiRerankRequest {
     entities: vec![
@@ -91,6 +91,7 @@ println!("stop_reason: {:?}", resp.meta.stop_reason);
 The cache stores judgements keyed on:
 - model
 - prompt template slug
+- prompt template hash
 - attribute id + prompt hash
 - entity ids + text hashes
 
@@ -98,6 +99,13 @@ This avoids repeated LLM calls across runs. Set a custom path via:
 
 ```bash
 export CARDINAL_CACHE_PATH=/path/to/cache.sqlite
+```
+
+Prune the cache by age or size:
+
+```bash
+cargo run --bin cardinal -- cache-prune --max-age-days 30
+cargo run --bin cardinal -- cache-prune --max-rows 100000
 ```
 
 ## Models
@@ -129,8 +137,15 @@ See `docs/ALGORITHM.md` for a short algorithm sketch.
 # Export cache to JSONL
 cargo run --bin cardinal -- cache-export --out cache.jsonl
 
+# Prune cache by age or size
+cargo run --bin cardinal -- cache-prune --max-age-days 30
+cargo run --bin cardinal -- cache-prune --max-rows 100000
+
 # List built-in policies
 cargo run --bin cardinal -- policy list
+
+# Load a policy config (JSON)
+cargo run --bin cardinal -- policy load --config policy.json
 
 # Run synthetic evals (JSONL) and emit a CSV error curve
 cargo run --bin cardinal -- eval --out eval.jsonl --curve-csv curves.csv
@@ -138,8 +153,8 @@ cargo run --bin cardinal -- eval --out eval.jsonl --curve-csv curves.csv
 # Generate a report from request/response JSON
 cargo run --bin cardinal -- report --request request.json --response response.json --out report.md
 
-# Run a reproducible rerank with cache locking + seed
-cargo run --bin cardinal -- rerank --request request.json --out response.json --lock-cache --rng-seed 1337 --report report.md
+# Run a reproducible rerank with cache locking + seed (no network calls)
+cargo run --bin cardinal -- rerank --request request.json --out response.json --lock-cache --cache-only --rng-seed 1337 --report report.md
 ```
 
 ## License
