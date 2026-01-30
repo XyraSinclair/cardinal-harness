@@ -28,6 +28,7 @@ use cardinal_harness::{
 use cardinal_harness::rerank::{
     MultiRerankAttributeSpec, MultiRerankEntity, MultiRerankRequest, MultiRerankTopKSpec,
     ModelLadderPolicy,
+    RerankRunOptions,
 };
 use cardinal_harness::gateway::NoopUsageSink;
 
@@ -35,6 +36,7 @@ use cardinal_harness::gateway::NoopUsageSink;
 let cache = SqlitePairwiseCache::new(SqlitePairwiseCache::default_path())?;
 let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
 let model_policy = Arc::new(ModelLadderPolicy::default());
+let run_options = RerankRunOptions { rng_seed: None };
 
 let req = MultiRerankRequest {
     entities: vec![
@@ -73,6 +75,7 @@ let resp = cardinal_harness::rerank::multi_rerank(
     Arc::new(gateway),
     Some(&cache),
     Some(model_policy),
+    Some(&run_options),
     req,
     attribution,
     None,
@@ -119,6 +122,25 @@ Tune thresholds to your domain if you want more (or less) aggressive switching.
 - `gateway`: OpenRouter client + usage tracking
 
 See `docs/ALGORITHM.md` for a short algorithm sketch.
+
+## CLI
+
+```bash
+# Export cache to JSONL
+cargo run --bin cardinal -- cache-export --out cache.jsonl
+
+# List built-in policies
+cargo run --bin cardinal -- policy list
+
+# Run synthetic evals (JSONL) and emit a CSV error curve
+cargo run --bin cardinal -- eval --out eval.jsonl --curve-csv curves.csv
+
+# Generate a report from request/response JSON
+cargo run --bin cardinal -- report --request request.json --response response.json --out report.md
+
+# Run a reproducible rerank with cache locking + seed
+cargo run --bin cardinal -- rerank --request request.json --out response.json --lock-cache --rng-seed 1337 --report report.md
+```
 
 ## License
 

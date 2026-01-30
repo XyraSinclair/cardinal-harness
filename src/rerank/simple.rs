@@ -9,6 +9,7 @@ use crate::cache::PairwiseCache;
 use crate::gateway::{Attribution, ProviderGateway, UsageSink};
 
 use super::model_policy::ModelPolicy;
+use super::options::RerankRunOptions;
 use super::multi::{multi_rerank, MultiRerankError};
 use super::types::{
     MultiRerankAttributeSpec, MultiRerankEntity, MultiRerankRequest, MultiRerankTopKSpec,
@@ -81,6 +82,7 @@ pub async fn rerank<U: UsageSink>(
     gateway: Arc<ProviderGateway<U>>,
     cache: Option<&dyn PairwiseCache>,
     model_policy: Option<Arc<dyn ModelPolicy>>,
+    run_options: Option<&RerankRunOptions>,
     req: RerankRequest,
     attribution: Attribution,
 ) -> Result<RerankResponse, MultiRerankError> {
@@ -88,7 +90,8 @@ pub async fn rerank<U: UsageSink>(
 
     // Call multi_rerank for the single-attribute wrapper.
     let multi_resp =
-        multi_rerank(gateway, cache, model_policy, multi_req, attribution, None).await?;
+        multi_rerank(gateway, cache, model_policy, run_options, multi_req, attribution, None)
+            .await?;
 
     // Map response to simple format
     let results: Vec<RerankResult> = multi_resp

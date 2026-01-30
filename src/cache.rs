@@ -2,7 +2,9 @@
 
 use async_trait::async_trait;
 use blake3;
+use fs2::FileExt;
 use rusqlite::{params, Connection};
+use serde::Serialize;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -74,10 +76,14 @@ pub struct CachedJudgement {
 pub enum CacheError {
     #[error("sqlite error: {0}")]
     Sqlite(#[from] rusqlite::Error),
+    #[error("io error: {0}")]
+    Io(#[from] std::io::Error),
     #[error("cache lock poisoned")]
     Poisoned,
     #[error("task join error: {0}")]
     Join(String),
+    #[error("serialization error: {0}")]
+    Serde(String),
 }
 
 #[async_trait]
@@ -141,6 +147,10 @@ impl SqlitePairwiseCache {
 
     pub fn path(&self) -> &Path {
         &self.path
+    }
+
+    pub fn lock_exclusive(&self) -> Result<CacheLock, CacheError> {
+        CacheLock::new(&self.path)
     }
 
     fn with_conn<F, R>(&self, f: F) -> Result<R, CacheError>
@@ -240,6 +250,94 @@ impl PairwiseCache for SqlitePairwiseCache {
                         now,
                     ],
                 )?;
+                Ok(())
+            })
+        })
+        .await
+        .map_err(|e| CacheError::Join(e.to_string()))?
+    }
+}
+
+#[derive(Debug)]
+pub struct CacheLock {
+    _file: std::fs::File,
+}
+
+impl CacheLock {
+    fn new(db_path: &Path) -> Result<Self, CacheError> {
+        let mut lock_path = db_path.to_path_buf();
+        lock_path.set_extension("lock");
+        let file = std::fs::OpenOptions::new()
+            .create(true)
+            .read(true)
+            .write(true)
+            .open(lock_path)?;
+        file.lock_exclusive()?;
+        Ok(Self { _file: file })
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct CacheExportRow {
+    pub key_hash: String,
+    pub model: String,
+    pub prompt_template_slug: String,
+    pub attribute_id: String,
+    pub attribute_prompt_hash: String,
+    pub entity_a_id: String,
+    pub entity_b_id: String,
+    pub entity_a_hash: String,
+    pub entity_b_hash: String,
+    pub higher_ranked: Option<String>,
+    pub ratio: Option<f64>,
+    pub confidence: Option<f64>,
+    pub refused: bool,
+    pub input_tokens: Option<u32>,
+    pub output_tokens: Option<u32>,
+    pub provider_cost_nanodollars: Option<i64>,
+    pub created_at: i64,
+    pub updated_at: i64,
+    pub hit_count: i64,
+}
+
+impl SqlitePairwiseCache {
+    pub async fn export_jsonl(&self, path: impl AsRef<Path>) -> Result<(), CacheError> {
+        let path = path.as_ref().to_path_buf();
+        let conn = self.clone();
+        tokio::task::spawn_blocking(move || {
+            conn.with_conn(|conn| {
+                let mut stmt = conn.prepare(
+                    "SELECT key_hash, model, prompt_template_slug, attribute_id, attribute_prompt_hash,\n                            entity_a_id, entity_b_id, entity_a_hash, entity_b_hash,\n                            higher_ranked, ratio, confidence, refused,\n                            input_tokens, output_tokens, provider_cost_nanodollars,\n                            created_at, updated_at, hit_count\n                     FROM pairwise_cache ORDER BY updated_at DESC",
+                )?;
+                let mut rows = stmt.query([])?;
+                let mut file = std::fs::File::create(path)?;
+                while let Some(row) = rows.next()? {
+                    let record = CacheExportRow {
+                        key_hash: row.get(0)?,
+                        model: row.get(1)?,
+                        prompt_template_slug: row.get(2)?,
+                        attribute_id: row.get(3)?,
+                        attribute_prompt_hash: row.get(4)?,
+                        entity_a_id: row.get(5)?,
+                        entity_b_id: row.get(6)?,
+                        entity_a_hash: row.get(7)?,
+                        entity_b_hash: row.get(8)?,
+                        higher_ranked: row.get(9)?,
+                        ratio: row.get(10)?,
+                        confidence: row.get(11)?,
+                        refused: row.get::<_, i64>(12)? != 0,
+                        input_tokens: row.get::<_, Option<i64>>(13)?.map(|v| v as u32),
+                        output_tokens: row.get::<_, Option<i64>>(14)?.map(|v| v as u32),
+                        provider_cost_nanodollars: row.get(15)?,
+                        created_at: row.get(16)?,
+                        updated_at: row.get(17)?,
+                        hit_count: row.get(18)?,
+                    };
+                    let line = serde_json::to_string(&record)
+                        .map_err(|e| CacheError::Serde(e.to_string()))?;
+                    use std::io::Write;
+                    writeln!(file, "{}", line)?;
+                }
                 Ok(())
             })
         })

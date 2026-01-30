@@ -83,7 +83,7 @@ fn default_tolerated_error() -> f64 {
 }
 
 /// Per-document result in the rerank response.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct RerankResult {
     /// Document identifier.
     pub id: String,
@@ -102,7 +102,7 @@ pub struct RerankResult {
 }
 
 /// Metadata for a rerank response.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct RerankMeta {
     /// Estimated top-k error (sum of p_flip in band).
     pub topk_error: f64,
@@ -134,7 +134,7 @@ pub struct RerankMeta {
 }
 
 /// Response for single-attribute reranking.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct RerankResponse {
     /// Ranked results, sorted by descending latent_mean.
     pub results: Vec<RerankResult>,
@@ -147,7 +147,7 @@ pub struct RerankResponse {
 // =============================================================================
 
 /// Why the rerank loop stopped.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum RerankStopReason {
     /// Current top-k error is <= tolerated_error.
@@ -253,7 +253,7 @@ fn default_gate_unit() -> String {
 }
 
 /// Request for multi-attribute reranking.
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct MultiRerankRequest {
     /// Entities to rerank.
     pub entities: Vec<MultiRerankEntity>,
@@ -297,7 +297,7 @@ pub struct MultiRerankRequest {
 }
 
 /// Per-attribute score summary.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AttributeScoreSummary {
     /// Posterior mean in latent space.
     pub latent_mean: f64,
@@ -312,7 +312,7 @@ pub struct AttributeScoreSummary {
 }
 
 /// Per-entity result in multi-rerank response.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct MultiRerankEntityResult {
     /// Entity identifier.
     pub id: String,
@@ -331,7 +331,7 @@ pub struct MultiRerankEntityResult {
 }
 
 /// Metadata for multi-rerank response.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct MultiRerankMeta {
     /// Global top-k error (frontier inversion bound).
     pub global_topk_error: f64,
@@ -367,7 +367,7 @@ pub struct MultiRerankMeta {
 }
 
 /// Response for multi-attribute reranking.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct MultiRerankResponse {
     /// Ranked entities.
     pub entities: Vec<MultiRerankEntityResult>,

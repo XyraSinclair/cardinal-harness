@@ -26,6 +26,10 @@ pub struct ModelPolicyContext<'a> {
 /// Policy that chooses a model for each comparison.
 pub trait ModelPolicy: Send + Sync {
     fn select_model(&self, ctx: &ModelPolicyContext<'_>) -> String;
+
+    fn describe(&self) -> Option<String> {
+        None
+    }
 }
 
 /// A simple 3-tier ladder policy (high → mid → low) based on uncertainty.
@@ -94,6 +98,10 @@ impl ModelPolicy for ModelLadderPolicy {
         }
 
         self.low_model.clone()
+    }
+
+    fn describe(&self) -> Option<String> {
+        Some(self.to_string())
     }
 }
 

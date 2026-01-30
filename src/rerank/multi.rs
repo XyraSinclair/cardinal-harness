@@ -41,6 +41,7 @@ use super::comparison::{
     PAIRWISE_MAX_OUTPUT_TOKENS_DEFAULT,
 };
 use super::model_policy::{ModelPolicy, ModelPolicyContext};
+use super::options::RerankRunOptions;
 use super::types::{
     AttributeScoreSummary, HigherRanked, MultiRerankEntityResult, MultiRerankMeta,
     MultiRerankRequest, MultiRerankResponse, PairwiseJudgement, RerankStopReason,
@@ -326,6 +327,7 @@ pub async fn multi_rerank<U: UsageSink>(
     gateway: Arc<ProviderGateway<U>>,
     cache: Option<&dyn PairwiseCache>,
     model_policy: Option<Arc<dyn ModelPolicy>>,
+    run_options: Option<&RerankRunOptions>,
     req: MultiRerankRequest,
     attribution: Attribution,
     cancel_flag: Option<&AtomicBool>,
@@ -386,6 +388,11 @@ pub async fn multi_rerank<U: UsageSink>(
     raters.insert(rater_id.to_string(), RaterParams::default());
 
     let mut engine_cfg = EngineConfig::default();
+    if let Some(options) = run_options {
+        if let Some(seed) = options.rng_seed {
+            engine_cfg.rng_seed = seed;
+        }
+    }
     engine_cfg.rank_weight_exponent = topk_cfg.weight_exponent;
     engine_cfg.top_k = Some(topk_cfg.k);
     if topk_cfg.k > 0 {

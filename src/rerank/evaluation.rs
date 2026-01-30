@@ -47,7 +47,7 @@ pub struct SyntheticCase {
     pub seed: u64,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct EvaluationMetrics {
     pub kendall_tau: f64,
     pub spearman_rho: f64,
@@ -65,7 +65,7 @@ pub struct EvaluationMetrics {
     pub latency_ms: u128,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct EvaluationResult {
     pub case_name: String,
     pub metrics: EvaluationMetrics,

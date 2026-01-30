@@ -15,6 +15,7 @@ target
 
 # Local pairwise cache
 .cardinal_pairwise_cache.sqlite
+.cardinal_pairwise_cache.lock
 
 # RustRover
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
