@@ -20,6 +20,8 @@ use crate::trait_search::{
     TraitSearchManager,
 };
 
+type AttrUnits = (Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>);
+
 // =============================================================================
 // Synthetic case definitions
 // =============================================================================
@@ -156,12 +158,7 @@ pub fn synthetic_cases() -> Vec<SyntheticCase> {
             attributes: vec![SyntheticAttribute {
                 id: "attr_cluster",
                 weight: 1.0,
-                scores: [
-                    vec![10.0; 10],
-                    vec![5.0; 10],
-                    vec![0.0; 10],
-                ]
-                .concat(),
+                scores: [vec![10.0; 10], vec![5.0; 10], vec![0.0; 10]].concat(),
             }],
             gates: vec![],
             topk: default_topk(10),
@@ -252,11 +249,7 @@ pub fn run_synthetic_suite(filter: Option<&str>) -> Vec<EvaluationResult> {
 pub fn run_synthetic_case(case: &SyntheticCase) -> EvaluationResult {
     let mut rng = StdRng::seed_from_u64(case.seed);
 
-    let n_entities = case
-        .attributes
-        .first()
-        .map(|a| a.scores.len())
-        .unwrap_or(0);
+    let n_entities = case.attributes.first().map(|a| a.scores.len()).unwrap_or(0);
 
     let n_attributes = case.attributes.len();
     let comparison_budget = case
@@ -283,7 +276,14 @@ pub fn run_synthetic_case(case: &SyntheticCase) -> EvaluationResult {
     let gates_cfg: Vec<GateSpec> = case
         .gates
         .iter()
-        .map(|g| GateSpec::new(&g.attribute_id, g.unit.to_ascii_lowercase(), &g.op, g.threshold))
+        .map(|g| {
+            GateSpec::new(
+                &g.attribute_id,
+                g.unit.to_ascii_lowercase(),
+                &g.op,
+                g.threshold,
+            )
+        })
         .collect();
 
     let config = TraitSearchConfig::new(n_entities, attributes_cfg, topk_cfg.clone(), gates_cfg);
@@ -293,9 +293,11 @@ pub fn run_synthetic_case(case: &SyntheticCase) -> EvaluationResult {
     let rater_id = "sim";
     raters.insert(rater_id.to_string(), RaterParams::default());
 
-    let mut engine_cfg = EngineConfig::default();
-    engine_cfg.rank_weight_exponent = topk_cfg.weight_exponent;
-    engine_cfg.top_k = Some(topk_cfg.k);
+    let mut engine_cfg = EngineConfig {
+        rank_weight_exponent: topk_cfg.weight_exponent,
+        top_k: Some(topk_cfg.k),
+        ..Default::default()
+    };
     if topk_cfg.k > 0 {
         let tail_weight =
             (1.0 / (topk_cfg.k as f64).powf(topk_cfg.weight_exponent)).clamp(0.05, 1.0);
@@ -364,7 +366,9 @@ pub fn run_synthetic_case(case: &SyntheticCase) -> EvaluationResult {
                     if manager.add_observation(attr_truth.id, obs).is_ok() {
                         comparisons_used += 1;
                     }
-                    *pair_repeats.entry((attr_idx, i.min(j), i.max(j))).or_insert(0.0) += 1.0;
+                    *pair_repeats
+                        .entry((attr_idx, i.min(j), i.max(j)))
+                        .or_insert(0.0) += 1.0;
                 } else {
                     comparisons_refused += 1;
                 }
@@ -445,7 +449,12 @@ pub fn run_synthetic_case(case: &SyntheticCase) -> EvaluationResult {
                 }
             }
 
-            tasks.push(CompareTask { key, attr_idx, i, j });
+            tasks.push(CompareTask {
+                key,
+                attr_idx,
+                i,
+                j,
+            });
             if tasks.len() >= batch_size {
                 break;
             }
@@ -563,7 +572,6 @@ pub fn run_synthetic_case(case: &SyntheticCase) -> EvaluationResult {
         (precision, recall)
     };
 
-
     EvaluationResult {
         case_name: case.name.to_string(),
         metrics: EvaluationMetrics {
@@ -657,8 +665,7 @@ fn simulate_pairwise(
         1.0 / ratio_raw
     };
 
-    let mut confidence =
-        confidence_from_signal((ratio.ln()).abs(), scale.max(1e-6), noise_sigma);
+    let mut confidence = confidence_from_signal((ratio.ln()).abs(), scale.max(1e-6), noise_sigma);
 
     if outlier_rate > 0.0 && rng.gen::<f64>() < outlier_rate {
         higher_ranked = match higher_ranked {
@@ -701,19 +708,22 @@ fn compute_ground_truth_scores(attributes: &[SyntheticAttribute]) -> Vec<f64> {
     for attr in attributes {
         let (scale, _, _, _) = compute_attribute_units(&attr.scores);
         let inv_scale = 1.0 / scale.max(1e-6);
-        for i in 0..n {
-            u[i] += attr.weight * (attr.scores[i] * inv_scale);
+        for (u_i, &score) in u.iter_mut().zip(attr.scores.iter()) {
+            *u_i += attr.weight * (score * inv_scale);
         }
     }
 
     u
 }
 
-fn compute_true_feasible(attributes: &[SyntheticAttribute], gates: &[MultiRerankGateSpec]) -> Vec<bool> {
+fn compute_true_feasible(
+    attributes: &[SyntheticAttribute],
+    gates: &[MultiRerankGateSpec],
+) -> Vec<bool> {
     let n = attributes.first().map(|a| a.scores.len()).unwrap_or(0);
     let mut feasible = vec![true; n];
 
-    let mut attr_units: HashMap<&str, (Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>)> = HashMap::new();
+    let mut attr_units: HashMap<&str, AttrUnits> = HashMap::new();
     for attr in attributes {
         let (_scale, z, min_norm, pct) = compute_attribute_units(&attr.scores);
         attr_units.insert(attr.id, (attr.scores.clone(), z, min_norm, pct));
@@ -835,12 +845,7 @@ fn ranks_with_ties(scores: &[f64]) -> Vec<f64> {
     ranks
 }
 
-fn topk_precision(
-    pred_scores: &[f64],
-    true_scores: &[f64],
-    indices: &[usize],
-    k: usize,
-) -> f64 {
+fn topk_precision(pred_scores: &[f64], true_scores: &[f64], indices: &[usize], k: usize) -> f64 {
     let pred_set = topk_set(pred_scores, indices, k, false);
     let true_set = topk_set(true_scores, indices, k, true);
     if pred_set.is_empty() {
@@ -850,12 +855,7 @@ fn topk_precision(
     inter as f64 / pred_set.len() as f64
 }
 
-fn topk_recall(
-    pred_scores: &[f64],
-    true_scores: &[f64],
-    indices: &[usize],
-    k: usize,
-) -> f64 {
+fn topk_recall(pred_scores: &[f64], true_scores: &[f64], indices: &[usize], k: usize) -> f64 {
     let pred_set = topk_set(pred_scores, indices, k, false);
     let true_set = topk_set(true_scores, indices, k, true);
     if true_set.is_empty() {
@@ -865,12 +865,7 @@ fn topk_recall(
     inter as f64 / true_set.len() as f64
 }
 
-fn topk_set(
-    scores: &[f64],
-    indices: &[usize],
-    k: usize,
-    include_ties: bool,
-) -> HashSet<usize> {
+fn topk_set(scores: &[f64], indices: &[usize], k: usize, include_ties: bool) -> HashSet<usize> {
     if indices.is_empty() || k == 0 {
         return HashSet::new();
     }

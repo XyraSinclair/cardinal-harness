@@ -83,7 +83,7 @@ impl OpenRouterAdapter {
         let mut headers = HeaderMap::new();
         headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
 
-        let auth_value = HeaderValue::from_str(&format!("Bearer {}", api_key))
+        let auth_value = HeaderValue::from_str(&format!("Bearer {api_key}"))
             .map_err(|_| ProviderError::config("Invalid API key format"))?;
         headers.insert(AUTHORIZATION, auth_value);
 
@@ -104,7 +104,7 @@ impl OpenRouterAdapter {
             .default_headers(headers)
             .gzip(true)
             .build()
-            .map_err(|e| ProviderError::config(format!("Failed to create HTTP client: {}", e)))?;
+            .map_err(|e| ProviderError::config(format!("Failed to create HTTP client: {e}")))?;
 
         Ok(Self { client, base_url })
     }
@@ -245,8 +245,7 @@ impl ChatProvider for OpenRouterAdapter {
 
         if total_chars > MAX_INPUT_CHARS {
             return Err(ProviderError::invalid_request(format!(
-                "Input too large: {} chars (max {})",
-                total_chars, MAX_INPUT_CHARS
+                "Input too large: {total_chars} chars (max {MAX_INPUT_CHARS})"
             )));
         }
 
@@ -285,7 +284,7 @@ impl ChatProvider for OpenRouterAdapter {
             if new_len > MAX_RESPONSE_LEN {
                 return Err(ProviderError::provider(
                     "openrouter",
-                    format!("Response too large: {} bytes", new_len),
+                    format!("Response too large: {new_len} bytes"),
                     false,
                 ));
             }
@@ -334,7 +333,7 @@ impl ChatProvider for OpenRouterAdapter {
         }
 
         let parsed: ChatApiResponse = serde_json::from_str(&body).map_err(|e| {
-            ProviderError::provider("openrouter", format!("Invalid JSON: {}", e), false)
+            ProviderError::provider("openrouter", format!("Invalid JSON: {e}"), false)
         })?;
 
         // Check for API-level error
@@ -356,10 +355,10 @@ impl ChatProvider for OpenRouterAdapter {
 
         let mut content = choice
             .message
-            .and_then(|m| {
+            .map(|m| {
                 let content = m.content.unwrap_or_default();
                 if !content.trim().is_empty() {
-                    return Some(content);
+                    return content;
                 }
 
                 // Some providers/models emit structured output via tool calls even when
@@ -372,7 +371,7 @@ impl ChatProvider for OpenRouterAdapter {
                     .find(|s| !s.trim().is_empty())
                     .unwrap_or_default();
 
-                Some(args)
+                args
             })
             .unwrap_or_default();
 

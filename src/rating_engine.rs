@@ -35,6 +35,19 @@ const MAX_REPS: f64 = 1000.0;
 /// When the reduced system is small, compute exact diag(L^-1) via Cholesky solves.
 const EXACT_DIAG_MAX_DIM: usize = 256;
 
+type IrlsHuberSolveResult = (
+    Vec<f64>,
+    Vec<f64>,
+    Vec<f64>,
+    Vec<f64>,
+    Option<Cholesky<f64, nalgebra::Dyn>>,
+    bool,
+);
+
+type FuseBucketKey = (usize, usize);
+type FuseBucketEntry = (f64, f64, String);
+type FuseBuckets = HashMap<FuseBucketKey, Vec<FuseBucketEntry>>;
+
 // ---------------------------------------------------------------------
 //  Config
 // ---------------------------------------------------------------------
@@ -573,7 +586,11 @@ fn hutchinson_diag(
             // weakly connected Laplacian). This is conservative but less accurate.
             let mut diag = Vec::with_capacity(n);
             for &d in diag_fallback {
-                let denom = if d.abs() <= cfg.tiny { cfg.tiny } else { d.abs() };
+                let denom = if d.abs() <= cfg.tiny {
+                    cfg.tiny
+                } else {
+                    d.abs()
+                };
                 diag.push((1.0 / denom).max(0.0));
             }
             return diag;
@@ -613,14 +630,7 @@ fn solve_irls_huber(
     edges: &[Edge],
     cfg: &Config,
     keep_idx: &[usize],
-) -> (
-    Vec<f64>,
-    Vec<f64>,
-    Vec<f64>,
-    Vec<f64>,
-    Option<Cholesky<f64, nalgebra::Dyn>>,
-    bool,
-) {
+) -> IrlsHuberSolveResult {
     let m = edges.len();
     if m == 0 {
         return (
@@ -871,10 +881,8 @@ fn select_rank_pairs(scores: &[f64], cfg: &Config) -> Vec<(usize, usize)> {
     let w = cfg.rank_band_window.max(1);
 
     // Adjacent neighbors + Rank band (combined: positions 0..w+1 from each)
-    for pos in 0..n {
-        let i = order[pos];
-        for pos2 in (pos + 1)..std::cmp::min(n, pos + w + 1) {
-            let j = order[pos2];
+    for (pos, &i) in order.iter().enumerate() {
+        for &j in order[(pos + 1)..std::cmp::min(n, pos + w + 1)].iter() {
             let (a, b) = if i < j { (i, j) } else { (j, i) };
             pairs.push((a, b));
         }
@@ -882,11 +890,9 @@ fn select_rank_pairs(scores: &[f64], cfg: &Config) -> Vec<(usize, usize)> {
 
     // Small-gap pairs
     let thr = cfg.small_gap_threshold.max(0.0);
-    for pos in 0..n {
-        let i = order[pos];
+    for (pos, &i) in order.iter().enumerate() {
         let s_i = scores[i];
-        for pos2 in (pos + 1)..n {
-            let j = order[pos2];
+        for &j in order.iter().skip(pos + 1) {
             let s_j = scores[j];
             if (s_i - s_j).abs() <= thr {
                 let (a, b) = if i < j { (i, j) } else { (j, i) };
@@ -1111,7 +1117,7 @@ impl RatingEngine {
         if n > MAX_ITEMS {
             return Err("Item count exceeds maximum allowed (5,000)");
         }
-        let cfg = cfg.unwrap_or_else(Config::default);
+        let cfg = cfg.unwrap_or_default();
         Ok(Self {
             n,
             attr,
@@ -1250,7 +1256,7 @@ impl RatingEngine {
 
     fn fuse_bulk(&mut self, observations: &[Observation]) {
         let t = self.attr.temperature.max(self.cfg.tiny);
-        let mut buckets: HashMap<(usize, usize), Vec<(f64, f64, String)>> = HashMap::new();
+        let mut buckets: FuseBuckets = HashMap::new();
 
         for ob in observations {
             let i = ob.i;
@@ -1422,9 +1428,7 @@ impl RatingEngine {
             }
         }
         if self.edges.is_empty() {
-            for v in &mut diag_cov {
-                *v = 1.0;
-            }
+            diag_cov.fill(1.0);
         }
         if !self.edges.is_empty() {
             let mut keep_mask = vec![false; self.n];
@@ -1535,7 +1539,6 @@ impl RatingEngine {
             _ => Err("No solve() results available"),
         }
     }
-
 }
 
 // ---------------------------------------------------------------------
@@ -1552,7 +1555,6 @@ fn effective_resistance_with_chol(
     chol: &Cholesky<f64, nalgebra::Dyn>,
     pos: &[Option<usize>],
 ) -> f64 {
-
     if labels[i] != labels[j] {
         return (diag_cov[i] + diag_cov[j]).max(0.0);
     }

@@ -110,7 +110,7 @@ pub fn embedding_cost(model: &str, tokens: u32) -> i64 {
 
 /// Calculate embedding cost (batch API, 50% discount).
 pub fn embedding_cost_batch(model: &str, tokens: u32) -> i64 {
-    let batch_model = format!("{}:batch", model);
+    let batch_model = format!("{model}:batch");
     let pricing = get_pricing(&batch_model).unwrap_or(OPENAI_EMBED_3_LARGE_BATCH);
     pricing.calculate_cost(tokens, 0)
 }

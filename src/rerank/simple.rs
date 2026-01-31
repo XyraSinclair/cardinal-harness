@@ -9,8 +9,9 @@ use crate::cache::PairwiseCache;
 use crate::gateway::{Attribution, ProviderGateway, UsageSink};
 
 use super::model_policy::ModelPolicy;
+use super::multi::{multi_rerank_with_trace, MultiRerankError};
 use super::options::RerankRunOptions;
-use super::multi::{multi_rerank, MultiRerankError};
+use super::trace::TraceSink;
 use super::types::{
     MultiRerankAttributeSpec, MultiRerankEntity, MultiRerankRequest, MultiRerankTopKSpec,
     RerankMeta, RerankRequest, RerankResponse, RerankResult,
@@ -86,12 +87,42 @@ pub async fn rerank<U: UsageSink>(
     req: RerankRequest,
     attribution: Attribution,
 ) -> Result<RerankResponse, MultiRerankError> {
+    rerank_with_trace(
+        gateway,
+        cache,
+        model_policy,
+        run_options,
+        req,
+        attribution,
+        None,
+    )
+    .await
+}
+
+/// Run a single-attribute reranking session with optional trace output.
+pub async fn rerank_with_trace<U: UsageSink>(
+    gateway: Arc<ProviderGateway<U>>,
+    cache: Option<&dyn PairwiseCache>,
+    model_policy: Option<Arc<dyn ModelPolicy>>,
+    run_options: Option<&RerankRunOptions>,
+    req: RerankRequest,
+    attribution: Attribution,
+    trace: Option<&dyn TraceSink>,
+) -> Result<RerankResponse, MultiRerankError> {
     let multi_req = to_multi_request(&req);
 
     // Call multi_rerank for the single-attribute wrapper.
-    let multi_resp =
-        multi_rerank(gateway, cache, model_policy, run_options, multi_req, attribution, None)
-            .await?;
+    let multi_resp = multi_rerank_with_trace(
+        gateway,
+        cache,
+        model_policy,
+        run_options,
+        multi_req,
+        attribution,
+        trace,
+        None,
+    )
+    .await?;
 
     // Map response to simple format
     let results: Vec<RerankResult> = multi_resp

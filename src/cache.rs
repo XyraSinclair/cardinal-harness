@@ -24,6 +24,7 @@ pub struct PairwiseCacheKey {
 }
 
 impl PairwiseCacheKey {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         model: &str,
         prompt_template_slug: &str,
@@ -93,8 +94,7 @@ pub enum CacheError {
 #[async_trait]
 pub trait PairwiseCache: Send + Sync {
     async fn get(&self, key: &PairwiseCacheKey) -> Result<Option<CachedJudgement>, CacheError>;
-    async fn put(&self, key: &PairwiseCacheKey, value: &CachedJudgement)
-        -> Result<(), CacheError>;
+    async fn put(&self, key: &PairwiseCacheKey, value: &CachedJudgement) -> Result<(), CacheError>;
 }
 
 #[derive(Clone)]
@@ -177,7 +177,7 @@ fn ensure_column(conn: &Connection, name: &str, spec: &str) -> Result<(), CacheE
             return Ok(());
         }
     }
-    let sql = format!("ALTER TABLE pairwise_cache ADD COLUMN {} {}", name, spec);
+    let sql = format!("ALTER TABLE pairwise_cache ADD COLUMN {name} {spec}");
     conn.execute(&sql, [])?;
     Ok(())
 }
@@ -221,11 +221,7 @@ impl PairwiseCache for SqlitePairwiseCache {
         .map_err(|e| CacheError::Join(e.to_string()))?
     }
 
-    async fn put(
-        &self,
-        key: &PairwiseCacheKey,
-        value: &CachedJudgement,
-    ) -> Result<(), CacheError> {
+    async fn put(&self, key: &PairwiseCacheKey, value: &CachedJudgement) -> Result<(), CacheError> {
         let key = key.clone();
         let value = value.clone();
         let conn = self.clone();
@@ -290,6 +286,7 @@ impl CacheLock {
         lock_path.set_extension("lock");
         let file = std::fs::OpenOptions::new()
             .create(true)
+            .truncate(false)
             .read(true)
             .write(true)
             .open(lock_path)?;
@@ -365,7 +362,7 @@ impl SqlitePairwiseCache {
                     let line = serde_json::to_string(&record)
                         .map_err(|e| CacheError::Serde(e.to_string()))?;
                     use std::io::Write;
-                    writeln!(file, "{}", line)?;
+                    writeln!(file, "{line}")?;
                 }
                 Ok(())
             })
@@ -412,7 +409,7 @@ impl SqlitePairwiseCache {
                              )",
                             params![keep],
                         )?;
-                        deleted = deleted.saturating_add(removed as usize);
+                        deleted = deleted.saturating_add(removed);
                     }
                 }
 

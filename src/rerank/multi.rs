@@ -21,12 +21,13 @@ use std::sync::atomic::{AtomicBool, Ordering as AtomicOrdering};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
+use blake3;
 use futures::stream::{self, StreamExt};
 
-use crate::cache::PairwiseCache;
+use crate::cache::{PairwiseCache, PairwiseCacheKey};
 use crate::gateway::pricing as provider_pricing;
 use crate::gateway::{Attribution, ProviderGateway, UsageSink};
-use crate::prompts::prompt_by_slug;
+use crate::prompts::{prompt_by_slug, DEFAULT_PROMPT};
 use crate::text_chunking::count_tokens;
 
 use crate::rating_engine::{
@@ -42,6 +43,7 @@ use super::comparison::{
 };
 use super::model_policy::{ModelPolicy, ModelPolicyContext};
 use super::options::RerankRunOptions;
+use super::trace::{now_epoch_ms, ComparisonTrace, TraceError, TraceSink};
 use super::types::{
     AttributeScoreSummary, HigherRanked, MultiRerankEntityResult, MultiRerankMeta,
     MultiRerankRequest, MultiRerankResponse, PairwiseJudgement, RerankStopReason,
@@ -80,6 +82,8 @@ pub enum MultiRerankError {
     RatingEngine(String),
     #[error("Comparison error: {0}")]
     Comparison(#[from] ComparisonError),
+    #[error("Trace error: {0}")]
+    Trace(#[from] TraceError),
 }
 
 // =============================================================================
@@ -223,8 +227,7 @@ pub fn validate_multi_rerank_request(req: &MultiRerankRequest) -> Result<(), Mul
         }
         if concurrency > MAX_COMPARISON_CONCURRENCY {
             return Err(MultiRerankError::InvalidRequest(format!(
-                "comparison_concurrency must be <= {}",
-                MAX_COMPARISON_CONCURRENCY
+                "comparison_concurrency must be <= {MAX_COMPARISON_CONCURRENCY}"
             )));
         }
     }
@@ -258,8 +261,7 @@ pub fn validate_multi_rerank_request(req: &MultiRerankRequest) -> Result<(), Mul
         if let Some(slug) = a.prompt_template_slug.as_deref() {
             if prompt_by_slug(slug).is_none() {
                 return Err(MultiRerankError::InvalidRequest(format!(
-                    "unknown prompt_template_slug: {}",
-                    slug
+                    "unknown prompt_template_slug: {slug}"
                 )));
             }
         }
@@ -330,6 +332,34 @@ pub async fn multi_rerank<U: UsageSink>(
     run_options: Option<&RerankRunOptions>,
     req: MultiRerankRequest,
     attribution: Attribution,
+    cancel_flag: Option<&AtomicBool>,
+) -> Result<MultiRerankResponse, MultiRerankError> {
+    multi_rerank_with_trace(
+        gateway,
+        cache,
+        model_policy,
+        run_options,
+        req,
+        attribution,
+        None,
+        cancel_flag,
+    )
+    .await
+}
+
+/// Run a multi-attribute reranking session with optional trace output.
+///
+/// If a cache is provided, cached pairwise judgements are reused and new
+/// judgements are written back to the cache.
+#[allow(clippy::too_many_arguments)]
+pub async fn multi_rerank_with_trace<U: UsageSink>(
+    gateway: Arc<ProviderGateway<U>>,
+    cache: Option<&dyn PairwiseCache>,
+    model_policy: Option<Arc<dyn ModelPolicy>>,
+    run_options: Option<&RerankRunOptions>,
+    req: MultiRerankRequest,
+    attribution: Attribution,
+    trace: Option<&dyn TraceSink>,
     cancel_flag: Option<&AtomicBool>,
 ) -> Result<MultiRerankResponse, MultiRerankError> {
     validate_multi_rerank_request(&req)?;
@@ -424,7 +454,6 @@ pub async fn multi_rerank<U: UsageSink>(
 
     let mut pair_repeats: HashMap<(usize, usize, usize), f64> = HashMap::new();
 
-
     let mut comparisons_attempted: usize = 0;
     let mut comparisons_used: usize = 0;
     let mut comparisons_refused: usize = 0;
@@ -450,6 +479,16 @@ pub async fn multi_rerank<U: UsageSink>(
         attr_idx: usize,
         i: usize,
         j: usize,
+    }
+
+    #[derive(Clone)]
+    struct TraceFields {
+        attribute_prompt_hash: String,
+        prompt_template_slug: String,
+        template_hash: String,
+        entity_a_hash: String,
+        entity_b_hash: String,
+        cache_key_hash: String,
     }
 
     let mut refused_pairs: HashSet<(usize, usize, usize)> = HashSet::new();
@@ -613,9 +652,86 @@ pub async fn multi_rerank<U: UsageSink>(
 
         for (task, judgement, selected_model) in batch_results {
             comparisons_attempted += 1;
-            attribute_attempted[task.attr_idx] = attribute_attempted[task.attr_idx].saturating_add(1);
-            models_used.insert(selected_model);
-            let attr_id = req.attributes[task.attr_idx].id.as_str();
+            let comparison_index = comparisons_attempted;
+            attribute_attempted[task.attr_idx] =
+                attribute_attempted[task.attr_idx].saturating_add(1);
+
+            let attr = &req.attributes[task.attr_idx];
+            let entity_a = &req.entities[task.i];
+            let entity_b = &req.entities[task.j];
+
+            models_used.insert(selected_model.clone());
+            let attr_id = attr.id.as_str();
+
+            let trace_fields = if trace.is_some() {
+                let template = attr
+                    .prompt_template_slug
+                    .as_deref()
+                    .and_then(prompt_by_slug)
+                    .unwrap_or(DEFAULT_PROMPT);
+                let prompt_slug = template.slug.to_string();
+                let template_hash =
+                    blake3::hash(format!("{}\n{}", template.system, template.user).as_bytes())
+                        .to_hex()
+                        .to_string();
+                let cache_key = PairwiseCacheKey::new(
+                    &selected_model,
+                    &prompt_slug,
+                    &template_hash,
+                    &attr.id,
+                    &attr.prompt,
+                    &entity_a.id,
+                    &entity_a.text,
+                    &entity_b.id,
+                    &entity_b.text,
+                );
+                Some(TraceFields {
+                    attribute_prompt_hash: cache_key.attribute_prompt_hash,
+                    prompt_template_slug: prompt_slug,
+                    template_hash,
+                    entity_a_hash: cache_key.entity_a_hash,
+                    entity_b_hash: cache_key.entity_b_hash,
+                    cache_key_hash: cache_key.key_hash,
+                })
+            } else {
+                None
+            };
+
+            let build_trace = |cached: bool,
+                               input_tokens: u32,
+                               output_tokens: u32,
+                               provider_cost_nanodollars: i64,
+                               error: Option<String>| {
+                let fields = trace_fields
+                    .as_ref()
+                    .expect("trace_fields set when trace active");
+                ComparisonTrace {
+                    timestamp_ms: now_epoch_ms(),
+                    comparison_index,
+                    attribute_id: attr.id.clone(),
+                    attribute_index: task.attr_idx,
+                    attribute_prompt_hash: fields.attribute_prompt_hash.clone(),
+                    prompt_template_slug: fields.prompt_template_slug.clone(),
+                    template_hash: fields.template_hash.clone(),
+                    entity_a_id: entity_a.id.clone(),
+                    entity_b_id: entity_b.id.clone(),
+                    entity_a_index: task.i,
+                    entity_b_index: task.j,
+                    entity_a_hash: fields.entity_a_hash.clone(),
+                    entity_b_hash: fields.entity_b_hash.clone(),
+                    cache_key_hash: fields.cache_key_hash.clone(),
+                    model: selected_model.clone(),
+                    higher_ranked: None,
+                    ratio: None,
+                    confidence: None,
+                    refused: false,
+                    cached,
+                    input_tokens,
+                    output_tokens,
+                    provider_cost_nanodollars,
+                    error,
+                }
+            };
 
             match judgement {
                 Ok((PairwiseJudgement::Refused, usage)) => {
@@ -630,13 +746,25 @@ pub async fn multi_rerank<U: UsageSink>(
                         provider_cost_nanodollars.saturating_add(usage.provider_cost_nanodollars);
                     comparisons_refused += 1;
                     refused_pairs.insert(task.key);
+
+                    if let Some(trace) = trace {
+                        let mut event = build_trace(
+                            usage.cached,
+                            usage.input_tokens,
+                            usage.output_tokens,
+                            usage.provider_cost_nanodollars,
+                            None,
+                        );
+                        event.refused = true;
+                        trace.record(event)?;
+                    }
                 }
                 Ok((
                     PairwiseJudgement::Observation {
-                    higher_ranked,
-                    ratio,
-                    confidence,
-                },
+                        higher_ranked,
+                        ratio,
+                        confidence,
+                    },
                     usage,
                 )) => {
                     if usage.cached {
@@ -666,8 +794,28 @@ pub async fn multi_rerank<U: UsageSink>(
                     }
                     *pair_repeats.entry(task.key).or_insert(0.0) += 1.0;
 
+                    if let Some(trace) = trace {
+                        let mut event = build_trace(
+                            usage.cached,
+                            usage.input_tokens,
+                            usage.output_tokens,
+                            usage.provider_cost_nanodollars,
+                            None,
+                        );
+                        event.higher_ranked = Some(match higher_ranked {
+                            HigherRanked::A => "A".to_string(),
+                            HigherRanked::B => "B".to_string(),
+                        });
+                        event.ratio = Some(ratio);
+                        event.confidence = Some(confidence);
+                        trace.record(event)?;
+                    }
                 }
                 Err(e) => {
+                    if let Some(trace) = trace {
+                        let event = build_trace(false, 0, 0, 0, Some(e.to_string()));
+                        trace.record(event)?;
+                    }
                     if cache_only {
                         return Err(MultiRerankError::Comparison(e));
                     }
@@ -681,7 +829,6 @@ pub async fn multi_rerank<U: UsageSink>(
                 }
             }
         }
-
     };
 
     // Final recompute and response assembly

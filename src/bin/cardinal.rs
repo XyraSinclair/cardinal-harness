@@ -8,12 +8,10 @@ use clap::{Parser, Subcommand};
 use cardinal_harness::cache::SqlitePairwiseCache;
 use cardinal_harness::gateway::{NoopUsageSink, ProviderGateway};
 use cardinal_harness::rerank::{
-    build_report, load_policy_from_path, render_report_markdown, ModelPolicy, PolicyRegistry,
-    RerankRunOptions,
+    build_report, load_policy_from_path, render_report_markdown, JsonlTraceSink, ModelPolicy,
+    PolicyRegistry, RerankRunOptions, TraceSink,
 };
-use cardinal_harness::rerank::{
-    MultiRerankRequest, MultiRerankResponse, RerankReportOptions,
-};
+use cardinal_harness::rerank::{MultiRerankRequest, MultiRerankResponse, RerankReportOptions};
 
 #[derive(Parser)]
 #[command(name = "cardinal", version, about = "Cardinal harness CLI")]
@@ -97,6 +95,8 @@ enum Commands {
         rng_seed: Option<u64>,
         #[arg(long)]
         report: Option<PathBuf>,
+        #[arg(long)]
+        trace: Option<PathBuf>,
     },
 }
 
@@ -143,21 +143,26 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             PolicyCommands::List => {
                 let registry = PolicyRegistry::default();
                 for name in registry.list() {
-                    println!("{}", name);
+                    println!("{name}");
                 }
             }
             PolicyCommands::Load { config } => {
                 let policy = load_policy_from_path(config)?;
                 let description = policy.describe().unwrap_or_else(|| "unknown".to_string());
-                println!("{}", description);
+                println!("{description}");
             }
         },
-        Commands::Eval { case, out, curve_csv } => {
-            let results = cardinal_harness::rerank::evaluation::run_synthetic_suite(case.as_deref());
+        Commands::Eval {
+            case,
+            out,
+            curve_csv,
+        } => {
+            let results =
+                cardinal_harness::rerank::evaluation::run_synthetic_suite(case.as_deref());
             let mut file = File::create(out)?;
             for result in &results {
                 let line = serde_json::to_string(result)?;
-                writeln!(file, "{}", line)?;
+                writeln!(file, "{line}")?;
             }
             if let Some(csv_path) = curve_csv {
                 let mut csv = File::create(csv_path)?;
@@ -210,11 +215,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             policy_config,
             rng_seed,
             report,
+            trace,
         } => {
             let req: MultiRerankRequest = read_json(&request)?;
             let cache_path = cache.unwrap_or_else(SqlitePairwiseCache::default_path);
             let cache = SqlitePairwiseCache::new(cache_path)?;
-            let _lock = if lock_cache { Some(cache.lock_exclusive()?) } else { None };
+            let _lock = if lock_cache {
+                Some(cache.lock_exclusive()?)
+            } else {
+                None
+            };
 
             let policy_obj: Option<Arc<dyn ModelPolicy>> = if let Some(path) = policy_config {
                 Some(load_policy_from_path(path)?)
@@ -225,8 +235,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     None => {
                         let available = registry.list().join(", ");
                         return Err(format!(
-                            "unknown policy '{}'; available policies: {}",
-                            name, available
+                            "unknown policy '{name}'; available policies: {available}"
                         )
                         .into());
                     }
@@ -235,20 +244,38 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 None
             };
 
-            let options = RerankRunOptions { rng_seed, cache_only };
+            let options = RerankRunOptions {
+                rng_seed,
+                cache_only,
+            };
             let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
-            let resp = cardinal_harness::rerank::multi_rerank(
+
+            let (trace_sink, trace_worker) = if let Some(path) = trace {
+                let (sink, worker) = JsonlTraceSink::new(path)?;
+                (Some(sink), Some(worker))
+            } else {
+                (None, None)
+            };
+            let trace_ref = trace_sink.as_ref().map(|sink| sink as &dyn TraceSink);
+
+            let resp = cardinal_harness::rerank::multi_rerank_with_trace(
                 Arc::new(gateway),
                 Some(&cache),
                 policy_obj.clone(),
                 Some(&options),
                 req.clone(),
                 cardinal_harness::Attribution::new("cardinal::rerank"),
+                trace_ref,
                 None,
             )
             .await?;
 
             write_json(&out, &resp)?;
+
+            drop(trace_sink);
+            if let Some(worker) = trace_worker {
+                worker.join()?;
+            }
 
             if let Some(report_path) = report {
                 let opts = RerankReportOptions {
@@ -269,13 +296,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn read_json<T: serde::de::DeserializeOwned>(path: &PathBuf) -> Result<T, Box<dyn std::error::Error>> {
+fn read_json<T: serde::de::DeserializeOwned>(
+    path: &PathBuf,
+) -> Result<T, Box<dyn std::error::Error>> {
     let raw = std::fs::read_to_string(path)?;
     Ok(serde_json::from_str(&raw)?)
 }
 
 fn write_json<T: serde::Serialize>(path: &PathBuf, value: &T) -> Result<(), io::Error> {
-    let json = serde_json::to_string_pretty(value)
-        .map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
+    let json = serde_json::to_string_pretty(value).map_err(io::Error::other)?;
     std::fs::write(path, json)
 }

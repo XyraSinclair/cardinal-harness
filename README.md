@@ -155,6 +155,9 @@ cargo run --bin cardinal -- report --request request.json --response response.js
 
 # Run a reproducible rerank with cache locking + seed (no network calls)
 cargo run --bin cardinal -- rerank --request request.json --out response.json --lock-cache --cache-only --rng-seed 1337 --report report.md
+
+# Capture per-comparison trace data (JSONL)
+cargo run --bin cardinal -- rerank --request request.json --out response.json --trace trace.jsonl
 ```
 
 ## License

@@ -177,6 +177,7 @@ fn extract_json(raw: &str) -> &str {
 // =============================================================================
 
 /// Perform a pairwise comparison using the LLM.
+#[allow(clippy::too_many_arguments)]
 pub async fn compare_pair<U: UsageSink>(
     gateway: &ProviderGateway<U>,
     cache: Option<&dyn PairwiseCache>,
@@ -198,11 +199,9 @@ pub async fn compare_pair<U: UsageSink>(
         .and_then(prompt_by_slug)
         .unwrap_or(DEFAULT_PROMPT);
     let prompt_slug = template.slug;
-    let template_hash = blake3::hash(
-        format!("{}\n{}", template.system, template.user).as_bytes(),
-    )
-    .to_hex()
-    .to_string();
+    let template_hash = blake3::hash(format!("{}\n{}", template.system, template.user).as_bytes())
+        .to_hex()
+        .to_string();
     let cache_key = cache.map(|_| {
         PairwiseCacheKey::new(
             model,

@@ -1,10 +1,10 @@
 //! Provider gateway for OpenRouter chat completions.
 
 pub mod error;
+pub mod openrouter;
 pub mod pricing;
 pub mod types;
 pub mod usage;
-pub mod openrouter;
 
 use std::sync::Arc;
 use std::time::Duration;
@@ -89,11 +89,8 @@ impl<U: UsageSinkTrait> ProviderGateway<U> {
             }
         }
 
-        Err(last_error.unwrap_or_else(|| ProviderError::provider(
-            "openrouter",
-            "unknown error",
-            false,
-        )))
+        Err(last_error
+            .unwrap_or_else(|| ProviderError::provider("openrouter", "unknown error", false)))
     }
 
     async fn record_usage(

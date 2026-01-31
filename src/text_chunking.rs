@@ -454,7 +454,7 @@ pub fn chunk_text_by_tokens(text: &str, params: &ChunkingParams) -> Vec<TextChun
             if merged_tokens <= params.max_tokens || chunks_units.len() == 2 {
                 let last = chunks_units.pop().unwrap();
                 let prev = chunks_units.pop().unwrap();
-                let merged: Vec<&TextUnit> = prev.into_iter().chain(last.into_iter()).collect();
+                let merged: Vec<&TextUnit> = prev.into_iter().chain(last).collect();
                 chunks_units.push(merged);
             }
         }
@@ -541,7 +541,7 @@ mod tests {
     fn test_long_text_chunking() {
         // Create a text that's definitely longer than 300 tokens
         let long_para = "This is a test sentence. ".repeat(50);
-        let text = format!("{}\n\n{}", long_para, long_para);
+        let text = format!("{long_para}\n\n{long_para}");
 
         let params = ChunkingParams::default();
         let chunks = chunk_text_by_tokens(&text, &params);

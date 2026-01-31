@@ -38,8 +38,14 @@ pub struct PolicyRegistry {
 impl Default for PolicyRegistry {
     fn default() -> Self {
         let mut policies: HashMap<String, Arc<dyn ModelPolicy>> = HashMap::new();
-        policies.insert("ladder_default".to_string(), Arc::new(ModelLadderPolicy::default()));
-        policies.insert("fast_only".to_string(), Arc::new(FixedPolicy::new("openai/gpt-5-mini")));
+        policies.insert(
+            "ladder_default".to_string(),
+            Arc::new(ModelLadderPolicy::default()),
+        );
+        policies.insert(
+            "fast_only".to_string(),
+            Arc::new(FixedPolicy::new("openai/gpt-5-mini")),
+        );
         policies.insert(
             "quality_only".to_string(),
             Arc::new(FixedPolicy::new("anthropic/claude-opus-4.5")),
@@ -107,8 +113,8 @@ pub fn policy_from_spec(spec: &PolicySpec) -> Result<Arc<dyn ModelPolicy>, Strin
 pub fn load_policy_from_path(path: impl AsRef<Path>) -> Result<Arc<dyn ModelPolicy>, String> {
     let raw = std::fs::read_to_string(path.as_ref())
         .map_err(|e| format!("failed to read policy config: {e}"))?;
-    let config: PolicyConfig = serde_json::from_str(&raw)
-        .map_err(|e| format!("failed to parse policy config: {e}"))?;
+    let config: PolicyConfig =
+        serde_json::from_str(&raw).map_err(|e| format!("failed to parse policy config: {e}"))?;
     policy_from_spec(&config.policy)
 }
 

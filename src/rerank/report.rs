@@ -6,9 +6,8 @@ use blake3;
 use serde::Serialize;
 
 use super::types::{
-    AttributeScoreSummary, MultiRerankAttributeSpec, MultiRerankEntityResult,
-    MultiRerankGateSpec, MultiRerankMeta, MultiRerankRequest, MultiRerankResponse,
-    RerankStopReason,
+    AttributeScoreSummary, MultiRerankAttributeSpec, MultiRerankEntityResult, MultiRerankGateSpec,
+    MultiRerankMeta, MultiRerankRequest, MultiRerankResponse, RerankStopReason,
 };
 
 #[derive(Debug, Clone, Serialize)]
@@ -108,7 +107,10 @@ pub fn build_report(
         if top_entities.len() >= opts.top_n {
             break;
         }
-        top_entities.push(ReportEntity::from_entity(entity, opts.include_attribute_scores));
+        top_entities.push(ReportEntity::from_entity(
+            entity,
+            opts.include_attribute_scores,
+        ));
     }
 
     RerankReport {
@@ -177,7 +179,10 @@ pub fn render_report_markdown(report: &RerankReport) -> String {
     let mut out = String::new();
     out.push_str("# Rerank Report\n\n");
     out.push_str(&format!("- Request hash: `{}`\n", report.request_hash));
-    out.push_str(&format!("- Stop reason: {:?}\n", report.summary.stop_reason));
+    out.push_str(&format!(
+        "- Stop reason: {:?}\n",
+        report.summary.stop_reason
+    ));
     out.push_str(&format!("- k: {}\n", report.summary.k));
     out.push_str(&format!(
         "- Global top-k error: {:.4}\n",
@@ -198,10 +203,10 @@ pub fn render_report_markdown(report: &RerankReport) -> String {
     out.push_str(&format!("- Rater ID: {}\n", report.summary.rater_id_used));
     out.push_str(&format!("- Latency: {} ms\n", report.summary.latency_ms));
     if let Some(seed) = report.run_stamp.rng_seed {
-        out.push_str(&format!("- RNG seed: {}\n", seed));
+        out.push_str(&format!("- RNG seed: {seed}\n"));
     }
     if let Some(policy) = &report.run_stamp.model_policy {
-        out.push_str(&format!("- Model policy: {}\n", policy));
+        out.push_str(&format!("- Model policy: {policy}\n"));
     }
     if report.run_stamp.cache_only {
         out.push_str("- Cache-only mode: true\n");

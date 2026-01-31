@@ -10,4 +10,7 @@ pub mod trait_search;
 
 pub use cache::{PairwiseCache, PairwiseCacheKey, SqlitePairwiseCache};
 pub use gateway::{Attribution, ProviderGateway, UsageSink};
-pub use rerank::{multi_rerank, rerank, ComparisonError, MultiRerankError};
+pub use rerank::{
+    multi_rerank, multi_rerank_with_trace, rerank, rerank_with_trace, ComparisonError,
+    ComparisonTrace, JsonlTraceSink, MultiRerankError, TraceError, TraceSink, TraceWorker,
+};

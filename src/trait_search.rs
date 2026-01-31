@@ -625,16 +625,11 @@ impl TraitSearchManager {
             };
             let weight_factor = (attr.weight / scale).powi(2) * uncertainty_weight;
 
-            let proposals_attr = plan_edges_for_rater(
-                engine,
-                &candidates,
-                rater_id,
-                planner_mode,
-                use_effective,
-            )
-            .map_err(|e| TraitSearchError::PlannerError {
-                message: e.to_string(),
-            })?;
+            let proposals_attr =
+                plan_edges_for_rater(engine, &candidates, rater_id, planner_mode, use_effective)
+                    .map_err(|e| TraitSearchError::PlannerError {
+                        message: e.to_string(),
+                    })?;
 
             for PlanProposal {
                 i,
@@ -654,10 +649,8 @@ impl TraitSearchManager {
                     continue;
                 }
 
-                let membership_weight =
-                    0.5 * (self.entities[a].p_flip + self.entities[b].p_flip);
-                let membership_weight = membership_weight
-                    .clamp(MIN_MEMBERSHIP_WEIGHT, 1.0);
+                let membership_weight = 0.5 * (self.entities[a].p_flip + self.entities[b].p_flip);
+                let membership_weight = membership_weight.clamp(MIN_MEMBERSHIP_WEIGHT, 1.0);
 
                 let weighted_score = weight_factor * score * p_before * membership_weight;
                 if weighted_score <= 0.0 {
@@ -694,9 +687,7 @@ impl TraitSearchManager {
             }
             let mut attr_iter = self.config.attributes.iter().cycle();
             for &(i, j) in band_candidates.iter().take(batch_size) {
-                let attr = attr_iter
-                    .next()
-                    .ok_or_else(|| TraitSearchError::EmptyAttributes)?;
+                let attr = attr_iter.next().ok_or(TraitSearchError::EmptyAttributes)?;
                 proposals.push(GlobalPlanProposal {
                     attribute_id: attr.id.clone(),
                     i,
@@ -765,7 +756,11 @@ impl TraitSearchManager {
         self.engines
             .get(attr_id)
             .and_then(|engine| engine.diag_cov())
-            .map(|diag| diag.iter().map(|&v| v.max(0.0).sqrt()).collect::<Vec<f64>>())
+            .map(|diag| {
+                diag.iter()
+                    .map(|&v| v.max(0.0).sqrt())
+                    .collect::<Vec<f64>>()
+            })
     }
 
     pub fn attribute_z_scores(&self, attr_id: &str) -> Option<&[f64]> {
@@ -803,7 +798,12 @@ impl TraitSearchManager {
 
     /// Ensure derived units are computed for all attributes (used at response time).
     pub fn ensure_all_attribute_units(&mut self) -> Result<()> {
-        let attr_ids: Vec<String> = self.config.attributes.iter().map(|a| a.id.clone()).collect();
+        let attr_ids: Vec<String> = self
+            .config
+            .attributes
+            .iter()
+            .map(|a| a.id.clone())
+            .collect();
         for attr_id in attr_ids {
             self.ensure_attribute_units(&attr_id)?;
         }
@@ -811,19 +811,16 @@ impl TraitSearchManager {
     }
 
     /// Add observations for a specific attribute and invalidate cached state.
-    pub fn add_observations(
-        &mut self,
-        attr_id: &str,
-        observations: &[Observation],
-    ) -> Result<()> {
+    pub fn add_observations(&mut self, attr_id: &str, observations: &[Observation]) -> Result<()> {
         if observations.is_empty() {
             return Ok(());
         }
-        let engine = self.engines.get_mut(attr_id).ok_or_else(|| {
-            TraitSearchError::MissingEngine {
-                attribute_id: attr_id.to_string(),
-            }
-        })?;
+        let engine =
+            self.engines
+                .get_mut(attr_id)
+                .ok_or_else(|| TraitSearchError::MissingEngine {
+                    attribute_id: attr_id.to_string(),
+                })?;
         engine.add_observations(observations);
         self.invalidate();
         Ok(())
@@ -911,16 +908,16 @@ impl TraitSearchManager {
                     .ok_or_else(|| TraitSearchError::InternalError {
                         message: "engine map invariant violated".to_string(),
                     })?;
-            let scores = engine.scores().ok_or_else(|| {
-                TraitSearchError::InternalError {
+            let scores = engine
+                .scores()
+                .ok_or_else(|| TraitSearchError::InternalError {
                     message: "scores not available; call solve() first".to_string(),
-                }
-            })?;
-            let diag_cov = engine.diag_cov().ok_or_else(|| {
-                TraitSearchError::InternalError {
+                })?;
+            let diag_cov = engine
+                .diag_cov()
+                .ok_or_else(|| TraitSearchError::InternalError {
                     message: "diag_cov not available; call solve() first".to_string(),
-                }
-            })?;
+                })?;
             let scale =
                 *self
                     .scales
@@ -948,11 +945,9 @@ impl TraitSearchManager {
                 .engines
                 .get(&gate.attribute_id)
                 .and_then(|engine| engine.scores())
-                .ok_or_else(|| {
-                TraitSearchError::GateUnknownAttribute {
+                .ok_or_else(|| TraitSearchError::GateUnknownAttribute {
                     attribute_id: gate.attribute_id.clone(),
-                }
-            })?;
+                })?;
 
             let gate_vals: &[f64] = match gate.unit.as_str() {
                 "latent" => scores,
