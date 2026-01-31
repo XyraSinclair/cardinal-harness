@@ -1,0 +1,64 @@
+name: Bug report
+description: Report a crash, incorrect output, or performance regression
+labels:
+  - bug
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What went wrong?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Steps to reproduce (include request JSON if possible)
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / stack traces
+      description: Paste logs (redact API keys / secrets)
+      render: text
+
+  - type: input
+    id: version
+    attributes:
+      label: Version / commit
+      description: `cardinal-harness` version or git SHA
+
+  - type: input
+    id: rust
+    attributes:
+      label: Rust version
+      description: Output of `rustc --version`
+
+  - type: input
+    id: os
+    attributes:
+      label: OS
+      description: e.g. macOS 14, Ubuntu 24.04
+

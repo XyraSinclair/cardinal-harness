@@ -316,7 +316,7 @@ pub fn estimate_pairwise_input_tokens(
 // Mapping functions
 // =============================================================================
 
-/// Map confidence ∈ [0,1] to variance in log-space.
+/// Map confidence ∈ 0..=1 to variance in log-space.
 ///
 /// High confidence → low variance (tight observation).
 /// Low confidence → high variance (noisy observation).

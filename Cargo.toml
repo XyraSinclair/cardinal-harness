@@ -4,6 +4,12 @@ version = "0.1.0"
 edition = "2021"
 license = "MIT"
 description = "LLMs-as-judge harness for cardinal latent ratings via pairwise ratio comparisons"
+readme = "README.md"
+repository = "https://github.com/XyraSinclair/cardinal-harness"
+homepage = "https://github.com/XyraSinclair/cardinal-harness"
+documentation = "https://docs.rs/cardinal-harness"
+keywords = ["llm", "reranking", "ranking", "pairwise", "cardinal"]
+categories = ["algorithms", "science", "command-line-utilities"]
 
 [dependencies]
 async-trait = "0.1"

@@ -20,7 +20,7 @@ The goal is to expose a clean, reusable research-grade core while staying practi
 export OPENROUTER_API_KEY=your_key_here
 ```
 
-```rust
+```rust,no_run
 use std::sync::Arc;
 use cardinal_harness::{
     Attribution, ProviderGateway, SqlitePairwiseCache,
@@ -159,6 +159,18 @@ cargo run --bin cardinal -- rerank --request request.json --out response.json --
 # Capture per-comparison trace data (JSONL)
 cargo run --bin cardinal -- rerank --request request.json --out response.json --trace trace.jsonl
 ```
+
+## Contributing
+
+See `CONTRIBUTING.md`.
+
+## Security
+
+See `SECURITY.md`.
+
+## Code of Conduct
+
+See `CODE_OF_CONDUCT.md`.
 
 ## License
 

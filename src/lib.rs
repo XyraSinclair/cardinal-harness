@@ -1,3 +1,5 @@
+#![forbid(unsafe_code)]
+
 //! Cardinal-harness: pairwise ratio LLM judging + multi-objective reranking.
 
 pub mod cache;
