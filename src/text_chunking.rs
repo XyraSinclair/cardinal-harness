@@ -2,12 +2,12 @@
 //!
 //! This module provides token-aware, structure-aware chunking that respects
 //! paragraph and sentence boundaries. The canonical implementation is now in
-//! `continual_scraping/src/chunking.rs`.
+//! this crate.
 //!
 //! # Example
 //!
-//! ```rust,ignore
-//! use exopriors_api::text_chunking::{chunk_text_by_tokens, ChunkingParams};
+//! ```rust,no_run
+//! use cardinal_harness::text_chunking::{chunk_text_by_tokens, ChunkingParams};
 //!
 //! let params = ChunkingParams::default(); // target=300, min=180, max=480, overlap=60
 //! let chunks = chunk_text_by_tokens("Your long text here...", &params);

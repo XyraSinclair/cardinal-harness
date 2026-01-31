@@ -32,6 +32,9 @@ jobs:
       - name: Tests
         run: cargo test --all-targets --all-features
 
+      - name: Doc tests
+        run: cargo test --doc
+
       - name: Docs
         env:
           RUSTDOCFLAGS: -D warnings
@@ -44,4 +47,3 @@ jobs:
 
       - name: Security audit
         run: cargo audit
-

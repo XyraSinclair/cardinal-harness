@@ -13,6 +13,7 @@ Thanks for helping make `cardinal-harness` reliable and easy to integrate.
 cargo fmt --all
 cargo clippy --all-targets --all-features -- -D warnings
 cargo test --all-targets --all-features
+cargo test --doc
 cargo doc --no-deps
 ```
 
@@ -34,4 +35,3 @@ cargo audit
 - Include a short “What/Why” in the description.
 - Call out any API changes explicitly.
 - Update docs/README when behavior changes.
-

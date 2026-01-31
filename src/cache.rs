@@ -191,7 +191,7 @@ impl PairwiseCache for SqlitePairwiseCache {
             conn.with_conn(|conn| {
                 let mut stmt = conn.prepare(
                     "SELECT higher_ranked, ratio, confidence, refused, input_tokens, output_tokens,\
-                            provider_cost_nanodollars\
+                            provider_cost_nanodollars \
                      FROM pairwise_cache WHERE key_hash = ?1",
                 )?;
                 let mut rows = stmt.query(params![key_hash])?;
@@ -206,7 +206,7 @@ impl PairwiseCache for SqlitePairwiseCache {
                         provider_cost_nanodollars: row.get::<_, Option<i64>>(6)?,
                     };
                     conn.execute(
-                        "UPDATE pairwise_cache\
+                        "UPDATE pairwise_cache \
                          SET hit_count = hit_count + 1, updated_at = ?1\
                          WHERE key_hash = ?2",
                         params![now_epoch(), key_hash],
@@ -236,7 +236,7 @@ impl PairwiseCache for SqlitePairwiseCache {
                         input_tokens, output_tokens, provider_cost_nanodollars,\
                         created_at, updated_at\
                      ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19)\
-                     ON CONFLICT(key_hash) DO UPDATE SET\
+                     ON CONFLICT(key_hash) DO UPDATE SET \
                         higher_ranked = excluded.higher_ranked,\
                         ratio = excluded.ratio,\
                         confidence = excluded.confidence,\
