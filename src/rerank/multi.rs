@@ -1166,4 +1166,52 @@ mod tests {
         let err = validate_multi_rerank_request(&req).unwrap_err();
         assert!(matches!(err, MultiRerankError::InvalidRequest(_)));
     }
+
+    #[test]
+    fn validate_rejects_duplicate_entity_ids() {
+        let mut req = base_request();
+        req.entities.push(MultiRerankEntity {
+            id: "a".to_string(),
+            text: "A2".to_string(),
+        });
+        let err = validate_multi_rerank_request(&req).unwrap_err();
+        assert!(matches!(err, MultiRerankError::InvalidRequest(_)));
+    }
+
+    #[test]
+    fn validate_rejects_unknown_prompt_template_slug() {
+        let mut req = base_request();
+        req.attributes[0].prompt_template_slug = Some("does_not_exist".to_string());
+        let err = validate_multi_rerank_request(&req).unwrap_err();
+        assert!(matches!(err, MultiRerankError::InvalidRequest(_)));
+    }
+
+    #[test]
+    fn validate_rejects_unsupported_gate_op() {
+        let mut req = base_request();
+        req.gates.push(MultiRerankGateSpec {
+            attribute_id: "attr".to_string(),
+            unit: "latent".to_string(),
+            op: "=".to_string(),
+            threshold: 0.0,
+        });
+        let err = validate_multi_rerank_request(&req).unwrap_err();
+        assert!(matches!(err, MultiRerankError::InvalidRequest(_)));
+    }
+
+    #[test]
+    fn validate_rejects_entities_len_lt_2() {
+        let mut req = base_request();
+        req.entities.truncate(1);
+        let err = validate_multi_rerank_request(&req).unwrap_err();
+        assert!(matches!(err, MultiRerankError::InvalidRequest(_)));
+    }
+
+    #[test]
+    fn validate_rejects_empty_attributes() {
+        let mut req = base_request();
+        req.attributes.clear();
+        let err = validate_multi_rerank_request(&req).unwrap_err();
+        assert!(matches!(err, MultiRerankError::InvalidRequest(_)));
+    }
 }
