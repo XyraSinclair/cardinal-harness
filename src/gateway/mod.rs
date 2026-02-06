@@ -19,6 +19,11 @@ pub use pricing::*;
 pub use types::*;
 pub use usage::{NoopUsageSink, StderrUsageSink, UsageSink};
 
+#[async_trait::async_trait]
+pub trait ChatGateway: Send + Sync {
+    async fn chat(&self, req: ChatRequest) -> Result<ChatResponse, ProviderError>;
+}
+
 #[derive(Debug, Clone)]
 pub struct GatewayConfig {
     pub max_retries: u32,
@@ -38,6 +43,13 @@ pub struct ProviderGateway<U: UsageSinkTrait> {
     openrouter: OpenRouterAdapter,
     usage_sink: Arc<U>,
     config: GatewayConfig,
+}
+
+#[async_trait::async_trait]
+impl<U: UsageSinkTrait> ChatGateway for ProviderGateway<U> {
+    async fn chat(&self, req: ChatRequest) -> Result<ChatResponse, ProviderError> {
+        ProviderGateway::chat(self, req).await
+    }
 }
 
 impl<U: UsageSinkTrait> ProviderGateway<U> {

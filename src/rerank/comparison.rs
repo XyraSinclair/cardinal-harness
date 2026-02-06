@@ -7,7 +7,7 @@ use tracing::warn;
 
 use crate::cache::{CacheError, CachedJudgement, PairwiseCache, PairwiseCacheKey};
 use crate::gateway::{
-    Attribution, ChatModel, ChatRequest, ProviderError, ProviderGateway, UsageSink,
+    Attribution, ChatGateway, ChatModel, ChatRequest, ProviderError,
 };
 use crate::text_chunking::count_tokens;
 
@@ -178,8 +178,8 @@ fn extract_json(raw: &str) -> &str {
 
 /// Perform a pairwise comparison using the LLM.
 #[allow(clippy::too_many_arguments)]
-pub async fn compare_pair<U: UsageSink>(
-    gateway: &ProviderGateway<U>,
+pub async fn compare_pair(
+    gateway: &dyn ChatGateway,
     cache: Option<&dyn PairwiseCache>,
     cache_only: bool,
     model: &str,

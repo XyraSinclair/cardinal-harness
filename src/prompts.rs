@@ -120,6 +120,12 @@ impl PromptTemplate {
 // =============================================================================
 // Standard prompts
 // =============================================================================
+//
+// The ratio ladder [1.0, 1.05, 1.1, ..., 18.0, 26.0] is approximately geometric
+// (evenly spaced in log-space), so each step represents a similar perceptual
+// increment. The cap at 26× is intentional: extreme ratios are unreliable, and
+// if two items differ by more than 26× the comparison is already decisive.
+// Fine gradations near 1.0 (1.05, 1.1) let the model express near-ties.
 
 pub const PROMPT_V1: PromptTemplate = PromptTemplate {
     slug: "canonical_v1",

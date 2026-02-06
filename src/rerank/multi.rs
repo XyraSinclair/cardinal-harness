@@ -26,7 +26,7 @@ use futures::stream::{self, StreamExt};
 
 use crate::cache::{PairwiseCache, PairwiseCacheKey};
 use crate::gateway::pricing as provider_pricing;
-use crate::gateway::{Attribution, ProviderGateway, UsageSink};
+use crate::gateway::{Attribution, ChatGateway};
 use crate::prompts::{prompt_by_slug, DEFAULT_PROMPT};
 use crate::text_chunking::count_tokens;
 
@@ -41,6 +41,7 @@ use super::comparison::{
     compare_pair, estimate_pairwise_input_tokens, pairwise_max_output_tokens, ComparisonError,
     PAIRWISE_MAX_OUTPUT_TOKENS_DEFAULT,
 };
+use super::hooks::{ComparisonEvent, ComparisonObserver, WarmStartProvider};
 use super::model_policy::{ModelPolicy, ModelPolicyContext};
 use super::options::RerankRunOptions;
 use super::trace::{now_epoch_ms, ComparisonTrace, TraceError, TraceSink};
@@ -63,6 +64,13 @@ const DEFAULT_MODEL: &str = "openai/gpt-5-mini";
 /// Default maximum number of comparisons to run concurrently.
 const DEFAULT_COMPARISON_CONCURRENCY: usize = 8;
 const MAX_COMPARISON_CONCURRENCY: usize = 64;
+
+/// Hard caps to prevent resource exhaustion / DoS.
+///
+/// Note: the per-attribute RatingEngine uses a dense solver and currently rejects n > 5,000.
+const MAX_ENTITIES: usize = 5_000;
+const MAX_ATTRIBUTES: usize = 256;
+const MAX_GATES: usize = 256;
 
 /// Rerank billing multiplier: 20% markup on top of provider cost.
 const RERANK_MARKUP_NUM: i64 = 6;
@@ -194,10 +202,29 @@ pub fn validate_multi_rerank_request(req: &MultiRerankRequest) -> Result<(), Mul
             "entities must contain at least 2 items".into(),
         ));
     }
+    if req.entities.len() > MAX_ENTITIES {
+        return Err(MultiRerankError::InvalidRequest(format!(
+            "entities must contain at most {MAX_ENTITIES} items (n={})",
+            req.entities.len()
+        )));
+    }
     if req.attributes.is_empty() {
         return Err(MultiRerankError::InvalidRequest(
             "attributes must not be empty".into(),
         ));
+    }
+    if req.attributes.len() > MAX_ATTRIBUTES {
+        return Err(MultiRerankError::InvalidRequest(format!(
+            "attributes must contain at most {MAX_ATTRIBUTES} items (n={})",
+            req.attributes.len()
+        )));
+    }
+
+    if req.gates.len() > MAX_GATES {
+        return Err(MultiRerankError::InvalidRequest(format!(
+            "gates must contain at most {MAX_GATES} items (n={})",
+            req.gates.len()
+        )));
     }
 
     if req.topk.k == 0 {
@@ -211,6 +238,26 @@ pub fn validate_multi_rerank_request(req: &MultiRerankRequest) -> Result<(), Mul
             req.topk.k,
             req.entities.len()
         )));
+    }
+    if req.topk.band_size == 0 {
+        return Err(MultiRerankError::InvalidRequest(
+            "topk.band_size must be >= 1".into(),
+        ));
+    }
+    if !req.topk.tolerated_error.is_finite() || req.topk.tolerated_error < 0.0 {
+        return Err(MultiRerankError::InvalidRequest(
+            "topk.tolerated_error must be finite and >= 0".into(),
+        ));
+    }
+    if !req.topk.weight_exponent.is_finite() {
+        return Err(MultiRerankError::InvalidRequest(
+            "topk.weight_exponent must be finite".into(),
+        ));
+    }
+    if !req.topk.stop_sigma_inflate.is_finite() || req.topk.stop_sigma_inflate <= 0.0 {
+        return Err(MultiRerankError::InvalidRequest(
+            "topk.stop_sigma_inflate must be finite and > 0".into(),
+        ));
     }
 
     if matches!(req.comparison_budget, Some(0)) {
@@ -325,13 +372,15 @@ fn finite_or_zero(x: f64) -> f64 {
 ///
 /// If a cache is provided, cached pairwise judgements are reused and new
 /// judgements are written back to the cache.
-pub async fn multi_rerank<U: UsageSink>(
-    gateway: Arc<ProviderGateway<U>>,
+pub async fn multi_rerank(
+    gateway: Arc<dyn ChatGateway>,
     cache: Option<&dyn PairwiseCache>,
     model_policy: Option<Arc<dyn ModelPolicy>>,
     run_options: Option<&RerankRunOptions>,
     req: MultiRerankRequest,
     attribution: Attribution,
+    warm_start: Option<&dyn WarmStartProvider>,
+    observer: Option<&dyn ComparisonObserver>,
     cancel_flag: Option<&AtomicBool>,
 ) -> Result<MultiRerankResponse, MultiRerankError> {
     multi_rerank_with_trace(
@@ -341,6 +390,8 @@ pub async fn multi_rerank<U: UsageSink>(
         run_options,
         req,
         attribution,
+        warm_start,
+        observer,
         None,
         cancel_flag,
     )
@@ -352,13 +403,15 @@ pub async fn multi_rerank<U: UsageSink>(
 /// If a cache is provided, cached pairwise judgements are reused and new
 /// judgements are written back to the cache.
 #[allow(clippy::too_many_arguments)]
-pub async fn multi_rerank_with_trace<U: UsageSink>(
-    gateway: Arc<ProviderGateway<U>>,
+pub async fn multi_rerank_with_trace(
+    gateway: Arc<dyn ChatGateway>,
     cache: Option<&dyn PairwiseCache>,
     model_policy: Option<Arc<dyn ModelPolicy>>,
     run_options: Option<&RerankRunOptions>,
     req: MultiRerankRequest,
     attribution: Attribution,
+    warm_start: Option<&dyn WarmStartProvider>,
+    observer: Option<&dyn ComparisonObserver>,
     trace: Option<&dyn TraceSink>,
     cancel_flag: Option<&AtomicBool>,
 ) -> Result<MultiRerankResponse, MultiRerankError> {
@@ -472,6 +525,57 @@ pub async fn multi_rerank_with_trace<U: UsageSink>(
         .enumerate()
         .map(|(idx, a)| (a.id.as_str(), idx))
         .collect();
+
+    if let Some(provider) = warm_start {
+        match provider.warm_start(&req, rater_id).await {
+            Ok(data) => {
+                let mut total_loaded = 0usize;
+
+                for (attribute_id, observations) in data.observations_by_attribute {
+                    if observations.is_empty() {
+                        continue;
+                    }
+
+                    if let Err(e) = manager.add_observations(&attribute_id, &observations) {
+                        tracing::warn!(
+                            attribute_id = %attribute_id,
+                            error = %e,
+                            "Warm-start failed: add observations"
+                        );
+                        continue;
+                    }
+
+                    total_loaded = total_loaded.saturating_add(observations.len());
+
+                    let Some(&attr_idx) = attr_id_to_index.get(attribute_id.as_str()) else {
+                        continue;
+                    };
+
+                    for obs in &observations {
+                        let (a, b) = if obs.i <= obs.j {
+                            (obs.i, obs.j)
+                        } else {
+                            (obs.j, obs.i)
+                        };
+                        let key = (attr_idx, a, b);
+                        let reps = if obs.reps.is_finite() && obs.reps > 0.0 {
+                            obs.reps
+                        } else {
+                            0.0
+                        };
+                        *pair_repeats.entry(key).or_insert(0.0) += reps;
+                    }
+                }
+
+                if total_loaded > 0 {
+                    manager.invalidate();
+                }
+            }
+            Err(e) => {
+                tracing::warn!(error = %e, "Warm-start provider failed");
+            }
+        }
+    }
 
     #[derive(Clone, Copy)]
     struct CompareTask {
@@ -758,6 +862,23 @@ pub async fn multi_rerank_with_trace<U: UsageSink>(
                         event.refused = true;
                         trace.record(event)?;
                     }
+
+                    if let Some(observer) = observer {
+                        let event = ComparisonEvent {
+                            attribute_id: attr.id.clone(),
+                            attribute_index: task.attr_idx,
+                            entity_a_id: entity_a.id.clone(),
+                            entity_b_id: entity_b.id.clone(),
+                            entity_a_index: task.i,
+                            entity_b_index: task.j,
+                            model: selected_model.clone(),
+                            judgement: PairwiseJudgement::Refused,
+                            usage,
+                        };
+                        if let Err(e) = observer.on_comparison(event).await {
+                            tracing::warn!(error = %e, "Comparison observer failed");
+                        }
+                    }
                 }
                 Ok((
                     PairwiseJudgement::Observation {
@@ -809,6 +930,27 @@ pub async fn multi_rerank_with_trace<U: UsageSink>(
                         event.ratio = Some(ratio);
                         event.confidence = Some(confidence);
                         trace.record(event)?;
+                    }
+
+                    if let Some(observer) = observer {
+                        let event = ComparisonEvent {
+                            attribute_id: attr.id.clone(),
+                            attribute_index: task.attr_idx,
+                            entity_a_id: entity_a.id.clone(),
+                            entity_b_id: entity_b.id.clone(),
+                            entity_a_index: task.i,
+                            entity_b_index: task.j,
+                            model: selected_model.clone(),
+                            judgement: PairwiseJudgement::Observation {
+                                higher_ranked,
+                                ratio,
+                                confidence,
+                            },
+                            usage,
+                        };
+                        if let Err(e) = observer.on_comparison(event).await {
+                            tracing::warn!(error = %e, "Comparison observer failed");
+                        }
                     }
                 }
                 Err(e) => {
@@ -1211,6 +1353,50 @@ mod tests {
     fn validate_rejects_empty_attributes() {
         let mut req = base_request();
         req.attributes.clear();
+        let err = validate_multi_rerank_request(&req).unwrap_err();
+        assert!(matches!(err, MultiRerankError::InvalidRequest(_)));
+    }
+
+    #[test]
+    fn validate_rejects_too_many_entities() {
+        let mut req = base_request();
+        req.entities = (0..(MAX_ENTITIES + 1))
+            .map(|i| MultiRerankEntity {
+                id: format!("e{i}"),
+                text: "x".to_string(),
+            })
+            .collect();
+        let err = validate_multi_rerank_request(&req).unwrap_err();
+        assert!(matches!(err, MultiRerankError::InvalidRequest(_)));
+    }
+
+    #[test]
+    fn validate_rejects_too_many_attributes() {
+        let mut req = base_request();
+        req.attributes = (0..(MAX_ATTRIBUTES + 1))
+            .map(|i| MultiRerankAttributeSpec {
+                id: format!("a{i}"),
+                prompt: "p".to_string(),
+                prompt_template_slug: None,
+                weight: 1.0,
+            })
+            .collect();
+        let err = validate_multi_rerank_request(&req).unwrap_err();
+        assert!(matches!(err, MultiRerankError::InvalidRequest(_)));
+    }
+
+    #[test]
+    fn validate_rejects_zero_band_size() {
+        let mut req = base_request();
+        req.topk.band_size = 0;
+        let err = validate_multi_rerank_request(&req).unwrap_err();
+        assert!(matches!(err, MultiRerankError::InvalidRequest(_)));
+    }
+
+    #[test]
+    fn validate_rejects_nan_tolerated_error() {
+        let mut req = base_request();
+        req.topk.tolerated_error = f64::NAN;
         let err = validate_multi_rerank_request(&req).unwrap_err();
         assert!(matches!(err, MultiRerankError::InvalidRequest(_)));
     }

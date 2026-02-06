@@ -3,7 +3,7 @@ name = "cardinal-harness"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
-description = "LLMs-as-judge harness for cardinal latent ratings via pairwise ratio comparisons"
+description = "The highest quality way to have LLMs put numbers on things — pairwise ratio judgments, robust statistics, uncertainty-aware stopping"
 readme = "README.md"
 repository = "https://github.com/XyraSinclair/cardinal-harness"
 homepage = "https://github.com/XyraSinclair/cardinal-harness"
@@ -37,3 +37,4 @@ uuid = { version = "1", features = ["v4", "serde"] }
 [dev-dependencies]
 tempfile = "3"
 tokio-test = "0.4"
+wiremock = "0.6"

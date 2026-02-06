@@ -6,8 +6,9 @@
 use std::sync::Arc;
 
 use crate::cache::PairwiseCache;
-use crate::gateway::{Attribution, ProviderGateway, UsageSink};
+use crate::gateway::{Attribution, ChatGateway};
 
+use super::hooks::{ComparisonObserver, WarmStartProvider};
 use super::model_policy::ModelPolicy;
 use super::multi::{multi_rerank_with_trace, MultiRerankError};
 use super::options::RerankRunOptions;
@@ -79,13 +80,15 @@ pub fn to_multi_request(req: &RerankRequest) -> MultiRerankRequest {
 ///
 /// Internally converts to a multi-attribute request with one attribute.
 /// If a cache is provided, cached pairwise judgements are reused.
-pub async fn rerank<U: UsageSink>(
-    gateway: Arc<ProviderGateway<U>>,
+pub async fn rerank(
+    gateway: Arc<dyn ChatGateway>,
     cache: Option<&dyn PairwiseCache>,
     model_policy: Option<Arc<dyn ModelPolicy>>,
     run_options: Option<&RerankRunOptions>,
     req: RerankRequest,
     attribution: Attribution,
+    warm_start: Option<&dyn WarmStartProvider>,
+    observer: Option<&dyn ComparisonObserver>,
 ) -> Result<RerankResponse, MultiRerankError> {
     rerank_with_trace(
         gateway,
@@ -94,19 +97,23 @@ pub async fn rerank<U: UsageSink>(
         run_options,
         req,
         attribution,
+        warm_start,
+        observer,
         None,
     )
     .await
 }
 
 /// Run a single-attribute reranking session with optional trace output.
-pub async fn rerank_with_trace<U: UsageSink>(
-    gateway: Arc<ProviderGateway<U>>,
+pub async fn rerank_with_trace(
+    gateway: Arc<dyn ChatGateway>,
     cache: Option<&dyn PairwiseCache>,
     model_policy: Option<Arc<dyn ModelPolicy>>,
     run_options: Option<&RerankRunOptions>,
     req: RerankRequest,
     attribution: Attribution,
+    warm_start: Option<&dyn WarmStartProvider>,
+    observer: Option<&dyn ComparisonObserver>,
     trace: Option<&dyn TraceSink>,
 ) -> Result<RerankResponse, MultiRerankError> {
     let multi_req = to_multi_request(&req);
@@ -119,6 +126,8 @@ pub async fn rerank_with_trace<U: UsageSink>(
         run_options,
         multi_req,
         attribution,
+        warm_start,
+        observer,
         trace,
         None,
     )

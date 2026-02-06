@@ -159,6 +159,8 @@ async fn rerank_records_trace_for_cached_comparison() {
         Some(&run_options),
         req.clone(),
         Attribution::new("test::rerank_trace_cached"),
+        None,
+        None,
         Some(&trace_sink),
         None,
     )
@@ -225,6 +227,8 @@ async fn rerank_records_trace_on_cache_miss_in_cache_only_mode() {
         Some(&run_options),
         req,
         Attribution::new("test::rerank_trace_cache_miss"),
+        None,
+        None,
         Some(&trace_sink),
         None,
     )

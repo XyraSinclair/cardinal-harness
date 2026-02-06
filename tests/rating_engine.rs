@@ -97,3 +97,21 @@ fn plan_edges_returns_sorted_proposals_and_skips_invalid_candidates() {
         );
     }
 }
+
+#[test]
+fn rating_engine_cycle_dim_positive_for_simple_triangle() {
+    let mut engine = RatingEngine::new(3, AttributeParams::default(), sim_raters(), None).unwrap();
+
+    // A simple inconsistent cycle: 0 > 1 > 2 > 0.
+    engine.ingest(&[
+        Observation::new(0, 1, 2.0, 1.0, "sim", 1.0),
+        Observation::new(1, 2, 2.0, 1.0, "sim", 1.0),
+        Observation::new(2, 0, 2.0, 1.0, "sim", 1.0),
+    ]);
+    let summary = engine.solve();
+
+    assert_eq!(summary.components, 1);
+    assert!(summary.cycle_dim >= 1);
+    assert!(summary.scores.iter().all(|v| v.is_finite()));
+    assert!(summary.diag_cov.iter().all(|v| v.is_finite() && *v >= 0.0));
+}

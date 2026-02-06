@@ -193,26 +193,51 @@ pub struct MultiRerankAttributeSpec {
 }
 
 /// Top-k configuration for multi-rerank.
+///
+/// Controls how the system decides which items to focus on, when to stop
+/// asking questions, and how conservative to be about the answer.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct MultiRerankTopKSpec {
-    /// Number of top items to focus on.
+    /// How many top items you care about identifying correctly.
+    /// The system focuses its comparison budget on separating the top-k from the rest.
     pub k: usize,
-    /// Exponent for weight emphasis in planning.
+
+    /// How much to prioritize high-weight attributes in planning (default: 1.3).
+    /// Values > 1.0 make the planner spend more comparisons on heavily-weighted
+    /// attributes; 1.0 = proportional to weight; 2.0 = quadratic emphasis.
     #[serde(default = "default_weight_exponent")]
     pub weight_exponent: f64,
-    /// Stop when global top-k error is below this.
+
+    /// Maximum acceptable probability that the top-k ranking is wrong (default: 0.1).
+    /// This is the sum of frontier inversion probabilities — the chance that any
+    /// item near the k-boundary is on the wrong side. Lower = more comparisons
+    /// but higher confidence. 0.1 means ~90% confidence the top-k is correct.
     #[serde(default = "default_tolerated_error")]
     pub tolerated_error: f64,
-    /// Frontier width for uncertainty tracking and candidate selection.
+
+    /// How many items around the k-boundary to monitor for uncertainty (default: 5).
+    /// A band_size of 5 means tracking items ranked k-5 through k+5. Larger values
+    /// catch more edge cases but increase planner work.
     #[serde(default = "default_band_size")]
     pub band_size: usize,
-    /// Max active set size to enable effective-resistance variance for critical pair.
+
+    /// Use exact effective-resistance planning when the active set is this small
+    /// or smaller (default: 64). Effective resistance measures how much a new
+    /// comparison would reduce uncertainty — exact computation is O(n³) so we
+    /// only do it for small sets.
     #[serde(default = "default_effective_resistance_max_active")]
     pub effective_resistance_max_active: usize,
-    /// Inflate sigma for certified stop to be conservative.
+
+    /// Safety margin for the certified stopping check (default: 1.25).
+    /// Inflates uncertainty estimates by this factor before checking if the top-k
+    /// is settled. Values > 1.0 make the system ask extra questions rather than
+    /// risk stopping with an incorrect ranking. 1.0 = no margin.
     #[serde(default = "default_stop_sigma_inflate")]
     pub stop_sigma_inflate: f64,
-    /// Require this many consecutive certified checks to stop.
+
+    /// How many consecutive rounds the certified stop check must pass before
+    /// actually stopping (default: 2). Prevents premature stops from lucky
+    /// fluctuations in the uncertainty estimate.
     #[serde(default = "default_stop_min_consecutive")]
     pub stop_min_consecutive: usize,
 }
@@ -393,7 +418,7 @@ pub enum HigherRanked {
 }
 
 /// Result of a pairwise LLM comparison.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum PairwiseJudgement {
     /// Valid comparison result.
     Observation {

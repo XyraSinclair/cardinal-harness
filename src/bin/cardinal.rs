@@ -267,6 +267,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 Some(&options),
                 req.clone(),
                 cardinal_harness::Attribution::new("cardinal::rerank"),
+                None,
+                None,
                 trace_ref,
                 None,
             )

@@ -52,41 +52,77 @@ type FuseBuckets = HashMap<FuseBucketKey, Vec<FuseBucketEntry>>;
 //  Config
 // ---------------------------------------------------------------------
 
+/// Configuration for the rating engine (IRLS solver + planner).
+///
+/// See `docs/ALGORITHM.md` for rationale behind these defaults.
 #[derive(Debug, Clone)]
 pub struct Config {
-    // Confidence curve g(c) = eps + (1 - eps) * c^gamma
+    // -- Confidence mapping --------------------------------------------------
+    // Maps LLM confidence (0..1) to observation weight via g(c) = eps + (1-eps)*c^gamma.
+    // Higher gamma = more aggressive discounting of low-confidence judgments.
+
+    /// Floor for confidence weight — even confidence=0 observations get this much weight.
     pub eps_confidence: f64,
+    /// Exponent for confidence curve. 2.0 means the LLM must be quite confident
+    /// before an observation gets substantial weight in the solver.
     pub gamma_confidence: f64,
 
-    // Robust IRLS (Huber)
+    // -- Robust IRLS (Huber loss) --------------------------------------------
+    // Huber loss downweights outlier comparisons where the LLM was inconsistent.
+
+    /// Huber loss threshold: residuals beyond k standard deviations are downweighted.
+    /// 1.5 is the standard choice — aggressive enough to suppress outliers,
+    /// mild enough to not discard borderline observations.
     pub huber_k: f64,
+    /// Maximum IRLS iterations. 12 is usually more than enough for convergence.
     pub irls_max_iters: usize,
+    /// IRLS convergence tolerance (relative change in scores between iterations).
     pub irls_tol: f64,
 
-    // Numerical stability
+    // -- Numerical stability -------------------------------------------------
+
+    /// Tikhonov regularization for the Hessian. Prevents singular matrices when
+    /// the comparison graph is sparse. Should be negligibly small (1e-9).
     pub ridge_lambda: f64,
+    /// Epsilon to prevent division by zero in weight calculations.
     pub tiny: f64,
+    /// Cap on log-ratio observations. ln(26) ≈ 3.26, so 10.0 is very permissive.
     pub max_log_ratio: f64,
 
-    // Hutchinson probes for diag(L^-1)
+    // -- Variance estimation -------------------------------------------------
+
+    /// Number of Hutchinson random probes for estimating diag(H^{-1}) when the
+    /// matrix is too large for exact Cholesky inversion (>256 items).
     pub hutch_probes: usize,
 
-    // Rank weighting: w_rank(pos) = 1 / (pos+1)^a
+    // -- Rank-weighted planning ----------------------------------------------
+    // Controls how the planner prioritizes comparisons near the top of the ranking.
+
+    /// Rank weighting exponent: w(pos) = 1/(pos+1)^a. Higher values focus more
+    /// comparisons on the very top of the ranking.
     pub rank_weight_exponent: f64,
 
-    // Pair selection for rank risk
+    /// Window around each rank position to consider for gap-closing comparisons.
     pub rank_band_window: usize,
+    /// Score gaps smaller than this are considered "small" and targeted for resolution.
     pub small_gap_threshold: f64,
+    /// Safety cap on candidate pairs to prevent unbounded planner iteration.
     pub max_rank_pairs: Option<usize>,
 
-    // Top-K focus
+    // -- Top-K focus ---------------------------------------------------------
+
+    /// If set, focus planning on identifying the top-k items specifically.
     pub top_k: Option<usize>,
+    /// Weight given to items outside the top-k band (0.0 = ignore tail entirely).
     pub tail_weight: f64,
 
-    // Planner blending
+    // -- Planner blending ----------------------------------------------------
+
+    /// Blend factor between information-gain and rank-risk objectives.
+    /// 1.0 = pure rank-risk, 0.0 = pure information gain.
     pub lambda_risk: f64,
 
-    // RNG seed
+    /// RNG seed for reproducible planner tie-breaking and Hutchinson probes.
     pub rng_seed: u64,
 }
 
