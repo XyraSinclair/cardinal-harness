@@ -36,6 +36,23 @@ fn median(sorted: &[f64]) -> f64 {
     }
 }
 
+fn stddev_population(scores: &[f64], indices: &[usize]) -> f64 {
+    if indices.is_empty() {
+        return 0.0;
+    }
+    let n = indices.len() as f64;
+    let mean = indices.iter().map(|&i| scores[i]).sum::<f64>() / n;
+    let var = indices
+        .iter()
+        .map(|&i| {
+            let d = scores[i] - mean;
+            d * d
+        })
+        .sum::<f64>()
+        / n;
+    var.max(0.0).sqrt()
+}
+
 /// Compute robust MAD scale for scores (for weight normalization).
 fn compute_attribute_scale(scores: &[f64]) -> f64 {
     let n = scores.len();
@@ -56,7 +73,15 @@ fn compute_attribute_scale(scores: &[f64]) -> f64 {
 
     let mut devs: Vec<f64> = finite.iter().map(|&i| (scores[i] - med).abs()).collect();
     devs.sort_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Equal));
-    median(&devs).max(SCALE_FLOOR)
+    let mad_raw = median(&devs);
+    if mad_raw >= SCALE_FLOOR {
+        return mad_raw;
+    }
+
+    // Degenerate/tied distributions can yield MAD=0 even when there's meaningful spread (e.g. many ties + a few outliers).
+    // Using SCALE_FLOOR directly makes normalized scores/z-scores explode; fall back to stddev-based scaling.
+    let sigma = stddev_population(scores, &finite).max(SCALE_FLOOR);
+    (sigma / MAD_TO_SIGMA).max(SCALE_FLOOR)
 }
 
 /// Compute robust derived units for a single attribute.
@@ -91,7 +116,14 @@ pub(crate) fn compute_attribute_units(scores: &[f64]) -> (f64, Vec<f64>, Vec<f64
 
     let mut devs: Vec<f64> = finite.iter().map(|&i| (scores[i] - med).abs()).collect();
     devs.sort_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Equal));
-    let mad = median(&devs).max(SCALE_FLOOR);
+    let mad_raw = median(&devs);
+    let mad = if mad_raw >= SCALE_FLOOR {
+        mad_raw
+    } else {
+        // See compute_attribute_scale() for rationale.
+        let sigma = stddev_population(scores, &finite).max(SCALE_FLOOR);
+        (sigma / MAD_TO_SIGMA).max(SCALE_FLOOR)
+    };
     let mad_sigma = (mad * MAD_TO_SIGMA).max(SCALE_FLOOR);
 
     for i in 0..n {
@@ -1416,5 +1448,16 @@ mod tests {
         let mut pct_sorted = pct.clone();
         pct_sorted.sort_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Equal));
         assert_eq!(pct_sorted, vec![1.0 / 6.0, 3.0 / 6.0, 5.0 / 6.0]);
+    }
+
+    #[test]
+    fn test_compute_attribute_units_degenerate_mad() {
+        // When >= 50% of values tie at the median, MAD can be zero even with non-trivial spread.
+        // We should avoid exploding z-scores/weight normalization in this case.
+        let scores = vec![0.0, 0.0, 0.097];
+        let (scale, z, _min_norm, _pct) = compute_attribute_units(&scores);
+        assert!(scale > 1e-3);
+        assert!(z.iter().all(|v| v.is_finite()));
+        assert!(z[2].abs() < 100.0);
     }
 }

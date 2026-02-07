@@ -60,7 +60,6 @@ pub struct Config {
     // -- Confidence mapping --------------------------------------------------
     // Maps LLM confidence (0..1) to observation weight via g(c) = eps + (1-eps)*c^gamma.
     // Higher gamma = more aggressive discounting of low-confidence judgments.
-
     /// Floor for confidence weight — even confidence=0 observations get this much weight.
     pub eps_confidence: f64,
     /// Exponent for confidence curve. 2.0 means the LLM must be quite confident
@@ -69,7 +68,6 @@ pub struct Config {
 
     // -- Robust IRLS (Huber loss) --------------------------------------------
     // Huber loss downweights outlier comparisons where the LLM was inconsistent.
-
     /// Huber loss threshold: residuals beyond k standard deviations are downweighted.
     /// 1.5 is the standard choice — aggressive enough to suppress outliers,
     /// mild enough to not discard borderline observations.
@@ -80,7 +78,6 @@ pub struct Config {
     pub irls_tol: f64,
 
     // -- Numerical stability -------------------------------------------------
-
     /// Tikhonov regularization for the Hessian. Prevents singular matrices when
     /// the comparison graph is sparse. Should be negligibly small (1e-9).
     pub ridge_lambda: f64,
@@ -90,14 +87,12 @@ pub struct Config {
     pub max_log_ratio: f64,
 
     // -- Variance estimation -------------------------------------------------
-
     /// Number of Hutchinson random probes for estimating diag(H^{-1}) when the
     /// matrix is too large for exact Cholesky inversion (>256 items).
     pub hutch_probes: usize,
 
     // -- Rank-weighted planning ----------------------------------------------
     // Controls how the planner prioritizes comparisons near the top of the ranking.
-
     /// Rank weighting exponent: w(pos) = 1/(pos+1)^a. Higher values focus more
     /// comparisons on the very top of the ranking.
     pub rank_weight_exponent: f64,
@@ -110,14 +105,12 @@ pub struct Config {
     pub max_rank_pairs: Option<usize>,
 
     // -- Top-K focus ---------------------------------------------------------
-
     /// If set, focus planning on identifying the top-k items specifically.
     pub top_k: Option<usize>,
     /// Weight given to items outside the top-k band (0.0 = ignore tail entirely).
     pub tail_weight: f64,
 
     // -- Planner blending ----------------------------------------------------
-
     /// Blend factor between information-gain and rank-risk objectives.
     /// 1.0 = pure rank-risk, 0.0 = pure information gain.
     pub lambda_risk: f64,

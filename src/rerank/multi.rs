@@ -372,6 +372,7 @@ fn finite_or_zero(x: f64) -> f64 {
 ///
 /// If a cache is provided, cached pairwise judgements are reused and new
 /// judgements are written back to the cache.
+#[allow(clippy::too_many_arguments)]
 pub async fn multi_rerank(
     gateway: Arc<dyn ChatGateway>,
     cache: Option<&dyn PairwiseCache>,

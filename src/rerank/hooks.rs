@@ -55,4 +55,3 @@ pub enum ObserverError {
 pub trait ComparisonObserver: Send + Sync {
     async fn on_comparison(&self, event: ComparisonEvent) -> Result<(), ObserverError>;
 }
-

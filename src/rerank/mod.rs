@@ -24,7 +24,10 @@ pub mod types;
 
 // Re-export main entry points
 pub use comparison::{compare_pair, ComparisonError};
-pub use hooks::{ComparisonEvent, ComparisonObserver, ObserverError, WarmStartData, WarmStartError, WarmStartProvider};
+pub use hooks::{
+    ComparisonEvent, ComparisonObserver, ObserverError, WarmStartData, WarmStartError,
+    WarmStartProvider,
+};
 pub use model_policy::{ModelLadderPolicy, ModelPolicy, ModelPolicyContext};
 pub use multi::{
     apply_rerank_markup, estimate_max_rerank_charge, multi_rerank, multi_rerank_with_trace,

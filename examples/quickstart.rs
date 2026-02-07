@@ -74,13 +74,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             ..serde_json::from_str("{}").unwrap()
         },
 
-        gates: vec![],              // no hard filters on any attribute
-        comparison_budget: None,    // no cap on number of LLM calls
-        latency_budget_ms: None,    // no wall-clock time limit
-        model: None,                // use the model ladder's default
-        rater_id: None,             // no logical rater grouping
+        gates: vec![],                // no hard filters on any attribute
+        comparison_budget: None,      // no cap on number of LLM calls
+        latency_budget_ms: None,      // no wall-clock time limit
+        model: None,                  // use the model ladder's default
+        rater_id: None,               // no logical rater grouping
         comparison_concurrency: None, // use internal default parallelism
-        max_pair_repeats: None,     // allow re-asking the same pair if needed
+        max_pair_repeats: None,       // allow re-asking the same pair if needed
     };
 
     // -- Run it --------------------------------------------------------------
@@ -110,10 +110,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     for entity in &resp.entities {
         println!(
             "  {} (rank {:?}): utility = {:.3} ± {:.3}",
-            entity.id,
-            entity.rank,
-            entity.u_mean,
-            entity.u_std,
+            entity.id, entity.rank, entity.u_mean, entity.u_std,
         );
     }
 

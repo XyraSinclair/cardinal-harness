@@ -80,6 +80,7 @@ pub fn to_multi_request(req: &RerankRequest) -> MultiRerankRequest {
 ///
 /// Internally converts to a multi-attribute request with one attribute.
 /// If a cache is provided, cached pairwise judgements are reused.
+#[allow(clippy::too_many_arguments)]
 pub async fn rerank(
     gateway: Arc<dyn ChatGateway>,
     cache: Option<&dyn PairwiseCache>,
@@ -105,6 +106,7 @@ pub async fn rerank(
 }
 
 /// Run a single-attribute reranking session with optional trace output.
+#[allow(clippy::too_many_arguments)]
 pub async fn rerank_with_trace(
     gateway: Arc<dyn ChatGateway>,
     cache: Option<&dyn PairwiseCache>,

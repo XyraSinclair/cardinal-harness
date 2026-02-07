@@ -6,9 +6,7 @@ use serde::Deserialize;
 use tracing::warn;
 
 use crate::cache::{CacheError, CachedJudgement, PairwiseCache, PairwiseCacheKey};
-use crate::gateway::{
-    Attribution, ChatGateway, ChatModel, ChatRequest, ProviderError,
-};
+use crate::gateway::{Attribution, ChatGateway, ChatModel, ChatRequest, ProviderError};
 use crate::text_chunking::count_tokens;
 
 use crate::prompts::{prompt_by_slug, EntityRef, DEFAULT_PROMPT};
