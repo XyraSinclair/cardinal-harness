@@ -142,6 +142,7 @@ Tune thresholds to your domain if you want more (or less) aggressive switching.
 - `gateway`: OpenRouter client + usage tracking
 
 See `docs/ALGORITHM.md` for full design rationale — why pairwise ratios, why IRLS, why Huber loss, how the stopping rule works, and more.
+See `docs/PROMPTS.md` for prompt template slugs and context placement details.
 
 ## CLI
 
@@ -161,6 +162,9 @@ cargo run --bin cardinal -- policy load --config policy.json
 
 # Run synthetic evals (JSONL) and emit a CSV error curve
 cargo run --bin cardinal -- eval --out eval.jsonl --curve-csv curves.csv
+
+# Run synthetic Likert baseline evals (JSONL) for comparison
+cargo run --bin cardinal -- eval-likert --out eval_likert.jsonl --curve-csv curves_likert.csv
 
 # Generate a report from request/response JSON
 cargo run --bin cardinal -- report --request request.json --response response.json --out report.md

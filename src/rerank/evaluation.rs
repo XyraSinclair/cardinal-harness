@@ -75,6 +75,58 @@ pub struct EvaluationResult {
 }
 
 // =============================================================================
+// Likert baseline evaluation
+// =============================================================================
+
+/// Configuration for the Likert baseline simulator.
+#[derive(Debug, Clone, Copy)]
+pub struct LikertEvalConfig {
+    /// Number of discrete levels in the Likert scale (e.g. 5 or 10).
+    pub levels: usize,
+    /// Multiplies the synthetic `comparison_budget` when allocating Likert ratings.
+    ///
+    /// Use this to explore fairness regimes, e.g.:
+    /// - `1.0`: equal number of model calls (pairwise comparisons vs per-item ratings)
+    /// - `2.0`: rough proxy for equal "entity reads" (pairwise prompts contain 2 entities)
+    pub budget_multiplier: f64,
+}
+
+impl Default for LikertEvalConfig {
+    fn default() -> Self {
+        Self {
+            levels: 10,
+            budget_multiplier: 1.0,
+        }
+    }
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct LikertEvaluationMetrics {
+    pub kendall_tau: f64,
+    pub spearman_rho: f64,
+    pub kendall_tau_all: f64,
+    pub spearman_rho_all: f64,
+    pub topk_precision: f64,
+    pub topk_recall: f64,
+    pub coverage_95ci: f64,
+    pub gate_precision: Option<f64>,
+    pub gate_recall: Option<f64>,
+    pub ratings_attempted: usize,
+    pub ratings_used: usize,
+    pub ratings_refused: usize,
+    pub latency_ms: u128,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct LikertEvaluationResult {
+    pub case_name: String,
+    /// Final metrics at the end of the allocated rating budget.
+    pub metrics: LikertEvaluationMetrics,
+    /// Trajectory of `1 - topk_precision` as more ratings are collected.
+    pub error_trajectory: Vec<f64>,
+}
+
+// =============================================================================
 // Public API
 // =============================================================================
 
@@ -594,6 +646,182 @@ pub fn run_synthetic_case(case: &SyntheticCase) -> EvaluationResult {
     }
 }
 
+/// Run a single synthetic case through a simulated per-item Likert baseline.
+///
+/// This baseline estimates each attribute score directly for each item on a bounded
+/// integer scale, then combines attributes with the same weighting and gating logic
+/// used in pairwise evaluation metrics.
+pub fn run_likert_baseline_case(
+    case: &SyntheticCase,
+    cfg: LikertEvalConfig,
+) -> LikertEvaluationResult {
+    let mut rng = StdRng::seed_from_u64(case.seed ^ 0x9E37_79B9_7F4A_7C15);
+    let n = case.attributes.first().map(|a| a.scores.len()).unwrap_or(0);
+    let levels = cfg.levels.max(2);
+
+    let start_time = Instant::now();
+
+    let n_attributes = case.attributes.len();
+    let pairwise_budget = case
+        .comparison_budget
+        .unwrap_or_else(|| default_comparison_budget(n, n_attributes));
+    let rating_budget = ((pairwise_budget as f64) * cfg.budget_multiplier)
+        .round()
+        .max(1.0) as usize;
+
+    let mut sums: HashMap<&str, Vec<f64>> = HashMap::new();
+    let mut counts: HashMap<&str, Vec<u32>> = HashMap::new();
+    for attr in &case.attributes {
+        sums.insert(attr.id, vec![0.0; n]);
+        counts.insert(attr.id, vec![0; n]);
+    }
+
+    let mut ratings_attempted = 0usize;
+    let mut ratings_used = 0usize;
+    let mut ratings_refused = 0usize;
+    let mut error_trajectory = Vec::new();
+
+    let stride = n.saturating_mul(n_attributes).max(1);
+
+    for step in 0..rating_budget {
+        let slot = step % stride;
+        let attr_idx = (slot / n.max(1)).min(n_attributes.saturating_sub(1));
+        let entity_idx = if n == 0 { 0 } else { slot % n };
+        let attr = &case.attributes[attr_idx];
+
+        ratings_attempted += 1;
+        if rng.gen::<f64>() < case.refusal_rate {
+            ratings_refused += 1;
+        } else {
+            let maybe = simulate_likert_rating(
+                &mut rng,
+                &attr.scores,
+                entity_idx,
+                levels,
+                case.noise_sigma,
+                case.outlier_rate,
+            );
+            if let Some(r) = maybe {
+                let s = sums
+                    .get_mut(attr.id)
+                    .expect("sum map invariant violated for likert baseline");
+                let c = counts
+                    .get_mut(attr.id)
+                    .expect("count map invariant violated for likert baseline");
+                s[entity_idx] += r as f64;
+                c[entity_idx] += 1;
+                ratings_used += 1;
+            } else {
+                ratings_refused += 1;
+            }
+        }
+
+        // Track an error trajectory using feasible-only top-k precision.
+        if (step + 1) % stride == 0 || step + 1 == rating_budget {
+            let (pred_scores, _, pred_feasible) =
+                infer_scores_from_likert(case, levels, &sums, &counts, false);
+            let true_scores = compute_ground_truth_scores(&case.attributes);
+            let eval_indices: Vec<usize> = (0..n).filter(|&i| pred_feasible[i]).collect();
+            let k = case.topk.k.min(eval_indices.len());
+            let p = if eval_indices.len() >= 2 && k > 0 {
+                topk_precision(&pred_scores, &true_scores, &eval_indices, k)
+            } else {
+                0.0
+            };
+            error_trajectory.push((1.0 - p).clamp(0.0, 1.0));
+        }
+    }
+
+    let (pred_scores, pred_vars, pred_feasible) =
+        infer_scores_from_likert(case, levels, &sums, &counts, true);
+    let true_scores = compute_ground_truth_scores(&case.attributes);
+    let true_feasible = compute_true_feasible(&case.attributes, &case.gates);
+    let eval_indices: Vec<usize> = (0..n).filter(|&i| pred_feasible[i]).collect();
+
+    let kendall_tau_all = kendall_tau_b(&pred_scores, &true_scores);
+    let spearman_rho_all = spearman_rho(&pred_scores, &true_scores);
+
+    let (kendall_tau, spearman_rho, topk_precision_v, topk_recall_v) = if eval_indices.len() >= 2 {
+        let pred_eval: Vec<f64> = eval_indices.iter().map(|&i| pred_scores[i]).collect();
+        let true_eval: Vec<f64> = eval_indices.iter().map(|&i| true_scores[i]).collect();
+        let k = case.topk.k.min(eval_indices.len());
+        (
+            kendall_tau_b(&pred_eval, &true_eval),
+            spearman_rho(&pred_eval, &true_eval),
+            topk_precision(&pred_scores, &true_scores, &eval_indices, k),
+            topk_recall(&pred_scores, &true_scores, &eval_indices, k),
+        )
+    } else {
+        (0.0, 0.0, 0.0, 0.0)
+    };
+
+    let coverage_95ci = coverage_95(&pred_scores, &pred_vars, &true_scores, &eval_indices);
+
+    let (gate_precision, gate_recall) = if case.gates.is_empty() {
+        (None, None)
+    } else {
+        let mut tp = 0usize;
+        let mut fp = 0usize;
+        let mut fn_ = 0usize;
+        for i in 0..n {
+            match (pred_feasible[i], true_feasible[i]) {
+                (true, true) => tp += 1,
+                (true, false) => fp += 1,
+                (false, true) => fn_ += 1,
+                (false, false) => {}
+            }
+        }
+        let precision = if tp + fp > 0 {
+            Some(tp as f64 / (tp + fp) as f64)
+        } else {
+            Some(0.0)
+        };
+        let recall = if tp + fn_ > 0 {
+            Some(tp as f64 / (tp + fn_) as f64)
+        } else {
+            Some(0.0)
+        };
+        (precision, recall)
+    };
+
+    LikertEvaluationResult {
+        case_name: case.name.to_string(),
+        metrics: LikertEvaluationMetrics {
+            kendall_tau,
+            spearman_rho,
+            kendall_tau_all,
+            spearman_rho_all,
+            topk_precision: topk_precision_v,
+            topk_recall: topk_recall_v,
+            coverage_95ci,
+            gate_precision,
+            gate_recall,
+            ratings_attempted,
+            ratings_used,
+            ratings_refused,
+            latency_ms: start_time.elapsed().as_millis(),
+        },
+        error_trajectory,
+    }
+}
+
+/// Run the Likert baseline across selected synthetic cases.
+pub fn run_likert_baseline_suite(
+    filter: Option<&str>,
+    cfg: LikertEvalConfig,
+) -> Vec<LikertEvaluationResult> {
+    let cases = synthetic_cases();
+    let selected: Vec<SyntheticCase> = match filter {
+        Some(name) => cases.into_iter().filter(|c| c.name == name).collect(),
+        None => cases,
+    };
+
+    selected
+        .into_iter()
+        .map(|case| run_likert_baseline_case(&case, cfg))
+        .collect()
+}
+
 // =============================================================================
 // Helpers
 // =============================================================================
@@ -621,6 +849,115 @@ fn default_topk(k: usize) -> MultiRerankTopKSpec {
 fn seeded_random_scores(n: usize, seed: u64) -> Vec<f64> {
     let mut rng = StdRng::seed_from_u64(seed);
     (0..n).map(|_| rng.gen_range(0.0..1.0)).collect()
+}
+
+fn infer_scores_from_likert(
+    case: &SyntheticCase,
+    levels: usize,
+    sums: &HashMap<&str, Vec<f64>>,
+    counts: &HashMap<&str, Vec<u32>>,
+    strict_for_gates: bool,
+) -> (Vec<f64>, Vec<f64>, Vec<bool>) {
+    let n = case.attributes.first().map(|a| a.scores.len()).unwrap_or(0);
+    let levels = levels.max(2);
+    let mid = (levels as f64 + 1.0) / 2.0;
+    let range = (levels as f64 - 1.0).max(1.0);
+
+    // Use a crude uncertainty model:
+    // - variance of a single Likert draw scales with the assumed noise level
+    // - missing ratings get a broad prior variance
+    let noise_std = case.noise_sigma.abs() * range / 2.0;
+    let noise_var = noise_std * noise_std;
+    let prior_var = (range * range) / 4.0;
+
+    let mut per_attr_units: HashMap<&str, AttrUnits> = HashMap::new();
+    let mut per_attr_vars: HashMap<&str, Vec<f64>> = HashMap::new();
+    let mut per_attr_scales: HashMap<&str, f64> = HashMap::new();
+
+    for attr in &case.attributes {
+        let s = sums
+            .get(attr.id)
+            .expect("sum map invariant violated for likert baseline");
+        let c = counts
+            .get(attr.id)
+            .expect("count map invariant violated for likert baseline");
+
+        let mut means = vec![mid; n];
+        let mut mean_vars = vec![prior_var; n];
+
+        for i in 0..n {
+            if c[i] > 0 {
+                means[i] = s[i] / c[i] as f64;
+                let denom = c[i] as f64;
+                let v = if noise_var > 0.0 {
+                    noise_var / denom
+                } else {
+                    0.0
+                };
+                mean_vars[i] = v.max(0.0);
+            }
+        }
+
+        let (scale, z, min_norm, pct) = compute_attribute_units(&means);
+        per_attr_units.insert(attr.id, (means, z, min_norm, pct));
+        per_attr_vars.insert(attr.id, mean_vars);
+        per_attr_scales.insert(attr.id, scale.max(1e-6));
+    }
+
+    let mut u_mean = vec![0.0; n];
+    let mut u_var = vec![0.0; n];
+    for attr in &case.attributes {
+        let (means, _, _, _) = per_attr_units
+            .get(attr.id)
+            .expect("units map invariant violated for likert baseline");
+        let mean_vars = per_attr_vars
+            .get(attr.id)
+            .expect("var map invariant violated for likert baseline");
+        let scale = *per_attr_scales
+            .get(attr.id)
+            .expect("scale map invariant violated for likert baseline");
+        let inv = 1.0 / scale;
+        let inv2 = inv * inv;
+        let w = attr.weight;
+        let w2 = w * w;
+        for i in 0..n {
+            u_mean[i] += w * (means[i] * inv);
+            u_var[i] += w2 * (mean_vars[i].max(0.0) * inv2);
+        }
+    }
+
+    let mut feasible = vec![true; n];
+    for gate in &case.gates {
+        let (latent, z, min_norm, pct) = per_attr_units
+            .get(gate.attribute_id.as_str())
+            .expect("gate attribute missing in likert baseline");
+        let c = counts
+            .get(gate.attribute_id.as_str())
+            .expect("gate count missing in likert baseline");
+
+        let unit = gate.unit.to_ascii_lowercase();
+        for i in 0..n {
+            if strict_for_gates && c[i] == 0 {
+                feasible[i] = false;
+                continue;
+            }
+            let value = match unit.as_str() {
+                "latent" => latent[i],
+                "z" => z[i],
+                "percentile" => pct[i],
+                "min_norm" => min_norm[i],
+                _ => latent[i],
+            };
+            let pass = match gate.op.as_str() {
+                ">=" => value >= gate.threshold,
+                "<=" => value <= gate.threshold,
+                _ => true,
+            };
+            feasible[i] &= pass;
+        }
+    }
+
+    (u_mean, u_var, feasible)
 }
 
 fn simulate_pairwise(
@@ -682,6 +1019,49 @@ fn simulate_pairwise(
         ratio,
         confidence,
     }
+}
+
+fn simulate_likert_rating(
+    rng: &mut impl Rng,
+    truth_scores: &[f64],
+    i: usize,
+    levels: usize,
+    noise_sigma: f64,
+    outlier_rate: f64,
+) -> Option<u32> {
+    if i >= truth_scores.len() || truth_scores.is_empty() || levels < 2 {
+        return None;
+    }
+
+    let mut min = f64::INFINITY;
+    let mut max = f64::NEG_INFINITY;
+    for &v in truth_scores {
+        if v.is_finite() {
+            min = min.min(v);
+            max = max.max(v);
+        }
+    }
+    if !min.is_finite() || !max.is_finite() {
+        return None;
+    }
+    let denom = (max - min).max(1e-9);
+    let v = truth_scores[i];
+    let norm = if v.is_finite() {
+        ((v - min) / denom).clamp(0.0, 1.0)
+    } else {
+        0.5
+    };
+
+    let mut expected = 1.0 + norm * (levels as f64 - 1.0);
+    let noise_std = noise_sigma.abs() * (levels as f64 - 1.0) / 2.0;
+    expected += sample_normal(rng, 0.0, noise_std.max(1e-9));
+
+    if outlier_rate > 0.0 && rng.gen::<f64>() < outlier_rate {
+        expected = rng.gen_range(1.0..=(levels as f64));
+    }
+
+    let rating = expected.round().clamp(1.0, levels as f64) as u32;
+    Some(rating)
 }
 
 fn sample_normal(rng: &mut impl Rng, mean: f64, std: f64) -> f64 {

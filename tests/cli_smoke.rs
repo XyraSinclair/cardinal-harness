@@ -49,6 +49,41 @@ fn run_cli_eval(case: &str) -> EvalResult {
     serde_json::from_str(first_line).unwrap()
 }
 
+#[derive(Debug, serde::Deserialize)]
+struct LikertEvalMetrics {
+    kendall_tau: f64,
+    spearman_rho: f64,
+    topk_precision: f64,
+    topk_recall: f64,
+    ratings_attempted: usize,
+    ratings_used: usize,
+    ratings_refused: usize,
+}
+
+#[derive(Debug, serde::Deserialize)]
+struct LikertEvalResult {
+    case_name: String,
+    metrics: LikertEvalMetrics,
+    error_trajectory: Vec<f64>,
+}
+
+fn run_cli_eval_likert(case: &str) -> LikertEvalResult {
+    let dir = tempdir().unwrap();
+    let out_path = dir.path().join("eval_likert.jsonl");
+
+    let status = Command::new(env!("CARGO_BIN_EXE_cardinal"))
+        .args(["eval-likert", "--case", case])
+        .arg("--out")
+        .arg(&out_path)
+        .status()
+        .unwrap();
+    assert!(status.success());
+
+    let raw = std::fs::read_to_string(&out_path).unwrap();
+    let first_line = raw.lines().next().unwrap();
+    serde_json::from_str(first_line).unwrap()
+}
+
 #[test]
 fn cli_eval_smoke_and_determinism() {
     let a = run_cli_eval("clean_ordering_10");
@@ -97,6 +132,53 @@ fn cli_eval_smoke_and_determinism() {
     assert_eq!(a.metrics.stop_reason, b.metrics.stop_reason);
     assert_ne!(a.metrics.latency_ms, 0);
     assert_ne!(b.metrics.latency_ms, 0);
+
+    assert_eq!(a.error_trajectory.len(), b.error_trajectory.len());
+    for (x, y) in a.error_trajectory.iter().zip(b.error_trajectory.iter()) {
+        assert!(approx_eq(*x, *y, 1e-12));
+    }
+}
+
+#[test]
+fn cli_eval_likert_smoke_and_determinism() {
+    let a = run_cli_eval_likert("clean_ordering_10");
+    let b = run_cli_eval_likert("clean_ordering_10");
+
+    assert_eq!(a.case_name, "clean_ordering_10");
+    assert_eq!(b.case_name, "clean_ordering_10");
+
+    assert!(a.metrics.kendall_tau >= 0.99);
+    assert!(a.metrics.spearman_rho >= 0.99);
+    assert!(a.metrics.topk_precision >= 0.99);
+    assert!(a.metrics.topk_recall >= 0.99);
+
+    assert!(a.metrics.ratings_attempted > 0);
+    assert!(a.metrics.ratings_used > 0);
+    assert!(a.metrics.ratings_refused <= a.metrics.ratings_attempted);
+
+    assert!(approx_eq(
+        a.metrics.kendall_tau,
+        b.metrics.kendall_tau,
+        1e-12
+    ));
+    assert!(approx_eq(
+        a.metrics.spearman_rho,
+        b.metrics.spearman_rho,
+        1e-12
+    ));
+    assert!(approx_eq(
+        a.metrics.topk_precision,
+        b.metrics.topk_precision,
+        1e-12
+    ));
+    assert!(approx_eq(
+        a.metrics.topk_recall,
+        b.metrics.topk_recall,
+        1e-12
+    ));
+    assert_eq!(a.metrics.ratings_attempted, b.metrics.ratings_attempted);
+    assert_eq!(a.metrics.ratings_used, b.metrics.ratings_used);
+    assert_eq!(a.metrics.ratings_refused, b.metrics.ratings_refused);
 
     assert_eq!(a.error_trajectory.len(), b.error_trajectory.len());
     for (x, y) in a.error_trajectory.iter().zip(b.error_trajectory.iter()) {

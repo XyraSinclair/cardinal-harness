@@ -80,6 +80,19 @@ impl PromptTemplate {
         let safe_a_label = escape_xml_chars(&a.label);
         let safe_b_label = escape_xml_chars(&b.label);
 
+        let ctx_a_block = a.context.as_ref().map_or_else(String::new, |ctx| {
+            format!(
+                "<entity_A_context>\n{}\n</entity_A_context>",
+                escape_xml_chars(ctx.trim())
+            )
+        });
+        let ctx_b_block = b.context.as_ref().map_or_else(String::new, |ctx| {
+            format!(
+                "<entity_B_context>\n{}\n</entity_B_context>",
+                escape_xml_chars(ctx.trim())
+            )
+        });
+
         let system = self
             .system
             .replace("{attribute_name}", &safe_attr_name)
@@ -92,22 +105,25 @@ impl PromptTemplate {
             .replace("{attribute_name}", &safe_attr_name)
             .replace("{full_attribute_text}", &safe_attr_text)
             .replace("{entity_A}", &safe_a_label)
-            .replace("{entity_B}", &safe_b_label);
+            .replace("{entity_B}", &safe_b_label)
+            .replace("{entity_A_context_block}", &ctx_a_block)
+            .replace("{entity_B_context_block}", &ctx_b_block);
+
+        let uses_inline_context = self.user.contains("{entity_A_context_block}")
+            || self.user.contains("{entity_B_context_block}");
 
         let mut parts: Vec<String> = Vec::new();
-        if let Some(ctx) = &a.context {
-            parts.push(format!(
-                "<entity_A_context>\n{}\n</entity_A_context>",
-                escape_xml_chars(ctx.trim())
-            ));
+        if uses_inline_context {
+            parts.push(user_core.trim().to_string());
+        } else {
+            if !ctx_a_block.is_empty() {
+                parts.push(ctx_a_block);
+            }
+            if !ctx_b_block.is_empty() {
+                parts.push(ctx_b_block);
+            }
+            parts.push(user_core.trim().to_string());
         }
-        if let Some(ctx) = &b.context {
-            parts.push(format!(
-                "<entity_B_context>\n{}\n</entity_B_context>",
-                escape_xml_chars(ctx.trim())
-            ));
-        }
-        parts.push(user_core.trim().to_string());
 
         PromptInstance {
             template_slug: self.slug.to_string(),
@@ -175,6 +191,30 @@ Return a JSON object with your evaluation.
 json:"#,
 };
 
+pub const PROMPT_V2_ATTR_FIRST: PromptTemplate = PromptTemplate {
+    slug: "canonical_v2_attr_first",
+    system: PROMPT_V2.system,
+    user: r#"Compare these entity by <attribute_name>: {attribute_name} </attribute_name>.
+<full_attribute_text>
+{full_attribute_text}
+</full_attribute_text>
+
+{entity_A_context_block}
+
+{entity_B_context_block}
+
+<entity_A>
+{entity_A}
+</entity_A>
+
+<entity_B>
+{entity_B}
+</entity_B>
+
+Return a JSON object with your evaluation.
+json:"#,
+};
+
 pub const PROMPT_V3: PromptTemplate = PromptTemplate {
     slug: "canonical_v3",
     system: r#"You are an expert subjective evaluator comparing two entities on one attribute. Decide which has more of it and how much more using ratio ladder R=[1,1.05,1.1,1.2,1.3,1.5,1.75,2.1,2.5,3.1,3.9,5.1,6.8,9.2,12.7,18,26].
@@ -187,7 +227,7 @@ Return only JSON: {higher_ranked:A|B,ratio:1-26,confidence:0..1}. If policy-bloc
 json:"#,
 };
 
-pub const PROMPTS: &[PromptTemplate] = &[PROMPT_V1, PROMPT_V2, PROMPT_V3];
+pub const PROMPTS: &[PromptTemplate] = &[PROMPT_V1, PROMPT_V2, PROMPT_V2_ATTR_FIRST, PROMPT_V3];
 pub const DEFAULT_PROMPT: PromptTemplate = PROMPT_V2;
 
 pub fn prompt_by_slug(slug: &str) -> Option<PromptTemplate> {
@@ -224,8 +264,31 @@ mod tests {
     }
 
     #[test]
+    fn prompt_attr_first_places_attribute_before_context() {
+        let a = EntityRef::with_context("A", "Context A");
+        let b = EntityRef::with_context("B", "Context B");
+        let t = prompt_by_slug("canonical_v2_attr_first").expect("template");
+        let p = t.render("clarity", "Which is clearer?", a, b);
+
+        let idx_attr = p.user.find("<full_attribute_text>").expect("attr tag");
+        let idx_ctx = p
+            .user
+            .find("<entity_A_context>")
+            .expect("entity_A_context tag");
+        assert!(
+            idx_attr < idx_ctx,
+            "expected attribute prompt before entity context for canonical_v2_attr_first"
+        );
+
+        // Ensure we did not also prefix-inject contexts.
+        assert_eq!(p.user.matches("<entity_A_context>").count(), 1);
+        assert_eq!(p.user.matches("<entity_B_context>").count(), 1);
+    }
+
+    #[test]
     fn prompt_lookup() {
         assert!(prompt_by_slug("canonical_v1").is_some());
+        assert!(prompt_by_slug("canonical_v2_attr_first").is_some());
         assert!(prompt_by_slug("nonexistent").is_none());
     }
 

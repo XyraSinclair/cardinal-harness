@@ -54,6 +54,21 @@ enum Commands {
         #[arg(long)]
         curve_csv: Option<PathBuf>,
     },
+    /// Run synthetic Likert baseline evaluation suite
+    EvalLikert {
+        #[arg(long)]
+        case: Option<String>,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long)]
+        curve_csv: Option<PathBuf>,
+        /// Number of Likert levels (e.g. 5 or 10)
+        #[arg(long, default_value_t = 10)]
+        levels: usize,
+        /// Multiplies the synthetic comparison budget when allocating ratings
+        #[arg(long, default_value_t = 1.0)]
+        budget_multiplier: f64,
+    },
     /// Generate a report from a request + response JSON
     Report {
         #[arg(long)]
@@ -161,6 +176,36 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         } => {
             let results =
                 cardinal_harness::rerank::evaluation::run_synthetic_suite(case.as_deref());
+            let mut file = File::create(out)?;
+            for result in &results {
+                let line = serde_json::to_string(result)?;
+                writeln!(file, "{line}")?;
+            }
+            if let Some(csv_path) = curve_csv {
+                let mut csv = File::create(csv_path)?;
+                writeln!(csv, "case,step,error")?;
+                for result in results {
+                    for (idx, err) in result.error_trajectory.iter().enumerate() {
+                        writeln!(csv, "{},{},{}", result.case_name, idx, err)?;
+                    }
+                }
+            }
+        }
+        Commands::EvalLikert {
+            case,
+            out,
+            curve_csv,
+            levels,
+            budget_multiplier,
+        } => {
+            let cfg = cardinal_harness::rerank::evaluation::LikertEvalConfig {
+                levels,
+                budget_multiplier,
+            };
+            let results = cardinal_harness::rerank::evaluation::run_likert_baseline_suite(
+                case.as_deref(),
+                cfg,
+            );
             let mut file = File::create(out)?;
             for result in &results {
                 let line = serde_json::to_string(result)?;
