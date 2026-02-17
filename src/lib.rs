@@ -13,6 +13,7 @@
 //!
 //! See `docs/ALGORITHM.md` for the full design rationale.
 
+pub mod anp;
 pub mod cache;
 pub mod gateway;
 pub mod prompts;

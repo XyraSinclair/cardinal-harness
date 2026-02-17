@@ -1,0 +1,72 @@
+{
+  "network": {
+    "clusters": [
+      {
+        "id": "criteria",
+        "label": "Criteria"
+      },
+      {
+        "id": "alts",
+        "label": "Alternatives"
+      }
+    ],
+    "nodes": [
+      {
+        "id": "tractability",
+        "cluster_id": "criteria",
+        "label": "Tractability"
+      },
+      {
+        "id": "option_a",
+        "cluster_id": "alts",
+        "label": "Option A"
+      },
+      {
+        "id": "option_b",
+        "cluster_id": "alts",
+        "label": "Option B"
+      },
+      {
+        "id": "option_c",
+        "cluster_id": "alts",
+        "label": "Option C"
+      }
+    ],
+    "contexts": [
+      {
+        "id": "ctx_tractability",
+        "relation_type": "preference",
+        "target_node_id": "tractability",
+        "source_cluster_id": "alts",
+        "prompt_text": "Over the next 24 months in this policy environment, how many times more tractable is A than B?",
+        "semantics_version": 1,
+        "judgment_kind": "composable_ratio",
+        "incoming_cluster_weight": null
+      }
+    ]
+  },
+  "judgments": [
+    {
+      "context_id": "ctx_tractability",
+      "entity_a_id": "option_a",
+      "entity_b_id": "option_b",
+      "ratio": 2.0,
+      "confidence": 0.9,
+      "rater_id": "r1",
+      "notes": null
+    },
+    {
+      "context_id": "ctx_tractability",
+      "entity_a_id": "option_b",
+      "entity_b_id": "option_c",
+      "ratio": 1.5,
+      "confidence": 0.8,
+      "rater_id": "r1",
+      "notes": null
+    }
+  ],
+  "context_sensitivity": {
+    "ctx_tractability": 1.0
+  },
+  "priority_cluster_id": "alts"
+}

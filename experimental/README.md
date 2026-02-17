@@ -37,6 +37,21 @@ Relevant repo hooks:
 Next: extend the synthetic suite to emit budget-quality curves that fairly account for
 token cost (pairwise prompts include two entities; Likert prompts include one).
 
+## ANP Typed Contexts
+
+Goal: measure failure modes when pairwise-only prompts are incorrectly forced into global composition.
+
+Relevant repo hooks:
+- Typed ANP module: `src/anp.rs`
+- Full demo pipeline: `cardinal anp-demo`
+- Synthetic typed-vs-forced benchmark: `cardinal eval-anp`
+
+Recommended experiment:
+1. Start from a real decomposition and mark one ambiguous axis as `pairwise_only_ratio`.
+2. Run `anp-demo`, capture priorities + `next_query`.
+3. Flip the same axis to `composable_ratio`, rerun, and compare rank shifts / Kendall tau.
+4. Track which contexts most often trigger high inconsistency and prompt rewrites.
+
 ## Planner Research (Differential / Optimal Design)
 
 Goal: go beyond heuristic blending by treating pair selection as an optimal design / value-of-information problem:
@@ -45,4 +60,3 @@ Goal: go beyond heuristic blending by treating pair selection as an optimal desi
 - explore differentiable surrogates to top-k error for gradient-based planning
 
 This work should start as design notes + offline experiments before touching the core planner.
-

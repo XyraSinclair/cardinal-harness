@@ -84,6 +84,34 @@ fn run_cli_eval_likert(case: &str) -> LikertEvalResult {
     serde_json::from_str(first_line).unwrap()
 }
 
+#[derive(Debug, serde::Deserialize)]
+struct AnpEvalResult {
+    case_name: String,
+    mode: String,
+    top_entity_id: String,
+    top_entity_score: f64,
+    top1_correct: bool,
+    kendall_tau: f64,
+}
+
+fn run_cli_eval_anp() -> Vec<AnpEvalResult> {
+    let dir = tempdir().unwrap();
+    let out_path = dir.path().join("anp_eval.jsonl");
+
+    let status = Command::new(env!("CARGO_BIN_EXE_cardinal"))
+        .args(["eval-anp"])
+        .arg("--out")
+        .arg(&out_path)
+        .status()
+        .unwrap();
+    assert!(status.success());
+
+    let raw = std::fs::read_to_string(&out_path).unwrap();
+    raw.lines()
+        .map(|line| serde_json::from_str(line).unwrap())
+        .collect()
+}
+
 #[test]
 fn cli_eval_smoke_and_determinism() {
     let a = run_cli_eval("clean_ordering_10");
@@ -184,6 +212,104 @@ fn cli_eval_likert_smoke_and_determinism() {
     for (x, y) in a.error_trajectory.iter().zip(b.error_trajectory.iter()) {
         assert!(approx_eq(*x, *y, 1e-12));
     }
+}
+
+#[test]
+fn cli_eval_anp_smoke_and_expected_modes() {
+    let rows = run_cli_eval_anp();
+    assert_eq!(rows.len(), 2);
+
+    let mut seen_typed = false;
+    let mut seen_forced = false;
+    for row in rows {
+        assert_eq!(row.case_name, "open_ended_priority_with_pairwise_only_axis");
+        assert!(!row.top_entity_id.is_empty());
+        assert!(row.top_entity_score >= 0.0);
+        assert!(matches!(row.top1_correct, true | false));
+        assert!((-1.0..=1.0).contains(&row.kendall_tau));
+
+        if row.mode == "typed_pairwise_only" {
+            seen_typed = true;
+        }
+        if row.mode == "forced_composable" {
+            seen_forced = true;
+        }
+    }
+    assert!(seen_typed);
+    assert!(seen_forced);
+}
+
+#[test]
+fn cli_anp_demo_smoke() {
+    let dir = tempdir().unwrap();
+    let input_path = dir.path().join("anp_request.json");
+    let out_path = dir.path().join("anp_output.json");
+
+    let req = serde_json::json!({
+      "network": {
+        "clusters": [
+          {"id":"criteria","label":"Criteria"},
+          {"id":"alts","label":"Alternatives"}
+        ],
+        "nodes": [
+          {"id":"c1","cluster_id":"criteria","label":"Criterion 1"},
+          {"id":"a","cluster_id":"alts","label":"A"},
+          {"id":"b","cluster_id":"alts","label":"B"}
+        ],
+        "contexts": [
+          {
+            "id":"ctx",
+            "relation_type":"preference",
+            "target_node_id":"c1",
+            "source_cluster_id":"alts",
+            "prompt_text":"tractability",
+            "semantics_version":1,
+            "judgment_kind":"composable_ratio",
+            "incoming_cluster_weight":null
+          }
+        ]
+      },
+      "judgments": [
+        {
+          "context_id":"ctx",
+          "entity_a_id":"a",
+          "entity_b_id":"b",
+          "ratio":2.0,
+          "confidence":0.9,
+          "rater_id":"r1",
+          "notes":null
+        }
+      ],
+      "context_sensitivity": {},
+      "priority_cluster_id":"alts"
+    });
+
+    std::fs::write(&input_path, serde_json::to_string_pretty(&req).unwrap()).unwrap();
+
+    let status = Command::new(env!("CARGO_BIN_EXE_cardinal"))
+        .args(["anp-demo"])
+        .arg("--input")
+        .arg(&input_path)
+        .arg("--out")
+        .arg(&out_path)
+        .status()
+        .unwrap();
+    assert!(status.success());
+
+    let raw = std::fs::read_to_string(&out_path).unwrap();
+    let out: serde_json::Value = serde_json::from_str(&raw).unwrap();
+    let local_fits = out
+        .get("local_fits")
+        .and_then(|v| v.as_array())
+        .expect("local_fits array");
+    assert_eq!(local_fits.len(), 1);
+
+    let stationary = out.get("stationary").expect("stationary");
+    let distribution = stationary
+        .get("distribution")
+        .and_then(|v| v.as_array())
+        .expect("distribution");
+    assert_eq!(distribution.len(), 3);
 }
 
 #[test]

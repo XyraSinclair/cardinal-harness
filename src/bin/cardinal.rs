@@ -69,6 +69,18 @@ enum Commands {
         #[arg(long, default_value_t = 1.0)]
         budget_multiplier: f64,
     },
+    /// Run ANP demo pipeline from JSON input
+    AnpDemo {
+        #[arg(long)]
+        input: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+    },
+    /// Run synthetic ANP typed-vs-forced benchmark
+    EvalAnp {
+        #[arg(long)]
+        out: PathBuf,
+    },
     /// Generate a report from a request + response JSON
     Report {
         #[arg(long)]
@@ -219,6 +231,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         writeln!(csv, "{},{},{}", result.case_name, idx, err)?;
                     }
                 }
+            }
+        }
+        Commands::AnpDemo { input, out } => {
+            let req: cardinal_harness::anp::AnpDemoRequest = read_json(&input)?;
+            let resp = cardinal_harness::anp::run_demo(req)?;
+            write_json(&out, &resp)?;
+        }
+        Commands::EvalAnp { out } => {
+            let results = cardinal_harness::anp::run_synthetic_benchmark_suite()?;
+            let mut file = File::create(out)?;
+            for result in &results {
+                let line = serde_json::to_string(result)?;
+                writeln!(file, "{line}")?;
             }
         }
         Commands::Report {

@@ -25,6 +25,8 @@ The system tracks its own uncertainty. It knows which items' scores are well-det
 - **Uncertainty-aware stopping** — stops when top-k is sufficiently certain, not after a budget
 - **SQLite cache** for pairwise judgments — repeated runs reuse prior LLM calls
 - **OpenRouter integration** for model access with dynamic model-ladder switching
+- **Typed ANP contexts** (`composable_ratio` vs `pairwise_only_ratio`) with supermatrix utilities
+- **ANP active query helpers** (next context + next pair proposal)
 
 ## Quickstart
 
@@ -135,6 +137,7 @@ Tune thresholds to your domain if you want more (or less) aggressive switching.
 ## Architecture
 
 - `rating_engine`: robust IRLS solver, diagnostics, and pair planning
+- `anp`: typed ANP contexts, confidence-weighted local fits, weighted supermatrix solve
 - `trait_search`: multi-attribute utility, gating, top-k uncertainty
 - `rerank`: orchestration loop + pairwise LLM calls
 - `prompts`: ratio ladder prompt templates
@@ -143,6 +146,7 @@ Tune thresholds to your domain if you want more (or less) aggressive switching.
 
 See `docs/ALGORITHM.md` for full design rationale — why pairwise ratios, why IRLS, why Huber loss, how the stopping rule works, and more.
 See `docs/PROMPTS.md` for prompt template slugs and context placement details.
+See `docs/ANP.md` for ANP context typing and supermatrix usage.
 
 ## CLI
 
@@ -165,6 +169,15 @@ cargo run --bin cardinal -- eval --out eval.jsonl --curve-csv curves.csv
 
 # Run synthetic Likert baseline evals (JSONL) for comparison
 cargo run --bin cardinal -- eval-likert --out eval_likert.jsonl --curve-csv curves_likert.csv
+
+# Run ANP demo from JSON input
+cargo run --bin cardinal -- anp-demo --input anp_request.json --out anp_output.json
+
+# Example request lives at examples/anp_demo_request.json
+cargo run --bin cardinal -- anp-demo --input examples/anp_demo_request.json --out anp_output.json
+
+# Run synthetic ANP typed-vs-forced benchmark
+cargo run --bin cardinal -- eval-anp --out anp_eval.jsonl
 
 # Generate a report from request/response JSON
 cargo run --bin cardinal -- report --request request.json --response response.json --out report.md

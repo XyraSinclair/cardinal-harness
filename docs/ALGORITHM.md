@@ -77,6 +77,17 @@ When scoring on multiple attributes (e.g., clarity *and* depth *and* originality
 
 The planner operates on the combined utility, targeting pairs that reduce uncertainty about the top-K of the *combined* ranking — so it naturally allocates more comparison budget to attributes where the top-K items are poorly separated.
 
+## ANP typed contexts (optional layer)
+
+For open-ended prioritization tasks with dependency graphs, use the ANP layer in `src/anp.rs`.
+
+- Keep contexts explicitly typed as `composable_ratio` or `pairwise_only_ratio`.
+- Fit local priorities per context from confidence-weighted log-ratio judgments.
+- Use context/pair query helpers to target highest-value next judgments.
+- Propagate only composable contexts through a weighted, damped supermatrix.
+
+See `docs/ANP.md` for data structures and usage.
+
 ## Caching
 
 Pairwise judgments are cached in SQLite, keyed on (model, prompt template, attribute, entity text hashes). This means:
