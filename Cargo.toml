@@ -16,7 +16,7 @@ async-trait = "0.1"
 blake3 = "1"
 clap = { version = "4", features = ["derive"] }
 chrono = { version = "0.4", features = ["serde"] }
-fancy-regex = "0.13"
+fancy-regex = "0.17"
 fs2 = "0.4"
 futures = "0.3"
 glob = "0.3"
