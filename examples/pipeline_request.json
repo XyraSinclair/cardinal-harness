@@ -1,0 +1,68 @@
+{
+  "prompt": "Assess the architectural strengths and weaknesses of the Basin unified storage platform. Focus on: (1) the layered durability model (Spiel → Slate → Engines), (2) the dynamic module system for protocol adapters, (3) the sync-first execution model with magma parking, (4) the EAV/Datalog query model in Slate. For each, identify what works well, what's risky, and what concrete improvements you'd prioritize.",
+  "system_prompt": "You are a senior distributed systems architect with deep experience in storage engines, consensus protocols, and database internals. Be specific, cite concrete failure modes, and propose actionable improvements rather than vague suggestions.",
+  "models": [
+    "anthropic/claude-opus-4-6",
+    "openai/gpt-5.2-pro",
+    "google/gemini-2.5-pro"
+  ],
+  "attributes": [
+    {
+      "id": "truthfulness",
+      "prompt": "Truthfulness measures whether a response makes claims that are grounded in observable reality — the actual codebase, real engineering constraints, genuine tradeoffs — versus fabricating plausible-sounding assertions that cannot be verified. A truthful response earns the reader's trust: when it says 'this function is O(n²)', you can check and find it's right; when it's uncertain, it says so rather than projecting false confidence. The critical distinction: truthfulness is not about saying correct things (a response can be truthful and wrong if it honestly represents its uncertainty), it's about the correspondence between the response's confidence and its actual evidence. A response that makes five bold claims with three wrong is LESS truthful than one that makes two cautious claims, both right, and flags three areas it's unsure about. Watch for: hallucinated function names or APIs, invented statistics, claims about code behavior without evidence, false precision about performance numbers, and the subtle tell of describing implementation details of code the author clearly hasn't read.",
+      "weight": 1.0
+    },
+    {
+      "id": "diagnosis_precision",
+      "prompt": "Diagnosis precision measures how specifically a response locates problems — not 'your architecture might have issues' but 'the DashMap in shoal::registry is read without a fence after the Spiel commit, creating a window where stale state is visible to concurrent readers.' The unit of precision is the intervention point: can an engineer read this diagnosis and know exactly which file to open, which function to look at, which data flow to trace? A precisely diagnosed problem is halfway to being solved. An imprecisely diagnosed problem requires another round of investigation before any work can begin. The hierarchy from worst to best: vague category ('you have scaling issues'), named subsystem ('Slate queries are slow'), specific mechanism ('the Datalog join in slate::query::execute materializes intermediate results into a Vec instead of streaming, causing O(n×m) allocation for the cross-product before any filtering'), and finally root cause with fix location ('the Datalog join materializes because the planner in query::optimize doesn't push selections below joins — adding a PushSelectDown rule to the optimizer would eliminate the intermediate allocation'). Discount responses that substitute jargon density for actual specificity.",
+      "weight": 0.9
+    },
+    {
+      "id": "causal_depth",
+      "prompt": "Causal depth measures how far a response traces the chain from surface observation to root cause — and beyond to the structural forces that created the root cause. Shallow analysis names a symptom. Moderate analysis identifies the proximate cause. Deep analysis follows the causal chain to the architectural decision, constraint, or incentive that made the proximate cause inevitable, and proposes interventions at the level where they'll have durable effect rather than patching symptoms. Example of shallow: 'the build is slow.' Moderate: 'the build is slow because steel depends on nalgebra which takes 40s to compile.' Deep: 'the build is slow because steel depends on nalgebra, which was pulled in for a single matrix multiply in the cost model — the actual operation could be done with a 20-line inline implementation, eliminating 40s of compile time and breaking a dependency that also forces the minimum Rust version.' Notice that depth is not length — a single sentence that identifies the true root cause is deeper than three paragraphs that elaborate on the symptoms. The deepest responses identify forces: why did the codebase evolve this way? What structural incentive or historical accident produced this state? What would prevent the problem from recurring after a fix?",
+      "weight": 0.85
+    },
+    {
+      "id": "intervention_economy",
+      "prompt": "Intervention economy measures whether a response proposes the smallest change that achieves the largest effect — maximum leverage, minimum disruption. This is the engineering equivalent of Occam's razor: prefer the three-line fix over the three-file refactor when both solve the problem. An economical intervention respects the existing codebase as a living system with history, test coverage, and downstream dependents. It doesn't propose 'rewrite the module' when 'add a check on line 47' suffices. It distinguishes between what MUST change to solve the problem and what COULD change to satisfy aesthetic preferences. Crucially, economy is not laziness — the minimal intervention might be architecturally significant if that's what the problem demands. The question is whether every proposed change earns its keep: does each edit directly contribute to solving the stated problem, or is the response padding recommendations to appear thorough? Watch for: unnecessary abstraction layers, premature generalization ('let's make this configurable'), cleanup of adjacent code that isn't broken, and the endemic failure mode of proposing six recommendations when the first two solve 90% of the problem and the remaining four add risk without proportionate value.",
+      "weight": 0.8
+    },
+    {
+      "id": "failure_imagination",
+      "prompt": "Failure imagination measures whether a response thinks concretely about what goes wrong — not as an abstract acknowledgment ('there could be edge cases') but as specific, visualizable scenarios with conditions, triggers, and consequences. A response with strong failure imagination says: 'if two clients submit conflicting writes within the Spiel batch window (default 10ms), and the second write's Slate entity references an attribute created by the first, the reference will dangle until the next compaction cycle, during which any Datalog query touching that entity will return incomplete results.' It thinks about timing (race conditions, ordering), scale (what happens at 10x, 100x, 1000x the current load), boundaries (what happens when a u32 counter wraps, when a Vec hits memory limits, when a network partition lasts longer than the timeout), and second-order effects (fixing problem A introduces problem B). Failure imagination is not pessimism — it's the skill of a builder who has been woken at 3am by production incidents enough times to think 'and then what?' after every design decision. Discount vague warnings ('this might not scale') that don't specify the mechanism of failure.",
+      "weight": 0.7
+    },
+    {
+      "id": "compositional_awareness",
+      "prompt": "Compositional awareness measures whether a response understands how the parts of the system interact — reasoning about the whole rather than analyzing components in isolation. A compositionally aware response, when discussing a change to Slate's query engine, traces the effect through Spool (which reads Slate state to route messages), through Shore (which queries Slate for connection metadata), and through any modules that depend on Slate's query latency for their SLA guarantees. It understands data flows across subsystem boundaries, shared resources that create implicit coupling, and the emergent behaviors that arise from component interactions that no single component's documentation describes. The hierarchy: isolated analysis (treats each component as independent), interface-aware analysis (understands the APIs between components but not the runtime dynamics), and genuinely compositional analysis (understands how state flows through the system at runtime, where backpressure propagates, which failure modes cascade). The gold standard: identifying interactions between subsystems that the original designers may not have intended or documented — the emergent properties of the composed system.",
+      "weight": 0.75
+    },
+    {
+      "id": "epistemic_integrity",
+      "prompt": "Epistemic integrity measures whether a response honestly represents its own state of knowledge — applying the Norvid assurance ladder to itself. A response with high epistemic integrity distinguishes between: claims it can verify by pointing to specific code (Implemented-level assurance), claims derived from general engineering principles applied to the architecture (Designed-level), claims based on pattern-matching from similar systems (Mentioned-level), and pure speculation (Proposed-level). It does not present speculation with the confidence of verified fact. When it's working from incomplete information — which is often, because no response has read the entire codebase — it flags this: 'I haven't traced the full call path but based on the types involved, this likely...' or 'assuming the standard Basin pattern here.' The failure mode is the authoritative-sounding response that treats every claim as equally certain, making it impossible for the reader to calibrate which recommendations to trust and which to verify independently. The deepest form of epistemic integrity is knowing what you don't know and saying so — identifying the specific questions that would need to be answered to raise confidence, rather than papering over uncertainty with fluent prose.",
+      "weight": 0.65
+    },
+    {
+      "id": "taste",
+      "prompt": "Taste is the irreducible aesthetic dimension of engineering judgment — the quality that separates a technically correct response from one that a senior engineer would actually want to act on. Taste manifests as: knowing which problems are important and which are pedantic (not every lint warning deserves a paragraph), respecting the organic history of a codebase rather than imposing textbook ideals onto a living system, understanding that 'correct' and 'good' are different things (a response can be correct about every fact and still propose the wrong priorities), and having a sense of proportion (the amount of attention given to each topic should reflect its actual impact, not its intellectual interest). A response with taste feels like it was written by someone who has built and maintained systems at scale — someone who knows that the elegant abstraction you didn't add is often worth more than the elegant abstraction you did, that naming is worth arguing about but indentation isn't, and that the best code change is sometimes no code change. Discount responses that demonstrate technical knowledge without engineering wisdom: technically impressive analyses that would lead you to spend a week on something that doesn't matter, or that optimize for local perfection at the expense of global coherence.",
+      "weight": 0.6
+    }
+  ],
+  "context_files": [
+    {
+      "path": "crates/slate/src/query/mod.rs",
+      "content": "// Example: paste relevant source file content here"
+    }
+  ],
+  "max_context_tokens": 8000,
+  "synthesis_model": "openai/gpt-5.2-pro",
+  "generation_temperature": 0.7,
+  "synthesis_temperature": 0.3,
+  "max_generation_tokens": 4096,
+  "max_synthesis_tokens": 8192,
+  "rank_config": {
+    "k": 1,
+    "tolerated_error": 0.05,
+    "judge_model": "openai/gpt-5-mini"
+  }
+}

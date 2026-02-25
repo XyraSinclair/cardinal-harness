@@ -14,8 +14,11 @@
 //! See `docs/ALGORITHM.md` for the full design rationale.
 
 pub mod anp;
+pub mod axes;
 pub mod cache;
+pub mod commander;
 pub mod gateway;
+pub mod pipeline;
 pub mod prompts;
 pub mod rating_engine;
 pub mod rerank;

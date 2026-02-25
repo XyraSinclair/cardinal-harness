@@ -314,7 +314,9 @@ fn weighted_median(x: &[f64], w: &[f64]) -> f64 {
             return *xi;
         }
     }
-    *x_sorted.last().unwrap()
+    *x_sorted
+        .last()
+        .expect("x_sorted is non-empty (caller provides non-empty x)")
 }
 
 // ---------------------------------------------------------------------

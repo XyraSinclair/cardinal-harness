@@ -28,8 +28,8 @@
 //! 6. **Tail merge**: Avoid tiny final chunks by merging with previous
 
 use fancy_regex::Regex as FancyRegex;
-use once_cell::sync::Lazy;
 use regex::Regex;
+use std::sync::LazyLock;
 use tiktoken_rs::cl100k_base;
 
 /// Default configuration matching Python: target=300, 20% overlap
@@ -38,11 +38,11 @@ pub const DEFAULT_OVERLAP_RATIO: f64 = 0.20;
 pub const MIN_PAYLOAD_LENGTH: usize = 100;
 
 // Lazy-initialized regex patterns
-static PARAGRAPH_SPLIT: Lazy<Regex> =
-    Lazy::new(|| Regex::new(r"\n\s*\n+").expect("Invalid paragraph split regex"));
+static PARAGRAPH_SPLIT: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"\n\s*\n+").expect("Invalid paragraph split regex"));
 
 // Use fancy-regex for lookbehind support
-static SENTENCE_SPLIT: Lazy<FancyRegex> = Lazy::new(|| {
+static SENTENCE_SPLIT: LazyLock<FancyRegex> = LazyLock::new(|| {
     // Split after . ! ? followed by whitespace
     FancyRegex::new(r"(?<=[.!?])\s+").expect("Invalid sentence split regex")
 });
@@ -443,17 +443,29 @@ pub fn chunk_text_by_tokens(text: &str, params: &ChunkingParams) -> Vec<TextChun
 
     // Optional tail merge: avoid a very small final chunk when possible
     if chunks_units.len() >= 2 {
-        let last_tokens: usize = chunks_units.last().unwrap().iter().map(|u| u.tokens).sum();
+        let last_tokens: usize = chunks_units
+            .last()
+            .expect("guarded by len >= 2 check above")
+            .iter()
+            .map(|u| u.tokens)
+            .sum();
         if last_tokens < params.min_tokens {
             let merged_tokens: usize = chunks_units[chunks_units.len() - 2]
                 .iter()
-                .chain(chunks_units.last().unwrap().iter())
+                .chain(
+                    chunks_units
+                        .last()
+                        .expect("guarded by len >= 2 check above")
+                        .iter(),
+                )
                 .map(|u| u.tokens)
                 .sum();
             // Allow merging if it doesn't create an unreasonable final chunk
             if merged_tokens <= params.max_tokens || chunks_units.len() == 2 {
-                let last = chunks_units.pop().unwrap();
-                let prev = chunks_units.pop().unwrap();
+                let last = chunks_units.pop().expect("guarded by len >= 2 check above");
+                let prev = chunks_units
+                    .pop()
+                    .expect("guarded by len >= 2 after pop of last");
                 let merged: Vec<&TextUnit> = prev.into_iter().chain(last).collect();
                 chunks_units.push(merged);
             }

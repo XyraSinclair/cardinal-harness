@@ -153,7 +153,7 @@ pub fn estimate_max_rerank_charge(req: &MultiRerankRequest) -> RerankChargeEstim
             )
         })
         .max_by_key(|(_, p, _)| count_tokens(p))
-        .unwrap();
+        .expect("n_attributes > 0 checked above, so attributes is non-empty");
 
     // Worst-case entity texts: choose 2 longest by byte length (fast upper bound).
     let mut idxs: Vec<usize> = (0..n_entities).collect();

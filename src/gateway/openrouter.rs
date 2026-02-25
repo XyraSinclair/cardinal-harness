@@ -408,6 +408,10 @@ impl ChatProvider for OpenRouterAdapter {
             upstream_cost_nanodollars,
             latency,
             finish_reason: FinishReason::from(choice.finish_reason),
+            // TODO: parse logprobs from OpenRouter response when available.
+            output_logprobs: None,
+            cache_read_tokens: None,
+            cache_write_tokens: None,
         })
     }
 }

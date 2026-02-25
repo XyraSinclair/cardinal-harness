@@ -150,6 +150,9 @@ impl ChatResponse {
             upstream_cost_nanodollars: None,
             latency: Duration::from_millis(0),
             finish_reason: FinishReason::Unknown("error".to_string()),
+            output_logprobs: None,
+            cache_read_tokens: None,
+            cache_write_tokens: None,
         }
     }
 }

@@ -1,0 +1,39 @@
+{
+  "preset": "balanced",
+  "synthesis_model": "anthropic/claude-opus-4-6",
+  "context_files": [
+    {
+      "path": "CLAUDE.md",
+      "content": "// Shared context: paste project overview here"
+    }
+  ],
+  "max_context_tokens": 8000,
+  "rank_config": {
+    "k": 1,
+    "tolerated_error": 0.05,
+    "judge_model": "openai/gpt-5-mini"
+  },
+  "tasks": [
+    {
+      "id": "slate-query-perf",
+      "prompt": "Review the Slate query optimizer for performance bottlenecks. Focus on join ordering, predicate pushdown, and materialization strategy.",
+      "system_prompt": "You are a database internals expert. Be specific about query plan improvements.",
+      "extra_context_files": [
+        {
+          "path": "crates/slate/src/query/optimize.rs",
+          "content": "// Task-specific context: paste query optimizer source here"
+        }
+      ]
+    },
+    {
+      "id": "spiel-durability",
+      "prompt": "Audit the Spiel oplog for durability guarantees. What failure modes exist between write acceptance and fsync? How does batch window size affect data loss risk?",
+      "system_prompt": "You are a storage systems expert with experience in write-ahead logging and crash recovery."
+    },
+    {
+      "id": "shore-backpressure",
+      "prompt": "Evaluate the Shore protocol frontend's backpressure mechanisms. How does it handle slow clients? What happens when the downstream Slate write path is saturated?",
+      "extra_context_files": []
+    }
+  ]
+}

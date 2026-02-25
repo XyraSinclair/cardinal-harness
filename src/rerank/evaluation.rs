@@ -23,6 +23,356 @@ use crate::trait_search::{
 type AttrUnits = (Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>);
 
 // =============================================================================
+// Rank quality metrics
+// =============================================================================
+
+/// Comprehensive rank quality metrics computed against ground truth.
+///
+/// These go beyond simple precision/recall to capture different failure modes:
+/// - **CURL** penalizes high-rank errors more than low-rank errors
+/// - **nDCG** is the standard IR metric (lingua franca of ranking evaluation)
+/// - **Weighted rank reversals** captures local instability weighted by position
+/// - **Bayesian regret** measures expected utility loss from selecting estimated top-K
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct RankQualityMetrics {
+    /// Kendall tau-b (pairwise concordance, handles ties).
+    pub kendall_tau_b: f64,
+    /// Spearman rho (monotonic rank correlation).
+    pub spearman_rho: f64,
+    /// Top-K set precision.
+    pub topk_precision: f64,
+    /// Top-K set recall.
+    pub topk_recall: f64,
+    /// Fraction of true scores within 95% confidence intervals.
+    pub coverage_95ci: f64,
+    /// Normalized Discounted Cumulative Gain at K.
+    /// DCG@k = sum_{i=1}^{k} (2^rel_i - 1) / log2(i+1), normalized by ideal DCG.
+    pub ndcg_at_k: f64,
+    /// CURL with harmonic weights: w(i,j) = 1/(rank_i * rank_j).
+    /// Penalizes high-rank errors more severely.
+    pub curl_harmonic: f64,
+    /// CURL with exponential decay: w(i,j) = exp(-0.1 * min(rank_i, rank_j)).
+    pub curl_exponential: f64,
+    /// Weighted rank reversals: sum of 1/rank * |displacement| for misranked items.
+    pub weighted_rank_reversals: f64,
+    /// Bayesian regret: E[U(true_top_k)] - E[U(estimated_top_k)].
+    /// Captures how bad the errors are, not just how many.
+    pub bayesian_regret: f64,
+    /// Number of pairwise discordances in the top-K region.
+    pub topk_discordance_count: usize,
+}
+
+impl RankQualityMetrics {
+    /// Compute all rank quality metrics from predicted and true scores.
+    ///
+    /// `pred_scores` and `true_scores` must have the same length.
+    /// `feasible_indices` restricts evaluation to feasible items.
+    /// `k` is the top-K threshold.
+    /// `pred_vars` provides variance estimates for coverage computation.
+    pub fn compute(
+        pred_scores: &[f64],
+        true_scores: &[f64],
+        pred_vars: &[f64],
+        feasible_indices: &[usize],
+        k: usize,
+    ) -> Self {
+        let k = k.min(feasible_indices.len());
+
+        let pred_feas: Vec<f64> = feasible_indices.iter().map(|&i| pred_scores[i]).collect();
+        let true_feas: Vec<f64> = feasible_indices.iter().map(|&i| true_scores[i]).collect();
+
+        let kt = if pred_feas.len() >= 2 {
+            kendall_tau_b(&pred_feas, &true_feas)
+        } else {
+            0.0
+        };
+        let sr = if pred_feas.len() >= 2 {
+            spearman_rho(&pred_feas, &true_feas)
+        } else {
+            0.0
+        };
+
+        let tp = topk_precision(pred_scores, true_scores, feasible_indices, k);
+        let tr = topk_recall(pred_scores, true_scores, feasible_indices, k);
+        let cov = coverage_95(pred_scores, pred_vars, true_scores, feasible_indices);
+
+        let ndcg = compute_ndcg_at_k(pred_scores, true_scores, feasible_indices, k);
+        let curl_h = compute_curl(pred_scores, true_scores, feasible_indices, CurlWeight::Harmonic);
+        let curl_e =
+            compute_curl(pred_scores, true_scores, feasible_indices, CurlWeight::Exponential(0.1));
+        let wrr = compute_weighted_rank_reversals(pred_scores, true_scores, feasible_indices, k);
+        let regret = compute_bayesian_regret(pred_scores, true_scores, feasible_indices, k);
+        let disc = compute_topk_discordance(pred_scores, true_scores, feasible_indices, k);
+
+        Self {
+            kendall_tau_b: kt,
+            spearman_rho: sr,
+            topk_precision: tp,
+            topk_recall: tr,
+            coverage_95ci: cov,
+            ndcg_at_k: ndcg,
+            curl_harmonic: curl_h,
+            curl_exponential: curl_e,
+            weighted_rank_reversals: wrr,
+            bayesian_regret: regret,
+            topk_discordance_count: disc,
+        }
+    }
+}
+
+/// Weighting scheme for CURL computation.
+enum CurlWeight {
+    /// w(i,j) = 1 / (rank_i * rank_j)
+    Harmonic,
+    /// w(i,j) = exp(-alpha * min(rank_i, rank_j))
+    Exponential(f64),
+}
+
+/// Compute CURL (Concordance-based Utility of Ranked Lists).
+///
+/// Measures rank agreement with position-dependent weighting so that
+/// errors among top-ranked items are penalized more heavily.
+fn compute_curl(
+    pred_scores: &[f64],
+    true_scores: &[f64],
+    indices: &[usize],
+    weight: CurlWeight,
+) -> f64 {
+    if indices.len() < 2 {
+        return 1.0;
+    }
+
+    // Sort indices by predicted score (descending) to get predicted ranks.
+    let mut pred_order: Vec<usize> = indices.to_vec();
+    pred_order.sort_by(|&a, &b| {
+        pred_scores[b]
+            .partial_cmp(&pred_scores[a])
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
+
+    // Sort indices by true score (descending) to get true ranks.
+    let mut true_order: Vec<usize> = indices.to_vec();
+    true_order.sort_by(|&a, &b| {
+        true_scores[b]
+            .partial_cmp(&true_scores[a])
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
+
+    // Build rank maps (1-based).
+    let mut pred_rank: HashMap<usize, usize> = HashMap::new();
+    let mut true_rank: HashMap<usize, usize> = HashMap::new();
+    for (r, &idx) in pred_order.iter().enumerate() {
+        pred_rank.insert(idx, r + 1);
+    }
+    for (r, &idx) in true_order.iter().enumerate() {
+        true_rank.insert(idx, r + 1);
+    }
+
+    let n = indices.len();
+    let mut weighted_concordant = 0.0;
+    let mut weighted_total = 0.0;
+
+    for ii in 0..n {
+        for jj in (ii + 1)..n {
+            let a = indices[ii];
+            let b = indices[jj];
+
+            let pr_a = pred_rank[&a] as f64;
+            let pr_b = pred_rank[&b] as f64;
+            let tr_a = true_rank[&a] as f64;
+            let tr_b = true_rank[&b] as f64;
+
+            let w = match weight {
+                CurlWeight::Harmonic => 1.0 / (pr_a.min(tr_a) * pr_b.min(tr_b)),
+                CurlWeight::Exponential(alpha) => (-alpha * pr_a.min(tr_a).min(pr_b.min(tr_b))).exp(),
+            };
+
+            weighted_total += w;
+
+            let pred_cmp = (pred_scores[a] - pred_scores[b]).signum();
+            let true_cmp = (true_scores[a] - true_scores[b]).signum();
+            if pred_cmp * true_cmp >= 0.0 {
+                // Concordant or tied.
+                weighted_concordant += w;
+            }
+        }
+    }
+
+    if weighted_total == 0.0 {
+        1.0
+    } else {
+        weighted_concordant / weighted_total
+    }
+}
+
+/// Compute nDCG@k.
+fn compute_ndcg_at_k(
+    pred_scores: &[f64],
+    true_scores: &[f64],
+    indices: &[usize],
+    k: usize,
+) -> f64 {
+    if indices.is_empty() || k == 0 {
+        return 0.0;
+    }
+
+    // Sort by predicted score (descending) to get the predicted ranking.
+    let mut pred_order: Vec<usize> = indices.to_vec();
+    pred_order.sort_by(|&a, &b| {
+        pred_scores[b]
+            .partial_cmp(&pred_scores[a])
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
+
+    // Sort by true score (descending) for ideal ranking.
+    let mut ideal_order: Vec<usize> = indices.to_vec();
+    ideal_order.sort_by(|&a, &b| {
+        true_scores[b]
+            .partial_cmp(&true_scores[a])
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
+
+    // Normalize true scores to [0, 1] for relevance.
+    let min_true = indices
+        .iter()
+        .map(|&i| true_scores[i])
+        .fold(f64::INFINITY, f64::min);
+    let max_true = indices
+        .iter()
+        .map(|&i| true_scores[i])
+        .fold(f64::NEG_INFINITY, f64::max);
+    let range = (max_true - min_true).max(1e-9);
+
+    let relevance = |idx: usize| -> f64 { ((true_scores[idx] - min_true) / range).clamp(0.0, 1.0) };
+
+    let k_eff = k.min(pred_order.len());
+
+    let dcg: f64 = (0..k_eff)
+        .map(|i| {
+            let rel = relevance(pred_order[i]);
+            (2.0_f64.powf(rel) - 1.0) / (i as f64 + 2.0).log2()
+        })
+        .sum();
+
+    let idcg: f64 = (0..k_eff)
+        .map(|i| {
+            let rel = relevance(ideal_order[i]);
+            (2.0_f64.powf(rel) - 1.0) / (i as f64 + 2.0).log2()
+        })
+        .sum();
+
+    if idcg == 0.0 {
+        0.0
+    } else {
+        (dcg / idcg).clamp(0.0, 1.0)
+    }
+}
+
+/// Compute weighted rank reversals in the top-K region.
+///
+/// For each item in the top-K (by true rank), compute the displacement from its
+/// predicted rank, weighted by 1/true_rank. Items that should be in top-K but
+/// aren't get maximum displacement.
+fn compute_weighted_rank_reversals(
+    pred_scores: &[f64],
+    true_scores: &[f64],
+    indices: &[usize],
+    k: usize,
+) -> f64 {
+    if indices.is_empty() || k == 0 {
+        return 0.0;
+    }
+
+    let mut pred_order: Vec<usize> = indices.to_vec();
+    pred_order.sort_by(|&a, &b| {
+        pred_scores[b]
+            .partial_cmp(&pred_scores[a])
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
+
+    let mut true_order: Vec<usize> = indices.to_vec();
+    true_order.sort_by(|&a, &b| {
+        true_scores[b]
+            .partial_cmp(&true_scores[a])
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
+
+    let n = indices.len();
+    let k_eff = k.min(n);
+
+    let mut pred_rank_map: HashMap<usize, usize> = HashMap::new();
+    for (r, &idx) in pred_order.iter().enumerate() {
+        pred_rank_map.insert(idx, r + 1);
+    }
+
+    let mut wrr = 0.0;
+    for true_r in 0..k_eff {
+        let idx = true_order[true_r];
+        let pred_r = pred_rank_map[&idx];
+        let displacement = (pred_r as f64 - (true_r + 1) as f64).abs();
+        let weight = 1.0 / (true_r + 1) as f64;
+        wrr += weight * displacement;
+    }
+
+    wrr
+}
+
+/// Compute Bayesian regret: the expected utility loss from selecting the
+/// predicted top-K instead of the true top-K.
+fn compute_bayesian_regret(
+    pred_scores: &[f64],
+    true_scores: &[f64],
+    indices: &[usize],
+    k: usize,
+) -> f64 {
+    if indices.is_empty() || k == 0 {
+        return 0.0;
+    }
+
+    let pred_topk = topk_set(pred_scores, indices, k, false);
+    let true_topk = topk_set(true_scores, indices, k, true);
+
+    let true_utility: f64 = true_topk.iter().map(|&i| true_scores[i]).sum();
+    let pred_utility: f64 = pred_topk.iter().map(|&i| true_scores[i]).sum();
+
+    (true_utility - pred_utility).max(0.0)
+}
+
+/// Count pairwise discordances among the top-K items.
+fn compute_topk_discordance(
+    pred_scores: &[f64],
+    true_scores: &[f64],
+    indices: &[usize],
+    k: usize,
+) -> usize {
+    if indices.is_empty() || k == 0 {
+        return 0;
+    }
+
+    // Items in the top-K by either predicted or true ranking.
+    let pred_topk = topk_set(pred_scores, indices, k, false);
+    let true_topk = topk_set(true_scores, indices, k, true);
+    let relevant: Vec<usize> = pred_topk.union(&true_topk).copied().collect();
+
+    let mut discordances = 0;
+    for i in 0..relevant.len() {
+        for j in (i + 1)..relevant.len() {
+            let a = relevant[i];
+            let b = relevant[j];
+            let pred_cmp = pred_scores[a].partial_cmp(&pred_scores[b]);
+            let true_cmp = true_scores[a].partial_cmp(&true_scores[b]);
+            if let (Some(p), Some(t)) = (pred_cmp, true_cmp) {
+                if p != t && p != std::cmp::Ordering::Equal && t != std::cmp::Ordering::Equal {
+                    discordances += 1;
+                }
+            }
+        }
+    }
+
+    discordances
+}
+
+// =============================================================================
 // Synthetic case definitions
 // =============================================================================
 
@@ -65,6 +415,9 @@ pub struct EvaluationMetrics {
     pub comparisons_refused: usize,
     pub stop_reason: RerankStopReason,
     pub latency_ms: u128,
+    /// Extended rank quality metrics (populated when ground truth is available).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rank_quality: Option<RankQualityMetrics>,
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
@@ -363,11 +716,12 @@ pub fn run_synthetic_case(case: &SyntheticCase) -> EvaluationResult {
             raters.clone(),
             Some(engine_cfg.clone()),
         )
-        .expect("rating engine init");
+        .expect("initializing rating engine with valid config should succeed");
         engines.insert(attr.id.to_string(), engine);
     }
 
-    let mut manager = TraitSearchManager::new(config, engines).expect("trait search init");
+    let mut manager = TraitSearchManager::new(config, engines)
+        .expect("initializing trait search manager should succeed");
 
     let start_time = Instant::now();
 
@@ -438,7 +792,9 @@ pub fn run_synthetic_case(case: &SyntheticCase) -> EvaluationResult {
     }
 
     let stop_reason = 'rerank: loop {
-        manager.recompute_global_state().expect("recompute");
+        manager
+            .recompute_global_state()
+            .expect("recomputing global state should succeed with valid data");
         error_trajectory.push(manager.estimate_topk_error());
 
         if manager.certified_stop() {
@@ -465,7 +821,7 @@ pub fn run_synthetic_case(case: &SyntheticCase) -> EvaluationResult {
         let proposal_request_size = (batch_size.saturating_mul(3)).max(batch_size);
         let proposals = manager
             .propose_batch(rater_id, proposal_request_size, PlannerMode::Hybrid)
-            .expect("proposals");
+            .expect("generating trait search proposals should succeed");
 
         if proposals.is_empty() {
             break 'rerank RerankStopReason::NoProposals;
@@ -560,7 +916,9 @@ pub fn run_synthetic_case(case: &SyntheticCase) -> EvaluationResult {
         }
     };
 
-    manager.recompute_global_state().expect("final recompute");
+    manager
+        .recompute_global_state()
+        .expect("final recomputation of global state should succeed");
 
     let n = n_entities;
     let mut pred_scores = vec![0.0; n];
@@ -624,6 +982,18 @@ pub fn run_synthetic_case(case: &SyntheticCase) -> EvaluationResult {
         (precision, recall)
     };
 
+    let rank_quality = if eval_indices.len() >= 2 {
+        Some(RankQualityMetrics::compute(
+            &pred_scores,
+            &true_scores,
+            &pred_vars,
+            &eval_indices,
+            case.topk.k,
+        ))
+    } else {
+        None
+    };
+
     EvaluationResult {
         case_name: case.name.to_string(),
         metrics: EvaluationMetrics {
@@ -641,6 +1011,7 @@ pub fn run_synthetic_case(case: &SyntheticCase) -> EvaluationResult {
             comparisons_refused,
             stop_reason,
             latency_ms: start_time.elapsed().as_millis(),
+            rank_quality,
         },
         error_trajectory,
     }
@@ -1205,7 +1576,11 @@ fn spearman_rho(x: &[f64], y: &[f64]) -> f64 {
 fn ranks_with_ties(scores: &[f64]) -> Vec<f64> {
     let n = scores.len();
     let mut indices: Vec<usize> = (0..n).collect();
-    indices.sort_by(|&a, &b| scores[a].partial_cmp(&scores[b]).unwrap());
+    indices.sort_by(|&a, &b| {
+        scores[a]
+            .partial_cmp(&scores[b])
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
 
     let mut ranks = vec![0.0; n];
     let mut i = 0usize;
@@ -1251,7 +1626,11 @@ fn topk_set(scores: &[f64], indices: &[usize], k: usize, include_ties: bool) -> 
     }
 
     let mut sorted: Vec<usize> = indices.to_vec();
-    sorted.sort_by(|&a, &b| scores[b].partial_cmp(&scores[a]).unwrap());
+    sorted.sort_by(|&a, &b| {
+        scores[b]
+            .partial_cmp(&scores[a])
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
 
     let k_eff = k.min(sorted.len());
 
@@ -1301,5 +1680,254 @@ fn coverage_95(
         0.0
     } else {
         covered as f64 / total as f64
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // =========================================================================
+    // Rank quality metrics
+    // =========================================================================
+
+    #[test]
+    fn test_rank_quality_perfect_ranking() {
+        // Predicted scores perfectly match true scores.
+        let pred = vec![10.0, 8.0, 6.0, 4.0, 2.0];
+        let truth = vec![10.0, 8.0, 6.0, 4.0, 2.0];
+        let vars = vec![0.1; 5];
+        let indices: Vec<usize> = (0..5).collect();
+
+        let rq = RankQualityMetrics::compute(&pred, &truth, &vars, &indices, 3);
+
+        assert!((rq.kendall_tau_b - 1.0).abs() < 1e-6, "perfect tau should be 1.0");
+        assert!((rq.spearman_rho - 1.0).abs() < 1e-6, "perfect rho should be 1.0");
+        assert!((rq.topk_precision - 1.0).abs() < 1e-6);
+        assert!((rq.topk_recall - 1.0).abs() < 1e-6);
+        assert!((rq.ndcg_at_k - 1.0).abs() < 1e-6, "perfect nDCG should be 1.0");
+        assert!((rq.curl_harmonic - 1.0).abs() < 1e-6, "perfect CURL should be 1.0");
+        assert!(rq.weighted_rank_reversals < 1e-6, "no reversals expected");
+        assert!(rq.bayesian_regret < 1e-6, "no regret expected");
+        assert_eq!(rq.topk_discordance_count, 0);
+    }
+
+    #[test]
+    fn test_rank_quality_reversed_ranking() {
+        // Predicted scores are completely reversed.
+        let pred = vec![2.0, 4.0, 6.0, 8.0, 10.0];
+        let truth = vec![10.0, 8.0, 6.0, 4.0, 2.0];
+        let vars = vec![0.1; 5];
+        let indices: Vec<usize> = (0..5).collect();
+
+        let rq = RankQualityMetrics::compute(&pred, &truth, &vars, &indices, 2);
+
+        assert!(rq.kendall_tau_b < -0.9, "reversed tau should be negative: {}", rq.kendall_tau_b);
+        assert!(rq.spearman_rho < -0.9, "reversed rho should be negative");
+        assert!(rq.topk_precision < 0.01, "top-K should be completely wrong");
+        assert!(rq.bayesian_regret > 0.0, "should have positive regret");
+        assert!(rq.topk_discordance_count > 0, "should have discordances");
+    }
+
+    #[test]
+    fn test_rank_quality_partial_error() {
+        // Items 0 and 1 are swapped, rest correct.
+        let pred = vec![8.0, 10.0, 6.0, 4.0, 2.0];
+        let truth = vec![10.0, 8.0, 6.0, 4.0, 2.0];
+        let vars = vec![0.1; 5];
+        let indices: Vec<usize> = (0..5).collect();
+
+        let rq = RankQualityMetrics::compute(&pred, &truth, &vars, &indices, 2);
+
+        // Top-2 set is still {0, 1}, just in wrong order.
+        assert!((rq.topk_precision - 1.0).abs() < 1e-6, "top-2 set should be correct");
+        assert!((rq.topk_recall - 1.0).abs() < 1e-6);
+        // But there should be rank reversals and discordances within top-K.
+        assert!(rq.weighted_rank_reversals > 0.0);
+        assert!(rq.topk_discordance_count > 0);
+        // CURL should be less than perfect.
+        assert!(rq.curl_harmonic < 1.0);
+    }
+
+    #[test]
+    fn test_ndcg_perfect_vs_random() {
+        let truth = vec![10.0, 8.0, 6.0, 4.0, 2.0];
+        let indices: Vec<usize> = (0..5).collect();
+
+        // Perfect ranking.
+        let ndcg_perfect = compute_ndcg_at_k(&truth, &truth, &indices, 3);
+        assert!((ndcg_perfect - 1.0).abs() < 1e-6);
+
+        // Worst-case: reverse ranking.
+        let pred_worst = vec![2.0, 4.0, 6.0, 8.0, 10.0];
+        let ndcg_worst = compute_ndcg_at_k(&pred_worst, &truth, &indices, 3);
+        assert!(ndcg_worst < ndcg_perfect);
+    }
+
+    #[test]
+    fn test_curl_monotonicity() {
+        // CURL should decrease as ranking quality degrades.
+        let truth = vec![10.0, 9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0];
+        let indices: Vec<usize> = (0..10).collect();
+
+        let curl_perfect = compute_curl(&truth, &truth, &indices, CurlWeight::Harmonic);
+
+        // Swap top 2.
+        let pred_swap2 = vec![9.0, 10.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0];
+        let curl_swap2 = compute_curl(&pred_swap2, &truth, &indices, CurlWeight::Harmonic);
+
+        // Swap items 5 and 6 (lower-ranked, should matter less).
+        let pred_swap_low = vec![10.0, 9.0, 8.0, 7.0, 6.0, 4.0, 5.0, 3.0, 2.0, 1.0];
+        let curl_swap_low = compute_curl(&pred_swap_low, &truth, &indices, CurlWeight::Harmonic);
+
+        assert!((curl_perfect - 1.0).abs() < 1e-6);
+        // Swapping top items should hurt CURL more than swapping low items.
+        assert!(
+            curl_swap2 < curl_swap_low,
+            "top swap ({curl_swap2:.4}) should be worse than low swap ({curl_swap_low:.4})"
+        );
+    }
+
+    #[test]
+    fn test_weighted_rank_reversals() {
+        let truth = vec![10.0, 8.0, 6.0, 4.0, 2.0];
+        let indices: Vec<usize> = (0..5).collect();
+
+        // Perfect ranking: no reversals.
+        let wrr = compute_weighted_rank_reversals(&truth, &truth, &indices, 3);
+        assert!(wrr < 1e-6);
+
+        // Swap items 0 and 4: item 0 (true rank 1) predicted at rank 5.
+        let pred_bad = vec![2.0, 8.0, 6.0, 4.0, 10.0];
+        let wrr_bad = compute_weighted_rank_reversals(&pred_bad, &truth, &indices, 3);
+        assert!(wrr_bad > 0.0, "should have nonzero weighted reversals");
+    }
+
+    #[test]
+    fn test_bayesian_regret_bounds() {
+        let truth = vec![10.0, 8.0, 6.0, 4.0, 2.0];
+        let indices: Vec<usize> = (0..5).collect();
+
+        // Perfect: zero regret.
+        let regret_perfect = compute_bayesian_regret(&truth, &truth, &indices, 2);
+        assert!(regret_perfect < 1e-6);
+
+        // Worst case: select bottom-2 instead of top-2.
+        let pred_worst = vec![2.0, 4.0, 6.0, 8.0, 10.0];
+        let regret_worst = compute_bayesian_regret(&pred_worst, &truth, &indices, 2);
+        // True top-2: {10, 8} = 18. Predicted top-2: {4, 2} gets true scores = 4+2 = 6. Wait,
+        // predicted top-2 by pred_worst are indices 3,4 (scores 8,10 in pred), so true scores
+        // for those are 4,2 = 6. True top-2 utility = 10+8 = 18. Regret = 18-6 = 12.
+        assert!((regret_worst - 12.0).abs() < 1e-6, "regret={regret_worst}, expected 12.0");
+    }
+
+    // =========================================================================
+    // Synthetic evaluation suite
+    // =========================================================================
+
+    #[test]
+    fn test_synthetic_suite_runs_all_cases() {
+        let results = run_synthetic_suite(None);
+        assert!(results.len() >= 6, "should have at least 6 test cases");
+
+        for result in &results {
+            assert!(!result.case_name.is_empty());
+            assert!(result.metrics.comparisons_used > 0, "{}: no comparisons used", result.case_name);
+            assert!(result.metrics.kendall_tau_all.is_finite());
+            assert!(result.metrics.spearman_rho_all.is_finite());
+        }
+    }
+
+    #[test]
+    fn test_synthetic_clean_ordering_is_accurate() {
+        let results = run_synthetic_suite(Some("clean_ordering_10"));
+        assert_eq!(results.len(), 1);
+        let r = &results[0];
+
+        // With no noise, solver should get perfect or near-perfect ranking.
+        assert!(
+            r.metrics.kendall_tau >= 0.8,
+            "clean ordering tau={}, expected >=0.8",
+            r.metrics.kendall_tau
+        );
+        assert!(r.metrics.topk_precision >= 0.8);
+    }
+
+    #[test]
+    fn test_synthetic_rank_quality_populated() {
+        let results = run_synthetic_suite(Some("noisy_ordering_50"));
+        assert_eq!(results.len(), 1);
+        let r = &results[0];
+
+        let rq = r.metrics.rank_quality.as_ref().expect("rank_quality should be populated");
+        assert!(rq.ndcg_at_k.is_finite());
+        assert!(rq.curl_harmonic.is_finite());
+        assert!(rq.curl_exponential.is_finite());
+        assert!(rq.bayesian_regret.is_finite());
+        assert!(rq.weighted_rank_reversals.is_finite());
+    }
+
+    #[test]
+    fn test_likert_baseline_runs() {
+        let results = run_likert_baseline_suite(Some("clean_ordering_10"), LikertEvalConfig::default());
+        assert_eq!(results.len(), 1);
+        let r = &results[0];
+
+        assert!(r.metrics.ratings_used > 0);
+        assert!(r.metrics.kendall_tau_all.is_finite());
+    }
+
+    // =========================================================================
+    // Helper function tests
+    // =========================================================================
+
+    #[test]
+    fn test_kendall_tau_identical() {
+        let x = vec![1.0, 2.0, 3.0, 4.0, 5.0];
+        assert!((kendall_tau_b(&x, &x) - 1.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_kendall_tau_reversed() {
+        let x = vec![1.0, 2.0, 3.0, 4.0, 5.0];
+        let y = vec![5.0, 4.0, 3.0, 2.0, 1.0];
+        assert!((kendall_tau_b(&x, &y) - (-1.0)).abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_spearman_identical() {
+        let x = vec![1.0, 2.0, 3.0, 4.0, 5.0];
+        assert!((spearman_rho(&x, &x) - 1.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_ranks_with_ties() {
+        let scores = vec![3.0, 1.0, 3.0, 2.0];
+        let ranks = ranks_with_ties(&scores);
+        // Sorted: 1.0(idx1)=rank0, 2.0(idx3)=rank1, 3.0(idx0,idx2)=avg(rank2,rank3)=2.5
+        assert!((ranks[0] - 2.5).abs() < 1e-6);
+        assert!((ranks[1] - 0.0).abs() < 1e-6);
+        assert!((ranks[2] - 2.5).abs() < 1e-6);
+        assert!((ranks[3] - 1.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_topk_set_basic() {
+        let scores = vec![10.0, 5.0, 8.0, 3.0, 7.0];
+        let indices: Vec<usize> = (0..5).collect();
+        let top2 = topk_set(&scores, &indices, 2, false);
+        assert!(top2.contains(&0)); // score 10
+        assert!(top2.contains(&2)); // score 8
+        assert_eq!(top2.len(), 2);
+    }
+
+    #[test]
+    fn test_coverage_95_all_within() {
+        let pred = vec![5.0, 3.0, 7.0];
+        let truth = vec![5.0, 3.0, 7.0]; // exact match
+        let vars = vec![1.0, 1.0, 1.0]; // generous variance
+        let indices = vec![0, 1, 2];
+        let cov = coverage_95(&pred, &vars, &truth, &indices);
+        assert!((cov - 1.0).abs() < 1e-6);
     }
 }
