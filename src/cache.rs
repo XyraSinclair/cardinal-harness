@@ -1,12 +1,21 @@
-//! SQLite-backed cache for pairwise LLM judgements.
+//! Cache for pairwise LLM judgements.
+//!
+//! The `PairwiseCache` trait and key types are always available.
+//! Enable the `sqlite-store` feature for the `SqlitePairwiseCache` implementation.
 
 use async_trait::async_trait;
 use blake3;
+#[cfg(feature = "sqlite-store")]
 use fs2::FileExt;
+#[cfg(feature = "sqlite-store")]
 use rusqlite::{params, Connection};
+#[cfg(feature = "sqlite-store")]
 use serde::Serialize;
+#[cfg(feature = "sqlite-store")]
 use std::path::{Path, PathBuf};
+#[cfg(feature = "sqlite-store")]
 use std::sync::{Arc, Mutex};
+#[cfg(feature = "sqlite-store")]
 use std::time::{SystemTime, UNIX_EPOCH};
 
 #[derive(Debug, Clone)]
@@ -79,6 +88,7 @@ pub struct CachedJudgement {
 
 #[derive(Debug, thiserror::Error)]
 pub enum CacheError {
+    #[cfg(feature = "sqlite-store")]
     #[error("sqlite error: {0}")]
     Sqlite(#[from] rusqlite::Error),
     #[error("io error: {0}")]
@@ -97,12 +107,14 @@ pub trait PairwiseCache: Send + Sync {
     async fn put(&self, key: &PairwiseCacheKey, value: &CachedJudgement) -> Result<(), CacheError>;
 }
 
+#[cfg(feature = "sqlite-store")]
 #[derive(Clone)]
 pub struct SqlitePairwiseCache {
     path: PathBuf,
     conn: Arc<Mutex<Connection>>,
 }
 
+#[cfg(feature = "sqlite-store")]
 impl SqlitePairwiseCache {
     pub fn new(path: impl AsRef<Path>) -> Result<Self, CacheError> {
         let path = path.as_ref().to_path_buf();
@@ -168,6 +180,7 @@ impl SqlitePairwiseCache {
     }
 }
 
+#[cfg(feature = "sqlite-store")]
 fn ensure_column(conn: &Connection, name: &str, spec: &str) -> Result<(), CacheError> {
     let mut stmt = conn.prepare("PRAGMA table_info(pairwise_cache)")?;
     let mut rows = stmt.query([])?;
@@ -182,6 +195,7 @@ fn ensure_column(conn: &Connection, name: &str, spec: &str) -> Result<(), CacheE
     Ok(())
 }
 
+#[cfg(feature = "sqlite-store")]
 #[async_trait]
 impl PairwiseCache for SqlitePairwiseCache {
     async fn get(&self, key: &PairwiseCacheKey) -> Result<Option<CachedJudgement>, CacheError> {
@@ -275,11 +289,13 @@ impl PairwiseCache for SqlitePairwiseCache {
     }
 }
 
+#[cfg(feature = "sqlite-store")]
 #[derive(Debug)]
 pub struct CacheLock {
     _file: std::fs::File,
 }
 
+#[cfg(feature = "sqlite-store")]
 impl CacheLock {
     fn new(db_path: &Path) -> Result<Self, CacheError> {
         let mut lock_path = db_path.to_path_buf();
@@ -295,6 +311,7 @@ impl CacheLock {
     }
 }
 
+#[cfg(feature = "sqlite-store")]
 #[derive(Debug, Serialize)]
 pub struct CacheExportRow {
     pub key_hash: String,
@@ -319,12 +336,14 @@ pub struct CacheExportRow {
     pub hit_count: i64,
 }
 
+#[cfg(feature = "sqlite-store")]
 #[derive(Debug, Clone, Serialize)]
 pub struct CachePruneStats {
     pub deleted: usize,
     pub remaining: usize,
 }
 
+#[cfg(feature = "sqlite-store")]
 impl SqlitePairwiseCache {
     pub async fn export_jsonl(&self, path: impl AsRef<Path>) -> Result<(), CacheError> {
         let path = path.as_ref().to_path_buf();
@@ -441,6 +460,7 @@ fn hash_fields(fields: &[&str]) -> String {
     hasher.finalize().to_hex().to_string()
 }
 
+#[cfg(feature = "sqlite-store")]
 fn now_epoch() -> i64 {
     SystemTime::now()
         .duration_since(UNIX_EPOCH)

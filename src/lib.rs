@@ -16,6 +16,7 @@
 pub mod anp;
 pub mod axes;
 pub mod cache;
+#[cfg(feature = "sqlite-store")]
 pub mod commander;
 pub mod gateway;
 pub mod pipeline;
@@ -25,7 +26,9 @@ pub mod rerank;
 pub mod text_chunking;
 pub mod trait_search;
 
-pub use cache::{PairwiseCache, PairwiseCacheKey, SqlitePairwiseCache};
+#[cfg(feature = "sqlite-store")]
+pub use cache::SqlitePairwiseCache;
+pub use cache::{PairwiseCache, PairwiseCacheKey};
 pub use gateway::{Attribution, ChatGateway, ProviderGateway, UsageSink};
 pub use rerank::{
     multi_rerank, multi_rerank_with_trace, rerank, rerank_with_trace, ComparisonError,
