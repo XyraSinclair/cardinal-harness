@@ -11,20 +11,24 @@ documentation = "https://docs.rs/cardinal-harness"
 keywords = ["llm", "reranking", "ranking", "pairwise", "cardinal"]
 categories = ["algorithms", "science", "command-line-utilities"]
 
+[features]
+default = ["sqlite-store"]
+sqlite-store = ["rusqlite", "fs2"]
+
 [dependencies]
 async-trait = "0.1"
 blake3 = "1"
 clap = { version = "4", features = ["derive"] }
 chrono = { version = "0.4", features = ["serde"] }
 fancy-regex = "0.13"
-fs2 = "0.4"
+fs2 = { version = "0.4", optional = true }
 futures = "0.3"
 glob = "0.3"
 nalgebra = "0.33"
 rand = "0.8"
 regex = "1"
 reqwest = { version = "0.12", features = ["json", "gzip", "stream"] }
-rusqlite = { version = "0.38", features = ["bundled"] }
+rusqlite = { version = "0.38", features = ["bundled"], optional = true }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 statrs = "0.18"
