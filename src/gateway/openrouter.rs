@@ -157,6 +157,10 @@ struct ChatApiRequest<'a> {
     max_tokens: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     response_format: Option<ResponseFormat>,
+    #[serde(skip_serializing_if = "std::ops::Not::not")]
+    logprobs: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    top_logprobs: Option<u32>,
 }
 
 #[derive(Serialize)]
@@ -195,6 +199,29 @@ struct ChatApiResponse {
 struct Choice {
     message: Option<ChoiceMessage>,
     finish_reason: Option<String>,
+    logprobs: Option<ChoiceLogprobs>,
+}
+
+/// OpenAI-compatible logprobs container on a choice.
+#[derive(Deserialize)]
+struct ChoiceLogprobs {
+    content: Option<Vec<ApiTokenLogprob>>,
+}
+
+/// A single token's logprob in the OpenAI/OpenRouter response format.
+#[derive(Deserialize)]
+struct ApiTokenLogprob {
+    token: String,
+    logprob: f64,
+    #[serde(default)]
+    top_logprobs: Vec<ApiTopLogprob>,
+}
+
+/// An alternative token at a given position.
+#[derive(Deserialize)]
+struct ApiTopLogprob {
+    token: String,
+    logprob: f64,
 }
 
 #[derive(Deserialize)]
@@ -265,6 +292,8 @@ impl ChatProvider for OpenRouterAdapter {
             } else {
                 None
             },
+            logprobs: req.logprobs,
+            top_logprobs: req.top_logprobs,
         };
 
         let mut response = self
@@ -408,10 +437,34 @@ impl ChatProvider for OpenRouterAdapter {
             upstream_cost_nanodollars,
             latency,
             finish_reason: FinishReason::from(choice.finish_reason),
-            // TODO: parse logprobs from OpenRouter response when available.
-            output_logprobs: None,
+            output_logprobs: parse_api_logprobs(choice.logprobs),
             cache_read_tokens: None,
             cache_write_tokens: None,
         })
     }
+}
+
+/// Convert OpenRouter/OpenAI logprobs format to our internal representation.
+fn parse_api_logprobs(logprobs: Option<ChoiceLogprobs>) -> Option<Vec<TokenLogprob>> {
+    let content = logprobs?.content?;
+    if content.is_empty() {
+        return None;
+    }
+    Some(
+        content
+            .into_iter()
+            .map(|lp| TokenLogprob {
+                token: lp.token,
+                logprob: lp.logprob,
+                top_alternatives: lp
+                    .top_logprobs
+                    .into_iter()
+                    .map(|alt| TokenAlternative {
+                        token: alt.token,
+                        logprob: alt.logprob,
+                    })
+                    .collect(),
+            })
+            .collect(),
+    )
 }

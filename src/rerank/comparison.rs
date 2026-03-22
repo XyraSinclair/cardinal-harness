@@ -6,7 +6,9 @@ use serde::Deserialize;
 use tracing::warn;
 
 use crate::cache::{CacheError, CachedJudgement, PairwiseCache, PairwiseCacheKey};
-use crate::gateway::{Attribution, ChatGateway, ChatModel, ChatRequest, ProviderError};
+use crate::gateway::{
+    Attribution, ChatGateway, ChatModel, ChatRequest, ProviderError, confidence_from_logprobs,
+};
 use crate::text_chunking::count_tokens;
 
 use crate::prompts::{prompt_by_slug, EntityRef, DEFAULT_PROMPT};
@@ -254,6 +256,12 @@ pub async fn compare_pair(
     if model.starts_with("openai/") {
         request = request.json();
     }
+    // Request logprobs when the provider supports them.
+    // Anthropic models don't expose logprobs via OpenRouter, so this is
+    // opportunistic — we fall back to self-reported confidence if absent.
+    if model_supports_logprobs(model) {
+        request = request.with_logprobs(10);
+    }
 
     let response = gateway.chat(request).await?;
 
@@ -266,6 +274,9 @@ pub async fn compare_pair(
 
     match parse_pairwise_response(&response.content) {
         Ok(judgement) => {
+            // If logprobs are available, derive confidence from the token
+            // distribution rather than trusting the model's self-report.
+            let judgement = maybe_override_confidence(judgement, &response.output_logprobs);
             if let (Some(cache), Some(ref key)) = (cache, &cache_key) {
                 let entry = judgement_to_cached(&judgement, &usage);
                 let _ = cache.put(key, &entry).await;
@@ -357,6 +368,66 @@ fn cached_to_judgement(cached: &CachedJudgement) -> Option<PairwiseJudgement> {
         ratio,
         confidence,
     })
+}
+
+/// The ratio ladder used in all prompt templates.
+const RATIO_LADDER: &[f64] = &[
+    1.0, 1.05, 1.1, 1.2, 1.3, 1.5, 1.75, 2.1, 2.5, 3.1, 3.9, 5.1, 6.8, 9.2, 12.7, 18.0, 26.0,
+];
+
+/// Whether a model is known to support logprobs via OpenRouter.
+///
+/// Anthropic models (Claude) do not expose logprobs through OpenRouter.
+/// OpenAI, Google, and most open-weight models do.
+fn model_supports_logprobs(model: &str) -> bool {
+    !model.starts_with("anthropic/")
+}
+
+/// If logprobs are available, derive confidence from the token probability
+/// distribution over ratio values. This replaces the model's self-reported
+/// confidence, which is poorly calibrated (typically clusters at 0.85).
+///
+/// Falls back to self-reported confidence when logprobs are absent (e.g.
+/// Anthropic models) or when the ratio token can't be found in the logprobs.
+fn maybe_override_confidence(
+    judgement: PairwiseJudgement,
+    logprobs: &Option<Vec<crate::gateway::TokenLogprob>>,
+) -> PairwiseJudgement {
+    let PairwiseJudgement::Observation {
+        higher_ranked,
+        ratio,
+        confidence: self_reported,
+    } = &judgement
+    else {
+        return judgement;
+    };
+
+    let Some(lps) = logprobs else {
+        return judgement;
+    };
+
+    match confidence_from_logprobs(lps, *ratio, RATIO_LADDER) {
+        Some(source) => {
+            let logprob_confidence = source.as_scalar();
+            tracing::debug!(
+                self_reported = %self_reported,
+                logprob = %logprob_confidence,
+                source = ?source,
+                "logprob confidence override"
+            );
+            PairwiseJudgement::Observation {
+                higher_ranked: *higher_ranked,
+                ratio: *ratio,
+                confidence: logprob_confidence,
+            }
+        }
+        None => {
+            tracing::debug!(
+                "logprobs present but ratio token not found; using self-reported confidence"
+            );
+            judgement
+        }
+    }
 }
 
 fn judgement_to_cached(judgement: &PairwiseJudgement, usage: &ComparisonUsage) -> CachedJudgement {
@@ -461,5 +532,80 @@ That's my assessment."#;
         assert!(ln_b < 0.0);
 
         assert!((ln_a + ln_b).abs() < 0.001);
+    }
+
+    #[test]
+    fn test_model_supports_logprobs() {
+        assert!(!model_supports_logprobs("anthropic/claude-opus-4-6"));
+        assert!(!model_supports_logprobs("anthropic/claude-sonnet-4"));
+        assert!(model_supports_logprobs("openai/gpt-4.1-mini"));
+        assert!(model_supports_logprobs("openai/gpt-5-mini"));
+        assert!(model_supports_logprobs("google/gemini-2.5-pro"));
+        assert!(model_supports_logprobs("moonshotai/kimi-k2-0905"));
+    }
+
+    #[test]
+    fn test_maybe_override_confidence_with_logprobs() {
+        use crate::gateway::types::{TokenAlternative, TokenLogprob};
+
+        let judgement = PairwiseJudgement::Observation {
+            higher_ranked: HigherRanked::A,
+            ratio: 2.1,
+            confidence: 0.85, // typical self-reported "always 0.85"
+        };
+
+        // Simulate logprobs where 2.1 has high probability
+        let logprobs = vec![TokenLogprob {
+            token: "2.1".to_string(),
+            logprob: -0.2, // ~82% probability
+            top_alternatives: vec![
+                TokenAlternative {
+                    token: "2.5".to_string(),
+                    logprob: -2.0,
+                },
+                TokenAlternative {
+                    token: "1.75".to_string(),
+                    logprob: -2.5,
+                },
+            ],
+        }];
+
+        let result = maybe_override_confidence(judgement, &Some(logprobs));
+        match result {
+            PairwiseJudgement::Observation { confidence, .. } => {
+                // Should differ from the self-reported 0.85
+                assert!(
+                    (confidence - 0.85).abs() > 0.01,
+                    "logprob confidence should differ from self-reported; got {confidence}"
+                );
+                assert!(confidence > 0.0 && confidence <= 1.0);
+            }
+            _ => panic!("Expected Observation"),
+        }
+    }
+
+    #[test]
+    fn test_maybe_override_confidence_without_logprobs() {
+        let judgement = PairwiseJudgement::Observation {
+            higher_ranked: HigherRanked::B,
+            ratio: 1.5,
+            confidence: 0.8,
+        };
+
+        // No logprobs (e.g., Anthropic model) — should keep self-reported
+        let result = maybe_override_confidence(judgement, &None);
+        match result {
+            PairwiseJudgement::Observation { confidence, .. } => {
+                assert!((confidence - 0.8).abs() < 0.001);
+            }
+            _ => panic!("Expected Observation"),
+        }
+    }
+
+    #[test]
+    fn test_maybe_override_confidence_refused() {
+        let judgement = PairwiseJudgement::Refused;
+        let result = maybe_override_confidence(judgement, &None);
+        assert!(matches!(result, PairwiseJudgement::Refused));
     }
 }
