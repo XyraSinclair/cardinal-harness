@@ -373,29 +373,32 @@ const RATIO_LADDER: &[f64] = &[
 /// Whether to request logprobs for this model.
 ///
 /// Logprobs are only useful for non-reasoning models that support them.
-/// - Anthropic models: no logprobs via OpenRouter
-/// - Reasoning models (o1, o3, deepseek-r1, etc.): logprobs not available
-///   on reasoning tokens, and the visible output is post-reasoning — logprob
-///   distribution over ratio tokens doesn't reflect the actual deliberation
+/// - Anthropic: no logprobs via OpenRouter
+/// - Reasoning models: output tokens are post-reasoning, so logprob
+///   distribution doesn't reflect the actual deliberation
+/// - `:thinking` suffix: OpenRouter convention for reasoning variants
 fn model_supports_logprobs(model: &str) -> bool {
+    // Anthropic never exposes logprobs via OpenRouter.
     if model.starts_with("anthropic/") {
         return false;
     }
-    // Reasoning models: logprobs on output tokens don't capture the
-    // internal chain-of-thought that produced the ratio choice.
-    let reasoning_patterns = [
-        "o1", "o3", "o4",           // OpenAI reasoning family
-        "deepseek-r1", "deepseek/r1",
-        "qwq",                       // Qwen reasoning
-    ];
-    let model_lower = model.to_lowercase();
-    if reasoning_patterns
-        .iter()
-        .any(|p| model_lower.contains(p))
-    {
+
+    // `:thinking` suffix is OpenRouter's convention for reasoning variants.
+    if model.contains(":thinking") {
         return false;
     }
-    true
+
+    // Known reasoning model families by prefix/substring.
+    let model_lower = model.to_lowercase();
+    let is_reasoning = model_lower.starts_with("openai/o1")
+        || model_lower.starts_with("openai/o3")
+        || model_lower.starts_with("openai/o4")
+        || model_lower.contains("deepseek-r1")
+        || model_lower.contains("/qwq")
+        || model_lower.contains("-thinking")
+        || model_lower.contains("reasoning");
+
+    !is_reasoning
 }
 
 /// If logprobs are available, derive confidence from the token probability
@@ -553,21 +556,38 @@ That's my assessment."#;
     fn test_model_supports_logprobs() {
         // Anthropic: no logprobs via OpenRouter
         assert!(!model_supports_logprobs("anthropic/claude-opus-4-6"));
+        assert!(!model_supports_logprobs("anthropic/claude-sonnet-4.6"));
         assert!(!model_supports_logprobs("anthropic/claude-sonnet-4"));
+        assert!(!model_supports_logprobs("anthropic/claude-haiku-4.5"));
 
         // Reasoning models: logprobs don't reflect deliberation
         assert!(!model_supports_logprobs("openai/o3"));
+        assert!(!model_supports_logprobs("openai/o3-pro"));
         assert!(!model_supports_logprobs("openai/o4-mini"));
-        assert!(!model_supports_logprobs("openai/o1-preview"));
+        assert!(!model_supports_logprobs("openai/o4-mini-high"));
+        assert!(!model_supports_logprobs("openai/o1"));
+        assert!(!model_supports_logprobs("openai/o1-pro"));
         assert!(!model_supports_logprobs("deepseek/deepseek-r1"));
+        assert!(!model_supports_logprobs("deepseek/deepseek-r1-0528"));
         assert!(!model_supports_logprobs("qwen/qwq-32b"));
 
-        // Non-reasoning models with logprob support
+        // :thinking variants
+        assert!(!model_supports_logprobs("anthropic/claude-3.7-sonnet:thinking"));
+        assert!(!model_supports_logprobs("moonshotai/kimi-k2-thinking"));
+        assert!(!model_supports_logprobs("qwen/qwen3-235b-a22b-thinking-2507"));
+        assert!(!model_supports_logprobs("baidu/ernie-4.5-21b-a3b-thinking"));
+
+        // Non-reasoning models: YES logprobs
+        assert!(model_supports_logprobs("openai/gpt-4.1"));
         assert!(model_supports_logprobs("openai/gpt-4.1-mini"));
         assert!(model_supports_logprobs("openai/gpt-5-mini"));
+        assert!(model_supports_logprobs("openai/gpt-5.2-pro"));
         assert!(model_supports_logprobs("google/gemini-2.5-pro"));
         assert!(model_supports_logprobs("google/gemini-2.5-flash"));
+        assert!(model_supports_logprobs("google/gemini-3-pro-preview"));
         assert!(model_supports_logprobs("moonshotai/kimi-k2-0905"));
+        assert!(model_supports_logprobs("deepseek/deepseek-chat"));
+        assert!(model_supports_logprobs("deepseek/deepseek-v3.2"));
     }
 
     #[test]
