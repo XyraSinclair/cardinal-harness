@@ -38,7 +38,7 @@ use crate::trait_search::{
 };
 
 use super::comparison::{
-    compare_pair, estimate_pairwise_input_tokens, pairwise_max_output_tokens, ComparisonError,
+    compare_pair, estimate_pairwise_input_tokens, ComparisonError,
     PAIRWISE_MAX_OUTPUT_TOKENS_DEFAULT,
 };
 use super::hooks::{ComparisonEvent, ComparisonObserver, WarmStartProvider};
@@ -139,7 +139,7 @@ pub fn estimate_max_rerank_charge(req: &MultiRerankRequest) -> RerankChargeEstim
     }
 
     let model = req.model.as_deref().unwrap_or(DEFAULT_MODEL);
-    let output_tokens_per_comparison = pairwise_max_output_tokens(model);
+    let output_tokens_per_comparison = PAIRWISE_MAX_OUTPUT_TOKENS_DEFAULT;
 
     // Worst-case attribute prompt: choose the largest prompt by token count (bounded, cheap).
     let (attr_id, attr_prompt, attr_template_slug) = req

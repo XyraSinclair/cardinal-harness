@@ -24,21 +24,16 @@ pub const SIGMA_MIN: f64 = 0.2;
 /// Maximum variance (low confidence).
 pub const SIGMA_MAX: f64 = 2.0;
 
-/// Hard cap on generation for a pairwise judgement.
+/// Default max output tokens for pairwise judgements.
 ///
-/// Keeps costs bounded and ensures responses stay in the small JSON schema.
-pub const PAIRWISE_MAX_OUTPUT_TOKENS_DEFAULT: u32 = 128;
-pub const PAIRWISE_MAX_OUTPUT_TOKENS_GPT5: u32 = 512;
-
-pub fn pairwise_max_output_tokens(model: &str) -> u32 {
-    // GPT-5 family tends to spend ~128 tokens on internal reasoning before emitting any
-    // visible output; a 128-token cap can yield empty `content` on OpenRouter.
-    if model.starts_with("openai/gpt-5") {
-        PAIRWISE_MAX_OUTPUT_TOKENS_GPT5
-    } else {
-        PAIRWISE_MAX_OUTPUT_TOKENS_DEFAULT
-    }
-}
+/// Reasoning models (including extended-thinking variants) need thousands of
+/// tokens for chain-of-thought before emitting JSON. The model knows when to
+/// stop — trust the EOS token rather than truncating mid-thought.
+///
+/// The old 128 default actively suppressed reasoning and produced worse
+/// judgements (empirically: confidence collapsed to 3 unique values,
+/// ratio ladder underused, rank disagreements with listwise).
+pub const PAIRWISE_MAX_OUTPUT_TOKENS_DEFAULT: u32 = 8192;
 
 // =============================================================================
 // JSON parsing
@@ -251,7 +246,7 @@ pub async fn compare_pair(
         prompt_instance.to_messages(),
         attribution,
     )
-    .max_tokens(pairwise_max_output_tokens(model));
+    .max_tokens(PAIRWISE_MAX_OUTPUT_TOKENS_DEFAULT);
     // Only OpenAI models reliably support response_format=json_object via OpenRouter.
     if model.starts_with("openai/") {
         request = request.json();
