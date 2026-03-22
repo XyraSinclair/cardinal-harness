@@ -44,11 +44,11 @@ impl Default for PolicyRegistry {
         );
         policies.insert(
             "fast_only".to_string(),
-            Arc::new(FixedPolicy::new("openai/gpt-5-mini")),
+            Arc::new(FixedPolicy::new("openai/gpt-5.4-mini")),
         );
         policies.insert(
             "quality_only".to_string(),
-            Arc::new(FixedPolicy::new("anthropic/claude-opus-4.5")),
+            Arc::new(FixedPolicy::new("anthropic/claude-opus-4.6")),
         );
         Self { policies }
     }

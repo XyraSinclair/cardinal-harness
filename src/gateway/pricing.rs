@@ -47,22 +47,35 @@ const OPENAI_EMBED_3_SMALL: ModelPricing = ModelPricing::new("openai", 20, 0);
 const OPENAI_EMBED_3_LARGE_BATCH: ModelPricing = ModelPricing::new("openai", 65, 0);
 const OPENAI_EMBED_3_SMALL_BATCH: ModelPricing = ModelPricing::new("openai", 10, 0);
 
-// OpenRouter pricing (verify periodically against OpenRouter model pages)
-// Claude 3.5 Haiku: $0.80/1M input, $4.00/1M output
-// Claude 3.5 Sonnet: $3.00/1M input, $15.00/1M output
-// GPT-4o-mini: $0.15/1M input, $0.60/1M output
+// OpenRouter pricing — updated 2026-03-21.
+// Verify periodically against OpenRouter model pages.
 
-const CLAUDE_35_HAIKU: ModelPricing = ModelPricing::new("openrouter", 800, 4_000);
-const CLAUDE_35_SONNET: ModelPricing = ModelPricing::new("openrouter", 3_000, 15_000);
-const GPT_4O_MINI: ModelPricing = ModelPricing::new("openrouter", 150, 600);
-// GPT-5-mini: $0.25/1M input, $2.00/1M output (released Aug 2025)
-const GPT_5_MINI: ModelPricing = ModelPricing::new("openrouter", 250, 2_000);
-// GPT-5.2 Chat: $1.75/1M input, $14.00/1M output
-const GPT_5_2_CHAT: ModelPricing = ModelPricing::new("openrouter", 1_750, 14_000);
-// Kimi K2 0905: $0.39/1M input, $1.90/1M output
-const KIMI_K2_0905: ModelPricing = ModelPricing::new("openrouter", 390, 1_900);
-// Claude Opus 4.5: $5.00/1M input, $25.00/1M output
+// Anthropic
+const CLAUDE_OPUS_4_6: ModelPricing = ModelPricing::new("openrouter", 5_000, 25_000);
 const CLAUDE_OPUS_4_5: ModelPricing = ModelPricing::new("openrouter", 5_000, 25_000);
+const CLAUDE_SONNET_4_6: ModelPricing = ModelPricing::new("openrouter", 3_000, 15_000);
+const CLAUDE_SONNET_4_5: ModelPricing = ModelPricing::new("openrouter", 3_000, 15_000);
+const CLAUDE_SONNET_4: ModelPricing = ModelPricing::new("openrouter", 3_000, 15_000);
+const CLAUDE_HAIKU_4_5: ModelPricing = ModelPricing::new("openrouter", 1_000, 5_000);
+
+// OpenAI
+const GPT_5_4_PRO: ModelPricing = ModelPricing::new("openrouter", 30_000, 180_000);
+const GPT_5_4: ModelPricing = ModelPricing::new("openrouter", 2_500, 15_000);
+const GPT_5_4_MINI: ModelPricing = ModelPricing::new("openrouter", 750, 4_500);
+const GPT_5_4_NANO: ModelPricing = ModelPricing::new("openrouter", 200, 1_250);
+const GPT_5_2_PRO: ModelPricing = ModelPricing::new("openrouter", 21_000, 168_000);
+const GPT_5_2_CHAT: ModelPricing = ModelPricing::new("openrouter", 1_750, 14_000);
+const GPT_5_MINI: ModelPricing = ModelPricing::new("openrouter", 250, 2_000);
+
+// Google
+const GEMINI_3_1_PRO: ModelPricing = ModelPricing::new("openrouter", 2_000, 12_000);
+const GEMINI_3_PRO: ModelPricing = ModelPricing::new("openrouter", 2_000, 12_000);
+
+// Moonshot
+const KIMI_K2_0905: ModelPricing = ModelPricing::new("openrouter", 400, 2_000);
+
+// DeepSeek
+const DEEPSEEK_V3_2: ModelPricing = ModelPricing::new("openrouter", 260, 380);
 
 static PRICING_MAP: OnceLock<HashMap<&'static str, ModelPricing>> = OnceLock::new();
 
@@ -75,18 +88,32 @@ fn init_pricing() -> HashMap<&'static str, ModelPricing> {
     map.insert("text-embedding-3-large:batch", OPENAI_EMBED_3_LARGE_BATCH);
     map.insert("text-embedding-3-small:batch", OPENAI_EMBED_3_SMALL_BATCH);
 
-    // OpenRouter models
-    map.insert("anthropic/claude-3-5-haiku", CLAUDE_35_HAIKU);
-    map.insert("anthropic/claude-3-5-haiku-20241022", CLAUDE_35_HAIKU);
-    map.insert("anthropic/claude-3-5-sonnet", CLAUDE_35_SONNET);
-    map.insert("anthropic/claude-3-5-sonnet-20241022", CLAUDE_35_SONNET);
-    map.insert("openai/gpt-4o-mini", GPT_4O_MINI);
-    map.insert("openai/gpt-4o-mini-2024-07-18", GPT_4O_MINI);
-    map.insert("openai/gpt-5-mini", GPT_5_MINI);
-    map.insert("openai/gpt-5-mini-2025-08-07", GPT_5_MINI);
-    map.insert("openai/gpt-5.2-chat", GPT_5_2_CHAT);
-    map.insert("moonshotai/kimi-k2-0905", KIMI_K2_0905);
+    // Anthropic
+    map.insert("anthropic/claude-opus-4.6", CLAUDE_OPUS_4_6);
     map.insert("anthropic/claude-opus-4.5", CLAUDE_OPUS_4_5);
+    map.insert("anthropic/claude-sonnet-4.6", CLAUDE_SONNET_4_6);
+    map.insert("anthropic/claude-sonnet-4.5", CLAUDE_SONNET_4_5);
+    map.insert("anthropic/claude-sonnet-4", CLAUDE_SONNET_4);
+    map.insert("anthropic/claude-haiku-4.5", CLAUDE_HAIKU_4_5);
+
+    // OpenAI
+    map.insert("openai/gpt-5.4-pro", GPT_5_4_PRO);
+    map.insert("openai/gpt-5.4", GPT_5_4);
+    map.insert("openai/gpt-5.4-mini", GPT_5_4_MINI);
+    map.insert("openai/gpt-5.4-nano", GPT_5_4_NANO);
+    map.insert("openai/gpt-5.2-pro", GPT_5_2_PRO);
+    map.insert("openai/gpt-5.2-chat", GPT_5_2_CHAT);
+    map.insert("openai/gpt-5-mini", GPT_5_MINI);
+
+    // Google
+    map.insert("google/gemini-3.1-pro-preview", GEMINI_3_1_PRO);
+    map.insert("google/gemini-3-pro-preview", GEMINI_3_PRO);
+
+    // Moonshot
+    map.insert("moonshotai/kimi-k2-0905", KIMI_K2_0905);
+
+    // DeepSeek
+    map.insert("deepseek/deepseek-v3.2", DEEPSEEK_V3_2);
 
     map
 }
@@ -260,12 +287,12 @@ mod tests {
 
     #[test]
     fn test_chat_cost() {
-        // 1K input + 1K output for Claude 3.5 Haiku
-        // Input: 1000 * 800 = 800,000 nanos
-        // Output: 1000 * 4000 = 4,000,000 nanos
-        // Total: 4,800,000 nanos = $0.0048
-        let cost = chat_cost("anthropic/claude-3-5-haiku", 1_000, 1_000);
-        assert_eq!(cost, 4_800_000);
+        // 1K input + 1K output for Claude Haiku 4.5
+        // Input: 1000 * 1000 = 1,000,000 nanos
+        // Output: 1000 * 5000 = 5,000,000 nanos
+        // Total: 6,000,000 nanos = $0.006
+        let cost = chat_cost("anthropic/claude-haiku-4.5", 1_000, 1_000);
+        assert_eq!(cost, 6_000_000);
     }
 
     // =========================================================================
@@ -275,7 +302,7 @@ mod tests {
     #[test]
     fn test_cache_aware_first_request_pays_full() {
         let pricing = CacheAwarePricing {
-            base: CLAUDE_35_HAIKU,
+            base: CLAUDE_HAIKU_4_5,
             cache_hit_multiplier: 0.1,
             cache_write_multiplier: 1.25,
             cache_page_size: 128,
@@ -295,7 +322,7 @@ mod tests {
     #[test]
     fn test_cache_aware_subsequent_request_gets_discount() {
         let pricing = CacheAwarePricing {
-            base: CLAUDE_35_HAIKU,
+            base: CLAUDE_HAIKU_4_5,
             cache_hit_multiplier: 0.1,
             cache_write_multiplier: 1.25,
             cache_page_size: 128,
@@ -318,7 +345,7 @@ mod tests {
     #[test]
     fn test_cache_aware_page_alignment() {
         let pricing = CacheAwarePricing {
-            base: CLAUDE_35_HAIKU,
+            base: CLAUDE_HAIKU_4_5,
             cache_hit_multiplier: 0.1,
             cache_write_multiplier: 1.0,
             cache_page_size: 128,
@@ -338,7 +365,7 @@ mod tests {
     #[test]
     fn test_cache_aware_zero_prefix() {
         let pricing = CacheAwarePricing {
-            base: CLAUDE_35_HAIKU,
+            base: CLAUDE_HAIKU_4_5,
             cache_hit_multiplier: 0.1,
             cache_write_multiplier: 1.0,
             cache_page_size: 128,
@@ -352,14 +379,14 @@ mod tests {
     #[test]
     fn test_cache_aware_pricing_lookup() {
         // Anthropic models should have cache-aware pricing.
-        let cap = cache_aware_pricing("anthropic/claude-opus-4.5");
+        let cap = cache_aware_pricing("anthropic/claude-opus-4.6");
         assert!(cap.is_some());
         let cap = cap.unwrap();
         assert!((cap.cache_hit_multiplier - 0.1).abs() < 1e-6);
         assert_eq!(cap.cache_page_size, 128);
 
         // OpenAI models should also have cache-aware pricing.
-        let cap = cache_aware_pricing("openai/gpt-5-mini");
+        let cap = cache_aware_pricing("openai/gpt-5.4-mini");
         assert!(cap.is_some());
         let cap = cap.unwrap();
         assert!((cap.cache_hit_multiplier - 0.5).abs() < 1e-6);
@@ -373,7 +400,7 @@ mod tests {
     fn test_cache_savings_for_typical_rerank_job() {
         // Simulate a typical 30-entity, 1-attribute rerank (30*29/2 = 435 max comparisons,
         // but active selection typically does ~60-100).
-        let cap = cache_aware_pricing("anthropic/claude-opus-4.5").unwrap();
+        let cap = cache_aware_pricing("anthropic/claude-opus-4.6").unwrap();
 
         let n_comparisons = 80;
         let prefix_tokens = 1500u32; // system + template + attribute
