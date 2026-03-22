@@ -58,8 +58,7 @@ use super::types::{
 const DEFAULT_BATCH_SIZE: usize = 32;
 
 /// Default model if not specified.
-/// GPT-5-mini: $0.25/1M input, $2.00/1M output - good balance of quality/cost for pairwise comparisons.
-const DEFAULT_MODEL: &str = "openai/gpt-5-mini";
+const DEFAULT_MODEL: &str = "openai/gpt-5.4-mini";
 
 /// Default maximum number of comparisons to run concurrently.
 const DEFAULT_COMPARISON_CONCURRENCY: usize = 8;
