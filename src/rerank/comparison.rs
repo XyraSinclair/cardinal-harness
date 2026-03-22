@@ -370,12 +370,32 @@ const RATIO_LADDER: &[f64] = &[
     1.0, 1.05, 1.1, 1.2, 1.3, 1.5, 1.75, 2.1, 2.5, 3.1, 3.9, 5.1, 6.8, 9.2, 12.7, 18.0, 26.0,
 ];
 
-/// Whether a model is known to support logprobs via OpenRouter.
+/// Whether to request logprobs for this model.
 ///
-/// Anthropic models (Claude) do not expose logprobs through OpenRouter.
-/// OpenAI, Google, and most open-weight models do.
+/// Logprobs are only useful for non-reasoning models that support them.
+/// - Anthropic models: no logprobs via OpenRouter
+/// - Reasoning models (o1, o3, deepseek-r1, etc.): logprobs not available
+///   on reasoning tokens, and the visible output is post-reasoning — logprob
+///   distribution over ratio tokens doesn't reflect the actual deliberation
 fn model_supports_logprobs(model: &str) -> bool {
-    !model.starts_with("anthropic/")
+    if model.starts_with("anthropic/") {
+        return false;
+    }
+    // Reasoning models: logprobs on output tokens don't capture the
+    // internal chain-of-thought that produced the ratio choice.
+    let reasoning_patterns = [
+        "o1", "o3", "o4",           // OpenAI reasoning family
+        "deepseek-r1", "deepseek/r1",
+        "qwq",                       // Qwen reasoning
+    ];
+    let model_lower = model.to_lowercase();
+    if reasoning_patterns
+        .iter()
+        .any(|p| model_lower.contains(p))
+    {
+        return false;
+    }
+    true
 }
 
 /// If logprobs are available, derive confidence from the token probability
@@ -531,11 +551,22 @@ That's my assessment."#;
 
     #[test]
     fn test_model_supports_logprobs() {
+        // Anthropic: no logprobs via OpenRouter
         assert!(!model_supports_logprobs("anthropic/claude-opus-4-6"));
         assert!(!model_supports_logprobs("anthropic/claude-sonnet-4"));
+
+        // Reasoning models: logprobs don't reflect deliberation
+        assert!(!model_supports_logprobs("openai/o3"));
+        assert!(!model_supports_logprobs("openai/o4-mini"));
+        assert!(!model_supports_logprobs("openai/o1-preview"));
+        assert!(!model_supports_logprobs("deepseek/deepseek-r1"));
+        assert!(!model_supports_logprobs("qwen/qwq-32b"));
+
+        // Non-reasoning models with logprob support
         assert!(model_supports_logprobs("openai/gpt-4.1-mini"));
         assert!(model_supports_logprobs("openai/gpt-5-mini"));
         assert!(model_supports_logprobs("google/gemini-2.5-pro"));
+        assert!(model_supports_logprobs("google/gemini-2.5-flash"));
         assert!(model_supports_logprobs("moonshotai/kimi-k2-0905"));
     }
 
