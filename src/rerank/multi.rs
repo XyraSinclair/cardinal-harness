@@ -21,7 +21,6 @@ use std::sync::atomic::{AtomicBool, Ordering as AtomicOrdering};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
-use blake3;
 use futures::stream::{self, StreamExt};
 
 use crate::cache::{PairwiseCache, PairwiseCacheKey};
@@ -774,10 +773,7 @@ pub async fn multi_rerank_with_trace(
                     .and_then(prompt_by_slug)
                     .unwrap_or(DEFAULT_PROMPT);
                 let prompt_slug = template.slug.to_string();
-                let template_hash =
-                    blake3::hash(format!("{}\n{}", template.system, template.user).as_bytes())
-                        .to_hex()
-                        .to_string();
+                let template_hash = template.template_hash();
                 let cache_key = PairwiseCacheKey::new(
                     &selected_model,
                     &prompt_slug,

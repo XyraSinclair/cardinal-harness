@@ -9,6 +9,15 @@ Prompt templates live in `src/prompts.rs` and are selected per-attribute via
 - `canonical_v2` (default)
 - `canonical_v2_attr_first` (attribute text appears before entity context)
 - `canonical_v3`
+- `canonical_v1_repeat_full`
+- `canonical_v2_repeat_full`
+- `canonical_v2_attr_first_repeat_full`
+- `canonical_v3_repeat_full`
+
+The `_repeat_full` variants duplicate the rendered system prompt and rendered
+user prompt verbatim. This is meant for prompt-harness experiments where you
+want to measure whether paying roughly 2x input tokens improves judgement
+consistency.
 
 ## Entity Context Placement
 
@@ -40,4 +49,3 @@ Ordering affects two things:
 
 The library intentionally keeps prompt templates as simple string templates so you can benchmark
 these tradeoffs per provider/model/attribute.
-

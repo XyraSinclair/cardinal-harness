@@ -64,9 +64,22 @@ pub struct PromptTemplate {
     pub slug: &'static str,
     pub system: &'static str,
     pub user: &'static str,
+    pub repeat_count: usize,
 }
 
 impl PromptTemplate {
+    pub fn template_hash(&self) -> String {
+        blake3::hash(
+            format!(
+                "repeat_count={}\n{}\n{}",
+                self.repeat_count, self.system, self.user
+            )
+            .as_bytes(),
+        )
+        .to_hex()
+        .to_string()
+    }
+
     pub fn render(
         &self,
         attr_name: &str,
@@ -125,12 +138,23 @@ impl PromptTemplate {
             parts.push(user_core.trim().to_string());
         }
 
+        let system = repeat_verbatim(system.trim(), self.repeat_count);
+        let user = repeat_verbatim(parts.join("\n\n").trim(), self.repeat_count);
+
         PromptInstance {
             template_slug: self.slug.to_string(),
-            system: system.trim().to_string(),
-            user: parts.join("\n\n"),
+            system,
+            user,
         }
     }
+}
+
+fn repeat_verbatim(text: &str, repeat_count: usize) -> String {
+    let count = repeat_count.max(1);
+    std::iter::repeat_n(text, count)
+        .map(str::trim)
+        .collect::<Vec<_>>()
+        .join("\n\n")
 }
 
 // =============================================================================
@@ -165,6 +189,7 @@ Example:
 
 Return a JSON object with your evaluation.
 json:"#,
+    repeat_count: 1,
 };
 
 pub const PROMPT_V2: PromptTemplate = PromptTemplate {
@@ -189,6 +214,7 @@ Example:
 
 Return a JSON object with your evaluation.
 json:"#,
+    repeat_count: 1,
 };
 
 pub const PROMPT_V2_ATTR_FIRST: PromptTemplate = PromptTemplate {
@@ -213,6 +239,7 @@ pub const PROMPT_V2_ATTR_FIRST: PromptTemplate = PromptTemplate {
 
 Return a JSON object with your evaluation.
 json:"#,
+    repeat_count: 1,
 };
 
 pub const PROMPT_V3: PromptTemplate = PromptTemplate {
@@ -225,9 +252,47 @@ Return only JSON: {higher_ranked:A|B,ratio:1-26,confidence:0..1}. If policy-bloc
 <entity_B>{entity_B}</entity_B>
 
 json:"#,
+    repeat_count: 1,
 };
 
-pub const PROMPTS: &[PromptTemplate] = &[PROMPT_V1, PROMPT_V2, PROMPT_V2_ATTR_FIRST, PROMPT_V3];
+pub const PROMPT_V1_REPEAT_FULL: PromptTemplate = PromptTemplate {
+    slug: "canonical_v1_repeat_full",
+    system: PROMPT_V1.system,
+    user: PROMPT_V1.user,
+    repeat_count: 2,
+};
+
+pub const PROMPT_V2_REPEAT_FULL: PromptTemplate = PromptTemplate {
+    slug: "canonical_v2_repeat_full",
+    system: PROMPT_V2.system,
+    user: PROMPT_V2.user,
+    repeat_count: 2,
+};
+
+pub const PROMPT_V2_ATTR_FIRST_REPEAT_FULL: PromptTemplate = PromptTemplate {
+    slug: "canonical_v2_attr_first_repeat_full",
+    system: PROMPT_V2_ATTR_FIRST.system,
+    user: PROMPT_V2_ATTR_FIRST.user,
+    repeat_count: 2,
+};
+
+pub const PROMPT_V3_REPEAT_FULL: PromptTemplate = PromptTemplate {
+    slug: "canonical_v3_repeat_full",
+    system: PROMPT_V3.system,
+    user: PROMPT_V3.user,
+    repeat_count: 2,
+};
+
+pub const PROMPTS: &[PromptTemplate] = &[
+    PROMPT_V1,
+    PROMPT_V2,
+    PROMPT_V2_ATTR_FIRST,
+    PROMPT_V3,
+    PROMPT_V1_REPEAT_FULL,
+    PROMPT_V2_REPEAT_FULL,
+    PROMPT_V2_ATTR_FIRST_REPEAT_FULL,
+    PROMPT_V3_REPEAT_FULL,
+];
 pub const DEFAULT_PROMPT: PromptTemplate = PROMPT_V2;
 
 pub fn prompt_by_slug(slug: &str) -> Option<PromptTemplate> {
@@ -289,6 +354,7 @@ mod tests {
     fn prompt_lookup() {
         assert!(prompt_by_slug("canonical_v1").is_some());
         assert!(prompt_by_slug("canonical_v2_attr_first").is_some());
+        assert!(prompt_by_slug("canonical_v2_repeat_full").is_some());
         assert!(prompt_by_slug("nonexistent").is_none());
     }
 
@@ -298,5 +364,32 @@ mod tests {
         let p = DEFAULT_PROMPT.render("test", "Test", a, EntityRef::new("B"));
         assert!(p.user.contains("&lt;script&gt;"));
         assert!(!p.user.contains("<script>"));
+    }
+
+    #[test]
+    fn prompt_repeat_full_duplicates_system_and_user() {
+        let a = EntityRef::with_context("A", "Context A");
+        let b = EntityRef::with_context("B", "Context B");
+        let base = prompt_by_slug("canonical_v2").expect("base template");
+        let repeated = prompt_by_slug("canonical_v2_repeat_full").expect("repeat template");
+
+        let base_prompt = base.render("clarity", "Which is clearer?", a.clone(), b.clone());
+        let repeated_prompt = repeated.render("clarity", "Which is clearer?", a, b);
+
+        assert_eq!(
+            repeated_prompt.system,
+            format!("{}\n\n{}", base_prompt.system, base_prompt.system)
+        );
+        assert_eq!(
+            repeated_prompt.user,
+            format!("{}\n\n{}", base_prompt.user, base_prompt.user)
+        );
+    }
+
+    #[test]
+    fn repeat_prompt_template_hash_differs_from_base() {
+        let base = prompt_by_slug("canonical_v2").expect("base template");
+        let repeated = prompt_by_slug("canonical_v2_repeat_full").expect("repeat template");
+        assert_ne!(base.template_hash(), repeated.template_hash());
     }
 }

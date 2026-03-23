@@ -194,9 +194,7 @@ pub async fn compare_pair(
         .and_then(prompt_by_slug)
         .unwrap_or(DEFAULT_PROMPT);
     let prompt_slug = template.slug;
-    let template_hash = blake3::hash(format!("{}\n{}", template.system, template.user).as_bytes())
-        .to_hex()
-        .to_string();
+    let template_hash = template.template_hash();
     let cache_key = cache.map(|_| {
         PairwiseCacheKey::new(
             model,
