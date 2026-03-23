@@ -161,6 +161,8 @@ struct ChatApiRequest<'a> {
     logprobs: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     top_logprobs: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    reasoning: Option<ReasoningConfig>,
 }
 
 #[derive(Serialize)]
@@ -186,6 +188,11 @@ impl From<&Message> for ApiMessage {
 struct ResponseFormat {
     #[serde(rename = "type")]
     format_type: &'static str,
+}
+
+#[derive(Serialize)]
+struct ReasoningConfig {
+    enabled: bool,
 }
 
 #[derive(Deserialize)]
@@ -294,6 +301,13 @@ impl ChatProvider for OpenRouterAdapter {
             },
             logprobs: req.logprobs,
             top_logprobs: req.top_logprobs,
+            // Kimi K2.5 may emit billed reasoning with empty visible content unless
+            // reasoning is explicitly disabled.
+            reasoning: if req.model.model_id() == "moonshotai/kimi-k2.5" {
+                Some(ReasoningConfig { enabled: false })
+            } else {
+                None
+            },
         };
 
         let mut response = self
