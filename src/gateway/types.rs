@@ -216,6 +216,8 @@ pub struct ChatRequest {
     /// Number of top alternative logprobs to return per token position.
     /// Only meaningful when `logprobs` is true. Typically 5-20.
     pub top_logprobs: Option<u32>,
+    /// Optional normalized reasoning configuration for providers that support it.
+    pub reasoning: Option<ReasoningConfig>,
 }
 
 impl ChatRequest {
@@ -229,6 +231,7 @@ impl ChatRequest {
             attribution,
             logprobs: false,
             top_logprobs: None,
+            reasoning: None,
         }
     }
 
@@ -252,6 +255,54 @@ impl ChatRequest {
         self.logprobs = true;
         self.top_logprobs = Some(top_n);
         self
+    }
+
+    pub fn reasoning(mut self, reasoning: ReasoningConfig) -> Self {
+        self.reasoning = Some(reasoning);
+        self
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub enum ReasoningEffort {
+    Xhigh,
+    High,
+    Medium,
+    Low,
+    Minimal,
+    None,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct ReasoningConfig {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub enabled: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub effort: Option<ReasoningEffort>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_tokens: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub exclude: Option<bool>,
+}
+
+impl ReasoningConfig {
+    pub fn disabled() -> Self {
+        Self {
+            enabled: Some(false),
+            effort: None,
+            max_tokens: None,
+            exclude: None,
+        }
+    }
+
+    pub fn low_with_excluded_trace() -> Self {
+        Self {
+            enabled: Some(true),
+            effort: Some(ReasoningEffort::Low),
+            max_tokens: None,
+            exclude: Some(true),
+        }
     }
 }
 

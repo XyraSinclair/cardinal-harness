@@ -190,11 +190,6 @@ struct ResponseFormat {
     format_type: &'static str,
 }
 
-#[derive(Serialize)]
-struct ReasoningConfig {
-    enabled: bool,
-}
-
 #[derive(Deserialize)]
 struct ChatApiResponse {
     choices: Option<Vec<Choice>>,
@@ -301,13 +296,15 @@ impl ChatProvider for OpenRouterAdapter {
             },
             logprobs: req.logprobs,
             top_logprobs: req.top_logprobs,
-            // Kimi K2.5 may emit billed reasoning with empty visible content unless
-            // reasoning is explicitly disabled.
-            reasoning: if req.model.model_id() == "moonshotai/kimi-k2.5" {
-                Some(ReasoningConfig { enabled: false })
-            } else {
-                None
-            },
+            reasoning: req.reasoning.clone().or_else(|| {
+                // Kimi K2.5 may emit billed reasoning with empty visible content unless
+                // reasoning is explicitly disabled.
+                if req.model.model_id() == "moonshotai/kimi-k2.5" {
+                    Some(ReasoningConfig::disabled())
+                } else {
+                    None
+                }
+            }),
         };
 
         let mut response = self
