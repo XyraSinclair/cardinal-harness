@@ -45,9 +45,7 @@ fn test_gateway() -> ProviderGateway<NoopUsageSink> {
 
 fn canonical_v2_template_hash() -> String {
     let template = prompt_by_slug("canonical_v2").unwrap();
-    blake3::hash(format!("{}\n{}", template.system, template.user).as_bytes())
-        .to_hex()
-        .to_string()
+    template.template_hash()
 }
 
 fn make_request(model: &str) -> MultiRerankRequest {

@@ -11,6 +11,7 @@
 
 pub mod comparison;
 pub mod evaluation;
+mod gates;
 pub mod hooks;
 pub mod model_policy;
 pub mod multi;

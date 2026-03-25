@@ -817,8 +817,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 pipeline_req,
                 gates,
             )
-            .await
-            .map_err(|e| -> Box<dyn std::error::Error> { e.to_string().into() })?;
+            .await?;
 
             // Write session JSON
             write_json(&out, &session)?;
@@ -961,16 +960,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 output_dir,
             };
 
-            commander::run_command(config)
-                .await
-                .map_err(|e| -> Box<dyn std::error::Error> { e.to_string().into() })?;
+            commander::run_command(config).await?;
         }
         Commands::Dashboard { store } => {
             let store_path = store.unwrap_or_else(commander::store::CommanderStore::default_path);
             let store_inst = commander::store::CommanderStore::new(&store_path)?;
-            commander::dashboard::render_dashboard(&store_inst)
-                .await
-                .map_err(|e| -> Box<dyn std::error::Error> { e.to_string().into() })?;
+            commander::dashboard::render_dashboard(&store_inst).await?;
         }
         Commands::Review {
             store,
@@ -990,19 +985,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let status_filter = status
                     .as_deref()
                     .map(commander::store::ProposalStatus::from_str);
-                let mut proposals = store_inst
-                    .list_proposals(status_filter)
-                    .await
-                    .map_err(|e| -> Box<dyn std::error::Error> { e.to_string().into() })?;
+                let mut proposals = store_inst.list_proposals(status_filter).await?;
                 if let Some(run_id) = run {
                     proposals.retain(|p| p.run_id == run_id);
                 }
                 commander::dashboard::render_proposal_list(&proposals);
             } else if let Some(id) = show {
-                let proposal = store_inst
-                    .get_proposal_by_short_id(&id)
-                    .await
-                    .map_err(|e| -> Box<dyn std::error::Error> { e.to_string().into() })?;
+                let proposal = store_inst.get_proposal_by_short_id(&id).await?;
                 commander::dashboard::render_proposal(&proposal);
             } else if let Some(id) = accept {
                 store_inst
@@ -1011,8 +1000,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         commander::store::ProposalStatus::Accepted,
                         notes.as_deref(),
                     )
-                    .await
-                    .map_err(|e| -> Box<dyn std::error::Error> { e.to_string().into() })?;
+                    .await?;
                 println!("Proposal [{id}] accepted.");
             } else if let Some(id) = reject {
                 store_inst
@@ -1021,8 +1009,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         commander::store::ProposalStatus::Rejected,
                         notes.as_deref(),
                     )
-                    .await
-                    .map_err(|e| -> Box<dyn std::error::Error> { e.to_string().into() })?;
+                    .await?;
                 println!("Proposal [{id}] rejected.");
             } else if let Some(id) = defer {
                 store_inst
@@ -1031,25 +1018,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         commander::store::ProposalStatus::Deferred,
                         notes.as_deref(),
                     )
-                    .await
-                    .map_err(|e| -> Box<dyn std::error::Error> { e.to_string().into() })?;
+                    .await?;
                 println!("Proposal [{id}] deferred.");
             } else {
                 // Default: list pending
                 let proposals = store_inst
                     .list_proposals(Some(commander::store::ProposalStatus::Pending))
-                    .await
-                    .map_err(|e| -> Box<dyn std::error::Error> { e.to_string().into() })?;
+                    .await?;
                 commander::dashboard::render_proposal_list(&proposals);
             }
         }
         Commands::Traces { store, run, phase } => {
             let store_path = store.unwrap_or_else(commander::store::CommanderStore::default_path);
             let store_inst = commander::store::CommanderStore::new(&store_path)?;
-            let traces = store_inst
-                .get_traces_for_run(run, phase.as_deref())
-                .await
-                .map_err(|e| -> Box<dyn std::error::Error> { e.to_string().into() })?;
+            let traces = store_inst.get_traces_for_run(run, phase.as_deref()).await?;
 
             if traces.is_empty() {
                 println!("No traces found for run #{run}.");
@@ -1102,19 +1084,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 output_dir,
             };
 
-            commander::scan::run_scan(config)
-                .await
-                .map_err(|e| -> Box<dyn std::error::Error> { e.to_string().into() })?;
+            commander::scan::run_scan(config).await?;
         }
         Commands::Reflect { store, run } => {
             let store_path = store.unwrap_or_else(commander::store::CommanderStore::default_path);
             let store_inst = commander::store::CommanderStore::new(&store_path)?;
 
-            match store_inst
-                .get_reflection(run)
-                .await
-                .map_err(|e| -> Box<dyn std::error::Error> { e.to_string().into() })?
-            {
+            match store_inst.get_reflection(run).await? {
                 Some(reflection) => {
                     println!("=== Reflection for Run #{run} ===");
                     println!(

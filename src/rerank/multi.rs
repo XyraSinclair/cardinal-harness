@@ -40,6 +40,7 @@ use super::comparison::{
     compare_pair, estimate_pairwise_input_tokens, ComparisonError,
     PAIRWISE_MAX_OUTPUT_TOKENS_DEFAULT,
 };
+use super::gates::validate_gate_specs;
 use super::hooks::{ComparisonEvent, ComparisonObserver, WarmStartProvider};
 use super::model_policy::{ModelPolicy, ModelPolicyContext};
 use super::options::RerankRunOptions;
@@ -318,42 +319,7 @@ pub fn validate_multi_rerank_request(req: &MultiRerankRequest) -> Result<(), Mul
         }
     }
 
-    for gate in &req.gates {
-        if !attribute_ids.contains(gate.attribute_id.as_str()) {
-            return Err(MultiRerankError::InvalidRequest(format!(
-                "gate references unknown attribute: {}",
-                gate.attribute_id
-            )));
-        }
-
-        let unit = gate.unit.to_ascii_lowercase();
-        match unit.as_str() {
-            "latent" | "z" | "percentile" | "min_norm" => {}
-            _ => {
-                return Err(MultiRerankError::InvalidRequest(format!(
-                    "unsupported gate unit: {}",
-                    gate.unit
-                )))
-            }
-        }
-
-        match gate.op.as_str() {
-            ">=" | "<=" => {}
-            _ => {
-                return Err(MultiRerankError::InvalidRequest(format!(
-                    "unsupported gate op (expected \">=\" or \"<=\"): {}",
-                    gate.op
-                )))
-            }
-        }
-
-        if unit == "percentile" && !(0.0..=1.0).contains(&gate.threshold) {
-            return Err(MultiRerankError::InvalidRequest(format!(
-                "percentile gate threshold must be in [0,1]: {}",
-                gate.threshold
-            )));
-        }
-    }
+    let _parsed_gates = validate_gate_specs(&req.gates, &attribute_ids)?;
 
     Ok(())
 }

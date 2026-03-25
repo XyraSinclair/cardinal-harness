@@ -299,7 +299,7 @@ pub enum ScanError {
     #[error("Store error: {0}")]
     Store(#[from] super::store::StoreError),
     #[error("Gateway error: {0}")]
-    Gateway(String),
+    Gateway(crate::gateway::ProviderError),
     #[error("IO error: {0}")]
     Io(#[from] std::io::Error),
     #[error("TOML parse error: {0}")]
@@ -759,10 +759,8 @@ pub async fn run_scan(config: ScanConfig) -> Result<ScanRunResult, ScanError> {
 
     // 5. Set up store and gateway
     let store = CommanderStore::new(&config.store_path)?;
-    let gateway: Arc<dyn ChatGateway> = Arc::new(
-        ProviderGateway::from_env(Arc::new(NoopUsageSink))
-            .map_err(|e| ScanError::Gateway(e.to_string()))?,
-    );
+    let gateway: Arc<dyn ChatGateway> =
+        Arc::new(ProviderGateway::from_env(Arc::new(NoopUsageSink)).map_err(ScanError::Gateway)?);
 
     // Build directive string for the run
     let profile_names: Vec<&str> = config.profiles.iter().map(|p| p.name()).collect();

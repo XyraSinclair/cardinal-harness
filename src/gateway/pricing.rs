@@ -407,14 +407,18 @@ mod tests {
         let entity_tokens = 400u32; // avg entity pair text
         let output_tokens = 80u32;
 
-        let first_cost = cap.estimate_comparison_cost(prefix_tokens, entity_tokens, output_tokens, true);
-        let cached_cost = cap.estimate_comparison_cost(prefix_tokens, entity_tokens, output_tokens, false);
+        let first_cost =
+            cap.estimate_comparison_cost(prefix_tokens, entity_tokens, output_tokens, true);
+        let cached_cost =
+            cap.estimate_comparison_cost(prefix_tokens, entity_tokens, output_tokens, false);
 
         let total_cached = first_cost.estimated_cost_nanodollars
             + (n_comparisons - 1) as i64 * cached_cost.estimated_cost_nanodollars;
 
         // Compare with naive (no cache) cost.
-        let naive_per = cap.base.calculate_cost(prefix_tokens + entity_tokens, output_tokens);
+        let naive_per = cap
+            .base
+            .calculate_cost(prefix_tokens + entity_tokens, output_tokens);
         let total_naive = n_comparisons as i64 * naive_per;
 
         let savings_pct = 100.0 * (1.0 - total_cached as f64 / total_naive as f64);

@@ -1033,7 +1033,7 @@ impl CommanderStore {
         let _permit = self.sem.acquire().await.expect("semaphore closed");
         tokio::task::spawn_blocking(move || {
             store.with_conn(|conn| {
-                conn.execute(
+                let updated = conn.execute(
                     "UPDATE runs SET briefing_cost_nanodollars = ?1, \
                      reflection_cost_nanodollars = ?2, output_dir = ?3, \
                      updated_at = ?4 WHERE id = ?5",
@@ -1045,6 +1045,9 @@ impl CommanderStore {
                         run_id
                     ],
                 )?;
+                if updated == 0 {
+                    return Err(StoreError::NotFound(format!("run {run_id}")));
+                }
                 Ok(())
             })
         })
@@ -1978,5 +1981,14 @@ mod tests {
         assert_eq!(result.0, 50_000_000);
         assert_eq!(result.1, 30_000_000);
         assert_eq!(result.2.as_deref(), Some("/tmp/run_1"));
+    }
+
+    #[tokio::test]
+    async fn test_update_run_officer_costs_missing_run_returns_not_found() {
+        let store = temp_store();
+        let result = store
+            .update_run_officer_costs(99999, 50_000_000, 30_000_000, Some("/tmp/run_1"))
+            .await;
+        assert!(matches!(result, Err(StoreError::NotFound(_))));
     }
 }

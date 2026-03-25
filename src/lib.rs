@@ -18,6 +18,7 @@ pub mod axes;
 pub mod cache;
 #[cfg(feature = "sqlite-store")]
 pub mod commander;
+pub mod discrete;
 pub mod gateway;
 pub mod pipeline;
 pub mod prompts;
@@ -29,6 +30,7 @@ pub mod trait_search;
 #[cfg(feature = "sqlite-store")]
 pub use cache::SqlitePairwiseCache;
 pub use cache::{PairwiseCache, PairwiseCacheKey};
+pub use discrete::{DiscreteDistribution, WeightedValue};
 pub use gateway::{Attribution, ChatGateway, ProviderGateway, UsageSink};
 pub use rerank::{
     multi_rerank, multi_rerank_with_trace, rerank, rerank_with_trace, ComparisonError,
@@ -36,3 +38,7 @@ pub use rerank::{
     ObserverError, TraceError, TraceSink, TraceWorker, WarmStartData, WarmStartError,
     WarmStartProvider,
 };
+
+#[cfg(doctest)]
+#[doc = include_str!("../README.md")]
+mod readme_doctests {}

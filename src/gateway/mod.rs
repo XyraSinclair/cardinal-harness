@@ -11,7 +11,7 @@ use std::time::Duration;
 
 use tokio::time::sleep;
 
-use openrouter::{ChatProvider, OpenRouterAdapter};
+use openrouter::OpenRouterAdapter;
 use usage::{CallStatus, ProviderCallRecord, UsageSink as UsageSinkTrait};
 
 pub use error::{ErrorContext, ProviderError, RateLimitSource};
@@ -75,8 +75,6 @@ impl<U: UsageSinkTrait> ProviderGateway<U> {
     }
 
     pub async fn chat(&self, req: ChatRequest) -> Result<ChatResponse, ProviderError> {
-        let mut last_error: Option<ProviderError> = None;
-
         for attempt in 0..=self.config.max_retries {
             let result = self.openrouter.chat(&req).await;
             match result {
@@ -95,14 +93,12 @@ impl<U: UsageSinkTrait> ProviderGateway<U> {
                     }
 
                     let delay = backoff_delay(self.config.retry_base_delay, attempt);
-                    last_error = Some(err);
                     sleep(delay).await;
                 }
             }
         }
 
-        Err(last_error
-            .unwrap_or_else(|| ProviderError::provider("openrouter", "unknown error", false)))
+        unreachable!("gateway retry loop must return within configured attempts")
     }
 
     async fn record_usage(
@@ -122,6 +118,7 @@ impl<U: UsageSinkTrait> ProviderGateway<U> {
         .cost(resp.cost_nanodollars)
         .upstream_cost(resp.upstream_cost_nanodollars)
         .user(req.attribution.user_id)
+        .api_key(req.attribution.api_key_id)
         .job(req.attribution.job_id)
         .latency(resp.latency.as_millis() as i32);
 
@@ -144,6 +141,8 @@ impl ChatResponse {
     fn empty() -> Self {
         Self {
             content: String::new(),
+            reasoning: None,
+            reasoning_tokens: None,
             input_tokens: 0,
             output_tokens: 0,
             cost_nanodollars: 0,

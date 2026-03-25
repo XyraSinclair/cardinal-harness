@@ -54,6 +54,8 @@ pub struct ProviderCallRecord {
     pub upstream_cost_nanodollars: Option<i64>,
     /// User who made the request (if known).
     pub user_id: Option<Uuid>,
+    /// API key used for the request (if known).
+    pub api_key_id: Option<Uuid>,
     /// Job this request is part of (if any).
     pub job_id: Option<Uuid>,
     /// Batch ID for batch operations.
@@ -89,6 +91,7 @@ impl ProviderCallRecord {
             cost_nanodollars: 0,
             upstream_cost_nanodollars: None,
             user_id: None,
+            api_key_id: None,
             job_id: None,
             batch_id: None,
             latency_ms: 0,
@@ -118,6 +121,11 @@ impl ProviderCallRecord {
 
     pub fn user(mut self, user_id: Option<Uuid>) -> Self {
         self.user_id = user_id;
+        self
+    }
+
+    pub fn api_key(mut self, api_key_id: Option<Uuid>) -> Self {
+        self.api_key_id = api_key_id;
         self
     }
 

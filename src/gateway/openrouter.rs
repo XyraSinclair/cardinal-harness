@@ -2,27 +2,13 @@
 
 use std::time::{Duration, Instant};
 
-use async_trait::async_trait;
 use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
 use super::error::{ErrorContext, ProviderError};
 use super::pricing::chat_cost;
 use super::types::*;
-
-// =============================================================================
-// TRAIT
-// =============================================================================
-
-/// Trait for chat completion providers.
-#[async_trait]
-pub trait ChatProvider: Send + Sync {
-    async fn chat(&self, req: &ChatRequest) -> Result<ChatResponse, ProviderError>;
-}
-
-// =============================================================================
-// OPENROUTER ADAPTER
-// =============================================================================
 
 /// Maximum allowed response content length (1MB).
 const MAX_RESPONSE_LEN: usize = 1_024 * 1_024;
@@ -201,34 +187,17 @@ struct ChatApiResponse {
 struct Choice {
     message: Option<ChoiceMessage>,
     finish_reason: Option<String>,
-    logprobs: Option<ChoiceLogprobs>,
-}
-
-/// OpenAI-compatible logprobs container on a choice.
-#[derive(Deserialize)]
-struct ChoiceLogprobs {
-    content: Option<Vec<ApiTokenLogprob>>,
-}
-
-/// A single token's logprob in the OpenAI/OpenRouter response format.
-#[derive(Deserialize)]
-struct ApiTokenLogprob {
-    token: String,
-    logprob: f64,
     #[serde(default)]
-    top_logprobs: Vec<ApiTopLogprob>,
-}
-
-/// An alternative token at a given position.
-#[derive(Deserialize)]
-struct ApiTopLogprob {
-    token: String,
-    logprob: f64,
+    logprobs: Option<ChoiceLogprobs>,
 }
 
 #[derive(Deserialize)]
 struct ChoiceMessage {
     content: Option<String>,
+    #[serde(default, alias = "reasoning_content")]
+    reasoning: Option<String>,
+    #[serde(default)]
+    reasoning_details: Option<Vec<Value>>,
     #[serde(default)]
     tool_calls: Option<Vec<ToolCall>>,
 }
@@ -248,7 +217,45 @@ struct Usage {
     prompt_tokens: Option<u32>,
     completion_tokens: Option<u32>,
     #[serde(default)]
+    prompt_tokens_details: Option<PromptTokensDetails>,
+    #[serde(default)]
+    completion_tokens_details: Option<CompletionTokensDetails>,
+    #[serde(default)]
     cost_details: Option<CostDetails>,
+}
+
+#[derive(Deserialize)]
+struct PromptTokensDetails {
+    #[serde(default)]
+    cached_tokens: Option<u32>,
+    #[serde(default)]
+    cache_write_tokens: Option<u32>,
+}
+
+#[derive(Deserialize)]
+struct CompletionTokensDetails {
+    #[serde(default)]
+    reasoning_tokens: Option<u32>,
+}
+
+#[derive(Deserialize)]
+struct ChoiceLogprobs {
+    #[serde(default)]
+    content: Option<Vec<LogprobToken>>,
+}
+
+#[derive(Deserialize)]
+struct LogprobToken {
+    token: String,
+    logprob: f64,
+    #[serde(default)]
+    top_logprobs: Vec<LogprobAlternative>,
+}
+
+#[derive(Deserialize)]
+struct LogprobAlternative {
+    token: String,
+    logprob: f64,
 }
 
 #[derive(Deserialize)]
@@ -263,12 +270,12 @@ struct ApiError {
 }
 
 // =============================================================================
-// CHAT PROVIDER IMPL
+// CHAT API
 // =============================================================================
 
-#[async_trait]
-impl ChatProvider for OpenRouterAdapter {
-    async fn chat(&self, req: &ChatRequest) -> Result<ChatResponse, ProviderError> {
+impl OpenRouterAdapter {
+    /// Execute a chat completion request against OpenRouter.
+    pub async fn chat(&self, req: &ChatRequest) -> Result<ChatResponse, ProviderError> {
         // Validate input size
         let total_chars: usize = req.messages.iter().map(|m| m.content.len()).sum();
 
@@ -392,13 +399,18 @@ impl ChatProvider for OpenRouterAdapter {
             .ok_or_else(|| {
                 ProviderError::provider("openrouter", "No choices in response", false)
             })?;
+        let Choice {
+            message,
+            finish_reason,
+            logprobs,
+        } = choice;
 
-        let mut content = choice
-            .message
+        let (mut content, reasoning) = message
             .map(|m| {
+                let reasoning = extract_reasoning_text(&m);
                 let content = m.content.unwrap_or_default();
                 if !content.trim().is_empty() {
-                    return content;
+                    return (content, reasoning);
                 }
 
                 // Some providers/models emit structured output via tool calls even when
@@ -411,9 +423,9 @@ impl ChatProvider for OpenRouterAdapter {
                     .find(|s| !s.trim().is_empty())
                     .unwrap_or_default();
 
-                args
+                (args, reasoning)
             })
-            .unwrap_or_default();
+            .unwrap_or_else(|| (String::new(), None));
 
         // Normalize content for downstream parsers.
         if content.len() > MAX_RESPONSE_LEN {
@@ -432,6 +444,17 @@ impl ChatProvider for OpenRouterAdapter {
 
         let input_tokens = usage.prompt_tokens.unwrap_or(0);
         let output_tokens = usage.completion_tokens.unwrap_or(0);
+        let reasoning_tokens = usage
+            .completion_tokens_details
+            .and_then(|details| details.reasoning_tokens);
+        let cache_read_tokens = usage
+            .prompt_tokens_details
+            .as_ref()
+            .and_then(|details| details.cached_tokens);
+        let cache_write_tokens = usage
+            .prompt_tokens_details
+            .as_ref()
+            .and_then(|details| details.cache_write_tokens);
 
         let latency = start.elapsed();
         let cost = chat_cost(req.model.model_id(), input_tokens, output_tokens);
@@ -442,32 +465,34 @@ impl ChatProvider for OpenRouterAdapter {
 
         Ok(ChatResponse {
             content,
+            reasoning,
+            reasoning_tokens,
             input_tokens,
             output_tokens,
             cost_nanodollars: cost,
             upstream_cost_nanodollars,
             latency,
-            finish_reason: FinishReason::from(choice.finish_reason),
-            output_logprobs: parse_api_logprobs(choice.logprobs),
-            cache_read_tokens: None,
-            cache_write_tokens: None,
+            finish_reason: FinishReason::from(finish_reason),
+            output_logprobs: map_output_logprobs(logprobs),
+            cache_read_tokens,
+            cache_write_tokens,
         })
     }
 }
 
-/// Convert OpenRouter/OpenAI logprobs format to our internal representation.
-fn parse_api_logprobs(logprobs: Option<ChoiceLogprobs>) -> Option<Vec<TokenLogprob>> {
-    let content = logprobs?.content?;
-    if content.is_empty() {
+fn map_output_logprobs(logprobs: Option<ChoiceLogprobs>) -> Option<Vec<TokenLogprob>> {
+    let tokens = logprobs?.content?;
+    if tokens.is_empty() {
         return None;
     }
+
     Some(
-        content
+        tokens
             .into_iter()
-            .map(|lp| TokenLogprob {
-                token: lp.token,
-                logprob: lp.logprob,
-                top_alternatives: lp
+            .map(|token| TokenLogprob {
+                token: token.token,
+                logprob: token.logprob,
+                top_alternatives: token
                     .top_logprobs
                     .into_iter()
                     .map(|alt| TokenAlternative {
@@ -478,4 +503,57 @@ fn parse_api_logprobs(logprobs: Option<ChoiceLogprobs>) -> Option<Vec<TokenLogpr
             })
             .collect(),
     )
+}
+
+fn extract_reasoning_text(message: &ChoiceMessage) -> Option<String> {
+    let explicit = message
+        .reasoning
+        .as_deref()
+        .map(str::trim)
+        .filter(|text| !text.is_empty())
+        .map(ToOwned::to_owned);
+    if explicit.is_some() {
+        return explicit;
+    }
+
+    let details = message.reasoning_details.as_ref()?;
+    let mut parts = Vec::new();
+    for detail in details {
+        if let Some(obj) = detail.as_object() {
+            if let Some(summary) = obj.get("summary").and_then(Value::as_str) {
+                let summary = summary.trim();
+                if !summary.is_empty() {
+                    parts.push(summary.to_string());
+                    continue;
+                }
+            }
+            if let Some(text) = obj.get("text").and_then(Value::as_str) {
+                let text = text.trim();
+                if !text.is_empty() {
+                    parts.push(text.to_string());
+                    continue;
+                }
+            }
+            if let Some(content) = obj.get("content").and_then(Value::as_str) {
+                let content = content.trim();
+                if !content.is_empty() {
+                    parts.push(content.to_string());
+                    continue;
+                }
+            }
+        }
+
+        if let Ok(serialized) = serde_json::to_string_pretty(detail) {
+            let serialized = serialized.trim();
+            if !serialized.is_empty() {
+                parts.push(serialized.to_string());
+            }
+        }
+    }
+
+    if parts.is_empty() {
+        None
+    } else {
+        Some(parts.join("\n\n"))
+    }
 }

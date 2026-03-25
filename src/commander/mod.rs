@@ -97,7 +97,7 @@ pub enum CommanderError {
     #[error("Reflection error: {0}")]
     Reflection(#[from] reflection::ReflectionError),
     #[error("Gateway error: {0}")]
-    Gateway(String),
+    Gateway(#[from] crate::gateway::ProviderError),
     #[error("Budget exceeded: estimated ${estimated:.2} exceeds budget ${budget:.2}")]
     BudgetExceeded { estimated: f64, budget: f64 },
     #[error("Cache error: {0}")]
@@ -125,6 +125,16 @@ fn run_output_dir(store_path: &Path, run_id: i64) -> PathBuf {
 
 /// Run a commander session: brief → decompose → flywheel → extract → reflect → persist.
 pub async fn run_command(config: CommanderConfig) -> Result<CommanderRunResult, CommanderError> {
+    let gateway: Arc<dyn ChatGateway> =
+        Arc::new(ProviderGateway::from_env(Arc::new(NoopUsageSink))?);
+
+    run_command_with_gateway(config, gateway).await
+}
+
+async fn run_command_with_gateway(
+    config: CommanderConfig,
+    gateway: Arc<dyn ChatGateway>,
+) -> Result<CommanderRunResult, CommanderError> {
     let store = CommanderStore::new(&config.store_path)?;
 
     eprintln!("[commander] directive: {}", config.directive);
@@ -133,12 +143,6 @@ pub async fn run_command(config: CommanderConfig) -> Result<CommanderRunResult, 
         config.preset,
         config.budget_nanodollars as f64 / 1_000_000_000.0,
         config.commander_model
-    );
-
-    // Set up gateway
-    let gateway: Arc<dyn ChatGateway> = Arc::new(
-        ProviderGateway::from_env(Arc::new(NoopUsageSink))
-            .map_err(|e| CommanderError::Gateway(e.to_string()))?,
     );
 
     // Create run record
@@ -371,7 +375,7 @@ pub async fn run_command(config: CommanderConfig) -> Result<CommanderRunResult, 
         if !ts.success {
             tasks_failed += 1;
             if let Err(e) = store
-                .update_task_result(run_id, &ts.task_id, false, 0, None, None)
+                .update_task_result(run_id, &ts.task_id, false, ts.cost_nanodollars, None, None)
                 .await
             {
                 eprintln!("[commander] warning: failed to update task result: {e}");
@@ -744,4 +748,313 @@ pub struct CommanderRunResult {
     pub tasks_failed: i64,
     pub proposals_generated: i64,
     pub total_cost_nanodollars: i64,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use std::sync::Mutex;
+    use std::time::Duration;
+
+    use tempfile::tempdir;
+
+    use crate::gateway::{ChatRequest, ChatResponse, FinishReason, ProviderError, Role};
+
+    #[derive(Default)]
+    struct ScriptedCommanderGateway {
+        callers: Mutex<Vec<String>>,
+    }
+
+    impl ScriptedCommanderGateway {
+        fn callers(&self) -> Vec<String> {
+            self.callers.lock().unwrap().clone()
+        }
+
+        fn record_call(&self, caller: &str) {
+            self.callers.lock().unwrap().push(caller.to_string());
+        }
+    }
+
+    #[async_trait::async_trait]
+    impl ChatGateway for ScriptedCommanderGateway {
+        async fn chat(&self, req: ChatRequest) -> Result<ChatResponse, ProviderError> {
+            self.record_call(req.attribution.caller);
+
+            match req.attribution.caller {
+                "commander::decompose" => Ok(chat_response(
+                    r#"{
+                        "tasks": [
+                            {
+                                "id": "inspect-retry-flow",
+                                "prompt": "Inspect retry handling in the gateway and identify the most leverage-heavy workflow test to add.",
+                                "system_prompt": null,
+                                "context_globs": [],
+                                "rationale": "The directive is about code quality, and retry/test coverage is a concrete reliability gap.",
+                                "success_criterion": "Find a specific change that improves retry correctness or test confidence."
+                            }
+                        ],
+                        "context_summary": "Synthetic commander test context",
+                        "estimated_difficulty": "moderate"
+                    }"#,
+                    24,
+                    18,
+                    300,
+                )),
+                "commander::extract" => Ok(chat_response(
+                    r#"{
+                        "proposals": [
+                            {
+                                "title": "Add commander-driven retry workflow coverage",
+                                "description": "Exercise the retry path through the real commander pipeline so the store and output artifacts reflect a fully verified run path.",
+                                "category": "improvement",
+                                "priority": "high",
+                                "affected_files": ["src/commander/mod.rs", "tests/gateway_openrouter.rs"],
+                                "estimated_effort": "small"
+                            }
+                        ]
+                    }"#,
+                    16,
+                    10,
+                    120,
+                )),
+                "pipeline::generate" => scripted_generation(&req),
+                "pipeline::rank" => scripted_pairwise_rank(&req),
+                "pipeline::synthesize" => Ok(chat_response(
+                    "Synthesis: tighten retry-path guarantees and keep the strongest concrete testing recommendation.",
+                    14,
+                    11,
+                    140,
+                )),
+                other => Err(ProviderError::provider(
+                    "scripted",
+                    format!("unexpected caller: {other}"),
+                    false,
+                )),
+            }
+        }
+    }
+
+    fn scripted_generation(req: &ChatRequest) -> Result<ChatResponse, ProviderError> {
+        let prompt = user_message(req);
+        if prompt.contains("FAIL_ALL") {
+            return Err(ProviderError::provider(
+                "scripted",
+                "generation failed for requested task",
+                false,
+            ));
+        }
+
+        let content = match req.model.model_id() {
+            "x-ai/grok-4.1-fast" => {
+                "BEST: add focused retry assertions and keep artifact handling explicit"
+            }
+            "z-ai/glm-5" => "WORST: rewrite the whole gateway subsystem without narrowing scope",
+            other => {
+                return Err(ProviderError::provider(
+                    "scripted",
+                    format!("unexpected generation model: {other}"),
+                    false,
+                ))
+            }
+        };
+
+        Ok(chat_response(content, 9, 6, 80))
+    }
+
+    fn scripted_pairwise_rank(req: &ChatRequest) -> Result<ChatResponse, ProviderError> {
+        let user_content = user_message(req);
+        let a_ctx = extract_between(user_content, "<entity_A_context>", "</entity_A_context>")
+            .unwrap_or("")
+            .trim();
+        let b_ctx = extract_between(user_content, "<entity_B_context>", "</entity_B_context>")
+            .unwrap_or("")
+            .trim();
+
+        let a_score = score_for_context(a_ctx);
+        let b_score = score_for_context(b_ctx);
+
+        let (higher, ratio) = if a_score >= b_score {
+            ("A", 3.0)
+        } else {
+            ("B", 3.0)
+        };
+
+        Ok(chat_response(
+            format!(r#"{{"higher_ranked":"{higher}","ratio":{ratio},"confidence":0.9}}"#),
+            12,
+            8,
+            40,
+        ))
+    }
+
+    fn user_message(req: &ChatRequest) -> &str {
+        req.messages
+            .iter()
+            .find(|message| matches!(message.role, Role::User))
+            .map(|message| message.content.as_str())
+            .unwrap_or("")
+    }
+
+    fn extract_between<'a>(s: &'a str, start: &str, end: &str) -> Option<&'a str> {
+        let start_idx = s.find(start)? + start.len();
+        let rest = &s[start_idx..];
+        let end_idx = rest.find(end)?;
+        Some(&rest[..end_idx])
+    }
+
+    fn score_for_context(ctx: &str) -> i32 {
+        if ctx.contains("BEST") {
+            3
+        } else if ctx.contains("WORST") {
+            1
+        } else {
+            0
+        }
+    }
+
+    fn chat_response(
+        content: impl Into<String>,
+        input_tokens: u32,
+        output_tokens: u32,
+        cost_nanodollars: i64,
+    ) -> ChatResponse {
+        ChatResponse {
+            content: content.into(),
+            reasoning: None,
+            reasoning_tokens: None,
+            input_tokens,
+            output_tokens,
+            cost_nanodollars,
+            upstream_cost_nanodollars: None,
+            latency: Duration::from_millis(1),
+            finish_reason: FinishReason::Stop,
+            output_logprobs: None,
+            cache_read_tokens: None,
+            cache_write_tokens: None,
+        }
+    }
+
+    fn test_config(temp: &tempfile::TempDir, budget_nanodollars: i64) -> CommanderConfig {
+        CommanderConfig {
+            directive: "Improve gateway reliability".to_string(),
+            store_path: temp.path().join("commander.sqlite"),
+            preset: ModelPreset::Fast,
+            budget_nanodollars,
+            cache_path: Some(temp.path().join("pairwise-cache.sqlite")),
+            parallel: 1,
+            commander_model: "test/commander".to_string(),
+            use_gates: false,
+            no_reflection: true,
+            fresh: true,
+            output_dir: Some(temp.path().join("artifacts")),
+        }
+    }
+
+    #[tokio::test]
+    async fn run_command_with_injected_gateway_executes_happy_path() {
+        let temp = tempdir().expect("tempdir");
+        let gateway = Arc::new(ScriptedCommanderGateway::default());
+        let config = test_config(&temp, 2_000_000_000);
+
+        let result = run_command_with_gateway(config.clone(), gateway.clone())
+            .await
+            .expect("commander run should succeed");
+
+        assert_eq!(result.tasks_completed, 1);
+        assert_eq!(result.tasks_failed, 0);
+        assert_eq!(result.proposals_generated, 1);
+        assert!(result.total_cost_nanodollars > 0);
+
+        let store = CommanderStore::new(&config.store_path).expect("reopen store");
+        let run = store.get_run(result.run_id).await.expect("run");
+        assert_eq!(run.status, RunStatus::Completed);
+        assert_eq!(run.tasks_completed, 1);
+        assert_eq!(run.tasks_failed, 0);
+
+        let tasks = store.get_tasks_for_run(result.run_id).await.expect("tasks");
+        assert_eq!(tasks.len(), 1);
+        assert_eq!(tasks[0].task_id, "inspect-retry-flow");
+        assert_eq!(tasks[0].success, Some(true));
+        assert_eq!(tasks[0].top_model.as_deref(), Some("x-ai/grok-4.1-fast"));
+
+        let proposals: Vec<_> = store
+            .list_proposals(None)
+            .await
+            .expect("proposals")
+            .into_iter()
+            .filter(|proposal| proposal.run_id == result.run_id)
+            .collect();
+        assert_eq!(proposals.len(), 1);
+        assert_eq!(
+            proposals[0].title,
+            "Add commander-driven retry workflow coverage"
+        );
+
+        let out_dir = config.output_dir.as_ref().expect("output dir");
+        assert!(out_dir.join("inspect-retry-flow.json").exists());
+        assert!(out_dir
+            .join("synthesis")
+            .join("inspect-retry-flow.md")
+            .exists());
+        assert!(out_dir
+            .join("traces")
+            .join("inspect-retry-flow.trace.jsonl")
+            .exists());
+
+        let callers = gateway.callers();
+        assert_eq!(
+            callers
+                .iter()
+                .filter(|caller| caller.as_str() == "commander::decompose")
+                .count(),
+            1
+        );
+        assert_eq!(
+            callers
+                .iter()
+                .filter(|caller| caller.as_str() == "commander::extract")
+                .count(),
+            1
+        );
+        assert!(
+            callers
+                .iter()
+                .filter(|caller| caller.as_str() == "pipeline::rank")
+                .count()
+                > 0
+        );
+    }
+
+    #[tokio::test]
+    async fn run_command_with_injected_gateway_records_budget_exceeded() {
+        let temp = tempdir().expect("tempdir");
+        let gateway = Arc::new(ScriptedCommanderGateway::default());
+        let config = test_config(&temp, 50_000_000);
+
+        let err = run_command_with_gateway(config.clone(), gateway.clone())
+            .await
+            .expect_err("budget should be exceeded before flywheel execution");
+        assert!(matches!(err, CommanderError::BudgetExceeded { .. }));
+
+        let store = CommanderStore::new(&config.store_path).expect("reopen store");
+        let run = store.get_run(1).await.expect("run");
+        assert_eq!(run.status, RunStatus::BudgetExceeded);
+
+        let callers = gateway.callers();
+        assert_eq!(
+            callers
+                .iter()
+                .filter(|caller| caller.as_str() == "commander::decompose")
+                .count(),
+            1
+        );
+        assert_eq!(
+            callers
+                .iter()
+                .filter(|caller| caller.starts_with("pipeline::"))
+                .count(),
+            0
+        );
+    }
 }

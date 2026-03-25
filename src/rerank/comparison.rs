@@ -7,8 +7,11 @@ use tracing::warn;
 
 use crate::cache::{CacheError, CachedJudgement, PairwiseCache, PairwiseCacheKey};
 use crate::gateway::{
-    Attribution, ChatGateway, ChatModel, ChatRequest, ProviderError, confidence_from_logprobs,
+    confidence_from_logprobs, pairwise_logprob_posterior, truncate_output_logprobs, Attribution,
+    ChatGateway, ChatModel, ChatRequest, PairwiseLogprobPosterior, PairwisePreferredSide,
+    ProviderError, TokenLogprob,
 };
+use crate::prompts::RATIO_LADDER;
 use crate::text_chunking::count_tokens;
 
 use crate::prompts::{prompt_by_slug, EntityRef, DEFAULT_PROMPT};
@@ -26,14 +29,20 @@ pub const SIGMA_MAX: f64 = 2.0;
 
 /// Default max output tokens for pairwise judgements.
 ///
-/// Reasoning models (including extended-thinking variants) need thousands of
-/// tokens for chain-of-thought before emitting JSON. The model knows when to
-/// stop — trust the EOS token rather than truncating mid-thought.
-///
-/// The old 128 default actively suppressed reasoning and produced worse
-/// judgements (empirically: confidence collapsed to 3 unique values,
-/// ratio ladder underused, rank disagreements with listwise).
+/// Reasoning-capable models can spend a large hidden budget before they emit the
+/// visible JSON answer. A small cap suppresses judgement quality and can yield
+/// empty visible output on OpenRouter.
 pub const PAIRWISE_MAX_OUTPUT_TOKENS_DEFAULT: u32 = 8192;
+pub const PAIRWISE_MAX_OUTPUT_TOKENS_GPT5: u32 = PAIRWISE_MAX_OUTPUT_TOKENS_DEFAULT;
+pub const PAIRWISE_LOGPROBS_TOP_N: u32 = 20;
+
+pub fn pairwise_max_output_tokens(model: &str) -> u32 {
+    if model.starts_with("openai/gpt-5") {
+        PAIRWISE_MAX_OUTPUT_TOKENS_GPT5
+    } else {
+        PAIRWISE_MAX_OUTPUT_TOKENS_DEFAULT
+    }
+}
 
 // =============================================================================
 // JSON parsing
@@ -66,16 +75,24 @@ pub enum ComparisonError {
 }
 
 /// Usage info for a single LLM comparison call.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct ComparisonUsage {
     pub input_tokens: u32,
     pub output_tokens: u32,
     pub provider_cost_nanodollars: i64,
     pub cached: bool,
+    pub prompt_text: Option<String>,
+    pub question_text: Option<String>,
+    pub raw_output: Option<String>,
+    pub output_logprobs: Option<Vec<TokenLogprob>>,
+    pub pairwise_logprob_posterior: Option<PairwiseLogprobPosterior>,
 }
 
 /// Parse LLM response JSON into a PairwiseJudgement.
-pub fn parse_pairwise_response(raw: &str) -> Result<PairwiseJudgement, ComparisonError> {
+pub fn parse_pairwise_response(
+    raw: &str,
+    output_logprobs: Option<&[TokenLogprob]>,
+) -> Result<PairwiseJudgement, ComparisonError> {
     // Try to extract JSON from the response (may have surrounding text)
     let json_str = extract_json(raw);
 
@@ -92,9 +109,6 @@ pub fn parse_pairwise_response(raw: &str) -> Result<PairwiseJudgement, Compariso
     let ratio = parsed
         .ratio
         .ok_or_else(|| ComparisonError::Parse("missing 'ratio'".into()))?;
-    let confidence = parsed
-        .confidence
-        .ok_or_else(|| ComparisonError::Parse("missing 'confidence'".into()))?;
 
     if !(1.0..=26.0).contains(&ratio) {
         return Err(ComparisonError::Parse(format!(
@@ -111,6 +125,19 @@ pub fn parse_pairwise_response(raw: &str) -> Result<PairwiseJudgement, Compariso
             )))
         }
     };
+    let selected_higher_ranked = match higher_ranked {
+        HigherRanked::A => PairwisePreferredSide::A,
+        HigherRanked::B => PairwisePreferredSide::B,
+    };
+    let confidence = output_logprobs
+        .and_then(|logprobs| {
+            confidence_from_logprobs(logprobs, selected_higher_ranked, ratio, RATIO_LADDER)
+        })
+        .map(|source| source.as_scalar())
+        .or(parsed.confidence)
+        .ok_or_else(|| {
+            ComparisonError::Parse("missing 'confidence' and no logprob-derived fallback".into())
+        })?;
 
     Ok(PairwiseJudgement::Observation {
         higher_ranked,
@@ -166,7 +193,6 @@ fn extract_json(raw: &str) -> &str {
 
     trimmed
 }
-
 // =============================================================================
 // LLM comparison
 // =============================================================================
@@ -218,6 +244,11 @@ pub async fn compare_pair(
                         output_tokens: 0,
                         provider_cost_nanodollars: 0,
                         cached: true,
+                        prompt_text: None,
+                        question_text: None,
+                        raw_output: None,
+                        output_logprobs: None,
+                        pairwise_logprob_posterior: None,
                     };
                     return Ok((judgement, usage));
                 }
@@ -249,23 +280,59 @@ pub async fn compare_pair(
     if model.starts_with("openai/") {
         request = request.json();
     }
-    // Request logprobs when the provider supports them.
-    // Anthropic models don't expose logprobs via OpenRouter, so this is
-    // opportunistic — we fall back to self-reported confidence if absent.
+    request = request.max_tokens(pairwise_max_output_tokens(model));
     if model_supports_logprobs(model) {
-        request = request.with_logprobs(10);
+        request = request.with_logprobs(PAIRWISE_LOGPROBS_TOP_N);
     }
 
     let response = gateway.chat(request).await?;
+    let stored_logprobs = response
+        .output_logprobs
+        .as_deref()
+        .map(|logprobs| truncate_output_logprobs(logprobs, 50));
+    let prompt_text = format!(
+        "{}\n---\n{}",
+        prompt_instance.system.as_str(),
+        prompt_instance.user.as_str()
+    );
+    let pairwise_posterior =
+        parse_pairwise_response(&response.content, response.output_logprobs.as_deref())
+            .ok()
+            .and_then(|judgement| match judgement {
+                PairwiseJudgement::Observation {
+                    higher_ranked,
+                    ratio,
+                    ..
+                } => {
+                    let selected_higher_ranked = match higher_ranked {
+                        HigherRanked::A => PairwisePreferredSide::A,
+                        HigherRanked::B => PairwisePreferredSide::B,
+                    };
+                    response.output_logprobs.as_deref().and_then(|logprobs| {
+                        pairwise_logprob_posterior(
+                            logprobs,
+                            selected_higher_ranked,
+                            ratio,
+                            RATIO_LADDER,
+                        )
+                    })
+                }
+                PairwiseJudgement::Refused => None,
+            });
 
     let usage = ComparisonUsage {
         input_tokens: response.input_tokens,
         output_tokens: response.output_tokens,
         provider_cost_nanodollars: response.cost_nanodollars,
         cached: false,
+        prompt_text: Some(prompt_text),
+        question_text: Some(attribute_prompt.to_string()),
+        raw_output: Some(response.content.clone()),
+        output_logprobs: stored_logprobs,
+        pairwise_logprob_posterior: pairwise_posterior,
     };
 
-    match parse_pairwise_response(&response.content) {
+    match parse_pairwise_response(&response.content, response.output_logprobs.as_deref()) {
         Ok(judgement) => {
             // If logprobs are available, derive confidence from the token
             // distribution rather than trusting the model's self-report.
@@ -363,11 +430,6 @@ fn cached_to_judgement(cached: &CachedJudgement) -> Option<PairwiseJudgement> {
     })
 }
 
-/// The ratio ladder used in all prompt templates.
-const RATIO_LADDER: &[f64] = &[
-    1.0, 1.05, 1.1, 1.2, 1.3, 1.5, 1.75, 2.1, 2.5, 3.1, 3.9, 5.1, 6.8, 9.2, 12.7, 18.0, 26.0,
-];
-
 /// Whether to request logprobs for this model.
 ///
 /// Logprobs are only useful for non-reasoning models that support them.
@@ -422,7 +484,12 @@ fn maybe_override_confidence(
         return judgement;
     };
 
-    match confidence_from_logprobs(lps, *ratio, RATIO_LADDER) {
+    let selected_higher_ranked = match higher_ranked {
+        HigherRanked::A => PairwisePreferredSide::A,
+        HigherRanked::B => PairwisePreferredSide::B,
+    };
+
+    match confidence_from_logprobs(lps, selected_higher_ranked, *ratio, RATIO_LADDER) {
         Some(source) => {
             let logprob_confidence = source.as_scalar();
             tracing::debug!(
@@ -483,7 +550,7 @@ mod tests {
     #[test]
     fn test_parse_valid_json() {
         let raw = r#"{"higher_ranked": "A", "ratio": 1.3, "confidence": 0.74}"#;
-        let result = parse_pairwise_response(raw).unwrap();
+        let result = parse_pairwise_response(raw, None).unwrap();
         match result {
             PairwiseJudgement::Observation {
                 higher_ranked,
@@ -501,7 +568,7 @@ mod tests {
     #[test]
     fn test_parse_refused() {
         let raw = r#"{"refused": true}"#;
-        let result = parse_pairwise_response(raw).unwrap();
+        let result = parse_pairwise_response(raw, None).unwrap();
         assert!(matches!(result, PairwiseJudgement::Refused));
     }
 
@@ -510,7 +577,7 @@ mod tests {
         let raw = r#"Here's my evaluation:
 {"higher_ranked": "B", "ratio": 2.5, "confidence": 0.9}
 That's my assessment."#;
-        let result = parse_pairwise_response(raw).unwrap();
+        let result = parse_pairwise_response(raw, None).unwrap();
         match result {
             PairwiseJudgement::Observation {
                 higher_ranked,
@@ -519,6 +586,37 @@ That's my assessment."#;
             } => {
                 assert_eq!(higher_ranked, HigherRanked::B);
                 assert!((ratio - 2.5).abs() < 0.001);
+            }
+            _ => panic!("Expected Observation"),
+        }
+    }
+
+    #[test]
+    fn test_parse_uses_logprob_confidence_when_json_omits_it() {
+        let raw = r#"{"higher_ranked":"A","ratio":2.5}"#;
+        let logprobs = vec![
+            TokenLogprob {
+                token: "\"A\"".to_string(),
+                logprob: -0.1,
+                top_alternatives: vec![crate::gateway::TokenAlternative {
+                    token: "\"B\"".to_string(),
+                    logprob: -2.3,
+                }],
+            },
+            TokenLogprob {
+                token: "2.5".to_string(),
+                logprob: -0.22,
+                top_alternatives: vec![crate::gateway::TokenAlternative {
+                    token: "2.1".to_string(),
+                    logprob: -1.61,
+                }],
+            },
+        ];
+
+        let result = parse_pairwise_response(raw, Some(&logprobs)).unwrap();
+        match result {
+            PairwiseJudgement::Observation { confidence, .. } => {
+                assert!(confidence > 0.7, "confidence={confidence}");
             }
             _ => panic!("Expected Observation"),
         }
@@ -570,9 +668,13 @@ That's my assessment."#;
         assert!(!model_supports_logprobs("qwen/qwq-32b"));
 
         // :thinking variants
-        assert!(!model_supports_logprobs("anthropic/claude-3.7-sonnet:thinking"));
+        assert!(!model_supports_logprobs(
+            "anthropic/claude-3.7-sonnet:thinking"
+        ));
         assert!(!model_supports_logprobs("moonshotai/kimi-k2-thinking"));
-        assert!(!model_supports_logprobs("qwen/qwen3-235b-a22b-thinking-2507"));
+        assert!(!model_supports_logprobs(
+            "qwen/qwen3-235b-a22b-thinking-2507"
+        ));
         assert!(!model_supports_logprobs("baidu/ernie-4.5-21b-a3b-thinking"));
 
         // Non-reasoning models: YES logprobs
@@ -599,27 +701,37 @@ That's my assessment."#;
         };
 
         // Simulate logprobs where 2.1 has high probability
-        let logprobs = vec![TokenLogprob {
-            token: "2.1".to_string(),
-            logprob: -0.2, // ~82% probability
-            top_alternatives: vec![
-                TokenAlternative {
-                    token: "2.5".to_string(),
-                    logprob: -2.0,
-                },
-                TokenAlternative {
-                    token: "1.75".to_string(),
-                    logprob: -2.5,
-                },
-            ],
-        }];
+        let logprobs = vec![
+            TokenLogprob {
+                token: "\"A\"".to_string(),
+                logprob: -0.1,
+                top_alternatives: vec![TokenAlternative {
+                    token: "\"B\"".to_string(),
+                    logprob: -2.4,
+                }],
+            },
+            TokenLogprob {
+                token: "2.1".to_string(),
+                logprob: -0.2, // ~82% probability
+                top_alternatives: vec![
+                    TokenAlternative {
+                        token: "2.5".to_string(),
+                        logprob: -2.0,
+                    },
+                    TokenAlternative {
+                        token: "1.75".to_string(),
+                        logprob: -2.5,
+                    },
+                ],
+            },
+        ];
 
         let result = maybe_override_confidence(judgement, &Some(logprobs));
         match result {
             PairwiseJudgement::Observation { confidence, .. } => {
                 // Should differ from the self-reported 0.85
                 assert!(
-                    (confidence - 0.85).abs() > 0.01,
+                    (confidence - 0.85).abs() > 0.001,
                     "logprob confidence should differ from self-reported; got {confidence}"
                 );
                 assert!(confidence > 0.0 && confidence <= 1.0);

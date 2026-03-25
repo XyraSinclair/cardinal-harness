@@ -12,6 +12,7 @@ use rand::{Rng, SeedableRng};
 use crate::rating_engine::{
     AttributeParams, Config as EngineConfig, Observation, PlannerMode, RaterParams, RatingEngine,
 };
+use crate::rerank::gates::{validate_gate_specs, ParsedGateSpec};
 use crate::rerank::types::{
     HigherRanked, MultiRerankGateSpec, MultiRerankTopKSpec, PairwiseJudgement, RerankStopReason,
 };
@@ -21,6 +22,14 @@ use crate::trait_search::{
 };
 
 type AttrUnits = (Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>);
+
+fn parse_evaluation_gates<'a>(
+    attributes: &'a [SyntheticAttribute],
+    gates: &'a [MultiRerankGateSpec],
+) -> Vec<ParsedGateSpec<'a>> {
+    let attribute_ids: HashSet<&str> = attributes.iter().map(|attr| attr.id).collect();
+    validate_gate_specs(gates, &attribute_ids).expect("synthetic evaluation gates should be valid")
+}
 
 // =============================================================================
 // Rank quality metrics
@@ -97,9 +106,18 @@ impl RankQualityMetrics {
         let cov = coverage_95(pred_scores, pred_vars, true_scores, feasible_indices);
 
         let ndcg = compute_ndcg_at_k(pred_scores, true_scores, feasible_indices, k);
-        let curl_h = compute_curl(pred_scores, true_scores, feasible_indices, CurlWeight::Harmonic);
-        let curl_e =
-            compute_curl(pred_scores, true_scores, feasible_indices, CurlWeight::Exponential(0.1));
+        let curl_h = compute_curl(
+            pred_scores,
+            true_scores,
+            feasible_indices,
+            CurlWeight::Harmonic,
+        );
+        let curl_e = compute_curl(
+            pred_scores,
+            true_scores,
+            feasible_indices,
+            CurlWeight::Exponential(0.1),
+        );
         let wrr = compute_weighted_rank_reversals(pred_scores, true_scores, feasible_indices, k);
         let regret = compute_bayesian_regret(pred_scores, true_scores, feasible_indices, k);
         let disc = compute_topk_discordance(pred_scores, true_scores, feasible_indices, k);
@@ -184,7 +202,9 @@ fn compute_curl(
 
             let w = match weight {
                 CurlWeight::Harmonic => 1.0 / (pr_a.min(tr_a) * pr_b.min(tr_b)),
-                CurlWeight::Exponential(alpha) => (-alpha * pr_a.min(tr_a).min(pr_b.min(tr_b))).exp(),
+                CurlWeight::Exponential(alpha) => {
+                    (-alpha * pr_a.min(tr_a).min(pr_b.min(tr_b))).exp()
+                }
             };
 
             weighted_total += w;
@@ -206,12 +226,7 @@ fn compute_curl(
 }
 
 /// Compute nDCG@k.
-fn compute_ndcg_at_k(
-    pred_scores: &[f64],
-    true_scores: &[f64],
-    indices: &[usize],
-    k: usize,
-) -> f64 {
+fn compute_ndcg_at_k(pred_scores: &[f64], true_scores: &[f64], indices: &[usize], k: usize) -> f64 {
     if indices.is_empty() || k == 0 {
         return 0.0;
     }
@@ -678,15 +693,15 @@ pub fn run_synthetic_case(case: &SyntheticCase) -> EvaluationResult {
         stop_min_consecutive: case.topk.stop_min_consecutive,
     };
 
-    let gates_cfg: Vec<GateSpec> = case
-        .gates
+    let parsed_gates = parse_evaluation_gates(&case.attributes, &case.gates);
+    let gates_cfg: Vec<GateSpec> = parsed_gates
         .iter()
-        .map(|g| {
+        .map(|gate| {
             GateSpec::new(
-                &g.attribute_id,
-                g.unit.to_ascii_lowercase(),
-                &g.op,
-                g.threshold,
+                gate.attribute_id,
+                gate.unit.as_str(),
+                gate.op.as_str(),
+                gate.threshold,
             )
         })
         .collect();
@@ -1298,32 +1313,21 @@ fn infer_scores_from_likert(
     }
 
     let mut feasible = vec![true; n];
-    for gate in &case.gates {
+    let parsed_gates = parse_evaluation_gates(&case.attributes, &case.gates);
+    for gate in parsed_gates {
         let (latent, z, min_norm, pct) = per_attr_units
-            .get(gate.attribute_id.as_str())
+            .get(gate.attribute_id)
             .expect("gate attribute missing in likert baseline");
         let c = counts
-            .get(gate.attribute_id.as_str())
+            .get(gate.attribute_id)
             .expect("gate count missing in likert baseline");
-
-        let unit = gate.unit.to_ascii_lowercase();
         for i in 0..n {
             if strict_for_gates && c[i] == 0 {
                 feasible[i] = false;
                 continue;
             }
-            let value = match unit.as_str() {
-                "latent" => latent[i],
-                "z" => z[i],
-                "percentile" => pct[i],
-                "min_norm" => min_norm[i],
-                _ => latent[i],
-            };
-            let pass = match gate.op.as_str() {
-                ">=" => value >= gate.threshold,
-                "<=" => value <= gate.threshold,
-                _ => true,
-            };
+            let value = gate.unit.select(latent[i], z[i], min_norm[i], pct[i]);
+            let pass = gate.op.passes(value, gate.threshold);
             feasible[i] &= pass;
         }
     }
@@ -1480,24 +1484,14 @@ fn compute_true_feasible(
         attr_units.insert(attr.id, (attr.scores.clone(), z, min_norm, pct));
     }
 
-    for gate in gates {
-        let Some((latent, z, min_norm, pct)) = attr_units.get(gate.attribute_id.as_str()) else {
+    let parsed_gates = parse_evaluation_gates(attributes, gates);
+    for gate in parsed_gates {
+        let Some((latent, z, min_norm, pct)) = attr_units.get(gate.attribute_id) else {
             continue;
         };
-        let unit = gate.unit.to_ascii_lowercase();
         for i in 0..n {
-            let value = match unit.as_str() {
-                "latent" => latent[i],
-                "z" => z[i],
-                "percentile" => pct[i],
-                "min_norm" => min_norm[i],
-                _ => latent[i],
-            };
-            let pass = match gate.op.as_str() {
-                ">=" => value >= gate.threshold,
-                "<=" => value <= gate.threshold,
-                _ => true,
-            };
+            let value = gate.unit.select(latent[i], z[i], min_norm[i], pct[i]);
+            let pass = gate.op.passes(value, gate.threshold);
             feasible[i] = feasible[i] && pass;
         }
     }
@@ -1701,12 +1695,24 @@ mod tests {
 
         let rq = RankQualityMetrics::compute(&pred, &truth, &vars, &indices, 3);
 
-        assert!((rq.kendall_tau_b - 1.0).abs() < 1e-6, "perfect tau should be 1.0");
-        assert!((rq.spearman_rho - 1.0).abs() < 1e-6, "perfect rho should be 1.0");
+        assert!(
+            (rq.kendall_tau_b - 1.0).abs() < 1e-6,
+            "perfect tau should be 1.0"
+        );
+        assert!(
+            (rq.spearman_rho - 1.0).abs() < 1e-6,
+            "perfect rho should be 1.0"
+        );
         assert!((rq.topk_precision - 1.0).abs() < 1e-6);
         assert!((rq.topk_recall - 1.0).abs() < 1e-6);
-        assert!((rq.ndcg_at_k - 1.0).abs() < 1e-6, "perfect nDCG should be 1.0");
-        assert!((rq.curl_harmonic - 1.0).abs() < 1e-6, "perfect CURL should be 1.0");
+        assert!(
+            (rq.ndcg_at_k - 1.0).abs() < 1e-6,
+            "perfect nDCG should be 1.0"
+        );
+        assert!(
+            (rq.curl_harmonic - 1.0).abs() < 1e-6,
+            "perfect CURL should be 1.0"
+        );
         assert!(rq.weighted_rank_reversals < 1e-6, "no reversals expected");
         assert!(rq.bayesian_regret < 1e-6, "no regret expected");
         assert_eq!(rq.topk_discordance_count, 0);
@@ -1722,7 +1728,11 @@ mod tests {
 
         let rq = RankQualityMetrics::compute(&pred, &truth, &vars, &indices, 2);
 
-        assert!(rq.kendall_tau_b < -0.9, "reversed tau should be negative: {}", rq.kendall_tau_b);
+        assert!(
+            rq.kendall_tau_b < -0.9,
+            "reversed tau should be negative: {}",
+            rq.kendall_tau_b
+        );
         assert!(rq.spearman_rho < -0.9, "reversed rho should be negative");
         assert!(rq.topk_precision < 0.01, "top-K should be completely wrong");
         assert!(rq.bayesian_regret > 0.0, "should have positive regret");
@@ -1740,7 +1750,10 @@ mod tests {
         let rq = RankQualityMetrics::compute(&pred, &truth, &vars, &indices, 2);
 
         // Top-2 set is still {0, 1}, just in wrong order.
-        assert!((rq.topk_precision - 1.0).abs() < 1e-6, "top-2 set should be correct");
+        assert!(
+            (rq.topk_precision - 1.0).abs() < 1e-6,
+            "top-2 set should be correct"
+        );
         assert!((rq.topk_recall - 1.0).abs() < 1e-6);
         // But there should be rank reversals and discordances within top-K.
         assert!(rq.weighted_rank_reversals > 0.0);
@@ -1818,7 +1831,10 @@ mod tests {
         // True top-2: {10, 8} = 18. Predicted top-2: {4, 2} gets true scores = 4+2 = 6. Wait,
         // predicted top-2 by pred_worst are indices 3,4 (scores 8,10 in pred), so true scores
         // for those are 4,2 = 6. True top-2 utility = 10+8 = 18. Regret = 18-6 = 12.
-        assert!((regret_worst - 12.0).abs() < 1e-6, "regret={regret_worst}, expected 12.0");
+        assert!(
+            (regret_worst - 12.0).abs() < 1e-6,
+            "regret={regret_worst}, expected 12.0"
+        );
     }
 
     // =========================================================================
@@ -1832,7 +1848,11 @@ mod tests {
 
         for result in &results {
             assert!(!result.case_name.is_empty());
-            assert!(result.metrics.comparisons_used > 0, "{}: no comparisons used", result.case_name);
+            assert!(
+                result.metrics.comparisons_used > 0,
+                "{}: no comparisons used",
+                result.case_name
+            );
             assert!(result.metrics.kendall_tau_all.is_finite());
             assert!(result.metrics.spearman_rho_all.is_finite());
         }
@@ -1859,7 +1879,11 @@ mod tests {
         assert_eq!(results.len(), 1);
         let r = &results[0];
 
-        let rq = r.metrics.rank_quality.as_ref().expect("rank_quality should be populated");
+        let rq = r
+            .metrics
+            .rank_quality
+            .as_ref()
+            .expect("rank_quality should be populated");
         assert!(rq.ndcg_at_k.is_finite());
         assert!(rq.curl_harmonic.is_finite());
         assert!(rq.curl_exponential.is_finite());
@@ -1869,7 +1893,8 @@ mod tests {
 
     #[test]
     fn test_likert_baseline_runs() {
-        let results = run_likert_baseline_suite(Some("clean_ordering_10"), LikertEvalConfig::default());
+        let results =
+            run_likert_baseline_suite(Some("clean_ordering_10"), LikertEvalConfig::default());
         assert_eq!(results.len(), 1);
         let r = &results[0];
 
@@ -1929,5 +1954,38 @@ mod tests {
         let indices = vec![0, 1, 2];
         let cov = coverage_95(&pred, &vars, &truth, &indices);
         assert!((cov - 1.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn synthetic_case_rejects_invalid_gate_units() {
+        let case = SyntheticCase {
+            name: "invalid_gate",
+            attributes: vec![SyntheticAttribute {
+                id: "quality",
+                weight: 1.0,
+                scores: vec![3.0, 2.0, 1.0],
+            }],
+            gates: vec![MultiRerankGateSpec {
+                attribute_id: "quality".to_string(),
+                unit: "bogus".to_string(),
+                op: ">=".to_string(),
+                threshold: 0.5,
+            }],
+            topk: default_topk(1),
+            comparison_budget: Some(3),
+            latency_budget_ms: None,
+            max_pair_repeats: None,
+            prewarm_pairs_per_attr: 0,
+            noise_sigma: 0.0,
+            refusal_rate: 0.0,
+            outlier_rate: 0.0,
+            seed: 7,
+        };
+
+        let panic = std::panic::catch_unwind(|| run_synthetic_case(&case));
+        assert!(
+            panic.is_err(),
+            "invalid gate specs should not be silently ignored"
+        );
     }
 }

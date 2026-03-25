@@ -70,7 +70,7 @@ Cost tracking operates at nanodollar precision (1e-9 USD) with full per-comparis
 
 ### Current: per-token pricing
 
-```
+```text
 cost = input_tokens * input_price + output_tokens * output_price
 ```
 
@@ -182,7 +182,7 @@ See `examples/quickstart.rs` for a fully commented version.
 
 ## Architecture
 
-```
+```text
                   ┌─────────────────────────────────────┐
                   │           rerank::multi              │
                   │  (orchestration loop + stopping)     │

@@ -167,6 +167,10 @@ fn repeat_verbatim(text: &str, repeat_count: usize) -> String {
 // if two items differ by more than 26× the comparison is already decisive.
 // Fine gradations near 1.0 (1.05, 1.1) let the model express near-ties.
 
+pub const RATIO_LADDER: &[f64] = &[
+    1.0, 1.05, 1.1, 1.2, 1.3, 1.5, 1.75, 2.1, 2.5, 3.1, 3.9, 5.1, 6.8, 9.2, 12.7, 18.0, 26.0,
+];
+
 pub const PROMPT_V1: PromptTemplate = PromptTemplate {
     slug: "canonical_v1",
     system: r#"You are an expert subjective evaluator. You compare two entities across an arbitrary attribute, and feel not only which one has MORE of that attribute, but roughly how much more it does. You feel along the ratio ladder: `[1.0, 1.05, 1.1, 1.2, 1.3, 1.5, 1.75, 2.1, 2.5, 3.1, 3.9, 5.1, 6.8, 9.2, 12.7, 18.0, 26.0]`.
