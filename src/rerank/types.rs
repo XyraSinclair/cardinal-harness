@@ -240,6 +240,14 @@ pub struct MultiRerankTopKSpec {
     /// fluctuations in the uncertainty estimate.
     #[serde(default = "default_stop_min_consecutive")]
     pub stop_min_consecutive: usize,
+
+    /// Minimum total edge count (summed across all attributes) each entity must
+    /// have before the planner switches to pure exploitation.  Until every entity
+    /// reaches this threshold, a fraction of each batch is reserved for comparing
+    /// under-observed entities against well-measured anchors.  Default: 2.
+    /// Set to 0 to disable forced exploration.
+    #[serde(default = "default_min_explore_degree")]
+    pub min_explore_degree: usize,
 }
 
 fn default_weight_exponent() -> f64 {
@@ -259,6 +267,10 @@ fn default_stop_sigma_inflate() -> f64 {
 }
 
 fn default_stop_min_consecutive() -> usize {
+    2
+}
+
+fn default_min_explore_degree() -> usize {
     2
 }
 

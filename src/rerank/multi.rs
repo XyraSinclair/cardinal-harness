@@ -418,6 +418,7 @@ pub async fn multi_rerank_with_trace(
         effective_resistance_max_active: req.topk.effective_resistance_max_active,
         stop_sigma_inflate: req.topk.stop_sigma_inflate,
         stop_min_consecutive: req.topk.stop_min_consecutive,
+        min_explore_degree: req.topk.min_explore_degree,
     };
 
     // Convert gates (unit is validated in validate_multi_rerank_request()).
@@ -1164,6 +1165,7 @@ mod tests {
                 effective_resistance_max_active: 64,
                 stop_sigma_inflate: 1.25,
                 stop_min_consecutive: 2,
+                min_explore_degree: 2,
             },
             gates: Vec::new(),
             comparison_budget: Some(1),

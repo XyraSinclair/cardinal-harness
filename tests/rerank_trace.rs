@@ -74,6 +74,7 @@ fn make_request(model: &str) -> MultiRerankRequest {
             effective_resistance_max_active: 64,
             stop_sigma_inflate: 1.25,
             stop_min_consecutive: 1,
+            min_explore_degree: 2,
         },
         gates: vec![],
         comparison_budget: Some(1),

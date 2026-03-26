@@ -344,6 +344,7 @@ fn cli_report_json_smoke() {
             effective_resistance_max_active: 64,
             stop_sigma_inflate: 1.25,
             stop_min_consecutive: 2,
+            min_explore_degree: 2,
         },
         gates: vec![],
         comparison_budget: Some(1),

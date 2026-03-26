@@ -1013,6 +1013,7 @@ fn build_rerank_request(
             effective_resistance_max_active: 64,
             stop_sigma_inflate: 1.25,
             stop_min_consecutive: 2,
+            min_explore_degree: 2,
         },
         gates: gates.to_vec(),
         comparison_budget: req.rank_config.comparison_budget,

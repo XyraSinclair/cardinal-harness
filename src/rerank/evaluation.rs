@@ -691,6 +691,7 @@ pub fn run_synthetic_case(case: &SyntheticCase) -> EvaluationResult {
         effective_resistance_max_active: case.topk.effective_resistance_max_active,
         stop_sigma_inflate: case.topk.stop_sigma_inflate,
         stop_min_consecutive: case.topk.stop_min_consecutive,
+        min_explore_degree: case.topk.min_explore_degree,
     };
 
     let parsed_gates = parse_evaluation_gates(&case.attributes, &case.gates);
@@ -1229,6 +1230,7 @@ fn default_topk(k: usize) -> MultiRerankTopKSpec {
         effective_resistance_max_active: 64,
         stop_sigma_inflate: 1.25,
         stop_min_consecutive: 2,
+        min_explore_degree: 2,
     }
 }
 

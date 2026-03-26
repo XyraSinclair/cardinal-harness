@@ -1183,6 +1183,7 @@ impl RatingEngine {
         }
 
         let chol = self.last_chol.as_ref()?;
+        let diag_cov = self.last_diag_cov.as_ref()?;
         let pos = build_pos_map(self.n, &self.keep_idx);
 
         let rdim = chol.l().nrows();
@@ -1191,12 +1192,25 @@ impl RatingEngine {
             let p = match pos.get(idx).copied().flatten() {
                 Some(v) => v,
                 None => {
-                    out.push(0.0);
+                    // Entity not in the reduced system (zero observations).
+                    // Use the diag_cov fallback which rating_engine already set
+                    // to the component-max for isolated entities.
+                    let fallback = if idx < diag_cov.len() {
+                        diag_cov[idx].max(0.0)
+                    } else {
+                        0.0
+                    };
+                    out.push(fallback);
                     continue;
                 }
             };
             if p >= rdim {
-                out.push(0.0);
+                let fallback = if idx < diag_cov.len() {
+                    diag_cov[idx].max(0.0)
+                } else {
+                    0.0
+                };
+                out.push(fallback);
                 continue;
             }
             let mut b = DVector::<f64>::zeros(rdim);

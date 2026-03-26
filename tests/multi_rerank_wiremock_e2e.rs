@@ -128,6 +128,7 @@ async fn multi_rerank_runs_end_to_end_against_wiremock_gateway() {
             effective_resistance_max_active: 64,
             stop_sigma_inflate: 1.25,
             stop_min_consecutive: 2,
+            min_explore_degree: 2,
         },
         gates: vec![],
         comparison_budget: Some(10),

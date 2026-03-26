@@ -340,6 +340,7 @@ pub struct TopKConfig {
     pub effective_resistance_max_active: usize,
     pub stop_sigma_inflate: f64,
     pub stop_min_consecutive: usize,
+    pub min_explore_degree: usize,
 }
 
 impl TopKConfig {
@@ -352,6 +353,7 @@ impl TopKConfig {
             effective_resistance_max_active: 64,
             stop_sigma_inflate: 1.25,
             stop_min_consecutive: 2,
+            min_explore_degree: 2,
         }
     }
 }
@@ -805,7 +807,124 @@ impl TraitSearchManager {
             }
         }
 
+        // Forced exploration: if any feasible entity has total degree below
+        // min_explore_degree, reserve up to half the batch for exploration proposals.
+        // These go at the FRONT so they aren't crowded out by exploitation.
+        let min_explore = self.config.topk.min_explore_degree;
+        if min_explore > 0 {
+            let explore_budget = (batch_size / 4).max(1);
+            let explore_proposals = self.build_exploration_proposals(min_explore, explore_budget);
+            if !explore_proposals.is_empty() {
+                let mut merged = Vec::with_capacity(batch_size);
+                let mut merged_seen: HashSet<(String, usize, usize)> = HashSet::new();
+                // Exploration proposals first
+                for ep in explore_proposals {
+                    let (a, b) = if ep.i <= ep.j { (ep.i, ep.j) } else { (ep.j, ep.i) };
+                    let key = (ep.attribute_id.clone(), a, b);
+                    if merged_seen.insert(key) {
+                        merged.push(ep);
+                    }
+                }
+                // Then exploitation proposals
+                for ep in deduped {
+                    if merged.len() >= batch_size {
+                        break;
+                    }
+                    let (a, b) = if ep.i <= ep.j { (ep.i, ep.j) } else { (ep.j, ep.i) };
+                    let key = (ep.attribute_id.clone(), a, b);
+                    if merged_seen.insert(key) {
+                        merged.push(ep);
+                    }
+                }
+                deduped = merged;
+            }
+        }
+
         Ok(deduped)
+    }
+
+    /// Build exploration proposals for entities with fewer than `min_degree` total
+    /// observations. Pairs each under-observed entity against the best-measured
+    /// anchor on a round-robin of attributes.
+    fn build_exploration_proposals(
+        &self,
+        min_degree: usize,
+        max_proposals: usize,
+    ) -> Vec<GlobalPlanProposal> {
+        let n = self.n;
+        let n_attrs = self.config.attributes.len();
+        if n_attrs == 0 {
+            return Vec::new();
+        }
+
+        // Compute total degree for each entity across all attribute engines.
+        // Uses has_min_degree as a probe: if entity has >= min_degree edges in this
+        // attribute, credit min_degree; if >= 1, credit 1; else 0.
+        let mut total_degree = vec![0usize; n];
+        for attr in &self.config.attributes {
+            if let Some(engine) = self.engines.get(&attr.id) {
+                for i in 0..n {
+                    if engine.has_min_degree(i, min_degree) {
+                        total_degree[i] += min_degree;
+                    } else if engine.has_min_degree(i, 1) {
+                        total_degree[i] += 1;
+                    }
+                }
+            }
+        }
+
+        // Find entities needing exploration (total degree < min_degree * n_attrs)
+        // Simplified: any entity with 0 total edges needs exploration most urgently
+        let mut needy: Vec<usize> = Vec::new();
+        for i in 0..n {
+            if self.entities[i].feasible && total_degree[i] < min_degree {
+                needy.push(i);
+            }
+        }
+
+        if needy.is_empty() {
+            return Vec::new();
+        }
+
+        // Pick the best-measured anchor: highest-ranked entity with most data
+        let anchor = match self.sorted_indices.first().copied() {
+            Some(idx) => idx,
+            None => return Vec::new(),
+        };
+
+        let mut proposals = Vec::new();
+        let mut attr_cycle = self.config.attributes.iter().cycle();
+
+        for &entity_idx in &needy {
+            if entity_idx == anchor {
+                continue;
+            }
+            // Propose one comparison per round-robin attribute
+            let attr = match attr_cycle.next() {
+                Some(a) => a,
+                None => break,
+            };
+            let (a, b) = if entity_idx < anchor {
+                (entity_idx, anchor)
+            } else {
+                (anchor, entity_idx)
+            };
+            proposals.push(GlobalPlanProposal {
+                attribute_id: attr.id.clone(),
+                i: a,
+                j: b,
+                global_score: f64::MAX, // highest priority
+                core_score: 0.0,
+                delta_info: 0.0,
+                delta_rank_risk: 0.0,
+            });
+
+            if proposals.len() >= max_proposals {
+                break;
+            }
+        }
+
+        proposals
     }
 
     pub fn ranked_indices(&self) -> Vec<usize> {
@@ -1015,8 +1134,7 @@ impl TraitSearchManager {
         // Use robust fence: cap at median + 3*IQR of that entity's contributions.
         for i in 0..n {
             let contribs = &mut attr_var_contributions[i];
-            let capped_sum = robust_capped_sum(contribs);
-            u_var[i] = capped_sum;
+            u_var[i] = robust_capped_sum(contribs);
         }
 
         let mut feasible_mask = vec![true; n];
@@ -1292,7 +1410,10 @@ impl TraitSearchManager {
             return;
         }
 
-        let mut refined = vec![0.0; active.len()];
+        let n_attrs = self.config.attributes.len();
+        let mut per_entity_contribs: Vec<Vec<f64>> = (0..active.len())
+            .map(|_| Vec::with_capacity(n_attrs))
+            .collect();
 
         for attr in &self.config.attributes {
             let attr_id = &attr.id;
@@ -1317,12 +1438,13 @@ impl TraitSearchManager {
                 .unwrap_or_else(|| active.iter().map(|&idx| diag[idx].max(0.0)).collect());
 
             for (pos, v) in vars.iter().enumerate() {
-                refined[pos] += weight_factor * v.max(0.0);
+                per_entity_contribs[pos].push(weight_factor * v.max(0.0));
             }
         }
 
         for (pos, &idx) in active.iter().enumerate() {
-            self.entities[idx].u_var = refined[pos].max(0.0);
+            let contribs = &mut per_entity_contribs[pos];
+            self.entities[idx].u_var = robust_capped_sum(contribs);
         }
     }
 
