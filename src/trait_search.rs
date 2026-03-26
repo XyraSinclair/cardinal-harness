@@ -819,7 +819,11 @@ impl TraitSearchManager {
                 let mut merged_seen: HashSet<(String, usize, usize)> = HashSet::new();
                 // Exploration proposals first
                 for ep in explore_proposals {
-                    let (a, b) = if ep.i <= ep.j { (ep.i, ep.j) } else { (ep.j, ep.i) };
+                    let (a, b) = if ep.i <= ep.j {
+                        (ep.i, ep.j)
+                    } else {
+                        (ep.j, ep.i)
+                    };
                     let key = (ep.attribute_id.clone(), a, b);
                     if merged_seen.insert(key) {
                         merged.push(ep);
@@ -830,7 +834,11 @@ impl TraitSearchManager {
                     if merged.len() >= batch_size {
                         break;
                     }
-                    let (a, b) = if ep.i <= ep.j { (ep.i, ep.j) } else { (ep.j, ep.i) };
+                    let (a, b) = if ep.i <= ep.j {
+                        (ep.i, ep.j)
+                    } else {
+                        (ep.j, ep.i)
+                    };
                     let key = (ep.attribute_id.clone(), a, b);
                     if merged_seen.insert(key) {
                         merged.push(ep);
