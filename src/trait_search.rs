@@ -36,6 +36,42 @@ fn median(sorted: &[f64]) -> f64 {
     }
 }
 
+/// Cap outlier variance contributions using a robust upper fence.
+///
+/// When combining per-attribute variances into global utility variance,
+/// one sparse attribute can dominate if its posterior variance is enormous.
+/// This caps each contribution at median + 3*IQR of the entity's contributions,
+/// preventing a single under-observed attribute from nuking global confidence.
+fn robust_capped_sum(values: &mut Vec<f64>) -> f64 {
+    let n = values.len();
+    if n == 0 {
+        return 0.0;
+    }
+    if n <= 2 {
+        return values.iter().sum();
+    }
+
+    let mut sorted = values.clone();
+    sorted.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
+
+    let q1 = sorted[n / 4];
+    let q3 = sorted[(3 * n) / 4];
+    let iqr = (q3 - q1).max(0.0);
+    let fence = q3 + 3.0 * iqr;
+
+    // Also ensure fence is at least the median * 10 to avoid over-capping
+    // when most contributions are small but legitimately varied.
+    let med = sorted[n / 2];
+    let min_fence = med * 10.0;
+    let effective_fence = fence.max(min_fence).max(1e-12);
+
+    let mut sum = 0.0;
+    for v in values.iter() {
+        sum += v.min(effective_fence);
+    }
+    sum
+}
+
 fn stddev_population(scores: &[f64], indices: &[usize]) -> f64 {
     if indices.is_empty() {
         return 0.0;
@@ -930,8 +966,13 @@ impl TraitSearchManager {
 
     fn combine_attributes(&mut self) -> Result<()> {
         let n = self.n;
+        let n_attrs = self.config.attributes.len();
         let mut u_mean = vec![0.0; n];
         let mut u_var = vec![0.0; n];
+
+        // Collect per-attribute weighted variance contributions per entity
+        // so we can cap outliers before summing.
+        let mut attr_var_contributions: Vec<Vec<f64>> = vec![Vec::with_capacity(n_attrs); n];
 
         for attr in &self.config.attributes {
             let engine =
@@ -965,8 +1006,17 @@ impl TraitSearchManager {
 
             for i in 0..n {
                 u_mean[i] += w * (scores[i] * inv_scale);
-                u_var[i] += w2 * (diag_cov[i].max(0.0) * inv_scale2);
+                let contribution = w2 * (diag_cov[i].max(0.0) * inv_scale2);
+                attr_var_contributions[i].push(contribution);
             }
+        }
+
+        // For each entity, cap outlier variance contributions.
+        // Use robust fence: cap at median + 3*IQR of that entity's contributions.
+        for i in 0..n {
+            let contribs = &mut attr_var_contributions[i];
+            let capped_sum = robust_capped_sum(contribs);
+            u_var[i] = capped_sum;
         }
 
         let mut feasible_mask = vec![true; n];
@@ -1160,7 +1210,7 @@ impl TraitSearchManager {
     }
 
     fn global_diff_var_safe(&self, i: usize, j: usize) -> f64 {
-        let mut var = 0.0;
+        let mut contribs: Vec<f64> = Vec::with_capacity(self.config.attributes.len());
         for attr in &self.config.attributes {
             let attr_id = &attr.id;
             let engine = match self.engines.get(attr_id) {
@@ -1181,13 +1231,13 @@ impl TraitSearchManager {
             let sigma_i = diag[i].max(0.0).sqrt();
             let sigma_j = diag[j].max(0.0).sqrt();
             let diff_var = (sigma_i + sigma_j) * (sigma_i + sigma_j);
-            var += (w / scale).powi(2) * diff_var;
+            contribs.push((w / scale).powi(2) * diff_var);
         }
-        var
+        robust_capped_sum(&mut contribs)
     }
 
     fn global_diff_var_diag(&self, i: usize, j: usize) -> f64 {
-        let mut var = 0.0;
+        let mut contribs: Vec<f64> = Vec::with_capacity(self.config.attributes.len());
         for attr in &self.config.attributes {
             let attr_id = &attr.id;
             let engine = match self.engines.get(attr_id) {
@@ -1206,13 +1256,13 @@ impl TraitSearchManager {
                 .max(SCALE_FLOOR);
             let w = attr.weight;
             let diff_var = (diag[i].max(0.0) + diag[j].max(0.0)).max(0.0);
-            var += (w / scale).powi(2) * diff_var;
+            contribs.push((w / scale).powi(2) * diff_var);
         }
-        var
+        robust_capped_sum(&mut contribs)
     }
 
     fn global_diff_var_effective(&self, i: usize, j: usize) -> Option<f64> {
-        let mut var = 0.0;
+        let mut contribs: Vec<f64> = Vec::new();
         let mut seen = false;
         for attr in &self.config.attributes {
             let attr_id = &attr.id;
@@ -1226,12 +1276,12 @@ impl TraitSearchManager {
             let w = attr.weight;
 
             if let Some(diff_var) = engine.diff_var_for(i, j) {
-                var += (w / scale).powi(2) * diff_var.max(0.0);
+                contribs.push((w / scale).powi(2) * diff_var.max(0.0));
                 seen = true;
             }
         }
         if seen {
-            Some(var)
+            Some(robust_capped_sum(&mut contribs))
         } else {
             None
         }
