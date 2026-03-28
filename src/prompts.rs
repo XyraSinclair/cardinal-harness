@@ -185,32 +185,13 @@ pub const RATIO_LADDER: &[f64] = &[
     1.0, 1.05, 1.1, 1.2, 1.3, 1.5, 1.75, 2.1, 2.5, 3.1, 3.9, 5.1, 6.8, 9.2, 12.7, 18.0, 26.0,
 ];
 
-pub const PROMPT_V1: PromptTemplate = PromptTemplate {
-    slug: "canonical_v1",
-    literal_double: false,
-    system: r#"You are an expert subjective evaluator. You compare two entities across an arbitrary attribute, and feel not only which one has MORE of that attribute, but roughly how much more it does. You feel along the ratio ladder: `[1.0, 1.05, 1.1, 1.2, 1.3, 1.5, 1.75, 2.1, 2.5, 3.1, 3.9, 5.1, 6.8, 9.2, 12.7, 18.0, 26.0]`.
-
-Output only valid JSON with higher_ranked, ratio (>=1.0 and <=26.0), and confidence (0.5-1.0).
-Example:
-{"higher_ranked": "B", "ratio": 1.3, "confidence": 0.74}"#,
-    user: r#"Compare these entity by <attribute_name>: {attribute_name} </attribute_name>.
-<full_attribute_text>
-{full_attribute_text}
-</full_attribute_text>
-
-<entity_A>
-{entity_A}
-</entity_A>
-
-<entity_B>
-{entity_B}
-</entity_B>
-
-Return a JSON object with your evaluation.
-json:"#,
-    repeat_count: 1,
-};
-
+/// The canonical pairwise ratio elicitation prompt.
+///
+/// Empirically validated as the best prompt across two comprehensive sweeps
+/// (March 2026): 4 layout variants x 7 models x 8 attributes, then 6 creative
+/// structures x 7 models x 8 attributes. v2 won on inter-model agreement
+/// (tau=0.433) with zero refusals across all 7 model families. See
+/// `docs/PROMPTS.md` for the full experimental record.
 pub const PROMPT_V2: PromptTemplate = PromptTemplate {
     slug: "canonical_v2",
     literal_double: false,
@@ -237,101 +218,19 @@ json:"#,
     repeat_count: 1,
 };
 
-pub const PROMPT_V2_ATTR_FIRST: PromptTemplate = PromptTemplate {
-    slug: "canonical_v2_attr_first",
-    literal_double: false,
-    system: PROMPT_V2.system,
-    user: r#"Compare these entity by <attribute_name>: {attribute_name} </attribute_name>.
-<full_attribute_text>
-{full_attribute_text}
-</full_attribute_text>
-
-{entity_A_context_block}
-
-{entity_B_context_block}
-
-<entity_A>
-{entity_A}
-</entity_A>
-
-<entity_B>
-{entity_B}
-</entity_B>
-
-Return a JSON object with your evaluation.
-json:"#,
-    repeat_count: 1,
-};
-
-pub const PROMPT_V3: PromptTemplate = PromptTemplate {
-    slug: "canonical_v3",
-    literal_double: false,
-    system: r#"You are an expert subjective evaluator comparing two entities on one attribute. Decide which has more of it and how much more using ratio ladder R=[1,1.05,1.1,1.2,1.3,1.5,1.75,2.1,2.5,3.1,3.9,5.1,6.8,9.2,12.7,18,26].
-Return only JSON: {higher_ranked:A|B,ratio:1-26,confidence:0..1}. If policy-blocked, return {refused:true}. If uncertain, lower confidence."#,
-    user: r#"Compare by <attribute_name>{attribute_name}</attribute_name>.
-<full_attribute_text>{full_attribute_text}</full_attribute_text>
-<entity_A>{entity_A}</entity_A>
-<entity_B>{entity_B}</entity_B>
-
-json:"#,
-    repeat_count: 1,
-};
-
-pub const PROMPT_V1_REPEAT_FULL: PromptTemplate = PromptTemplate {
-    slug: "canonical_v1_repeat_full",
-    system: PROMPT_V1.system,
-    user: PROMPT_V1.user,
-    repeat_count: 2,
-    literal_double: false,
-};
-
-pub const PROMPT_V2_REPEAT_FULL: PromptTemplate = PromptTemplate {
-    slug: "canonical_v2_repeat_full",
-    system: PROMPT_V2.system,
-    user: PROMPT_V2.user,
-    repeat_count: 2,
-    literal_double: false,
-};
-
-pub const PROMPT_V2_ATTR_FIRST_REPEAT_FULL: PromptTemplate = PromptTemplate {
-    slug: "canonical_v2_attr_first_repeat_full",
-    system: PROMPT_V2_ATTR_FIRST.system,
-    user: PROMPT_V2_ATTR_FIRST.user,
-    repeat_count: 2,
-    literal_double: false,
-};
-
-pub const PROMPT_V3_REPEAT_FULL: PromptTemplate = PromptTemplate {
-    slug: "canonical_v3_repeat_full",
-    system: PROMPT_V3.system,
-    user: PROMPT_V3.user,
-    repeat_count: 2,
-    literal_double: false,
-};
-
-pub const PROMPT_V2_LITERAL_DOUBLE: PromptTemplate = PromptTemplate {
-    slug: "canonical_v2_literal_double",
-    system: PROMPT_V2.system,
-    user: PROMPT_V2.user,
-    repeat_count: 1,
-    literal_double: true,
-};
-
-pub const PROMPTS: &[PromptTemplate] = &[
-    PROMPT_V1,
-    PROMPT_V2,
-    PROMPT_V2_ATTR_FIRST,
-    PROMPT_V3,
-    PROMPT_V1_REPEAT_FULL,
-    PROMPT_V2_REPEAT_FULL,
-    PROMPT_V2_ATTR_FIRST_REPEAT_FULL,
-    PROMPT_V3_REPEAT_FULL,
-    PROMPT_V2_LITERAL_DOUBLE,
-];
+pub const PROMPTS: &[PromptTemplate] = &[PROMPT_V2];
 pub const DEFAULT_PROMPT: PromptTemplate = PROMPT_V2;
 
+/// Look up a prompt template by slug.
+///
+/// All legacy slugs (canonical_v1, canonical_v3, repeat_full variants,
+/// literal_double, experimental_*) resolve to canonical_v2. The alternatives
+/// were empirically tested and retired -- see `docs/PROMPTS.md`.
 pub fn prompt_by_slug(slug: &str) -> Option<PromptTemplate> {
-    PROMPTS.iter().find(|t| t.slug == slug).copied()
+    match slug {
+        "" => None,
+        _ => Some(PROMPT_V2),
+    }
 }
 
 // =============================================================================
@@ -364,33 +263,25 @@ mod tests {
     }
 
     #[test]
-    fn prompt_attr_first_places_attribute_before_context() {
-        let a = EntityRef::with_context("A", "Context A");
-        let b = EntityRef::with_context("B", "Context B");
-        let t = prompt_by_slug("canonical_v2_attr_first").expect("template");
-        let p = t.render("clarity", "Which is clearer?", a, b);
-
-        let idx_attr = p.user.find("<full_attribute_text>").expect("attr tag");
-        let idx_ctx = p
-            .user
-            .find("<entity_A_context>")
-            .expect("entity_A_context tag");
-        assert!(
-            idx_attr < idx_ctx,
-            "expected attribute prompt before entity context for canonical_v2_attr_first"
-        );
-
-        // Ensure we did not also prefix-inject contexts.
-        assert_eq!(p.user.matches("<entity_A_context>").count(), 1);
-        assert_eq!(p.user.matches("<entity_B_context>").count(), 1);
+    fn prompt_lookup() {
+        assert!(prompt_by_slug("canonical_v2").is_some());
+        assert!(prompt_by_slug("").is_none());
     }
 
     #[test]
-    fn prompt_lookup() {
-        assert!(prompt_by_slug("canonical_v1").is_some());
-        assert!(prompt_by_slug("canonical_v2_attr_first").is_some());
-        assert!(prompt_by_slug("canonical_v2_repeat_full").is_some());
-        assert!(prompt_by_slug("nonexistent").is_none());
+    fn legacy_slugs_resolve_to_v2() {
+        for slug in &[
+            "canonical_v1",
+            "canonical_v2_attr_first",
+            "canonical_v3",
+            "canonical_v2_repeat_full",
+            "canonical_v2_literal_double",
+            "experimental_reasoning",
+            "anything_else",
+        ] {
+            let t = prompt_by_slug(slug).expect(slug);
+            assert_eq!(t.slug, "canonical_v2");
+        }
     }
 
     #[test]
@@ -399,63 +290,5 @@ mod tests {
         let p = DEFAULT_PROMPT.render("test", "Test", a, EntityRef::new("B"));
         assert!(p.user.contains("&lt;script&gt;"));
         assert!(!p.user.contains("<script>"));
-    }
-
-    #[test]
-    fn prompt_repeat_full_duplicates_system_and_user() {
-        let a = EntityRef::with_context("A", "Context A");
-        let b = EntityRef::with_context("B", "Context B");
-        let base = prompt_by_slug("canonical_v2").expect("base template");
-        let repeated = prompt_by_slug("canonical_v2_repeat_full").expect("repeat template");
-
-        let base_prompt = base.render("clarity", "Which is clearer?", a.clone(), b.clone());
-        let repeated_prompt = repeated.render("clarity", "Which is clearer?", a, b);
-
-        assert_eq!(
-            repeated_prompt.system,
-            format!("{}\n\n{}", base_prompt.system, base_prompt.system)
-        );
-        assert_eq!(
-            repeated_prompt.user,
-            format!("{}\n\n{}", base_prompt.user, base_prompt.user)
-        );
-    }
-
-    #[test]
-    fn repeat_prompt_template_hash_differs_from_base() {
-        let base = prompt_by_slug("canonical_v2").expect("base template");
-        let repeated = prompt_by_slug("canonical_v2_repeat_full").expect("repeat template");
-        assert_ne!(base.template_hash(), repeated.template_hash());
-    }
-
-    #[test]
-    fn literal_double_flattens_and_doubles_entire_prompt() {
-        let a = EntityRef::with_context("A", "Context A");
-        let b = EntityRef::with_context("B", "Context B");
-        let base = prompt_by_slug("canonical_v2").expect("base template");
-        let doubled = prompt_by_slug("canonical_v2_literal_double").expect("literal double template");
-
-        let base_prompt = base.render("clarity", "Which is clearer?", a.clone(), b.clone());
-        let doubled_prompt = doubled.render("clarity", "Which is clearer?", a, b);
-
-        assert!(doubled_prompt.system.is_empty(), "literal_double should have empty system");
-
-        let full_base = format!("{}\n\n{}", base_prompt.system, base_prompt.user);
-        let expected_user = format!("{}\n\n{}", full_base, full_base);
-        assert_eq!(doubled_prompt.user, expected_user);
-    }
-
-    #[test]
-    fn literal_double_hash_differs_from_base_and_repeat() {
-        let base = prompt_by_slug("canonical_v2").expect("base");
-        let repeated = prompt_by_slug("canonical_v2_repeat_full").expect("repeat");
-        let doubled = prompt_by_slug("canonical_v2_literal_double").expect("literal double");
-        assert_ne!(base.template_hash(), doubled.template_hash());
-        assert_ne!(repeated.template_hash(), doubled.template_hash());
-    }
-
-    #[test]
-    fn literal_double_lookup() {
-        assert!(prompt_by_slug("canonical_v2_literal_double").is_some());
     }
 }
