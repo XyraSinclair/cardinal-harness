@@ -458,7 +458,17 @@ fn model_supports_logprobs(model: &str) -> bool {
         || model_lower.contains("-thinking")
         || model_lower.contains("reasoning");
 
-    !is_reasoning
+    if is_reasoning {
+        return false;
+    }
+
+    // GPT-5.4 family: logprobs request causes OpenAI backend 502 via OpenRouter.
+    // The upstream API crashes rather than returning logprobs for these models.
+    if model_lower.starts_with("openai/gpt-5.4") {
+        return false;
+    }
+
+    true
 }
 
 /// If logprobs are available, derive confidence from the token probability
@@ -676,6 +686,11 @@ That's my assessment."#;
             "qwen/qwen3-235b-a22b-thinking-2507"
         ));
         assert!(!model_supports_logprobs("baidu/ernie-4.5-21b-a3b-thinking"));
+
+        // GPT-5.4 family: logprobs crash OpenAI backend via OpenRouter
+        assert!(!model_supports_logprobs("openai/gpt-5.4-mini"));
+        assert!(!model_supports_logprobs("openai/gpt-5.4"));
+        assert!(!model_supports_logprobs("openai/gpt-5.4-nano"));
 
         // Non-reasoning models: YES logprobs
         assert!(model_supports_logprobs("openai/gpt-4.1"));
