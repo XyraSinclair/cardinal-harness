@@ -342,6 +342,7 @@ See [docs/RESEARCH_THREADS.md](docs/RESEARCH_THREADS.md) for detailed analysis o
 | Document | Contents |
 |----------|----------|
 | [`docs/ALGORITHM.md`](docs/ALGORITHM.md) | Full design rationale: why pairwise ratios, IRLS, Huber loss, stopping rules |
+| [`docs/FOUNDATIONS_MATRYOSHKA.md`](docs/FOUNDATIONS_MATRYOSHKA.md) | Nested dense explanations of the system at increasing token budgets |
 | [`docs/PROMPTS.md`](docs/PROMPTS.md) | Prompt template slugs and context placement details |
 | [`docs/ANP.md`](docs/ANP.md) | ANP context typing and supermatrix usage |
 | [`docs/RESEARCH_THREADS.md`](docs/RESEARCH_THREADS.md) | Open research directions and opportunities |

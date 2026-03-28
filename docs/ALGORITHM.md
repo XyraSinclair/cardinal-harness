@@ -2,6 +2,9 @@
 
 This document explains not just *what* cardinal-harness does, but *why* each design choice was made.
 
+If you want the same foundations explained in nested increasing-detail form, see
+`docs/FOUNDATIONS_MATRYOSHKA.md`.
+
 ## Why pairwise comparisons instead of direct scoring?
 
 When you ask an LLM to "rate this essay 1–10", the scores are:
