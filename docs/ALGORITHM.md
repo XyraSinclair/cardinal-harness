@@ -67,6 +67,63 @@ The global top-K error is the sum of these boundary flip probabilities. The syst
 
 The `stop_sigma_inflate` parameter (default 1.25) inflates the uncertainty estimate for the stopping check to be conservative — the system would rather ask one extra question than stop prematurely with an incorrect ranking.
 
+## Why these evaluation metrics?
+
+The evaluation suite deliberately reports several metrics because they answer
+different questions about the same run.
+
+### 1. Global order agreement
+
+- **Kendall tau-b** is the primary "did we get the ranking right?" metric.
+  It counts concordant versus discordant item pairs and handles ties correctly.
+  This matches the core object the system learns from: pairwise comparisons.
+- **Spearman rho** complements tau-b by measuring correlation between rank
+  positions. It is useful when a small number of items move a long distance,
+  which can leave pairwise agreement fairly high while still producing a visibly
+  distorted ranking.
+
+These are complementary, not redundant. Tau-b is better for pairwise order
+correctness; rho is better for rank displacement.
+
+### 2. Top-K recovery
+
+- **Top-K precision** asks whether the returned top-K includes impostors.
+- **Top-K recall** asks whether the true top-K items were missed.
+
+These matter because the product is usually used for selection, not for caring
+about the exact ordering of the entire tail.
+
+### 3. Uncertainty calibration
+
+- **Coverage @95% CI** checks whether the reported posterior intervals are
+  honest. If true latent scores fall inside nominal 95% intervals much less than
+  95% of the time, the system is overconfident. If they fall inside far more
+  often, the system is conservative.
+
+This is distinct from ranking quality. A system can rank well but still report
+bad uncertainty.
+
+### 4. Top-heavy ranking quality
+
+- **nDCG@K** rewards getting the top of the list right, with position discount.
+- **CURL** measures pairwise concordance with extra weight on high-ranked items.
+- **Weighted rank reversals** gives an interpretable count-like penalty for
+  reversals near the top and for large displacement.
+- **Bayesian regret** translates ranking mistakes into lost decision utility.
+
+These are useful because not all ranking errors are equally costly. Swapping #1
+and #2 matters more than swapping #49 and #50.
+
+### 5. Planner-facing boundary risk
+
+- **Frontier inversion probability** is not just an evaluation summary. It is
+  the operational risk signal used by the planner and stopping rule. It asks the
+  question the system is actually trying to control: "how likely is the K / K+1
+  boundary to be wrong?"
+
+That is why it can disagree with global metrics. A run can have mediocre global
+tau while still having low boundary risk, or vice versa.
+
 ## Multi-attribute composition
 
 When scoring on multiple attributes (e.g., clarity *and* depth *and* originality), each attribute gets its own independent rating engine. Attributes are then combined into a single utility score:

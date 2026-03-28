@@ -48,17 +48,51 @@ Combine cheap Likert pre-screening (identify obviously dominated items) with exp
 
 ## Objective functions
 
-The system optimizes for top-K identification, but "top-K accuracy" decomposes into several distinct metrics, each capturing a different failure mode:
+The system optimizes for top-K identification, but there is no single metric
+called "ranking quality." Different metrics answer different questions. The
+important distinction is between:
 
-| Metric | What it measures | Failure mode it catches |
-|--------|-----------------|------------------------|
-| **Top-K precision/recall** | Set overlap with true top-K | Completely wrong items in top-K |
-| **Kendall tau-b** | Pairwise concordance (handles ties) | Global ranking disorder |
-| **Spearman rho** | Monotonic correlation | Non-linear but monotone distortions |
-| **Rank reversals** | Weighted count of adjacent-rank swaps | Local instability at K-boundary |
-| **Frontier inversion probability** | P(item K and K+1 are swapped) | The specific failure the planner targets |
-| **Coverage @95% CI** | Fraction of true scores inside confidence intervals | Miscalibrated uncertainty |
-| **CURL** | Concordance-based utility of ranked lists | Penalizes high-rank errors more than low-rank |
+- **Order metrics**: did we get the relative ordering right?
+- **Selection metrics**: did we recover the correct top-K set?
+- **Calibration metrics**: are the uncertainty intervals honest?
+- **Top-heavy utility metrics**: did we make mistakes where they matter most?
+
+### Why both Kendall and Spearman?
+
+They are related but not interchangeable:
+
+- **Kendall tau-b** asks: across all item pairs, how often do predicted and true
+  orderings agree? It is the cleanest "pairwise ordering correctness" metric,
+  and tau-b correctly handles ties.
+- **Spearman rho** asks: how correlated are the predicted and true ranks? It is
+  more sensitive to large rank displacement of individual items, even when most
+  pairwise relations are still correct.
+
+If you care about "how many pairwise ordering mistakes did we make?", look at
+Kendall first. If you care about "did a few items move a long way up or down?",
+Spearman adds signal.
+
+### Metrics we report
+
+| Metric | What it answers | When it is most useful |
+|--------|------------------|------------------------|
+| **Kendall tau-b** | Are pairwise order relations mostly correct? | Default global rank-agreement metric |
+| **Spearman rho** | Are overall ranks strongly correlated? | Detecting large rank displacement |
+| **Top-K precision** | Of the items we selected, how many truly belong in top-K? | Screening false positives in the selected set |
+| **Top-K recall** | Of the true top-K, how many did we recover? | Screening false negatives near the boundary |
+| **Coverage @95% CI** | Are posterior uncertainty intervals calibrated? | Checking whether the solver is overconfident |
+| **nDCG@K** | Did we rank the top region well, with graded relevance? | IR-style evaluation where early positions matter |
+| **CURL** | Did we preserve pairwise order, especially near the top? | Top-heavy ranking quality |
+| **Weighted rank reversals** | Did we create large or high-rank reversals? | Interpretable top-heavy error counting |
+| **Bayesian regret** | How much utility did we lose by selecting the estimated top-K? | Decision-oriented evaluation |
+| **Frontier inversion probability** | How likely is a swap across the K / K+1 boundary? | The planner's stopping and targeting objective |
+
+Two implementation details matter:
+
+- `kendall_tau` / `spearman_rho` are computed on the currently feasible set
+  after gates.
+- `kendall_tau_all` / `spearman_rho_all` are computed on all items, regardless
+  of feasibility.
 
 The planner's query selection objective blends **information gain** (from spectral graph theory — effective resistance) with **rank risk** (weighted probability of frontier inversions). The mixing parameter `lambda_risk` controls the blend: pure information gain explores uniformly, pure rank risk focuses narrowly on the K-boundary.
 

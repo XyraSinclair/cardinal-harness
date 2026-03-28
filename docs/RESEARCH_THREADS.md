@@ -297,10 +297,43 @@ product decision.
 ### Current state
 
 The planner optimizes a blend of information gain (effective resistance) and rank
-risk (frontier inversion probability). The evaluation suite reports Kendall tau-b,
-Spearman rho, top-K precision/recall, and coverage@95%CI.
+risk (frontier inversion probability). The evaluation suite now reports a wider
+set of rank-quality metrics:
 
-### Additional objectives worth tracking
+- Kendall tau-b
+- Spearman rho
+- top-K precision / recall
+- coverage @95% CI
+- nDCG@K
+- CURL (harmonic and exponential weighting)
+- weighted rank reversals
+- Bayesian regret
+- top-K discordance count
+
+The implementation lives in `src/rerank/evaluation.rs` under
+`RankQualityMetrics`.
+
+### Why this metric set is coherent
+
+The metric suite is intentionally split across four jobs:
+
+- **Pairwise order agreement**: Kendall tau-b
+- **Rank displacement**: Spearman rho
+- **Selection quality**: top-K precision / recall
+- **Calibration**: coverage @95% CI
+- **Top-heavy decision quality**: nDCG, CURL, weighted rank reversals, regret
+
+This avoids overloading one metric with too many meanings. In particular,
+Kendall and Spearman are not substitutes:
+
+- Kendall answers "how often do pairwise orderings agree?"
+- Spearman answers "how correlated are the final rank positions?"
+
+Cardinal-harness is fundamentally built from pairwise judgements, so Kendall is
+the more natural default headline metric. Spearman remains useful because a few
+large item displacements can matter a lot in practice.
+
+### Why the extra top-heavy metrics are still useful
 
 #### CURL (Concordance-based Utility of Ranked Lists)
 
@@ -320,8 +353,8 @@ items. Common choices:
 - `w(i,j) = exp(-alpha * min(rank_i, rank_j))` — exponential decay
 
 CURL is especially relevant for cardinal-harness because the planner already
-focuses on top-K — CURL would measure whether that focus translates into
-actual top-K quality.
+focuses on top-K. Reporting CURL lets us check whether that focus actually
+translates into better top-heavy ranking quality.
 
 #### Weighted rank reversals
 
@@ -332,8 +365,8 @@ WRR = sum_{i: sigma(i) != sigma*(i)} 1/rank(i) * |sigma(i) - sigma*(i)|
 ```
 
 This is simpler than CURL but captures the same intuition: reversals near the
-top matter more. The current `expected_rank_reversals` in `SolveSummary` counts
-unweighted — adding position weighting is straightforward.
+top matter more. It is easier to interpret than CURL when you want an explicit
+"how much bad swapping happened near the top?" style metric.
 
 #### Bayesian regret
 
@@ -361,9 +394,10 @@ nDCG@k = DCG@k / IDCG@k
 
 Where `rel_i` is the ground-truth relevance/score of the item at position i.
 
-### What would need to change
+### What changed in the implementation
 
-Add a `RankQualityMetrics` struct to `rerank/evaluation.rs`:
+`RankQualityMetrics` now centralizes the evaluation metrics in
+`rerank/evaluation.rs`:
 
 ```rust
 pub struct RankQualityMetrics {
@@ -377,12 +411,12 @@ pub struct RankQualityMetrics {
     pub curl_exponential: f64,
     pub weighted_rank_reversals: f64,
     pub bayesian_regret: f64,
+    pub topk_discordance_count: usize,
 }
 ```
 
-This centralizes all rank quality metrics in one place instead of computing them
-ad-hoc. The planner could then be parameterized by which metric to optimize,
-and the evaluation suite could report all of them side-by-side.
+This keeps rank-quality reporting in one place instead of spreading metric logic
+across ad hoc call sites.
 
 ### Relationship to the planner objective
 
