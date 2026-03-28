@@ -64,10 +64,15 @@ pub struct PromptTemplate {
     pub slug: &'static str,
     pub system: &'static str,
     pub user: &'static str,
+    /// Number of times to repeat the system and user prompt text verbatim.
+    /// Unused by the current sole template (`canonical_v2`, which uses 1) but
+    /// kept for future experimentation with repeated-prompt elicitation strategies.
     pub repeat_count: usize,
     /// When true, the entire rendered prompt (system + user combined) is
     /// concatenated with itself and sent as a single user message. This is
     /// distinct from `repeat_count` which doubles system and user independently.
+    /// Unused by the current sole template (`canonical_v2`) but kept for future
+    /// experimentation with literal-double prompt layouts.
     pub literal_double: bool,
 }
 

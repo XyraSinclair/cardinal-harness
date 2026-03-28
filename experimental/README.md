@@ -9,21 +9,21 @@ Principles:
 
 Current threads:
 
-## Prompt Layout + Read Cache
+## Prompt Layout + Read Cache (Concluded)
 
 Goal: understand how prompt ordering affects:
 - quality of judgements (consistency, refusal rate, calibration)
 - provider read-cache efficiency (cached input tokens, latency, cost)
 
+**Result:** A comprehensive sweep (4 layout variants × 7 models × 8 attributes)
+found no significant advantage to attribute-first ordering. `canonical_v2`
+(entity-first) won on inter-model agreement (tau=0.433) with zero refusals.
+The `canonical_v2_attr_first` variant was retired; its slug now silently aliases
+to `canonical_v2`. See `docs/PROMPTS.md` for the full experimental record.
+
 Relevant repo hooks:
 - Prompt templates live in `src/prompts.rs`.
-- `canonical_v2` currently places entity context blocks before the attribute text.
-- `canonical_v2_attr_first` inverts that ordering by embedding context blocks after the attribute.
-
-Recommended experiment:
-1. Pick a realistic request JSON and run two reranks that differ only in `prompt_template_slug`.
-2. Capture traces (`--trace`) and usage logs.
-3. Compare: cost, refusal rates, stop reasons, and stability of top-k.
+- `canonical_v2` is the sole active template, placing entity context blocks before the attribute text.
 
 ## Baselines (Likert vs Ratio)
 

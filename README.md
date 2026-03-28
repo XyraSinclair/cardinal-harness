@@ -32,7 +32,7 @@ Three properties make pairwise ratios the right primitive for LLM prior elicitat
 
 ### Pairwise ratios (primary)
 
-The core method. Ratio ladder from 1.0 to 26.0 (approximately geometric in log-space), with fine gradations near 1.0 for near-ties. Four prompt template variants (`canonical_v1` through `v3`) optimized for different contexts.
+The core method. Ratio ladder from 1.0 to 26.0 (approximately geometric in log-space), with fine gradations near 1.0 for near-ties. A single prompt template (`canonical_v2`) empirically validated across comprehensive sweeps. Legacy slugs (`canonical_v1`, `v3`, etc.) silently alias to it for backward compatibility.
 
 ### Likert scale (baseline)
 

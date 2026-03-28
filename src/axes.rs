@@ -1,5 +1,9 @@
 //! Orthogonal evaluation axes for code and idea assessment.
 //!
+//! This module provides evaluation axis definitions for potential external
+//! consumers and research purposes. It is intentionally kept as a public module
+//! despite having no internal consumer within cardinal-harness itself.
+//!
 //! Three clusters, twelve axes, designed for genuine orthogonality and
 //! exhaustive coverage of the evaluation space. Each axis is ratio-scalable
 //! ("A has 3x more groundedness than B") and operationally grounded.
