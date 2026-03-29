@@ -192,6 +192,7 @@ let req = MultiRerankRequest {
     rater_id: None,
     comparison_concurrency: None,
     max_pair_repeats: None,
+    randomize_presentation_order: true,
 };
 
 let resp = cardinal_harness::rerank::multi_rerank(

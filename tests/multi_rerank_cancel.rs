@@ -62,6 +62,7 @@ async fn multi_rerank_honors_cancel_flag_before_any_comparisons() {
         rater_id: None,
         comparison_concurrency: Some(1),
         max_pair_repeats: Some(1),
+        randomize_presentation_order: true,
     };
 
     let cancel_flag = AtomicBool::new(true);

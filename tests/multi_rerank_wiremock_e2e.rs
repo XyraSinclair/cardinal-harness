@@ -137,6 +137,7 @@ async fn multi_rerank_runs_end_to_end_against_wiremock_gateway() {
         rater_id: None,
         comparison_concurrency: Some(1),
         max_pair_repeats: Some(1),
+        randomize_presentation_order: false,
     };
 
     let resp = multi_rerank(

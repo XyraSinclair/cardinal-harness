@@ -74,6 +74,7 @@ pub fn to_multi_request(req: &RerankRequest) -> MultiRerankRequest {
         rater_id: req.rater_id.clone(),
         comparison_concurrency: req.comparison_concurrency,
         max_pair_repeats: req.max_pair_repeats,
+        randomize_presentation_order: true,
     }
 }
 

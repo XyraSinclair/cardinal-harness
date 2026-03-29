@@ -28,6 +28,7 @@ fn make_trace(comparison_index: usize) -> ComparisonTrace {
         confidence: Some(0.9),
         refused: false,
         cached: true,
+        swapped: false,
         input_tokens: 0,
         output_tokens: 0,
         provider_cost_nanodollars: 0,

@@ -28,6 +28,11 @@ pub struct ComparisonTrace {
     pub confidence: Option<f64>,
     pub refused: bool,
     pub cached: bool,
+    /// Whether entity A/B presentation order was swapped to counteract
+    /// position bias.  When true, the entity at index `entity_a_index` was
+    /// shown in the "B" position and vice versa.
+    #[serde(default)]
+    pub swapped: bool,
     pub input_tokens: u32,
     pub output_tokens: u32,
     pub provider_cost_nanodollars: i64,

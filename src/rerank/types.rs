@@ -334,6 +334,15 @@ pub struct MultiRerankRequest {
     /// Each successful pairwise comparison increments repeats by 1.
     #[serde(default)]
     pub max_pair_repeats: Option<usize>,
+
+    /// Randomly swap which entity is presented as "A" vs "B" in each
+    /// comparison to eliminate position bias.  Default: true.
+    #[serde(default = "default_randomize_presentation_order")]
+    pub randomize_presentation_order: bool,
+}
+
+fn default_randomize_presentation_order() -> bool {
+    true
 }
 
 /// Per-attribute score summary.

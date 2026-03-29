@@ -353,6 +353,7 @@ fn cli_report_json_smoke() {
         rater_id: None,
         comparison_concurrency: Some(1),
         max_pair_repeats: Some(1),
+        randomize_presentation_order: true,
     };
 
     let mut a_scores = HashMap::new();

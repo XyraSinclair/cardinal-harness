@@ -81,6 +81,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         rater_id: None,               // no logical rater grouping
         comparison_concurrency: None, // use internal default parallelism
         max_pair_repeats: None,       // allow re-asking the same pair if needed
+        randomize_presentation_order: true,
     };
 
     // -- Run it --------------------------------------------------------------

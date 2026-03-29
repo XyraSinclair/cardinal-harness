@@ -22,6 +22,7 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use futures::stream::{self, StreamExt};
+use rand::Rng;
 
 use crate::cache::{PairwiseCache, PairwiseCacheKey};
 use crate::gateway::pricing as provider_pricing;
@@ -549,6 +550,9 @@ pub async fn multi_rerank_with_trace(
         attr_idx: usize,
         i: usize,
         j: usize,
+        /// When true, entity j is presented as "A" and entity i as "B"
+        /// to counteract position bias.
+        swapped: bool,
     }
 
     #[derive(Clone)]
@@ -633,11 +637,17 @@ pub async fn multi_rerank_with_trace(
                 }
             }
 
+            let swapped = if req.randomize_presentation_order {
+                rand::thread_rng().gen_bool(0.5)
+            } else {
+                false
+            };
             tasks.push(CompareTask {
                 key,
                 attr_idx,
                 i,
                 j,
+                swapped,
             });
 
             if tasks.len() >= batch_size {
@@ -676,8 +686,13 @@ pub async fn multi_rerank_with_trace(
             let attribution = attribution.clone();
             let policy = model_policy.clone();
             let attr = &req.attributes[task.attr_idx];
-            let entity_a = &req.entities[task.i];
-            let entity_b = &req.entities[task.j];
+            // When swapped, present entity j as "A" and entity i as "B"
+            // to counteract position bias.
+            let (entity_a, entity_b) = if task.swapped {
+                (&req.entities[task.j], &req.entities[task.i])
+            } else {
+                (&req.entities[task.i], &req.entities[task.j])
+            };
             let score_cache = score_cache.clone();
             let std_cache = std_cache.clone();
             let context = ModelPolicyContext {
@@ -793,6 +808,7 @@ pub async fn multi_rerank_with_trace(
                     confidence: None,
                     refused: false,
                     cached,
+                    swapped: task.swapped,
                     input_tokens,
                     output_tokens,
                     provider_cost_nanodollars,
@@ -860,7 +876,17 @@ pub async fn multi_rerank_with_trace(
                         provider_output_tokens.saturating_add(usage.output_tokens);
                     provider_cost_nanodollars =
                         provider_cost_nanodollars.saturating_add(usage.provider_cost_nanodollars);
-                    let (obs_i, obs_j) = match higher_ranked {
+                    // When presentation was swapped, "A" in the LLM
+                    // response actually refers to entity j, not i.
+                    let effective = if task.swapped {
+                        match higher_ranked {
+                            HigherRanked::A => HigherRanked::B,
+                            HigherRanked::B => HigherRanked::A,
+                        }
+                    } else {
+                        higher_ranked
+                    };
+                    let (obs_i, obs_j) = match effective {
                         HigherRanked::A => (task.i, task.j),
                         HigherRanked::B => (task.j, task.i),
                     };
@@ -1174,6 +1200,7 @@ mod tests {
             rater_id: None,
             comparison_concurrency: None,
             max_pair_repeats: None,
+            randomize_presentation_order: true,
         }
     }
 

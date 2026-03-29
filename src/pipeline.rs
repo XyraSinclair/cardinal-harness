@@ -1022,6 +1022,7 @@ fn build_rerank_request(
         rater_id: None,
         comparison_concurrency: None,
         max_pair_repeats: None,
+        randomize_presentation_order: true,
     }
 }
 
