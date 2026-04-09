@@ -1,0 +1,15 @@
+[project]
+name = "cardinal-harness-gx10-pairwise"
+version = "0.1.0"
+description = "Minimal SFT scaffold for pairwise ratio fine-tuning"
+requires-python = ">=3.10"
+dependencies = [
+  "accelerate",
+  "datasets",
+  "peft",
+  "torch",
+  "transformers",
+]
+
+[tool.uv]
+package = false

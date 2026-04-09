@@ -5,8 +5,8 @@ use cardinal_harness::gateway::{
     ChatGateway, ChatRequest, ChatResponse, FinishReason, ProviderError, Role,
 };
 use cardinal_harness::pipeline::{
-    run_flywheel, run_pipeline, FlywheelManifest, FlywheelTask, PipelineAttribute,
-    PipelineRankConfig, PipelineRequest,
+    run_flywheel, run_pipeline, FlywheelManifest, FlywheelRunConfig, FlywheelTask,
+    PipelineAttribute, PipelineRankConfig, PipelineRequest,
 };
 use tempfile::tempdir;
 
@@ -165,7 +165,6 @@ fn test_rank_config() -> PipelineRankConfig {
         tolerated_error: 0.2,
         comparison_budget: Some(4),
         judge_model: Some("test/judge".to_string()),
-        model_policy: None,
     }
 }
 
@@ -282,15 +281,17 @@ async fn run_flywheel_writes_artifacts_and_reports_failures() {
 
     let summary = run_flywheel(
         gateway,
-        None,
-        None,
         manifest,
-        &out_dir,
-        Some(&synth_dir),
-        Some(&trace_dir),
-        None,
-        2,
-        Vec::new(),
+        FlywheelRunConfig {
+            cache: None,
+            model_policy: None,
+            out_dir: &out_dir,
+            synthesis_out_dir: Some(&synth_dir),
+            trace_dir: Some(&trace_dir),
+            preset_override: None,
+            parallel: 2,
+            gates: Vec::new(),
+        },
     )
     .await;
 
@@ -353,15 +354,17 @@ async fn run_flywheel_marks_artifact_write_failures_as_task_failures() {
 
     let summary = run_flywheel(
         gateway,
-        None,
-        None,
         manifest,
-        &blocked_out,
-        Some(&synth_dir),
-        Some(&trace_dir),
-        None,
-        1,
-        Vec::new(),
+        FlywheelRunConfig {
+            cache: None,
+            model_policy: None,
+            out_dir: &blocked_out,
+            synthesis_out_dir: Some(&synth_dir),
+            trace_dir: Some(&trace_dir),
+            preset_override: None,
+            parallel: 1,
+            gates: Vec::new(),
+        },
     )
     .await;
 

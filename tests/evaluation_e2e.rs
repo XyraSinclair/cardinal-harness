@@ -12,14 +12,16 @@ fn synthetic_suite_filter_selects_exact_name() {
     let all = synthetic_cases();
     assert!(all.iter().any(|c| c.name == "clean_ordering_10"));
 
-    let selected = run_synthetic_suite(Some("clean_ordering_10"));
+    let selected =
+        run_synthetic_suite(Some("clean_ordering_10")).expect("synthetic suite should run");
     assert_eq!(selected.len(), 1);
     assert_eq!(selected[0].case_name, "clean_ordering_10");
 }
 
 #[test]
 fn clean_ordering_case_is_perfect_topk() {
-    let result = run_synthetic_suite(Some("clean_ordering_10"));
+    let result =
+        run_synthetic_suite(Some("clean_ordering_10")).expect("synthetic suite should run");
     let metrics = &result[0].metrics;
 
     assert!(metrics.kendall_tau >= 0.99);
@@ -36,7 +38,8 @@ fn clean_ordering_case_is_perfect_topk() {
 
 #[test]
 fn gated_case_produces_reasonable_gate_metrics() {
-    let result = run_synthetic_suite(Some("gated_feasibility_30"));
+    let result =
+        run_synthetic_suite(Some("gated_feasibility_30")).expect("synthetic suite should run");
     let metrics = &result[0].metrics;
 
     assert_prob(metrics.coverage_95ci);

@@ -219,9 +219,9 @@ pub struct ChatRequest {
     /// Whether to request token-level logprobs in the response.
     ///
     /// When true, the provider returns log-probabilities for output tokens.
-    /// For structured outputs (ratio ladder selection), logprobs over ratio
-    /// tokens provide a direct confidence signal that's cheaper and potentially
-    /// more calibrated than self-reported confidence.
+    /// These are useful for diagnostics and future answer-level rescoring, but
+    /// decimal ratio ladders do not admit a valid confidence estimate from a
+    /// single token-position peek.
     pub logprobs: bool,
     /// Number of top alternative logprobs to return per token position.
     /// Only meaningful when `logprobs` is true. Typically 5-20.
@@ -806,9 +806,8 @@ pub struct ChatResponse {
     pub finish_reason: FinishReason,
     /// Per-token logprobs for the output, if requested and available.
     ///
-    /// When present, this enables logprob-based confidence extraction:
-    /// the distribution over ratio ladder tokens directly measures the model's
-    /// uncertainty about the comparison.
+    /// This is raw provider metadata. A valid ladder-level posterior may require
+    /// continuation rescoring rather than naive inspection of one emitted token.
     pub output_logprobs: Option<Vec<TokenLogprob>>,
     /// Input tokens served from provider prompt cache (if reported).
     pub cache_read_tokens: Option<u32>,
@@ -824,7 +823,7 @@ pub struct ChatResponse {
 pub enum ConfidenceSource {
     /// Model self-reported confidence (from JSON output field).
     SelfReported(f64),
-    /// Derived from logprob distribution over ratio tokens.
+    /// Derived from a valid answer-level logprob scoring path.
     Logprob {
         /// Shannon entropy of the ratio token distribution (lower = more certain).
         entropy: f64,
@@ -982,6 +981,13 @@ pub fn truncate_output_logprobs(
         .collect()
 }
 
+/// Build a pairwise posterior from winner and ratio token alternatives.
+///
+/// This helper assumes the preferred side and ratio each correspond to a single
+/// token position whose alternatives enumerate the relevant support. That is a
+/// useful synthetic model and can be valid for genuinely atomic vocabularies,
+/// but it is not sufficient for decimal ratio ladders without continuation
+/// rescoring.
 pub fn pairwise_logprob_posterior(
     logprobs: &[TokenLogprob],
     selected_higher_ranked: PairwisePreferredSide,

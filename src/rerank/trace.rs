@@ -1,12 +1,12 @@
 //! Comparison trace capture for rerank runs.
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::io::{BufWriter, Write};
 use std::path::Path;
 use std::sync::mpsc;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ComparisonTrace {
     pub timestamp_ms: i64,
     pub comparison_index: usize,

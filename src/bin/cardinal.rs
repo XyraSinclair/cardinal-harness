@@ -11,6 +11,9 @@ use cardinal_harness::cache::SqlitePairwiseCache;
 use cardinal_harness::commander;
 use cardinal_harness::gateway::{NoopUsageSink, ProviderGateway};
 use cardinal_harness::pipeline::{self, ModelPreset, PipelineRequest};
+use cardinal_harness::rerank::dataset::{
+    export_pairwise_dataset, export_pairwise_prompt_grid, PairwiseDatasetExportOptions,
+};
 use cardinal_harness::rerank::{
     build_report, load_policy_from_path, render_report_markdown, JsonlTraceSink, ModelPolicy,
     PolicyRegistry, RerankRunOptions, TraceSink,
@@ -105,6 +108,34 @@ enum Commands {
         policy: Option<String>,
         #[arg(long)]
         cache_only: bool,
+    },
+    /// Export rerank request + trace JSONL into fine-tuning records
+    DatasetExport {
+        #[arg(long)]
+        request: PathBuf,
+        #[arg(long)]
+        response: Option<PathBuf>,
+        #[arg(long, required = true, num_args = 1..)]
+        trace: Vec<PathBuf>,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long)]
+        drop_cached: bool,
+        #[arg(long)]
+        drop_refusals: bool,
+    },
+    /// Export the full attribute x pair x orientation prompt grid for cache-seeded replay
+    PromptGridExport {
+        #[arg(long)]
+        request: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+        /// Cache model identifier. Defaults to request.model.
+        #[arg(long)]
+        model: Option<String>,
+        /// Emit only canonical A/B ordering, not both presentations.
+        #[arg(long)]
+        no_swaps: bool,
     },
     /// Run a rerank from JSON input (LLM calls)
     Rerank {
@@ -512,7 +543,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             curve_csv,
         } => {
             let results =
-                cardinal_harness::rerank::evaluation::run_synthetic_suite(case.as_deref());
+                cardinal_harness::rerank::evaluation::run_synthetic_suite(case.as_deref())?;
             let mut file = File::create(out)?;
             for result in &results {
                 let line = serde_json::to_string(result)?;
@@ -542,7 +573,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let results = cardinal_harness::rerank::evaluation::run_likert_baseline_suite(
                 case.as_deref(),
                 cfg,
-            );
+            )?;
             let mut file = File::create(out)?;
             for result in &results {
                 let line = serde_json::to_string(result)?;
@@ -601,6 +632,71 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let markdown = render_report_markdown(&report);
                 std::fs::write(out, markdown)?;
             }
+        }
+        Commands::DatasetExport {
+            request,
+            response,
+            trace,
+            out,
+            drop_cached,
+            drop_refusals,
+        } => {
+            let req: MultiRerankRequest = read_json(&request)?;
+            let resp: Option<MultiRerankResponse> = if let Some(path) = response {
+                Some(read_json(&path)?)
+            } else {
+                None
+            };
+
+            let mut traces = Vec::new();
+            for path in &trace {
+                traces.extend(read_jsonl(path)?);
+            }
+
+            let exported = export_pairwise_dataset(
+                &req,
+                resp.as_ref(),
+                &traces,
+                &PairwiseDatasetExportOptions {
+                    drop_cached,
+                    drop_refusals,
+                },
+            );
+            write_jsonl(&out, &exported.records)?;
+            eprintln!(
+                "[dataset-export] wrote {} records to {} (from {} traces; snapped_off_ladder={}; skipped cached={}, refusals={}, errors={}, incomplete={}, unknown_attribute={}, unknown_entity={})",
+                exported.stats.exported_records,
+                out.display(),
+                exported.stats.total_traces,
+                exported.stats.snapped_off_ladder,
+                exported.stats.skipped_cached,
+                exported.stats.skipped_refusals,
+                exported.stats.skipped_errors,
+                exported.stats.skipped_incomplete,
+                exported.stats.skipped_unknown_attribute,
+                exported.stats.skipped_unknown_entity,
+            );
+        }
+        Commands::PromptGridExport {
+            request,
+            out,
+            model,
+            no_swaps,
+        } => {
+            let req: MultiRerankRequest = read_json(&request)?;
+            let model = model
+                .or_else(|| req.model.clone())
+                .ok_or("prompt-grid-export requires --model or request.model")?;
+            let exported = export_pairwise_prompt_grid(&req, &model, !no_swaps);
+            write_jsonl(&out, &exported.records)?;
+            eprintln!(
+                "[prompt-grid-export] wrote {} records to {} (attributes={}; unordered_pairs_per_attribute={}; presentations_per_pair={})",
+                exported.stats.exported_records,
+                out.display(),
+                exported.stats.total_attributes,
+                exported.stats.unordered_pairs_per_attribute,
+                exported.stats.presentations_per_pair,
+            );
         }
         Commands::Rerank {
             request,
@@ -891,15 +987,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             let summary = pipeline::run_flywheel(
                 gateway,
-                Some(&cache_inst),
-                policy_obj,
                 flywheel_manifest,
-                &out_dir,
-                synthesis_out_dir.as_deref(),
-                trace_dir.as_deref(),
-                preset_override,
-                parallel,
-                gates,
+                pipeline::FlywheelRunConfig {
+                    cache: Some(&cache_inst),
+                    model_policy: policy_obj,
+                    out_dir: &out_dir,
+                    synthesis_out_dir: synthesis_out_dir.as_deref(),
+                    trace_dir: trace_dir.as_deref(),
+                    preset_override,
+                    parallel,
+                    gates,
+                },
             )
             .await;
 
@@ -1149,9 +1247,34 @@ fn read_json<T: serde::de::DeserializeOwned>(
     Ok(serde_json::from_str(&raw)?)
 }
 
+fn read_jsonl<T: serde::de::DeserializeOwned>(
+    path: &PathBuf,
+) -> Result<Vec<T>, Box<dyn std::error::Error>> {
+    let raw = std::fs::read_to_string(path)?;
+    let mut values = Vec::new();
+    for line in raw.lines() {
+        let trimmed = line.trim();
+        if trimmed.is_empty() {
+            continue;
+        }
+        values.push(serde_json::from_str(trimmed)?);
+    }
+    Ok(values)
+}
+
 fn write_json<T: serde::Serialize>(path: &PathBuf, value: &T) -> Result<(), io::Error> {
     let json = serde_json::to_string_pretty(value).map_err(io::Error::other)?;
     std::fs::write(path, json)
+}
+
+fn write_jsonl<T: serde::Serialize>(path: &PathBuf, values: &[T]) -> Result<(), io::Error> {
+    let mut out = String::new();
+    for value in values {
+        let line = serde_json::to_string(value).map_err(io::Error::other)?;
+        out.push_str(&line);
+        out.push('\n');
+    }
+    std::fs::write(path, out)
 }
 
 /// Parse "id:weight" attribute specs from CLI args.

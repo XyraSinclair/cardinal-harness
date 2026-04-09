@@ -14,12 +14,12 @@
 //! See `docs/ALGORITHM.md` for the full design rationale.
 
 pub mod anp;
-pub mod axes;
 pub mod cache;
 #[cfg(feature = "sqlite-store")]
 pub mod commander;
 pub mod discrete;
 pub mod gateway;
+pub mod logprob_resampling;
 pub mod pipeline;
 pub mod prompts;
 pub mod rating_engine;

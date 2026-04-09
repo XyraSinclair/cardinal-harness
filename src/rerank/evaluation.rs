@@ -23,12 +23,18 @@ use crate::trait_search::{
 
 type AttrUnits = (Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>);
 
+#[derive(Debug, thiserror::Error)]
+pub enum EvaluationError {
+    #[error("invalid synthetic gate spec: {0}")]
+    InvalidGate(#[from] crate::rerank::MultiRerankError),
+}
+
 fn parse_evaluation_gates<'a>(
     attributes: &'a [SyntheticAttribute],
     gates: &'a [MultiRerankGateSpec],
-) -> Vec<ParsedGateSpec<'a>> {
+) -> Result<Vec<ParsedGateSpec<'a>>, EvaluationError> {
     let attribute_ids: HashSet<&str> = attributes.iter().map(|attr| attr.id).collect();
-    validate_gate_specs(gates, &attribute_ids).expect("synthetic evaluation gates should be valid")
+    validate_gate_specs(gates, &attribute_ids).map_err(EvaluationError::from)
 }
 
 // =============================================================================
@@ -653,7 +659,7 @@ pub fn synthetic_cases() -> Vec<SyntheticCase> {
     ]
 }
 
-pub fn run_synthetic_suite(filter: Option<&str>) -> Vec<EvaluationResult> {
+pub fn run_synthetic_suite(filter: Option<&str>) -> Result<Vec<EvaluationResult>, EvaluationError> {
     let cases = synthetic_cases();
     let selected: Vec<SyntheticCase> = match filter {
         Some(name) => cases.into_iter().filter(|c| c.name == name).collect(),
@@ -666,7 +672,7 @@ pub fn run_synthetic_suite(filter: Option<&str>) -> Vec<EvaluationResult> {
         .collect()
 }
 
-pub fn run_synthetic_case(case: &SyntheticCase) -> EvaluationResult {
+pub fn run_synthetic_case(case: &SyntheticCase) -> Result<EvaluationResult, EvaluationError> {
     let mut rng = StdRng::seed_from_u64(case.seed);
 
     let n_entities = case.attributes.first().map(|a| a.scores.len()).unwrap_or(0);
@@ -694,7 +700,7 @@ pub fn run_synthetic_case(case: &SyntheticCase) -> EvaluationResult {
         min_explore_degree: case.topk.min_explore_degree,
     };
 
-    let parsed_gates = parse_evaluation_gates(&case.attributes, &case.gates);
+    let parsed_gates = parse_evaluation_gates(&case.attributes, &case.gates)?;
     let gates_cfg: Vec<GateSpec> = parsed_gates
         .iter()
         .map(|gate| {
@@ -948,7 +954,7 @@ pub fn run_synthetic_case(case: &SyntheticCase) -> EvaluationResult {
     }
 
     let true_scores = compute_ground_truth_scores(&case.attributes);
-    let true_feasible = compute_true_feasible(&case.attributes, &case.gates);
+    let true_feasible = compute_true_feasible(&case.attributes, &case.gates)?;
 
     let eval_indices: Vec<usize> = (0..n).filter(|&i| pred_feasible[i]).collect();
 
@@ -1010,7 +1016,7 @@ pub fn run_synthetic_case(case: &SyntheticCase) -> EvaluationResult {
         None
     };
 
-    EvaluationResult {
+    Ok(EvaluationResult {
         case_name: case.name.to_string(),
         metrics: EvaluationMetrics {
             kendall_tau,
@@ -1030,7 +1036,7 @@ pub fn run_synthetic_case(case: &SyntheticCase) -> EvaluationResult {
             rank_quality,
         },
         error_trajectory,
-    }
+    })
 }
 
 /// Run a single synthetic case through a simulated per-item Likert baseline.
@@ -1041,7 +1047,7 @@ pub fn run_synthetic_case(case: &SyntheticCase) -> EvaluationResult {
 pub fn run_likert_baseline_case(
     case: &SyntheticCase,
     cfg: LikertEvalConfig,
-) -> LikertEvaluationResult {
+) -> Result<LikertEvaluationResult, EvaluationError> {
     let mut rng = StdRng::seed_from_u64(case.seed ^ 0x9E37_79B9_7F4A_7C15);
     let n = case.attributes.first().map(|a| a.scores.len()).unwrap_or(0);
     let levels = cfg.levels.max(2);
@@ -1106,7 +1112,7 @@ pub fn run_likert_baseline_case(
         // Track an error trajectory using feasible-only top-k precision.
         if (step + 1) % stride == 0 || step + 1 == rating_budget {
             let (pred_scores, _, pred_feasible) =
-                infer_scores_from_likert(case, levels, &sums, &counts, false);
+                infer_scores_from_likert(case, levels, &sums, &counts, false)?;
             let true_scores = compute_ground_truth_scores(&case.attributes);
             let eval_indices: Vec<usize> = (0..n).filter(|&i| pred_feasible[i]).collect();
             let k = case.topk.k.min(eval_indices.len());
@@ -1120,9 +1126,9 @@ pub fn run_likert_baseline_case(
     }
 
     let (pred_scores, pred_vars, pred_feasible) =
-        infer_scores_from_likert(case, levels, &sums, &counts, true);
+        infer_scores_from_likert(case, levels, &sums, &counts, true)?;
     let true_scores = compute_ground_truth_scores(&case.attributes);
-    let true_feasible = compute_true_feasible(&case.attributes, &case.gates);
+    let true_feasible = compute_true_feasible(&case.attributes, &case.gates)?;
     let eval_indices: Vec<usize> = (0..n).filter(|&i| pred_feasible[i]).collect();
 
     let kendall_tau_all = kendall_tau_b(&pred_scores, &true_scores);
@@ -1171,7 +1177,7 @@ pub fn run_likert_baseline_case(
         (precision, recall)
     };
 
-    LikertEvaluationResult {
+    Ok(LikertEvaluationResult {
         case_name: case.name.to_string(),
         metrics: LikertEvaluationMetrics {
             kendall_tau,
@@ -1189,14 +1195,14 @@ pub fn run_likert_baseline_case(
             latency_ms: start_time.elapsed().as_millis(),
         },
         error_trajectory,
-    }
+    })
 }
 
 /// Run the Likert baseline across selected synthetic cases.
 pub fn run_likert_baseline_suite(
     filter: Option<&str>,
     cfg: LikertEvalConfig,
-) -> Vec<LikertEvaluationResult> {
+) -> Result<Vec<LikertEvaluationResult>, EvaluationError> {
     let cases = synthetic_cases();
     let selected: Vec<SyntheticCase> = match filter {
         Some(name) => cases.into_iter().filter(|c| c.name == name).collect(),
@@ -1245,7 +1251,7 @@ fn infer_scores_from_likert(
     sums: &HashMap<&str, Vec<f64>>,
     counts: &HashMap<&str, Vec<u32>>,
     strict_for_gates: bool,
-) -> (Vec<f64>, Vec<f64>, Vec<bool>) {
+) -> Result<(Vec<f64>, Vec<f64>, Vec<bool>), EvaluationError> {
     let n = case.attributes.first().map(|a| a.scores.len()).unwrap_or(0);
     let levels = levels.max(2);
     let mid = (levels as f64 + 1.0) / 2.0;
@@ -1315,7 +1321,7 @@ fn infer_scores_from_likert(
     }
 
     let mut feasible = vec![true; n];
-    let parsed_gates = parse_evaluation_gates(&case.attributes, &case.gates);
+    let parsed_gates = parse_evaluation_gates(&case.attributes, &case.gates)?;
     for gate in parsed_gates {
         let (latent, z, min_norm, pct) = per_attr_units
             .get(gate.attribute_id)
@@ -1334,7 +1340,7 @@ fn infer_scores_from_likert(
         }
     }
 
-    (u_mean, u_var, feasible)
+    Ok((u_mean, u_var, feasible))
 }
 
 fn simulate_pairwise(
@@ -1476,7 +1482,7 @@ fn compute_ground_truth_scores(attributes: &[SyntheticAttribute]) -> Vec<f64> {
 fn compute_true_feasible(
     attributes: &[SyntheticAttribute],
     gates: &[MultiRerankGateSpec],
-) -> Vec<bool> {
+) -> Result<Vec<bool>, EvaluationError> {
     let n = attributes.first().map(|a| a.scores.len()).unwrap_or(0);
     let mut feasible = vec![true; n];
 
@@ -1486,7 +1492,7 @@ fn compute_true_feasible(
         attr_units.insert(attr.id, (attr.scores.clone(), z, min_norm, pct));
     }
 
-    let parsed_gates = parse_evaluation_gates(attributes, gates);
+    let parsed_gates = parse_evaluation_gates(attributes, gates)?;
     for gate in parsed_gates {
         let Some((latent, z, min_norm, pct)) = attr_units.get(gate.attribute_id) else {
             continue;
@@ -1498,7 +1504,7 @@ fn compute_true_feasible(
         }
     }
 
-    feasible
+    Ok(feasible)
 }
 
 fn kendall_tau_b(x: &[f64], y: &[f64]) -> f64 {
@@ -1845,7 +1851,7 @@ mod tests {
 
     #[test]
     fn test_synthetic_suite_runs_all_cases() {
-        let results = run_synthetic_suite(None);
+        let results = run_synthetic_suite(None).expect("synthetic suite should run");
         assert!(results.len() >= 6, "should have at least 6 test cases");
 
         for result in &results {
@@ -1862,7 +1868,8 @@ mod tests {
 
     #[test]
     fn test_synthetic_clean_ordering_is_accurate() {
-        let results = run_synthetic_suite(Some("clean_ordering_10"));
+        let results =
+            run_synthetic_suite(Some("clean_ordering_10")).expect("synthetic suite should run");
         assert_eq!(results.len(), 1);
         let r = &results[0];
 
@@ -1877,7 +1884,8 @@ mod tests {
 
     #[test]
     fn test_synthetic_rank_quality_populated() {
-        let results = run_synthetic_suite(Some("noisy_ordering_50"));
+        let results =
+            run_synthetic_suite(Some("noisy_ordering_50")).expect("synthetic suite should run");
         assert_eq!(results.len(), 1);
         let r = &results[0];
 
@@ -1896,7 +1904,8 @@ mod tests {
     #[test]
     fn test_likert_baseline_runs() {
         let results =
-            run_likert_baseline_suite(Some("clean_ordering_10"), LikertEvalConfig::default());
+            run_likert_baseline_suite(Some("clean_ordering_10"), LikertEvalConfig::default())
+                .expect("likert baseline suite should run");
         assert_eq!(results.len(), 1);
         let r = &results[0];
 
@@ -1984,10 +1993,8 @@ mod tests {
             seed: 7,
         };
 
-        let panic = std::panic::catch_unwind(|| run_synthetic_case(&case));
-        assert!(
-            panic.is_err(),
-            "invalid gate specs should not be silently ignored"
-        );
+        let error = run_synthetic_case(&case)
+            .expect_err("invalid gate specs should not be silently ignored");
+        assert!(matches!(error, EvaluationError::InvalidGate(_)));
     }
 }

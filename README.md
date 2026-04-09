@@ -38,13 +38,7 @@ The core method. Ratio ladder from 1.0 to 26.0 (approximately geometric in log-s
 
 Per-item absolute ratings on configurable scales (5-point, 10-point). Implemented as a comparison baseline — the `eval-likert` CLI command runs head-to-head evaluations showing how pairwise ratios converge faster and more reliably than Likert for the same token budget.
 
-### Planned: logprob extraction
-
-Many models expose token-level log-probabilities. For structured outputs (ratio selection from a fixed ladder), logprobs over the ratio tokens provide a *direct* confidence signal that's cheaper and potentially more calibrated than asking the model to self-report confidence. See [docs/RESEARCH_THREADS.md](docs/RESEARCH_THREADS.md#logprob-extraction).
-
-### Planned: hybrid elicitation
-
-Combine cheap Likert pre-screening (identify obviously dominated items) with expensive pairwise ratios (resolve the top-K boundary). The planner already supports per-comparison cost weighting — extending this to heterogeneous elicitation methods is a natural next step.
+Longer-horizon research on logprob extraction, hybrid elicitation, and other measurement variants now lives in `openpriors-research/docs/cardinal_harness_research_threads.md`.
 
 ## Objective functions
 
@@ -96,8 +90,6 @@ Two implementation details matter:
 
 The planner's query selection objective blends **information gain** (from spectral graph theory — effective resistance) with **rank risk** (weighted probability of frontier inversions). The mixing parameter `lambda_risk` controls the blend: pure information gain explores uniformly, pure rank risk focuses narrowly on the K-boundary.
 
-See [docs/RESEARCH_THREADS.md](docs/RESEARCH_THREADS.md#objective-functions) for discussion of additional objectives and their trade-offs.
-
 ## Cost model
 
 Cost tracking operates at nanodollar precision (1e-9 USD) with full per-comparison attribution.
@@ -109,18 +101,6 @@ cost = input_tokens * input_price + output_tokens * output_price
 ```
 
 Provider pricing registry covers Claude, GPT, Kimi, and embedding models. A 20% rerank markup (6/5 ratio) applies on top of provider cost for service billing.
-
-### Planned: cache-aware cost model
-
-Modern inference providers implement **prompt caching** with a paged KV-cache architecture. When multiple requests share a common prefix (e.g., the system prompt + prompt template), cached tokens cost 10-25% of uncached tokens. This fundamentally changes the cost optimization landscape for cardinal-harness because:
-
-- All comparisons for an attribute share the same system prompt + template (~500-2000 tokens)
-- Entity text varies per comparison but the prefix is stable
-- With prompt caching, the marginal cost of additional comparisons drops significantly after the first
-
-The cost model should respect this structure: `cost = cache_creation_tokens * full_price + cache_hit_tokens * cached_price + uncached_tokens * full_price + output_tokens * output_price`. The planner can then make better cost-benefit decisions about whether an additional comparison is worth its (reduced) marginal cost.
-
-See [docs/RESEARCH_THREADS.md](docs/RESEARCH_THREADS.md#prompt-caching) for the full analysis including paged cache alignment considerations.
 
 ### Model ladder
 
@@ -137,7 +117,6 @@ See [docs/RESEARCH_THREADS.md](docs/RESEARCH_THREADS.md#prompt-caching) for the 
 - **OpenRouter integration** for model access with dynamic model-ladder switching
 - **Typed ANP contexts** (`composable_ratio` vs `pairwise_only_ratio`) with supermatrix utilities
 - **ANP active query helpers** (next context + next pair proposal)
-- **12 orthogonal evaluation axes** organized into epistemic, instrumental, and strategic clusters
 - **Synthetic evaluation suite** with 6 test scenarios, convergence curves, and head-to-head Likert comparison
 - **Nanodollar cost tracking** with per-comparison attribution, usage sinks, and audit trails
 - **Commander** strategic agent for codebase-scale evaluation (briefing, decomposition, flywheel, extraction, reflection)
@@ -245,27 +224,12 @@ See `examples/quickstart.rs` for a fully commented version.
 | `trait_search` | Multi-attribute utility composition, MAD normalization, gating, top-K uncertainty |
 | `rerank` | Orchestration loop, pairwise LLM comparison, stopping criteria, trace/hooks |
 | `anp` | Typed ANP contexts, confidence-weighted local fits, weighted supermatrix |
-| `axes` | 12 orthogonal evaluation dimensions (epistemic/instrumental/strategic clusters) |
 | `prompts` | Ratio ladder prompt templates with entity context placement |
 | `cache` | SQLite-backed pairwise memoization with composite key hashing |
 | `gateway` | OpenRouter client, pricing registry, usage tracking, model ladder |
 | `pipeline` | Multi-model generate/rank/synthesize pipeline |
 | `commander` | Strategic agent: briefing, decomposition, flywheel, extraction, reflection |
 | `text_chunking` | Token-aware semantic chunking with overlap |
-
-## Evaluation axes
-
-12 orthogonal dimensions organized into three clusters, designed for both code and idea evaluation:
-
-**Epistemic** (quality of understanding): groundedness, calibration, resolution, causal depth, compositional reach
-
-**Instrumental** (quality of proposed action): leverage, robustness, option value, economy
-
-**Strategic** (meta-judgment): information value, temporal shape, prioritization
-
-Each cluster feeds into the next via typed ANP edges: epistemic enables instrumental design (composable ratio), calibration enables information value assessment (composable ratio), temporal shape locally constrains interventions (pairwise-only ratio — not globally propagatable).
-
-See `src/axes.rs` for the full axis definitions with context-sensitive weight profiles.
 
 ## Pairwise cache
 
@@ -326,27 +290,23 @@ cargo run --bin cardinal -- policy load --config policy.json
 cargo run --bin cardinal -- rerank --request input.json --out output.json --lock-cache --cache-only --rng-seed 1337
 ```
 
-## Open research threads
+## Research notes
 
-See [docs/RESEARCH_THREADS.md](docs/RESEARCH_THREADS.md) for detailed analysis of:
+Long-form research notes and archived experiments now live in `openpriors-research/docs/`:
 
-- **Prompt caching** — exploiting paged KV-cache structure for 75-90% cost reduction on shared prefixes, and how cache-aware cost models change planner behavior
-- **Logprob extraction** — using token-level log-probabilities as direct confidence signals, avoiding self-reported confidence calibration issues
-- **Likert integration** — hybrid elicitation combining cheap absolute ratings (screening) with expensive pairwise ratios (top-K resolution)
-- **Labs coherence metrics** — future opportunities as providers expose internal coherence/consistency measurements as API parameters
-- **Objective function zoo** — CURL, weighted discordance, Bayesian regret, and their trade-offs for different use cases
-- **Rater calibration** — learning per-model bias/variance profiles from historical judgments
-- **Confidence model selection** — beyond power-law mapping (Beta distributions, logistic, learned curves)
+- `cardinal_harness_research_threads.md`
+- `cardinal_harness_foundations.md`
+- `cardinal_harness_experiments.md`
 
 ## Documentation
 
 | Document | Contents |
 |----------|----------|
 | [`docs/ALGORITHM.md`](docs/ALGORITHM.md) | Full design rationale: why pairwise ratios, IRLS, Huber loss, stopping rules |
-| [`docs/FOUNDATIONS_MATRYOSHKA.md`](docs/FOUNDATIONS_MATRYOSHKA.md) | Nested dense explanations of the system at increasing token budgets |
 | [`docs/PROMPTS.md`](docs/PROMPTS.md) | Prompt template slugs and context placement details |
 | [`docs/ANP.md`](docs/ANP.md) | ANP context typing and supermatrix usage |
-| [`docs/RESEARCH_THREADS.md`](docs/RESEARCH_THREADS.md) | Open research directions and opportunities |
+
+Archived research notes were moved to `openpriors-research/docs/` so this repo can stay focused on supported engine docs.
 
 ## Contributing
 

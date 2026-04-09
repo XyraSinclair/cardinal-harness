@@ -9,10 +9,26 @@ use crate::gateway::ChatGateway;
 use crate::rerank::model_policy::ModelPolicy;
 use crate::rerank::types::MultiRerankGateSpec;
 
-use super::{
+use super::core::{
     default_extended_attributes, run_pipeline_with_trace_file, ContextFile, ModelPreset,
     PipelineAttribute, PipelineRankConfig, PipelineRequest, PipelineSession,
 };
+
+/// Execution controls for a flywheel run.
+///
+/// This keeps transport, caching, output, tracing, and ranking gates together
+/// instead of forcing callers to thread a long positional argument list.
+#[derive(Clone)]
+pub struct FlywheelRunConfig<'a> {
+    pub cache: Option<&'a dyn PairwiseCache>,
+    pub model_policy: Option<Arc<dyn ModelPolicy>>,
+    pub out_dir: &'a Path,
+    pub synthesis_out_dir: Option<&'a Path>,
+    pub trace_dir: Option<&'a Path>,
+    pub preset_override: Option<ModelPreset>,
+    pub parallel: usize,
+    pub gates: Vec<MultiRerankGateSpec>,
+}
 
 fn write_task_artifacts(
     task_id: &str,
@@ -125,16 +141,10 @@ pub struct FlywheelTaskSummary {
 /// Run a flywheel: iterate tasks from a manifest and run the pipeline for each.
 pub async fn run_flywheel(
     gateway: Arc<dyn ChatGateway>,
-    cache: Option<&dyn PairwiseCache>,
-    model_policy: Option<Arc<dyn ModelPolicy>>,
     manifest: FlywheelManifest,
-    out_dir: &Path,
-    synthesis_out_dir: Option<&Path>,
-    trace_dir: Option<&Path>,
-    preset_override: Option<ModelPreset>,
-    parallel: usize,
-    gates: Vec<MultiRerankGateSpec>,
+    config: FlywheelRunConfig<'_>,
 ) -> FlywheelSummary {
+    let parallel = config.parallel.max(1);
     let attributes = manifest
         .attributes
         .clone()
@@ -147,7 +157,7 @@ pub async fn run_flywheel(
 
     let rank_config = manifest.rank_config.clone().unwrap_or_default();
 
-    let preset = preset_override.or(manifest.preset);
+    let preset = config.preset_override.or(manifest.preset);
 
     let task_count = manifest.tasks.len();
     eprintln!(
@@ -163,16 +173,17 @@ pub async fn run_flywheel(
 
     let task_futures = tasks.into_iter().enumerate().map(|(idx, task)| {
         let gateway = gateway.clone();
-        let model_policy = model_policy.clone();
+        let cache = config.cache;
+        let model_policy = config.model_policy.clone();
         let attributes = attributes.clone();
         let default_synth = default_synth.clone();
         let rank_config = rank_config.clone();
         let shared_context = manifest.context_files.clone();
         let max_context_tokens = manifest.max_context_tokens;
-        let out_dir = out_dir.to_path_buf();
-        let synthesis_out_dir = synthesis_out_dir.map(|p| p.to_path_buf());
-        let trace_dir = trace_dir.map(|p| p.to_path_buf());
-        let gates = gates.clone();
+        let out_dir = config.out_dir.to_path_buf();
+        let synthesis_out_dir = config.synthesis_out_dir.map(|p| p.to_path_buf());
+        let trace_dir = config.trace_dir.map(|p| p.to_path_buf());
+        let gates = config.gates.clone();
 
         async move {
             let task_id = task.id.clone();

@@ -131,7 +131,8 @@ pub fn plan_ratio_resampling(
                     &aligned.suffix_affix,
                 )?;
                 let branch_prefix = format!("{prefix_before}{core}");
-                let candidate_ratios = ladder_candidates_with_prefix(&ladder_strings, &branch_prefix);
+                let candidate_ratios =
+                    ladder_candidates_with_prefix(&ladder_strings, &branch_prefix);
                 if candidate_ratios.is_empty() {
                     return None;
                 }
@@ -327,7 +328,10 @@ mod tests {
             .iter()
             .find(|branch| branch.branch_prefix == "1.")
             .expect("1. branch");
-        assert_eq!(one_dot.candidate_ratios, vec![1.0, 1.05, 1.1, 1.2, 1.3, 1.5, 1.75]);
+        assert_eq!(
+            one_dot.candidate_ratios,
+            vec![1.0, 1.05, 1.1, 1.2, 1.3, 1.5, 1.75]
+        );
     }
 
     #[test]
@@ -356,7 +360,10 @@ mod tests {
         let plan = plan_ratio_resampling(&logprobs, 2.1, RATIO_LADDER, 0.05, 4);
         assert_eq!(plan.ratio_token_span, Some((0, 3)));
         assert_eq!(plan.steps[0].selected_token, "2");
-        assert!(plan.branches.iter().any(|branch| branch.branch_prefix == "1"));
+        assert!(plan
+            .branches
+            .iter()
+            .any(|branch| branch.branch_prefix == "1"));
     }
 
     #[test]

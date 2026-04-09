@@ -308,6 +308,8 @@ pub enum StoreError {
     Sqlite(#[from] rusqlite::Error),
     #[error("io error: {0}")]
     Io(#[from] std::io::Error),
+    #[error("store concurrency error: {0}")]
+    Concurrency(String),
     #[error("store lock poisoned")]
     Poisoned,
     #[error("task join error: {0}")]
@@ -363,7 +365,7 @@ impl CommanderStore {
         PathBuf::from(".cardinal_commander.sqlite")
     }
 
-    /// Acquire the semaphore, then lock the connection.
+    /// Lock the connection.
     /// L2: Recover from mutex poisoning — the SQLite connection is still usable.
     fn with_conn<F, R>(&self, f: F) -> Result<R, StoreError>
     where
@@ -374,6 +376,23 @@ impl CommanderStore {
             .lock()
             .unwrap_or_else(|poisoned| poisoned.into_inner());
         f(&guard)
+    }
+
+    async fn with_blocking_conn<F, R>(&self, f: F) -> Result<R, StoreError>
+    where
+        F: FnOnce(&Connection) -> Result<R, StoreError> + Send + 'static,
+        R: Send + 'static,
+    {
+        let store = self.clone();
+        let _permit = self
+            .sem
+            .clone()
+            .acquire_owned()
+            .await
+            .map_err(|_| StoreError::Concurrency("semaphore closed".to_string()))?;
+        tokio::task::spawn_blocking(move || store.with_conn(f))
+            .await
+            .map_err(|e| StoreError::Join(e.to_string()))?
     }
 
     fn create_tables(conn: &Connection) -> Result<(), StoreError> {
@@ -514,32 +533,27 @@ impl CommanderStore {
         preset: &str,
         budget_nanodollars: i64,
     ) -> Result<i64, StoreError> {
-        let store = self.clone();
         let directive = directive.to_string();
         let commander_model = commander_model.to_string();
         let preset = preset.to_string();
-        let _permit = self.sem.acquire().await.expect("semaphore closed");
-        tokio::task::spawn_blocking(move || {
-            store.with_conn(|conn| {
-                let now = now_epoch();
-                conn.execute(
-                    "INSERT INTO runs (directive, commander_model, preset, budget_nanodollars, \
-                     status, created_at, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
-                    params![
-                        directive,
-                        commander_model,
-                        preset,
-                        budget_nanodollars,
-                        RunStatus::Running.as_str(),
-                        now,
-                        now,
-                    ],
-                )?;
-                Ok(conn.last_insert_rowid())
-            })
+        self.with_blocking_conn(move |conn| {
+            let now = now_epoch();
+            conn.execute(
+                "INSERT INTO runs (directive, commander_model, preset, budget_nanodollars, \
+                 status, created_at, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
+                params![
+                    directive,
+                    commander_model,
+                    preset,
+                    budget_nanodollars,
+                    RunStatus::Running.as_str(),
+                    now,
+                    now,
+                ],
+            )?;
+            Ok(conn.last_insert_rowid())
         })
         .await
-        .map_err(|e| StoreError::Join(e.to_string()))?
     }
 
     pub async fn update_run_status(
@@ -547,22 +561,17 @@ impl CommanderStore {
         run_id: i64,
         status: RunStatus,
     ) -> Result<(), StoreError> {
-        let store = self.clone();
-        let _permit = self.sem.acquire().await.expect("semaphore closed");
-        tokio::task::spawn_blocking(move || {
-            store.with_conn(|conn| {
-                let rows = conn.execute(
-                    "UPDATE runs SET status = ?1, updated_at = ?2 WHERE id = ?3",
-                    params![status.as_str(), now_epoch(), run_id],
-                )?;
-                if rows == 0 {
-                    return Err(StoreError::NotFound(format!("run {run_id}")));
-                }
-                Ok(())
-            })
+        self.with_blocking_conn(move |conn| {
+            let rows = conn.execute(
+                "UPDATE runs SET status = ?1, updated_at = ?2 WHERE id = ?3",
+                params![status.as_str(), now_epoch(), run_id],
+            )?;
+            if rows == 0 {
+                return Err(StoreError::NotFound(format!("run {run_id}")));
+            }
+            Ok(())
         })
         .await
-        .map_err(|e| StoreError::Join(e.to_string()))?
     }
 
     pub async fn update_run_costs(
@@ -574,85 +583,70 @@ impl CommanderStore {
         tasks_completed: i64,
         tasks_failed: i64,
     ) -> Result<(), StoreError> {
-        let store = self.clone();
-        let _permit = self.sem.acquire().await.expect("semaphore closed");
-        tokio::task::spawn_blocking(move || {
-            store.with_conn(|conn| {
-                let total = decompose_cost
-                    .saturating_add(flywheel_cost)
-                    .saturating_add(extract_cost);
-                let rows = conn.execute(
-                    "UPDATE runs SET decompose_cost_nanodollars = ?1, \
-                     flywheel_cost_nanodollars = ?2, extract_cost_nanodollars = ?3, \
-                     total_cost_nanodollars = ?4, tasks_completed = ?5, tasks_failed = ?6, \
-                     updated_at = ?7 WHERE id = ?8",
-                    params![
-                        decompose_cost,
-                        flywheel_cost,
-                        extract_cost,
-                        total,
-                        tasks_completed,
-                        tasks_failed,
-                        now_epoch(),
-                        run_id,
-                    ],
-                )?;
-                if rows == 0 {
-                    return Err(StoreError::NotFound(format!("run {run_id}")));
-                }
-                Ok(())
-            })
+        self.with_blocking_conn(move |conn| {
+            let total = decompose_cost
+                .saturating_add(flywheel_cost)
+                .saturating_add(extract_cost);
+            let rows = conn.execute(
+                "UPDATE runs SET decompose_cost_nanodollars = ?1, \
+                 flywheel_cost_nanodollars = ?2, extract_cost_nanodollars = ?3, \
+                 total_cost_nanodollars = ?4, tasks_completed = ?5, tasks_failed = ?6, \
+                 updated_at = ?7 WHERE id = ?8",
+                params![
+                    decompose_cost,
+                    flywheel_cost,
+                    extract_cost,
+                    total,
+                    tasks_completed,
+                    tasks_failed,
+                    now_epoch(),
+                    run_id,
+                ],
+            )?;
+            if rows == 0 {
+                return Err(StoreError::NotFound(format!("run {run_id}")));
+            }
+            Ok(())
         })
         .await
-        .map_err(|e| StoreError::Join(e.to_string()))?
     }
 
     pub async fn get_run(&self, run_id: i64) -> Result<Run, StoreError> {
-        let store = self.clone();
-        let _permit = self.sem.acquire().await.expect("semaphore closed");
-        tokio::task::spawn_blocking(move || {
-            store.with_conn(|conn| {
-                conn.query_row(
-                    "SELECT id, directive, commander_model, preset, budget_nanodollars, status, \
-                     decompose_cost_nanodollars, flywheel_cost_nanodollars, extract_cost_nanodollars, \
-                     total_cost_nanodollars, tasks_completed, tasks_failed, created_at, updated_at \
-                     FROM runs WHERE id = ?1",
-                    params![run_id],
-                    |row| row_to_run(row),
-                )
-                .map_err(|e| match e {
-                    rusqlite::Error::QueryReturnedNoRows => {
-                        StoreError::NotFound(format!("run {run_id}"))
-                    }
-                    other => StoreError::Sqlite(other),
-                })
+        self.with_blocking_conn(move |conn| {
+            conn.query_row(
+                "SELECT id, directive, commander_model, preset, budget_nanodollars, status, \
+                 decompose_cost_nanodollars, flywheel_cost_nanodollars, extract_cost_nanodollars, \
+                 total_cost_nanodollars, tasks_completed, tasks_failed, created_at, updated_at \
+                 FROM runs WHERE id = ?1",
+                params![run_id],
+                |row| row_to_run(row),
+            )
+            .map_err(|e| match e {
+                rusqlite::Error::QueryReturnedNoRows => {
+                    StoreError::NotFound(format!("run {run_id}"))
+                }
+                other => StoreError::Sqlite(other),
             })
         })
         .await
-        .map_err(|e| StoreError::Join(e.to_string()))?
     }
 
     pub async fn list_runs(&self) -> Result<Vec<Run>, StoreError> {
-        let store = self.clone();
-        let _permit = self.sem.acquire().await.expect("semaphore closed");
-        tokio::task::spawn_blocking(move || {
-            store.with_conn(|conn| {
-                let mut stmt = conn.prepare(
-                    "SELECT id, directive, commander_model, preset, budget_nanodollars, status, \
-                     decompose_cost_nanodollars, flywheel_cost_nanodollars, extract_cost_nanodollars, \
-                     total_cost_nanodollars, tasks_completed, tasks_failed, created_at, updated_at \
-                     FROM runs ORDER BY id DESC",
-                )?;
-                let mut rows = stmt.query([])?;
-                let mut runs = Vec::new();
-                while let Some(row) = rows.next()? {
-                    runs.push(row_to_run(row)?);
-                }
-                Ok(runs)
-            })
+        self.with_blocking_conn(move |conn| {
+            let mut stmt = conn.prepare(
+                "SELECT id, directive, commander_model, preset, budget_nanodollars, status, \
+                 decompose_cost_nanodollars, flywheel_cost_nanodollars, extract_cost_nanodollars, \
+                 total_cost_nanodollars, tasks_completed, tasks_failed, created_at, updated_at \
+                 FROM runs ORDER BY id DESC",
+            )?;
+            let mut rows = stmt.query([])?;
+            let mut runs = Vec::new();
+            while let Some(row) = rows.next()? {
+                runs.push(row_to_run(row)?);
+            }
+            Ok(runs)
         })
         .await
-        .map_err(|e| StoreError::Join(e.to_string()))?
     }
 
     // -------------------------------------------------------------------------
@@ -669,37 +663,32 @@ impl CommanderStore {
         context_globs: &str,
         rationale: &str,
     ) -> Result<i64, StoreError> {
-        let store = self.clone();
         let task_id = task_id.to_string();
         let prompt = prompt.to_string();
         let system_prompt = system_prompt.map(String::from);
         let context_globs = context_globs.to_string();
         let rationale = rationale.to_string();
-        let _permit = self.sem.acquire().await.expect("semaphore closed");
-        tokio::task::spawn_blocking(move || {
-            store.with_conn(|conn| {
-                let now = now_epoch();
-                conn.execute(
-                    "INSERT INTO tasks (run_id, task_index, task_id, prompt, system_prompt, \
-                     context_globs, rationale, created_at, updated_at) \
-                     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
-                    params![
-                        run_id,
-                        task_index,
-                        task_id,
-                        prompt,
-                        system_prompt,
-                        context_globs,
-                        rationale,
-                        now,
-                        now,
-                    ],
-                )?;
-                Ok(conn.last_insert_rowid())
-            })
+        self.with_blocking_conn(move |conn| {
+            let now = now_epoch();
+            conn.execute(
+                "INSERT INTO tasks (run_id, task_index, task_id, prompt, system_prompt, \
+                 context_globs, rationale, created_at, updated_at) \
+                 VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
+                params![
+                    run_id,
+                    task_index,
+                    task_id,
+                    prompt,
+                    system_prompt,
+                    context_globs,
+                    rationale,
+                    now,
+                    now,
+                ],
+            )?;
+            Ok(conn.last_insert_rowid())
         })
         .await
-        .map_err(|e| StoreError::Join(e.to_string()))?
     }
 
     pub async fn update_task_result(
@@ -711,60 +700,50 @@ impl CommanderStore {
         top_model: Option<&str>,
         synthesis_content: Option<&str>,
     ) -> Result<(), StoreError> {
-        let store = self.clone();
         let task_id = task_id.to_string();
         let top_model = top_model.map(String::from);
         let synthesis_content = synthesis_content.map(String::from);
-        let _permit = self.sem.acquire().await.expect("semaphore closed");
-        tokio::task::spawn_blocking(move || {
-            store.with_conn(|conn| {
-                let rows = conn.execute(
-                    "UPDATE tasks SET success = ?1, cost_nanodollars = ?2, top_model = ?3, \
-                     synthesis_content = ?4, updated_at = ?5 \
-                     WHERE run_id = ?6 AND task_id = ?7",
-                    params![
-                        success as i64,
-                        cost_nanodollars,
-                        top_model,
-                        synthesis_content,
-                        now_epoch(),
-                        run_id,
-                        task_id,
-                    ],
-                )?;
-                if rows == 0 {
-                    return Err(StoreError::NotFound(format!(
-                        "task {task_id} in run {run_id}"
-                    )));
-                }
-                Ok(())
-            })
+        self.with_blocking_conn(move |conn| {
+            let rows = conn.execute(
+                "UPDATE tasks SET success = ?1, cost_nanodollars = ?2, top_model = ?3, \
+                 synthesis_content = ?4, updated_at = ?5 \
+                 WHERE run_id = ?6 AND task_id = ?7",
+                params![
+                    success as i64,
+                    cost_nanodollars,
+                    top_model,
+                    synthesis_content,
+                    now_epoch(),
+                    run_id,
+                    task_id,
+                ],
+            )?;
+            if rows == 0 {
+                return Err(StoreError::NotFound(format!(
+                    "task {task_id} in run {run_id}"
+                )));
+            }
+            Ok(())
         })
         .await
-        .map_err(|e| StoreError::Join(e.to_string()))?
     }
 
     pub async fn get_tasks_for_run(&self, run_id: i64) -> Result<Vec<Task>, StoreError> {
-        let store = self.clone();
-        let _permit = self.sem.acquire().await.expect("semaphore closed");
-        tokio::task::spawn_blocking(move || {
-            store.with_conn(|conn| {
-                let mut stmt = conn.prepare(
-                    "SELECT id, run_id, task_index, task_id, prompt, system_prompt, context_globs, \
-                     rationale, success, cost_nanodollars, top_model, synthesis_content, \
-                     created_at, updated_at \
-                     FROM tasks WHERE run_id = ?1 ORDER BY task_index",
-                )?;
-                let mut rows = stmt.query(params![run_id])?;
-                let mut tasks = Vec::new();
-                while let Some(row) = rows.next()? {
-                    tasks.push(row_to_task(row)?);
-                }
-                Ok(tasks)
-            })
+        self.with_blocking_conn(move |conn| {
+            let mut stmt = conn.prepare(
+                "SELECT id, run_id, task_index, task_id, prompt, system_prompt, context_globs, \
+                 rationale, success, cost_nanodollars, top_model, synthesis_content, \
+                 created_at, updated_at \
+                 FROM tasks WHERE run_id = ?1 ORDER BY task_index",
+            )?;
+            let mut rows = stmt.query(params![run_id])?;
+            let mut tasks = Vec::new();
+            while let Some(row) = rows.next()? {
+                tasks.push(row_to_task(row)?);
+            }
+            Ok(tasks)
         })
         .await
-        .map_err(|e| StoreError::Join(e.to_string()))?
     }
 
     // -------------------------------------------------------------------------
@@ -782,128 +761,113 @@ impl CommanderStore {
         affected_files: &str,
         estimated_effort: EstimatedEffort,
     ) -> Result<i64, StoreError> {
-        let store = self.clone();
         let task_id = task_id.to_string();
         let title = title.to_string();
         let description = description.to_string();
         let affected_files = affected_files.to_string();
-        let _permit = self.sem.acquire().await.expect("semaphore closed");
-        tokio::task::spawn_blocking(move || {
-            store.with_conn(|conn| {
-                let now = now_epoch();
-                // H6: Retry on short_id collision (12-char hex = 48 bits)
-                for attempt in 0..SHORT_ID_RETRIES {
-                    let short_id = uuid::Uuid::new_v4().to_string()[..SHORT_ID_LEN].to_string();
-                    match conn.execute(
-                        "INSERT INTO proposals (short_id, run_id, task_id, title, description, \
-                         category, priority, affected_files, estimated_effort, status, \
-                         created_at, updated_at) \
-                         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)",
-                        params![
-                            short_id,
-                            run_id,
-                            task_id,
-                            title,
-                            description,
-                            category.as_str(),
-                            priority.as_str(),
-                            affected_files,
-                            estimated_effort.as_str(),
-                            ProposalStatus::Pending.as_str(),
-                            now,
-                            now,
-                        ],
-                    ) {
-                        Ok(_) => return Ok(conn.last_insert_rowid()),
-                        Err(rusqlite::Error::SqliteFailure(err, _))
-                            if err.code == rusqlite::ErrorCode::ConstraintViolation
-                                && attempt < SHORT_ID_RETRIES - 1 =>
-                        {
-                            continue; // Retry with new UUID
-                        }
-                        Err(e) => return Err(StoreError::Sqlite(e)),
+        self.with_blocking_conn(move |conn| {
+            let now = now_epoch();
+            // H6: Retry on short_id collision (12-char hex = 48 bits)
+            for attempt in 0..SHORT_ID_RETRIES {
+                let short_id = uuid::Uuid::new_v4().to_string()[..SHORT_ID_LEN].to_string();
+                match conn.execute(
+                    "INSERT INTO proposals (short_id, run_id, task_id, title, description, \
+                     category, priority, affected_files, estimated_effort, status, \
+                     created_at, updated_at) \
+                     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)",
+                    params![
+                        short_id,
+                        run_id,
+                        task_id,
+                        title,
+                        description,
+                        category.as_str(),
+                        priority.as_str(),
+                        affected_files,
+                        estimated_effort.as_str(),
+                        ProposalStatus::Pending.as_str(),
+                        now,
+                        now,
+                    ],
+                ) {
+                    Ok(_) => return Ok(conn.last_insert_rowid()),
+                    Err(rusqlite::Error::SqliteFailure(err, _))
+                        if err.code == rusqlite::ErrorCode::ConstraintViolation
+                            && attempt < SHORT_ID_RETRIES - 1 =>
+                    {
+                        continue;
                     }
+                    Err(e) => return Err(StoreError::Sqlite(e)),
                 }
-                Err(StoreError::NotFound(
-                    "failed to generate unique proposal short_id after retries".to_string(),
-                ))
-            })
+            }
+            Err(StoreError::NotFound(
+                "failed to generate unique proposal short_id after retries".to_string(),
+            ))
         })
         .await
-        .map_err(|e| StoreError::Join(e.to_string()))?
     }
 
     pub async fn list_proposals(
         &self,
         status_filter: Option<ProposalStatus>,
     ) -> Result<Vec<Proposal>, StoreError> {
-        let store = self.clone();
-        let _permit = self.sem.acquire().await.expect("semaphore closed");
-        tokio::task::spawn_blocking(move || {
-            store.with_conn(|conn| {
-                let (sql, filter_val) = if let Some(status) = status_filter {
-                    (
-                        "SELECT id, short_id, run_id, task_id, title, description, category, \
-                         priority, affected_files, estimated_effort, status, reviewer_notes, \
-                         created_at, updated_at FROM proposals WHERE status = ?1 \
-                         ORDER BY \
-                           CASE priority WHEN 'critical' THEN 0 WHEN 'high' THEN 1 \
-                           WHEN 'medium' THEN 2 WHEN 'low' THEN 3 END, id",
-                        Some(status.as_str().to_string()),
-                    )
-                } else {
-                    (
-                        "SELECT id, short_id, run_id, task_id, title, description, category, \
-                         priority, affected_files, estimated_effort, status, reviewer_notes, \
-                         created_at, updated_at FROM proposals \
-                         ORDER BY \
-                           CASE priority WHEN 'critical' THEN 0 WHEN 'high' THEN 1 \
-                           WHEN 'medium' THEN 2 WHEN 'low' THEN 3 END, id",
-                        None,
-                    )
-                };
+        self.with_blocking_conn(move |conn| {
+            let (sql, filter_val) = if let Some(status) = status_filter {
+                (
+                    "SELECT id, short_id, run_id, task_id, title, description, category, \
+                     priority, affected_files, estimated_effort, status, reviewer_notes, \
+                     created_at, updated_at FROM proposals WHERE status = ?1 \
+                     ORDER BY \
+                       CASE priority WHEN 'critical' THEN 0 WHEN 'high' THEN 1 \
+                       WHEN 'medium' THEN 2 WHEN 'low' THEN 3 END, id",
+                    Some(status.as_str().to_string()),
+                )
+            } else {
+                (
+                    "SELECT id, short_id, run_id, task_id, title, description, category, \
+                     priority, affected_files, estimated_effort, status, reviewer_notes, \
+                     created_at, updated_at FROM proposals \
+                     ORDER BY \
+                       CASE priority WHEN 'critical' THEN 0 WHEN 'high' THEN 1 \
+                       WHEN 'medium' THEN 2 WHEN 'low' THEN 3 END, id",
+                    None,
+                )
+            };
 
-                let mut stmt = conn.prepare(sql)?;
-                let mut rows = if let Some(ref val) = filter_val {
-                    stmt.query(params![val])?
-                } else {
-                    stmt.query([])?
-                };
+            let mut stmt = conn.prepare(sql)?;
+            let mut rows = if let Some(ref val) = filter_val {
+                stmt.query(params![val])?
+            } else {
+                stmt.query([])?
+            };
 
-                let mut proposals = Vec::new();
-                while let Some(row) = rows.next()? {
-                    proposals.push(row_to_proposal(row)?);
-                }
-                Ok(proposals)
-            })
+            let mut proposals = Vec::new();
+            while let Some(row) = rows.next()? {
+                proposals.push(row_to_proposal(row)?);
+            }
+            Ok(proposals)
         })
         .await
-        .map_err(|e| StoreError::Join(e.to_string()))?
     }
 
     pub async fn get_proposal_by_short_id(&self, short_id: &str) -> Result<Proposal, StoreError> {
-        let store = self.clone();
         let short_id = short_id.to_string();
-        let _permit = self.sem.acquire().await.expect("semaphore closed");
-        tokio::task::spawn_blocking(move || {
-            store.with_conn(|conn| {
-                conn.query_row(
-                    "SELECT id, short_id, run_id, task_id, title, description, category, \
-                     priority, affected_files, estimated_effort, status, reviewer_notes, \
-                     created_at, updated_at FROM proposals WHERE short_id = ?1",
-                    params![short_id],
-                    |row| row_to_proposal(row),
-                )
-                .map_err(|e| match e {
-                    rusqlite::Error::QueryReturnedNoRows => {
-                        StoreError::NotFound(format!("proposal {short_id}"))
-                    }
-                    other => StoreError::Sqlite(other),
-                })
+        self.with_blocking_conn(move |conn| {
+            conn.query_row(
+                "SELECT id, short_id, run_id, task_id, title, description, category, \
+                 priority, affected_files, estimated_effort, status, reviewer_notes, \
+                 created_at, updated_at FROM proposals WHERE short_id = ?1",
+                params![short_id],
+                |row| row_to_proposal(row),
+            )
+            .map_err(|e| match e {
+                rusqlite::Error::QueryReturnedNoRows => {
+                    StoreError::NotFound(format!("proposal {short_id}"))
+                }
+                other => StoreError::Sqlite(other),
             })
         })
         .await
-        .map_err(|e| StoreError::Join(e.to_string()))?
     }
 
     pub async fn update_proposal_status(
@@ -912,25 +876,20 @@ impl CommanderStore {
         status: ProposalStatus,
         notes: Option<&str>,
     ) -> Result<(), StoreError> {
-        let store = self.clone();
         let short_id = short_id.to_string();
         let notes = notes.map(String::from);
-        let _permit = self.sem.acquire().await.expect("semaphore closed");
-        tokio::task::spawn_blocking(move || {
-            store.with_conn(|conn| {
-                let rows = conn.execute(
-                    "UPDATE proposals SET status = ?1, reviewer_notes = ?2, updated_at = ?3 \
-                     WHERE short_id = ?4",
-                    params![status.as_str(), notes, now_epoch(), short_id],
-                )?;
-                if rows == 0 {
-                    return Err(StoreError::NotFound(format!("proposal {short_id}")));
-                }
-                Ok(())
-            })
+        self.with_blocking_conn(move |conn| {
+            let rows = conn.execute(
+                "UPDATE proposals SET status = ?1, reviewer_notes = ?2, updated_at = ?3 \
+                 WHERE short_id = ?4",
+                params![status.as_str(), notes, now_epoch(), short_id],
+            )?;
+            if rows == 0 {
+                return Err(StoreError::NotFound(format!("proposal {short_id}")));
+            }
+            Ok(())
         })
         .await
-        .map_err(|e| StoreError::Join(e.to_string()))?
     }
 
     // -------------------------------------------------------------------------
@@ -945,44 +904,34 @@ impl CommanderStore {
         rank: i64,
         utility: f64,
     ) -> Result<i64, StoreError> {
-        let store = self.clone();
         let task_id = task_id.to_string();
         let model = model.to_string();
-        let _permit = self.sem.acquire().await.expect("semaphore closed");
-        tokio::task::spawn_blocking(move || {
-            store.with_conn(|conn| {
-                let now = now_epoch();
-                conn.execute(
-                    "INSERT INTO model_rankings (run_id, task_id, model, rank, utility, created_at) \
-                     VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
-                    params![run_id, task_id, model, rank, utility, now],
-                )?;
-                Ok(conn.last_insert_rowid())
-            })
+        self.with_blocking_conn(move |conn| {
+            let now = now_epoch();
+            conn.execute(
+                "INSERT INTO model_rankings (run_id, task_id, model, rank, utility, created_at) \
+                 VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+                params![run_id, task_id, model, rank, utility, now],
+            )?;
+            Ok(conn.last_insert_rowid())
         })
         .await
-        .map_err(|e| StoreError::Join(e.to_string()))?
     }
 
     pub async fn get_model_rankings(&self) -> Result<Vec<ModelRanking>, StoreError> {
-        let store = self.clone();
-        let _permit = self.sem.acquire().await.expect("semaphore closed");
-        tokio::task::spawn_blocking(move || {
-            store.with_conn(|conn| {
-                let mut stmt = conn.prepare(
-                    "SELECT id, run_id, task_id, model, rank, utility, created_at \
-                     FROM model_rankings ORDER BY run_id, task_id, rank",
-                )?;
-                let mut rows = stmt.query([])?;
-                let mut rankings = Vec::new();
-                while let Some(row) = rows.next()? {
-                    rankings.push(row_to_ranking(row)?);
-                }
-                Ok(rankings)
-            })
+        self.with_blocking_conn(move |conn| {
+            let mut stmt = conn.prepare(
+                "SELECT id, run_id, task_id, model, rank, utility, created_at \
+                 FROM model_rankings ORDER BY run_id, task_id, rank",
+            )?;
+            let mut rows = stmt.query([])?;
+            let mut rankings = Vec::new();
+            while let Some(row) = rows.next()? {
+                rankings.push(row_to_ranking(row)?);
+            }
+            Ok(rankings)
         })
         .await
-        .map_err(|e| StoreError::Join(e.to_string()))?
     }
 
     // -------------------------------------------------------------------------
@@ -990,34 +939,24 @@ impl CommanderStore {
     // -------------------------------------------------------------------------
 
     pub async fn total_spend(&self) -> Result<i64, StoreError> {
-        let store = self.clone();
-        let _permit = self.sem.acquire().await.expect("semaphore closed");
-        tokio::task::spawn_blocking(move || {
-            store.with_conn(|conn| {
-                let total: i64 = conn.query_row(
-                    "SELECT COALESCE(SUM(total_cost_nanodollars), 0) FROM runs",
-                    [],
-                    |row| row.get(0),
-                )?;
-                Ok(total)
-            })
+        self.with_blocking_conn(move |conn| {
+            let total: i64 = conn.query_row(
+                "SELECT COALESCE(SUM(total_cost_nanodollars), 0) FROM runs",
+                [],
+                |row| row.get(0),
+            )?;
+            Ok(total)
         })
         .await
-        .map_err(|e| StoreError::Join(e.to_string()))?
     }
 
     pub async fn total_proposals(&self) -> Result<i64, StoreError> {
-        let store = self.clone();
-        let _permit = self.sem.acquire().await.expect("semaphore closed");
-        tokio::task::spawn_blocking(move || {
-            store.with_conn(|conn| {
-                let total: i64 =
-                    conn.query_row("SELECT COUNT(*) FROM proposals", [], |row| row.get(0))?;
-                Ok(total)
-            })
+        self.with_blocking_conn(move |conn| {
+            let total: i64 =
+                conn.query_row("SELECT COUNT(*) FROM proposals", [], |row| row.get(0))?;
+            Ok(total)
         })
         .await
-        .map_err(|e| StoreError::Join(e.to_string()))?
     }
 
     /// Update officer-specific cost columns on a run.
@@ -1028,31 +967,26 @@ impl CommanderStore {
         reflection_cost: i64,
         output_dir: Option<&str>,
     ) -> Result<(), StoreError> {
-        let store = self.clone();
         let output_dir = output_dir.map(String::from);
-        let _permit = self.sem.acquire().await.expect("semaphore closed");
-        tokio::task::spawn_blocking(move || {
-            store.with_conn(|conn| {
-                let updated = conn.execute(
-                    "UPDATE runs SET briefing_cost_nanodollars = ?1, \
-                     reflection_cost_nanodollars = ?2, output_dir = ?3, \
-                     updated_at = ?4 WHERE id = ?5",
-                    params![
-                        briefing_cost,
-                        reflection_cost,
-                        output_dir,
-                        now_epoch(),
-                        run_id
-                    ],
-                )?;
-                if updated == 0 {
-                    return Err(StoreError::NotFound(format!("run {run_id}")));
-                }
-                Ok(())
-            })
+        self.with_blocking_conn(move |conn| {
+            let updated = conn.execute(
+                "UPDATE runs SET briefing_cost_nanodollars = ?1, \
+                 reflection_cost_nanodollars = ?2, output_dir = ?3, \
+                 updated_at = ?4 WHERE id = ?5",
+                params![
+                    briefing_cost,
+                    reflection_cost,
+                    output_dir,
+                    now_epoch(),
+                    run_id
+                ],
+            )?;
+            if updated == 0 {
+                return Err(StoreError::NotFound(format!("run {run_id}")));
+            }
+            Ok(())
         })
         .await
-        .map_err(|e| StoreError::Join(e.to_string()))?
     }
 
     // -------------------------------------------------------------------------
@@ -1062,73 +996,63 @@ impl CommanderStore {
     /// Acceptance rate across last N runs (or all runs).
     /// Returns fraction of accepted proposals out of all non-pending proposals.
     pub async fn acceptance_rate(&self, last_n_runs: Option<i64>) -> Result<f64, StoreError> {
-        let store = self.clone();
-        let _permit = self.sem.acquire().await.expect("semaphore closed");
-        tokio::task::spawn_blocking(move || {
-            store.with_conn(|conn| {
-                let (reviewed, accepted) = if let Some(n) = last_n_runs {
-                    let reviewed: i64 = conn.query_row(
-                        "SELECT COUNT(*) FROM proposals WHERE status != 'pending' \
-                         AND run_id IN (SELECT id FROM runs ORDER BY id DESC LIMIT ?1)",
-                        params![n],
-                        |row| row.get(0),
-                    )?;
-                    let accepted: i64 = conn.query_row(
-                        "SELECT COUNT(*) FROM proposals WHERE status IN ('accepted', 'implemented') \
-                         AND run_id IN (SELECT id FROM runs ORDER BY id DESC LIMIT ?1)",
-                        params![n],
-                        |row| row.get(0),
-                    )?;
-                    (reviewed, accepted)
-                } else {
-                    let reviewed: i64 = conn.query_row(
-                        "SELECT COUNT(*) FROM proposals WHERE status != 'pending'",
-                        [],
-                        |row| row.get(0),
-                    )?;
-                    let accepted: i64 = conn.query_row(
-                        "SELECT COUNT(*) FROM proposals WHERE status IN ('accepted', 'implemented')",
-                        [],
-                        |row| row.get(0),
-                    )?;
-                    (reviewed, accepted)
-                };
-                if reviewed == 0 {
-                    Ok(0.0)
-                } else {
-                    Ok(accepted as f64 / reviewed as f64)
-                }
-            })
-        })
-        .await
-        .map_err(|e| StoreError::Join(e.to_string()))?
-    }
-
-    /// Cost per accepted proposal (total spend / accepted count).
-    /// Returns None if no proposals have been accepted.
-    pub async fn cost_per_accepted(&self) -> Result<Option<f64>, StoreError> {
-        let store = self.clone();
-        let _permit = self.sem.acquire().await.expect("semaphore closed");
-        tokio::task::spawn_blocking(move || {
-            store.with_conn(|conn| {
+        self.with_blocking_conn(move |conn| {
+            let (reviewed, accepted) = if let Some(n) = last_n_runs {
+                let reviewed: i64 = conn.query_row(
+                    "SELECT COUNT(*) FROM proposals WHERE status != 'pending' \
+                     AND run_id IN (SELECT id FROM runs ORDER BY id DESC LIMIT ?1)",
+                    params![n],
+                    |row| row.get(0),
+                )?;
+                let accepted: i64 = conn.query_row(
+                    "SELECT COUNT(*) FROM proposals WHERE status IN ('accepted', 'implemented') \
+                     AND run_id IN (SELECT id FROM runs ORDER BY id DESC LIMIT ?1)",
+                    params![n],
+                    |row| row.get(0),
+                )?;
+                (reviewed, accepted)
+            } else {
+                let reviewed: i64 = conn.query_row(
+                    "SELECT COUNT(*) FROM proposals WHERE status != 'pending'",
+                    [],
+                    |row| row.get(0),
+                )?;
                 let accepted: i64 = conn.query_row(
                     "SELECT COUNT(*) FROM proposals WHERE status IN ('accepted', 'implemented')",
                     [],
                     |row| row.get(0),
                 )?;
-                if accepted == 0 {
-                    return Ok(None);
-                }
-                let total_spend: i64 = conn.query_row(
-                    "SELECT COALESCE(SUM(total_cost_nanodollars), 0) FROM runs",
-                    [],
-                    |row| row.get(0),
-                )?;
-                Ok(Some(total_spend as f64 / accepted as f64))
-            })
+                (reviewed, accepted)
+            };
+            if reviewed == 0 {
+                Ok(0.0)
+            } else {
+                Ok(accepted as f64 / reviewed as f64)
+            }
         })
         .await
-        .map_err(|e| StoreError::Join(e.to_string()))?
+    }
+
+    /// Cost per accepted proposal (total spend / accepted count).
+    /// Returns None if no proposals have been accepted.
+    pub async fn cost_per_accepted(&self) -> Result<Option<f64>, StoreError> {
+        self.with_blocking_conn(move |conn| {
+            let accepted: i64 = conn.query_row(
+                "SELECT COUNT(*) FROM proposals WHERE status IN ('accepted', 'implemented')",
+                [],
+                |row| row.get(0),
+            )?;
+            if accepted == 0 {
+                return Ok(None);
+            }
+            let total_spend: i64 = conn.query_row(
+                "SELECT COALESCE(SUM(total_cost_nanodollars), 0) FROM runs",
+                [],
+                |row| row.get(0),
+            )?;
+            Ok(Some(total_spend as f64 / accepted as f64))
+        })
+        .await
     }
 
     /// Recent proposal titles + status for dedup detection.
@@ -1136,89 +1060,74 @@ impl CommanderStore {
         &self,
         limit: i64,
     ) -> Result<Vec<(String, ProposalStatus)>, StoreError> {
-        let store = self.clone();
-        let _permit = self.sem.acquire().await.expect("semaphore closed");
-        tokio::task::spawn_blocking(move || {
-            store.with_conn(|conn| {
-                let mut stmt =
-                    conn.prepare("SELECT title, status FROM proposals ORDER BY id DESC LIMIT ?1")?;
-                let mut rows = stmt.query(params![limit])?;
-                let mut results = Vec::new();
-                while let Some(row) = rows.next()? {
-                    let title: String = row.get(0)?;
-                    let status = ProposalStatus::from_str(&row.get::<_, String>(1)?);
-                    results.push((title, status));
-                }
-                Ok(results)
-            })
+        self.with_blocking_conn(move |conn| {
+            let mut stmt =
+                conn.prepare("SELECT title, status FROM proposals ORDER BY id DESC LIMIT ?1")?;
+            let mut rows = stmt.query(params![limit])?;
+            let mut results = Vec::new();
+            while let Some(row) = rows.next()? {
+                let title: String = row.get(0)?;
+                let status = ProposalStatus::from_str(&row.get::<_, String>(1)?);
+                results.push((title, status));
+            }
+            Ok(results)
         })
         .await
-        .map_err(|e| StoreError::Join(e.to_string()))?
     }
 
     /// Model performance summary: model → (avg_rank, win_count, total_appearances).
     pub async fn model_performance_summary(
         &self,
     ) -> Result<Vec<ModelPerformanceSummary>, StoreError> {
-        let store = self.clone();
-        let _permit = self.sem.acquire().await.expect("semaphore closed");
-        tokio::task::spawn_blocking(move || {
-            store.with_conn(|conn| {
-                let mut stmt = conn.prepare(
-                    "SELECT model, AVG(rank) as avg_rank, \
-                     SUM(CASE WHEN rank = 1 THEN 1 ELSE 0 END) as wins, \
-                     COUNT(*) as appearances \
-                     FROM model_rankings GROUP BY model ORDER BY avg_rank ASC",
-                )?;
-                let mut rows = stmt.query([])?;
-                let mut results = Vec::new();
-                while let Some(row) = rows.next()? {
-                    results.push(ModelPerformanceSummary {
-                        model: row.get(0)?,
-                        avg_rank: row.get(1)?,
-                        win_count: row.get(2)?,
-                        total_appearances: row.get(3)?,
-                    });
-                }
-                Ok(results)
-            })
+        self.with_blocking_conn(move |conn| {
+            let mut stmt = conn.prepare(
+                "SELECT model, AVG(rank) as avg_rank, \
+                 SUM(CASE WHEN rank = 1 THEN 1 ELSE 0 END) as wins, \
+                 COUNT(*) as appearances \
+                 FROM model_rankings GROUP BY model ORDER BY avg_rank ASC",
+            )?;
+            let mut rows = stmt.query([])?;
+            let mut results = Vec::new();
+            while let Some(row) = rows.next()? {
+                results.push(ModelPerformanceSummary {
+                    model: row.get(0)?,
+                    avg_rank: row.get(1)?,
+                    win_count: row.get(2)?,
+                    total_appearances: row.get(3)?,
+                });
+            }
+            Ok(results)
         })
         .await
-        .map_err(|e| StoreError::Join(e.to_string()))?
     }
 
     /// Recent run summaries for briefing context.
     pub async fn recent_run_summaries(&self, limit: i64) -> Result<Vec<RunBrief>, StoreError> {
-        let store = self.clone();
-        let _permit = self.sem.acquire().await.expect("semaphore closed");
-        tokio::task::spawn_blocking(move || {
-            store.with_conn(|conn| {
-                let mut stmt = conn.prepare(
-                    "SELECT r.id, r.directive, r.status, r.tasks_completed, r.tasks_failed, \
-                     r.total_cost_nanodollars, \
-                     (SELECT COUNT(*) FROM proposals WHERE run_id = r.id) as proposals_count, \
-                     r.created_at \
-                     FROM runs r ORDER BY r.id DESC LIMIT ?1",
-                )?;
-                let mut rows = stmt.query(params![limit])?;
-                let mut results = Vec::new();
-                while let Some(row) = rows.next()? {
-                    results.push(RunBrief {
-                        id: row.get(0)?,
-                        directive: row.get(1)?,
-                        status: RunStatus::from_str(&row.get::<_, String>(2)?),
-                        tasks_completed: row.get(3)?,
-                        tasks_failed: row.get(4)?,
-                        total_cost_nanodollars: row.get(5)?,
-                        proposals_count: row.get(6)?,
-                        created_at: row.get(7)?,
-                    });
-                }
-                Ok(results)
-            })
+        self.with_blocking_conn(move |conn| {
+            let mut stmt = conn.prepare(
+                "SELECT r.id, r.directive, r.status, r.tasks_completed, r.tasks_failed, \
+                 r.total_cost_nanodollars, \
+                 (SELECT COUNT(*) FROM proposals WHERE run_id = r.id) as proposals_count, \
+                 r.created_at \
+                 FROM runs r ORDER BY r.id DESC LIMIT ?1",
+            )?;
+            let mut rows = stmt.query(params![limit])?;
+            let mut results = Vec::new();
+            while let Some(row) = rows.next()? {
+                results.push(RunBrief {
+                    id: row.get(0)?,
+                    directive: row.get(1)?,
+                    status: RunStatus::from_str(&row.get::<_, String>(2)?),
+                    tasks_completed: row.get(3)?,
+                    tasks_failed: row.get(4)?,
+                    total_cost_nanodollars: row.get(5)?,
+                    proposals_count: row.get(6)?,
+                    created_at: row.get(7)?,
+                });
+            }
+            Ok(results)
         })
         .await
-        .map_err(|e| StoreError::Join(e.to_string()))?
     }
 
     // -------------------------------------------------------------------------
@@ -1241,42 +1150,37 @@ impl CommanderStore {
         output_tokens: i64,
         latency_ms: i64,
     ) -> Result<i64, StoreError> {
-        let store = self.clone();
         let phase = phase.to_string();
         let task_id = task_id.map(String::from);
         let model = model.to_string();
         let input_messages = input_messages.to_string();
         let raw_output = raw_output.to_string();
         let parsed_output = parsed_output.map(String::from);
-        let _permit = self.sem.acquire().await.expect("semaphore closed");
-        tokio::task::spawn_blocking(move || {
-            store.with_conn(|conn| {
-                let now = now_epoch();
-                conn.execute(
-                    "INSERT INTO llm_traces (run_id, phase, task_id, model, input_messages, \
-                     raw_output, parsed_output, cost_nanodollars, input_tokens, output_tokens, \
-                     latency_ms, created_at) \
-                     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)",
-                    params![
-                        run_id,
-                        phase,
-                        task_id,
-                        model,
-                        input_messages,
-                        raw_output,
-                        parsed_output,
-                        cost_nanodollars,
-                        input_tokens,
-                        output_tokens,
-                        latency_ms,
-                        now,
-                    ],
-                )?;
-                Ok(conn.last_insert_rowid())
-            })
+        self.with_blocking_conn(move |conn| {
+            let now = now_epoch();
+            conn.execute(
+                "INSERT INTO llm_traces (run_id, phase, task_id, model, input_messages, \
+                 raw_output, parsed_output, cost_nanodollars, input_tokens, output_tokens, \
+                 latency_ms, created_at) \
+                 VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)",
+                params![
+                    run_id,
+                    phase,
+                    task_id,
+                    model,
+                    input_messages,
+                    raw_output,
+                    parsed_output,
+                    cost_nanodollars,
+                    input_tokens,
+                    output_tokens,
+                    latency_ms,
+                    now,
+                ],
+            )?;
+            Ok(conn.last_insert_rowid())
         })
         .await
-        .map_err(|e| StoreError::Join(e.to_string()))?
     }
 
     /// Get all LLM traces for a run, optionally filtered by phase.
@@ -1285,40 +1189,35 @@ impl CommanderStore {
         run_id: i64,
         phase_filter: Option<&str>,
     ) -> Result<Vec<LlmTrace>, StoreError> {
-        let store = self.clone();
         let phase_filter = phase_filter.map(String::from);
-        let _permit = self.sem.acquire().await.expect("semaphore closed");
-        tokio::task::spawn_blocking(move || {
-            store.with_conn(|conn| {
-                let mut traces = Vec::new();
-                if let Some(ref phase) = phase_filter {
-                    let mut stmt = conn.prepare(
-                        "SELECT id, run_id, phase, task_id, model, input_messages, raw_output, \
-                         parsed_output, cost_nanodollars, input_tokens, output_tokens, \
-                         latency_ms, created_at \
-                         FROM llm_traces WHERE run_id = ?1 AND phase = ?2 ORDER BY id",
-                    )?;
-                    let mut rows = stmt.query(params![run_id, phase])?;
-                    while let Some(row) = rows.next()? {
-                        traces.push(row_to_llm_trace(row)?);
-                    }
-                } else {
-                    let mut stmt = conn.prepare(
-                        "SELECT id, run_id, phase, task_id, model, input_messages, raw_output, \
-                         parsed_output, cost_nanodollars, input_tokens, output_tokens, \
-                         latency_ms, created_at \
-                         FROM llm_traces WHERE run_id = ?1 ORDER BY id",
-                    )?;
-                    let mut rows = stmt.query(params![run_id])?;
-                    while let Some(row) = rows.next()? {
-                        traces.push(row_to_llm_trace(row)?);
-                    }
+        self.with_blocking_conn(move |conn| {
+            let mut traces = Vec::new();
+            if let Some(ref phase) = phase_filter {
+                let mut stmt = conn.prepare(
+                    "SELECT id, run_id, phase, task_id, model, input_messages, raw_output, \
+                     parsed_output, cost_nanodollars, input_tokens, output_tokens, \
+                     latency_ms, created_at \
+                     FROM llm_traces WHERE run_id = ?1 AND phase = ?2 ORDER BY id",
+                )?;
+                let mut rows = stmt.query(params![run_id, phase])?;
+                while let Some(row) = rows.next()? {
+                    traces.push(row_to_llm_trace(row)?);
                 }
-                Ok(traces)
-            })
+            } else {
+                let mut stmt = conn.prepare(
+                    "SELECT id, run_id, phase, task_id, model, input_messages, raw_output, \
+                     parsed_output, cost_nanodollars, input_tokens, output_tokens, \
+                     latency_ms, created_at \
+                     FROM llm_traces WHERE run_id = ?1 ORDER BY id",
+                )?;
+                let mut rows = stmt.query(params![run_id])?;
+                while let Some(row) = rows.next()? {
+                    traces.push(row_to_llm_trace(row)?);
+                }
+            }
+            Ok(traces)
         })
         .await
-        .map_err(|e| StoreError::Join(e.to_string()))?
     }
 
     // -------------------------------------------------------------------------
@@ -1337,53 +1236,49 @@ impl CommanderStore {
         model_insights: Option<&str>,
         cost_nanodollars: i64,
     ) -> Result<i64, StoreError> {
-        let store = self.clone();
         let summary = summary.to_string();
         let efficiency_analysis = efficiency_analysis.to_string();
         let recommendations = recommendations.to_string();
         let model_insights = model_insights.map(String::from);
-        let _permit = self.sem.acquire().await.expect("semaphore closed");
-        tokio::task::spawn_blocking(move || {
-            store.with_conn(|conn| {
-                let now = now_epoch();
-                conn.execute(
-                    "INSERT INTO reflections (run_id, quality_score, summary, efficiency_analysis, \
-                     recommendations, model_insights, cost_nanodollars, created_at) \
-                     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
-                    params![
-                        run_id, quality_score, summary, efficiency_analysis,
-                        recommendations, model_insights, cost_nanodollars, now,
-                    ],
-                )?;
-                Ok(conn.last_insert_rowid())
-            })
+        self.with_blocking_conn(move |conn| {
+            let now = now_epoch();
+            conn.execute(
+                "INSERT INTO reflections (run_id, quality_score, summary, efficiency_analysis, \
+                 recommendations, model_insights, cost_nanodollars, created_at) \
+                 VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
+                params![
+                    run_id,
+                    quality_score,
+                    summary,
+                    efficiency_analysis,
+                    recommendations,
+                    model_insights,
+                    cost_nanodollars,
+                    now,
+                ],
+            )?;
+            Ok(conn.last_insert_rowid())
         })
         .await
-        .map_err(|e| StoreError::Join(e.to_string()))?
     }
 
     /// Get the reflection for a run, if one exists.
     pub async fn get_reflection(&self, run_id: i64) -> Result<Option<Reflection>, StoreError> {
-        let store = self.clone();
-        let _permit = self.sem.acquire().await.expect("semaphore closed");
-        tokio::task::spawn_blocking(move || {
-            store.with_conn(|conn| {
-                let result = conn.query_row(
-                    "SELECT id, run_id, quality_score, summary, efficiency_analysis, \
-                     recommendations, model_insights, cost_nanodollars, created_at \
-                     FROM reflections WHERE run_id = ?1",
-                    params![run_id],
-                    |row| row_to_reflection(row),
-                );
-                match result {
-                    Ok(r) => Ok(Some(r)),
-                    Err(rusqlite::Error::QueryReturnedNoRows) => Ok(None),
-                    Err(e) => Err(StoreError::Sqlite(e)),
-                }
-            })
+        self.with_blocking_conn(move |conn| {
+            let result = conn.query_row(
+                "SELECT id, run_id, quality_score, summary, efficiency_analysis, \
+                 recommendations, model_insights, cost_nanodollars, created_at \
+                 FROM reflections WHERE run_id = ?1",
+                params![run_id],
+                |row| row_to_reflection(row),
+            );
+            match result {
+                Ok(r) => Ok(Some(r)),
+                Err(rusqlite::Error::QueryReturnedNoRows) => Ok(None),
+                Err(e) => Err(StoreError::Sqlite(e)),
+            }
         })
         .await
-        .map_err(|e| StoreError::Join(e.to_string()))?
     }
 }
 

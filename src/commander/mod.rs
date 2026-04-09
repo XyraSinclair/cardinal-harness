@@ -343,15 +343,17 @@ async fn run_command_with_gateway(
 
     let summary = pipeline::run_flywheel(
         gateway.clone(),
-        Some(&cache_inst),
-        None::<Arc<dyn ModelPolicy>>,
         manifest,
-        &out_dir,
-        Some(&synth_dir),
-        Some(&trace_dir),
-        Some(config.preset),
-        config.parallel,
-        gates,
+        pipeline::FlywheelRunConfig {
+            cache: Some(&cache_inst),
+            model_policy: None::<Arc<dyn ModelPolicy>>,
+            out_dir: &out_dir,
+            synthesis_out_dir: Some(&synth_dir),
+            trace_dir: Some(&trace_dir),
+            preset_override: Some(config.preset),
+            parallel: config.parallel,
+            gates,
+        },
     )
     .await;
 

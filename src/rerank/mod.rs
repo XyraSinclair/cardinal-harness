@@ -10,6 +10,7 @@
 //! - Multi: Full trait search with gates and weights
 
 pub mod comparison;
+pub mod dataset;
 pub mod evaluation;
 mod gates;
 pub mod hooks;
