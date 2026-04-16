@@ -7,7 +7,10 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-use crate::cache::PairwiseCacheKey;
+use crate::cache::{
+    PairwiseCacheAttribute, PairwiseCacheEntity, PairwiseCacheKey, PairwiseCacheKeyParts,
+    PairwiseCacheTemplate,
+};
 use crate::prompts::RATIO_LADDER;
 use crate::prompts::{prompt_by_slug, EntityRef, DEFAULT_PROMPT};
 
@@ -238,17 +241,25 @@ pub fn export_pairwise_prompt_grid(
                         EntityRef::with_context("A", display_a.text.clone()),
                         EntityRef::with_context("B", display_b.text.clone()),
                     );
-                    let cache_key = PairwiseCacheKey::new(
+                    let cache_key = PairwiseCacheKey::from_parts(PairwiseCacheKeyParts {
                         model,
-                        template.slug,
-                        &template_hash,
-                        &attr.id,
-                        &attr.prompt,
-                        &display_a.id,
-                        &display_a.text,
-                        &display_b.id,
-                        &display_b.text,
-                    );
+                        prompt_template: PairwiseCacheTemplate {
+                            slug: template.slug,
+                            template_hash: &template_hash,
+                        },
+                        attribute: PairwiseCacheAttribute {
+                            id: &attr.id,
+                            prompt: &attr.prompt,
+                        },
+                        entity_a: PairwiseCacheEntity {
+                            id: &display_a.id,
+                            text: &display_a.text,
+                        },
+                        entity_b: PairwiseCacheEntity {
+                            id: &display_b.id,
+                            text: &display_b.text,
+                        },
+                    });
                     let messages = prompt_instance
                         .to_messages()
                         .into_iter()

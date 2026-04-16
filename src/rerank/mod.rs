@@ -25,7 +25,10 @@ pub mod types;
 // No async worker in the standalone harness.
 
 // Re-export main entry points
-pub use comparison::{compare_pair, ComparisonError};
+pub use comparison::{
+    compare_pair, ComparisonError, PairwiseComparisonAttribute, PairwiseComparisonEntity,
+    PairwiseComparisonRequest, PairwiseComparisonSpec,
+};
 pub use hooks::{
     ComparisonEvent, ComparisonObserver, ObserverError, WarmStartData, WarmStartError,
     WarmStartProvider,

@@ -32,7 +32,64 @@ pub struct PairwiseCacheKey {
     pub key_hash: String,
 }
 
+#[derive(Debug, Clone, Copy)]
+pub struct PairwiseCacheEntity<'a> {
+    pub id: &'a str,
+    pub text: &'a str,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct PairwiseCacheAttribute<'a> {
+    pub id: &'a str,
+    pub prompt: &'a str,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct PairwiseCacheTemplate<'a> {
+    pub slug: &'a str,
+    pub template_hash: &'a str,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct PairwiseCacheKeyParts<'a> {
+    pub model: &'a str,
+    pub prompt_template: PairwiseCacheTemplate<'a>,
+    pub attribute: PairwiseCacheAttribute<'a>,
+    pub entity_a: PairwiseCacheEntity<'a>,
+    pub entity_b: PairwiseCacheEntity<'a>,
+}
+
 impl PairwiseCacheKey {
+    pub fn from_parts(parts: PairwiseCacheKeyParts<'_>) -> Self {
+        let attribute_prompt_hash = hash_text(parts.attribute.prompt);
+        let entity_a_hash = hash_text(parts.entity_a.text);
+        let entity_b_hash = hash_text(parts.entity_b.text);
+        let key_hash = hash_fields(&[
+            parts.model,
+            parts.prompt_template.slug,
+            parts.prompt_template.template_hash,
+            parts.attribute.id,
+            &attribute_prompt_hash,
+            parts.entity_a.id,
+            &entity_a_hash,
+            parts.entity_b.id,
+            &entity_b_hash,
+        ]);
+
+        Self {
+            model: parts.model.to_string(),
+            prompt_template_slug: parts.prompt_template.slug.to_string(),
+            template_hash: parts.prompt_template.template_hash.to_string(),
+            attribute_id: parts.attribute.id.to_string(),
+            attribute_prompt_hash,
+            entity_a_id: parts.entity_a.id.to_string(),
+            entity_b_id: parts.entity_b.id.to_string(),
+            entity_a_hash,
+            entity_b_hash,
+            key_hash,
+        }
+    }
+
     #[allow(clippy::too_many_arguments)]
     pub fn new(
         model: &str,
@@ -45,33 +102,25 @@ impl PairwiseCacheKey {
         entity_b_id: &str,
         entity_b_text: &str,
     ) -> Self {
-        let attribute_prompt_hash = hash_text(attribute_prompt);
-        let entity_a_hash = hash_text(entity_a_text);
-        let entity_b_hash = hash_text(entity_b_text);
-        let key_hash = hash_fields(&[
+        Self::from_parts(PairwiseCacheKeyParts {
             model,
-            prompt_template_slug,
-            template_hash,
-            attribute_id,
-            &attribute_prompt_hash,
-            entity_a_id,
-            &entity_a_hash,
-            entity_b_id,
-            &entity_b_hash,
-        ]);
-
-        Self {
-            model: model.to_string(),
-            prompt_template_slug: prompt_template_slug.to_string(),
-            template_hash: template_hash.to_string(),
-            attribute_id: attribute_id.to_string(),
-            attribute_prompt_hash,
-            entity_a_id: entity_a_id.to_string(),
-            entity_b_id: entity_b_id.to_string(),
-            entity_a_hash,
-            entity_b_hash,
-            key_hash,
-        }
+            prompt_template: PairwiseCacheTemplate {
+                slug: prompt_template_slug,
+                template_hash,
+            },
+            attribute: PairwiseCacheAttribute {
+                id: attribute_id,
+                prompt: attribute_prompt,
+            },
+            entity_a: PairwiseCacheEntity {
+                id: entity_a_id,
+                text: entity_a_text,
+            },
+            entity_b: PairwiseCacheEntity {
+                id: entity_b_id,
+                text: entity_b_text,
+            },
+        })
     }
 }
 

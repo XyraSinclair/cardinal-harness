@@ -24,10 +24,10 @@ use std::time::{Duration, Instant};
 use futures::stream::{self, StreamExt};
 use rand::Rng;
 
-use crate::cache::{PairwiseCache, PairwiseCacheKey};
+use crate::cache::PairwiseCache;
 use crate::gateway::pricing as provider_pricing;
 use crate::gateway::{Attribution, ChatGateway};
-use crate::prompts::{prompt_by_slug, DEFAULT_PROMPT};
+use crate::prompts::prompt_by_slug;
 use crate::text_chunking::count_tokens;
 
 use crate::rating_engine::{
@@ -38,7 +38,8 @@ use crate::trait_search::{
 };
 
 use super::comparison::{
-    compare_pair, estimate_pairwise_input_tokens, ComparisonError,
+    compare_pair, estimate_pairwise_input_tokens, ComparisonError, PairwiseComparisonAttribute,
+    PairwiseComparisonEntity, PairwiseComparisonRequest, PairwiseComparisonSpec,
     PAIRWISE_MAX_OUTPUT_TOKENS_DEFAULT,
 };
 use super::gates::validate_gate_specs;
@@ -713,21 +714,27 @@ pub async fn multi_rerank_with_trace(
                 base_model.clone()
             };
             async move {
-                let judgement = compare_pair(
-                    gateway.as_ref(),
-                    cache,
+                let comparison = PairwiseComparisonRequest {
+                    spec: PairwiseComparisonSpec {
+                        model: &selected_model,
+                        attribute: PairwiseComparisonAttribute {
+                            id: &attr.id,
+                            prompt: &attr.prompt,
+                            prompt_template_slug: attr.prompt_template_slug.as_deref(),
+                        },
+                        entity_a: PairwiseComparisonEntity {
+                            id: &entity_a.id,
+                            text: &entity_a.text,
+                        },
+                        entity_b: PairwiseComparisonEntity {
+                            id: &entity_b.id,
+                            text: &entity_b.text,
+                        },
+                    },
                     cache_only,
-                    &selected_model,
-                    &attr.id,
-                    &attr.prompt,
-                    attr.prompt_template_slug.as_deref(),
-                    &entity_a.id,
-                    &entity_a.text,
-                    &entity_b.id,
-                    &entity_b.text,
                     attribution,
-                )
-                .await;
+                };
+                let judgement = compare_pair(gateway.as_ref(), cache, comparison).await;
                 (task, judgement, selected_model)
             }
         }))
@@ -749,28 +756,28 @@ pub async fn multi_rerank_with_trace(
             let attr_id = attr.id.as_str();
 
             let trace_fields = if trace.is_some() {
-                let template = attr
-                    .prompt_template_slug
-                    .as_deref()
-                    .and_then(prompt_by_slug)
-                    .unwrap_or(DEFAULT_PROMPT);
-                let prompt_slug = template.slug.to_string();
-                let template_hash = template.template_hash();
-                let cache_key = PairwiseCacheKey::new(
-                    &selected_model,
-                    &prompt_slug,
-                    &template_hash,
-                    &attr.id,
-                    &attr.prompt,
-                    &entity_a.id,
-                    &entity_a.text,
-                    &entity_b.id,
-                    &entity_b.text,
-                );
+                let comparison = PairwiseComparisonSpec {
+                    model: &selected_model,
+                    attribute: PairwiseComparisonAttribute {
+                        id: &attr.id,
+                        prompt: &attr.prompt,
+                        prompt_template_slug: attr.prompt_template_slug.as_deref(),
+                    },
+                    entity_a: PairwiseComparisonEntity {
+                        id: &entity_a.id,
+                        text: &entity_a.text,
+                    },
+                    entity_b: PairwiseComparisonEntity {
+                        id: &entity_b.id,
+                        text: &entity_b.text,
+                    },
+                };
+                let template = comparison.prompt_template();
+                let cache_key = comparison.cache_key();
                 Some(TraceFields {
                     attribute_prompt_hash: cache_key.attribute_prompt_hash,
-                    prompt_template_slug: prompt_slug,
-                    template_hash,
+                    prompt_template_slug: template.slug.to_string(),
+                    template_hash: cache_key.template_hash.clone(),
                     entity_a_hash: cache_key.entity_a_hash,
                     entity_b_hash: cache_key.entity_b_hash,
                     cache_key_hash: cache_key.key_hash,

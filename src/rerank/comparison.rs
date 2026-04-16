@@ -5,14 +5,17 @@
 use serde::Deserialize;
 use tracing::warn;
 
-use crate::cache::{CacheError, CachedJudgement, PairwiseCache, PairwiseCacheKey};
+use crate::cache::{
+    CacheError, CachedJudgement, PairwiseCache, PairwiseCacheAttribute, PairwiseCacheEntity,
+    PairwiseCacheKey, PairwiseCacheKeyParts, PairwiseCacheTemplate,
+};
 use crate::gateway::{
     truncate_output_logprobs, Attribution, ChatGateway, ChatModel, ChatRequest,
     PairwiseLogprobPosterior, ProviderError, TokenLogprob,
 };
 use crate::text_chunking::count_tokens;
 
-use crate::prompts::{prompt_by_slug, EntityRef, DEFAULT_PROMPT};
+use crate::prompts::{prompt_by_slug, EntityRef, PromptInstance, PromptTemplate, DEFAULT_PROMPT};
 
 use super::types::{HigherRanked, PairwiseJudgement};
 
@@ -84,6 +87,79 @@ pub struct ComparisonUsage {
     pub raw_output: Option<String>,
     pub output_logprobs: Option<Vec<TokenLogprob>>,
     pub pairwise_logprob_posterior: Option<PairwiseLogprobPosterior>,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct PairwiseComparisonEntity<'a> {
+    pub id: &'a str,
+    pub text: &'a str,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct PairwiseComparisonAttribute<'a> {
+    pub id: &'a str,
+    pub prompt: &'a str,
+    pub prompt_template_slug: Option<&'a str>,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct PairwiseComparisonSpec<'a> {
+    pub model: &'a str,
+    pub attribute: PairwiseComparisonAttribute<'a>,
+    pub entity_a: PairwiseComparisonEntity<'a>,
+    pub entity_b: PairwiseComparisonEntity<'a>,
+}
+
+impl PairwiseComparisonSpec<'_> {
+    #[must_use]
+    pub fn prompt_template(self) -> PromptTemplate {
+        self.attribute
+            .prompt_template_slug
+            .and_then(prompt_by_slug)
+            .unwrap_or(DEFAULT_PROMPT)
+    }
+
+    #[must_use]
+    pub fn prompt_instance(self) -> PromptInstance {
+        self.prompt_template().render(
+            self.attribute.id,
+            self.attribute.prompt,
+            EntityRef::with_context("A", self.entity_a.text),
+            EntityRef::with_context("B", self.entity_b.text),
+        )
+    }
+
+    #[must_use]
+    pub fn cache_key(self) -> PairwiseCacheKey {
+        let template = self.prompt_template();
+        let template_hash = template.template_hash();
+        PairwiseCacheKey::from_parts(PairwiseCacheKeyParts {
+            model: self.model,
+            prompt_template: PairwiseCacheTemplate {
+                slug: template.slug,
+                template_hash: &template_hash,
+            },
+            attribute: PairwiseCacheAttribute {
+                id: self.attribute.id,
+                prompt: self.attribute.prompt,
+            },
+            entity_a: PairwiseCacheEntity {
+                id: self.entity_a.id,
+                text: self.entity_a.text,
+            },
+            entity_b: PairwiseCacheEntity {
+                id: self.entity_b.id,
+                text: self.entity_b.text,
+            },
+        })
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PairwiseComparisonRequest<'a> {
+    pub spec: PairwiseComparisonSpec<'a>,
+    pub cache_only: bool,
+    pub attribution: Attribution,
 }
 
 /// Parse LLM response JSON into a PairwiseJudgement.
@@ -186,42 +262,13 @@ fn extract_json(raw: &str) -> &str {
 // =============================================================================
 
 /// Perform a pairwise comparison using the LLM.
-#[allow(clippy::too_many_arguments)]
 pub async fn compare_pair(
     gateway: &dyn ChatGateway,
     cache: Option<&dyn PairwiseCache>,
-    cache_only: bool,
-    model: &str,
-    attribute_name: &str,
-    attribute_prompt: &str,
-    prompt_template_slug: Option<&str>,
-    entity_a_id: &str,
-    entity_a_text: &str,
-    entity_b_id: &str,
-    entity_b_text: &str,
-    attribution: Attribution,
+    request: PairwiseComparisonRequest<'_>,
 ) -> Result<(PairwiseJudgement, ComparisonUsage), ComparisonError> {
-    let entity_a = EntityRef::with_context("A", entity_a_text);
-    let entity_b = EntityRef::with_context("B", entity_b_text);
-
-    let template = prompt_template_slug
-        .and_then(prompt_by_slug)
-        .unwrap_or(DEFAULT_PROMPT);
-    let prompt_slug = template.slug;
-    let template_hash = template.template_hash();
-    let cache_key = cache.map(|_| {
-        PairwiseCacheKey::new(
-            model,
-            prompt_slug,
-            &template_hash,
-            attribute_name,
-            attribute_prompt,
-            entity_a_id,
-            entity_a_text,
-            entity_b_id,
-            entity_b_text,
-        )
-    });
+    let prompt_instance = request.spec.prompt_instance();
+    let cache_key = cache.map(|_| request.spec.cache_key());
 
     if let (Some(cache), Some(ref key)) = (cache, &cache_key) {
         match cache.get(key).await {
@@ -243,37 +290,35 @@ pub async fn compare_pair(
             }
             Ok(None) => {}
             Err(err) => {
-                if cache_only {
+                if request.cache_only {
                     return Err(ComparisonError::Cache(err));
                 }
                 warn!(error = %err, "Cache read failed; falling back to live comparison");
             }
         }
     }
-    if cache_only {
+    if request.cache_only {
         return Err(ComparisonError::CacheMiss(
             "cache_only is enabled and no cached judgement was found".to_string(),
         ));
     }
 
-    let prompt_instance = template.render(attribute_name, attribute_prompt, entity_a, entity_b);
-
-    let mut request = ChatRequest::new(
-        ChatModel::openrouter(model),
+    let mut chat_request = ChatRequest::new(
+        ChatModel::openrouter(request.spec.model),
         prompt_instance.to_messages(),
-        attribution,
+        request.attribution,
     )
     .max_tokens(PAIRWISE_MAX_OUTPUT_TOKENS_DEFAULT);
     // Only OpenAI models reliably support response_format=json_object via OpenRouter.
-    if model.starts_with("openai/") {
-        request = request.json();
+    if request.spec.model.starts_with("openai/") {
+        chat_request = chat_request.json();
     }
-    request = request.max_tokens(pairwise_max_output_tokens(model));
-    if model_supports_logprobs(model) {
-        request = request.with_logprobs(PAIRWISE_LOGPROBS_TOP_N);
+    chat_request = chat_request.max_tokens(pairwise_max_output_tokens(request.spec.model));
+    if model_supports_logprobs(request.spec.model) {
+        chat_request = chat_request.with_logprobs(PAIRWISE_LOGPROBS_TOP_N);
     }
 
-    let response = gateway.chat(request).await?;
+    let response = gateway.chat(chat_request).await?;
     let stored_logprobs = response
         .output_logprobs
         .as_deref()
@@ -289,7 +334,7 @@ pub async fn compare_pair(
         provider_cost_nanodollars: response.cost_nanodollars,
         cached: false,
         prompt_text: Some(prompt_text),
-        question_text: Some(attribute_prompt.to_string()),
+        question_text: Some(request.spec.attribute.prompt.to_string()),
         raw_output: Some(response.content.clone()),
         output_logprobs: stored_logprobs,
         pairwise_logprob_posterior: None,
