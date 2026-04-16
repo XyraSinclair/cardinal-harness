@@ -67,15 +67,9 @@ async fn multi_rerank_honors_cancel_flag_before_any_comparisons() {
 
     let cancel_flag = AtomicBool::new(true);
     let resp = multi_rerank(
-        gateway,
-        None,
-        None,
-        None,
         req,
-        Attribution::new("test"),
-        None,
-        None,
-        Some(&cancel_flag),
+        cardinal_harness::rerank::RerankExecution::new(gateway, Attribution::new("test"))
+            .cancel_flag(&cancel_flag),
     )
     .await
     .unwrap();

@@ -7,8 +7,8 @@ use cardinal_harness::gateway::openrouter::OpenRouterAdapter;
 use cardinal_harness::gateway::{GatewayConfig, NoopUsageSink, ProviderGateway};
 use cardinal_harness::prompts::prompt_by_slug;
 use cardinal_harness::rerank::{
-    multi_rerank_with_trace, MultiRerankAttributeSpec, MultiRerankEntity, MultiRerankRequest,
-    MultiRerankTopKSpec, RerankRunOptions,
+    multi_rerank, MultiRerankAttributeSpec, MultiRerankEntity, MultiRerankRequest,
+    MultiRerankTopKSpec, RerankExecution, RerankRunOptions,
 };
 use cardinal_harness::{Attribution, ComparisonTrace, PairwiseCache, TraceError, TraceSink};
 use tempfile::tempdir;
@@ -152,17 +152,15 @@ async fn rerank_records_trace_for_cached_comparison() {
     let req = make_request(model);
 
     let trace_sink = VecTraceSink::default();
-    let resp = multi_rerank_with_trace(
-        std::sync::Arc::new(gateway),
-        Some(&cache),
-        None,
-        Some(&run_options),
+    let resp = multi_rerank(
         req.clone(),
-        Attribution::new("test::rerank_trace_cached"),
-        None,
-        None,
-        Some(&trace_sink),
-        None,
+        RerankExecution::new(
+            std::sync::Arc::new(gateway),
+            Attribution::new("test::rerank_trace_cached"),
+        )
+        .cache(&cache)
+        .run_options(run_options)
+        .trace(&trace_sink),
     )
     .await
     .unwrap();
@@ -220,17 +218,15 @@ async fn rerank_records_trace_on_cache_miss_in_cache_only_mode() {
     let req = make_request(model);
 
     let trace_sink = VecTraceSink::default();
-    let err = multi_rerank_with_trace(
-        std::sync::Arc::new(gateway),
-        Some(&cache),
-        None,
-        Some(&run_options),
+    let err = multi_rerank(
         req,
-        Attribution::new("test::rerank_trace_cache_miss"),
-        None,
-        None,
-        Some(&trace_sink),
-        None,
+        RerankExecution::new(
+            std::sync::Arc::new(gateway),
+            Attribution::new("test::rerank_trace_cache_miss"),
+        )
+        .cache(&cache)
+        .run_options(run_options)
+        .trace(&trace_sink),
     )
     .await
     .unwrap_err();

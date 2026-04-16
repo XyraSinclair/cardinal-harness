@@ -286,19 +286,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             };
             let trace_ref = trace_sink.as_ref().map(|sink| sink as &dyn TraceSink);
 
-            let resp = cardinal_harness::rerank::multi_rerank_with_trace(
+            let mut execution = cardinal_harness::rerank::RerankExecution::new(
                 Arc::new(gateway),
-                Some(&cache),
-                policy_obj.clone(),
-                Some(&options),
-                req.clone(),
                 Attribution::new("cardinal::rerank"),
-                None,
-                None,
-                trace_ref,
-                None,
             )
-            .await?;
+            .cache(&cache)
+            .run_options(options);
+            if let Some(policy) = policy_obj.clone() {
+                execution = execution.model_policy(policy);
+            }
+            if let Some(trace) = trace_ref {
+                execution = execution.trace(trace);
+            }
+
+            let resp = cardinal_harness::rerank::multi_rerank(req.clone(), execution).await?;
 
             write_json(&out, &resp)?;
 

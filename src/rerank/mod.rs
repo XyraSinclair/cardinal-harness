@@ -34,12 +34,12 @@ pub use hooks::{
 };
 pub use model_policy::{ModelLadderPolicy, ModelPolicy, ModelPolicyContext};
 pub use multi::{
-    apply_rerank_markup, estimate_max_rerank_charge, multi_rerank, multi_rerank_with_trace,
-    MultiRerankError, RerankChargeEstimate,
+    apply_rerank_markup, estimate_max_rerank_charge, multi_rerank, MultiRerankError,
+    RerankChargeEstimate, RerankExecution,
 };
 pub use options::RerankRunOptions;
 pub use policy_registry::{load_policy_from_path, PolicyConfig, PolicyRegistry, PolicySpec};
 pub use report::{build_report, render_report_markdown, RerankReport, RerankReportOptions};
-pub use simple::{rerank, rerank_with_trace};
+pub use simple::rerank;
 pub use trace::{ComparisonTrace, JsonlTraceSink, TraceError, TraceSink, TraceWorker};
 pub use types::*;

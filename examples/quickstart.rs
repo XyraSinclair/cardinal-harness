@@ -87,15 +87,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // -- Run it --------------------------------------------------------------
 
     let resp = cardinal_harness::rerank::multi_rerank(
-        Arc::new(gateway),
-        Some(&cache),
-        Some(model_policy),
-        Some(&run_options),
         req,
-        Attribution::new("example::quickstart"),
-        None, // no cancellation token
-        None, // no trace sink
-        None, // no comparison observer
+        cardinal_harness::rerank::RerankExecution::new(
+            Arc::new(gateway),
+            Attribution::new("example::quickstart"),
+        )
+        .cache(&cache)
+        .model_policy(model_policy)
+        .run_options(run_options),
     )
     .await?;
 

@@ -334,53 +334,132 @@ fn finite_or_zero(x: f64) -> f64 {
     }
 }
 
+#[derive(Clone)]
+pub struct RerankExecution<'a> {
+    gateway: Arc<dyn ChatGateway>,
+    cache: Option<&'a dyn PairwiseCache>,
+    model_policy: Option<Arc<dyn ModelPolicy>>,
+    run_options: RerankRunOptions,
+    attribution: Attribution,
+    warm_start: Option<&'a dyn WarmStartProvider>,
+    observer: Option<&'a dyn ComparisonObserver>,
+    trace: Option<&'a dyn TraceSink>,
+    cancel_flag: Option<&'a AtomicBool>,
+}
+
+impl<'a> RerankExecution<'a> {
+    #[must_use]
+    pub fn new(gateway: Arc<dyn ChatGateway>, attribution: Attribution) -> Self {
+        Self {
+            gateway,
+            cache: None,
+            model_policy: None,
+            run_options: RerankRunOptions::default(),
+            attribution,
+            warm_start: None,
+            observer: None,
+            trace: None,
+            cancel_flag: None,
+        }
+    }
+
+    #[must_use]
+    pub fn cache(mut self, cache: &'a dyn PairwiseCache) -> Self {
+        self.cache = Some(cache);
+        self
+    }
+
+    #[must_use]
+    pub fn model_policy(mut self, model_policy: Arc<dyn ModelPolicy>) -> Self {
+        self.model_policy = Some(model_policy);
+        self
+    }
+
+    #[must_use]
+    pub fn run_options(mut self, run_options: RerankRunOptions) -> Self {
+        self.run_options = run_options;
+        self
+    }
+
+    #[must_use]
+    pub fn warm_start(mut self, warm_start: &'a dyn WarmStartProvider) -> Self {
+        self.warm_start = Some(warm_start);
+        self
+    }
+
+    #[must_use]
+    pub fn observer(mut self, observer: &'a dyn ComparisonObserver) -> Self {
+        self.observer = Some(observer);
+        self
+    }
+
+    #[must_use]
+    pub fn trace(mut self, trace: &'a dyn TraceSink) -> Self {
+        self.trace = Some(trace);
+        self
+    }
+
+    #[must_use]
+    pub fn cancel_flag(mut self, cancel_flag: &'a AtomicBool) -> Self {
+        self.cancel_flag = Some(cancel_flag);
+        self
+    }
+}
+
+fn build_trait_search_config(req: &MultiRerankRequest) -> (TraitSearchConfig, TopKConfig) {
+    let attributes = req
+        .attributes
+        .iter()
+        .map(|attribute| AttributeConfig::new(&attribute.id, attribute.weight))
+        .collect();
+    let topk = TopKConfig {
+        k: req.topk.k,
+        weight_exponent: req.topk.weight_exponent,
+        tolerated_error: req.topk.tolerated_error,
+        band_size: req.topk.band_size,
+        effective_resistance_max_active: req.topk.effective_resistance_max_active,
+        stop_sigma_inflate: req.topk.stop_sigma_inflate,
+        stop_min_consecutive: req.topk.stop_min_consecutive,
+        min_explore_degree: req.topk.min_explore_degree,
+    };
+    let gates = req
+        .gates
+        .iter()
+        .map(|gate| {
+            GateSpec::new(
+                &gate.attribute_id,
+                gate.unit.to_ascii_lowercase(),
+                &gate.op,
+                gate.threshold,
+            )
+        })
+        .collect();
+    (
+        TraitSearchConfig::new(req.entities.len(), attributes, topk.clone(), gates),
+        topk,
+    )
+}
+
+fn build_engine_config(run_options: &RerankRunOptions, topk: &TopKConfig) -> EngineConfig {
+    let mut config = EngineConfig::default();
+    if let Some(seed) = run_options.rng_seed {
+        config.rng_seed = seed;
+    }
+    config.rank_weight_exponent = topk.weight_exponent;
+    config.top_k = Some(topk.k);
+    if topk.k > 0 {
+        config.tail_weight = (1.0 / (topk.k as f64).powf(topk.weight_exponent)).clamp(0.05, 1.0);
+    }
+    config
+}
+
 /// Run a multi-attribute reranking session.
 ///
 /// If a cache is provided, cached pairwise judgements are reused and new
 /// judgements are written back to the cache.
-#[allow(clippy::too_many_arguments)]
 pub async fn multi_rerank(
-    gateway: Arc<dyn ChatGateway>,
-    cache: Option<&dyn PairwiseCache>,
-    model_policy: Option<Arc<dyn ModelPolicy>>,
-    run_options: Option<&RerankRunOptions>,
     req: MultiRerankRequest,
-    attribution: Attribution,
-    warm_start: Option<&dyn WarmStartProvider>,
-    observer: Option<&dyn ComparisonObserver>,
-    cancel_flag: Option<&AtomicBool>,
-) -> Result<MultiRerankResponse, MultiRerankError> {
-    multi_rerank_with_trace(
-        gateway,
-        cache,
-        model_policy,
-        run_options,
-        req,
-        attribution,
-        warm_start,
-        observer,
-        None,
-        cancel_flag,
-    )
-    .await
-}
-
-/// Run a multi-attribute reranking session with optional trace output.
-///
-/// If a cache is provided, cached pairwise judgements are reused and new
-/// judgements are written back to the cache.
-#[allow(clippy::too_many_arguments)]
-pub async fn multi_rerank_with_trace(
-    gateway: Arc<dyn ChatGateway>,
-    cache: Option<&dyn PairwiseCache>,
-    model_policy: Option<Arc<dyn ModelPolicy>>,
-    run_options: Option<&RerankRunOptions>,
-    req: MultiRerankRequest,
-    attribution: Attribution,
-    warm_start: Option<&dyn WarmStartProvider>,
-    observer: Option<&dyn ComparisonObserver>,
-    trace: Option<&dyn TraceSink>,
-    cancel_flag: Option<&AtomicBool>,
+    execution: RerankExecution<'_>,
 ) -> Result<MultiRerankResponse, MultiRerankError> {
     validate_multi_rerank_request(&req)?;
 
@@ -391,8 +470,8 @@ pub async fn multi_rerank_with_trace(
         .comparison_budget
         .unwrap_or_else(|| default_comparison_budget(n_entities, n_attributes));
     let latency_budget = req.latency_budget_ms.map(Duration::from_millis);
-    let cache_only = run_options.map(|o| o.cache_only).unwrap_or(false);
-    if cache_only && cache.is_none() {
+    let cache_only = execution.run_options.cache_only;
+    if cache_only && execution.cache.is_none() {
         return Err(MultiRerankError::InvalidRequest(
             "cache_only requires a cache instance".into(),
         ));
@@ -405,58 +484,14 @@ pub async fn multi_rerank_with_trace(
         .unwrap_or(DEFAULT_COMPARISON_CONCURRENCY);
     let max_pair_repeats = req.max_pair_repeats;
 
-    // Build TraitSearchConfig
-    let attributes_cfg: Vec<AttributeConfig> = req
-        .attributes
-        .iter()
-        .map(|a| AttributeConfig::new(&a.id, a.weight))
-        .collect();
-
-    let topk_cfg = TopKConfig {
-        k: req.topk.k,
-        weight_exponent: req.topk.weight_exponent,
-        tolerated_error: req.topk.tolerated_error,
-        band_size: req.topk.band_size,
-        effective_resistance_max_active: req.topk.effective_resistance_max_active,
-        stop_sigma_inflate: req.topk.stop_sigma_inflate,
-        stop_min_consecutive: req.topk.stop_min_consecutive,
-        min_explore_degree: req.topk.min_explore_degree,
-    };
-
-    // Convert gates (unit is validated in validate_multi_rerank_request()).
-    let gates_cfg: Vec<GateSpec> = req
-        .gates
-        .iter()
-        .map(|g| {
-            GateSpec::new(
-                &g.attribute_id,
-                g.unit.to_ascii_lowercase(),
-                &g.op,
-                g.threshold,
-            )
-        })
-        .collect();
-
-    let config = TraitSearchConfig::new(n_entities, attributes_cfg, topk_cfg.clone(), gates_cfg);
+    let (config, topk_cfg) = build_trait_search_config(&req);
 
     // Create engines for each attribute
     let mut engines: HashMap<String, RatingEngine> = HashMap::new();
     let mut raters: HashMap<String, RaterParams> = HashMap::new();
     raters.insert(rater_id.to_string(), RaterParams::default());
 
-    let mut engine_cfg = EngineConfig::default();
-    if let Some(options) = run_options {
-        if let Some(seed) = options.rng_seed {
-            engine_cfg.rng_seed = seed;
-        }
-    }
-    engine_cfg.rank_weight_exponent = topk_cfg.weight_exponent;
-    engine_cfg.top_k = Some(topk_cfg.k);
-    if topk_cfg.k > 0 {
-        let tail_weight =
-            (1.0 / (topk_cfg.k as f64).powf(topk_cfg.weight_exponent)).clamp(0.05, 1.0);
-        engine_cfg.tail_weight = tail_weight;
-    }
+    let engine_cfg = build_engine_config(&execution.run_options, &topk_cfg);
 
     for attr in &req.attributes {
         let engine = RatingEngine::new(
@@ -494,7 +529,7 @@ pub async fn multi_rerank_with_trace(
         .map(|(idx, a)| (a.id.as_str(), idx))
         .collect();
 
-    if let Some(provider) = warm_start {
+    if let Some(provider) = execution.warm_start {
         match provider.warm_start(&req, rater_id).await {
             Ok(data) => {
                 let mut total_loaded = 0usize;
@@ -570,7 +605,7 @@ pub async fn multi_rerank_with_trace(
     let mut models_used: HashSet<String> = HashSet::new();
 
     let stop_reason = 'rerank: loop {
-        if let Some(flag) = cancel_flag {
+        if let Some(flag) = execution.cancel_flag {
             if flag.load(AtomicOrdering::Relaxed) {
                 break 'rerank RerankStopReason::Cancelled;
             }
@@ -662,7 +697,7 @@ pub async fn multi_rerank_with_trace(
 
         let mut score_cache: HashMap<String, Vec<f64>> = HashMap::new();
         let mut std_cache: HashMap<String, Vec<f64>> = HashMap::new();
-        if model_policy.is_some() {
+        if execution.model_policy.is_some() {
             let mut attrs_in_batch: HashSet<&str> = HashSet::new();
             for task in &tasks {
                 attrs_in_batch.insert(req.attributes[task.attr_idx].id.as_str());
@@ -683,9 +718,9 @@ pub async fn multi_rerank_with_trace(
         let comparisons_used_snapshot = comparisons_used;
 
         let batch_results = stream::iter(tasks.into_iter().map(|task| {
-            let gateway = gateway.clone();
-            let attribution = attribution.clone();
-            let policy = model_policy.clone();
+            let gateway = execution.gateway.clone();
+            let attribution = execution.attribution.clone();
+            let policy = execution.model_policy.clone();
             let attr = &req.attributes[task.attr_idx];
             // When swapped, present entity j as "A" and entity i as "B"
             // to counteract position bias.
@@ -734,7 +769,7 @@ pub async fn multi_rerank_with_trace(
                     cache_only,
                     attribution,
                 };
-                let judgement = compare_pair(gateway.as_ref(), cache, comparison).await;
+                let judgement = compare_pair(gateway.as_ref(), execution.cache, comparison).await;
                 (task, judgement, selected_model)
             }
         }))
@@ -755,7 +790,7 @@ pub async fn multi_rerank_with_trace(
             models_used.insert(selected_model.clone());
             let attr_id = attr.id.as_str();
 
-            let trace_fields = if trace.is_some() {
+            let trace_fields = if execution.trace.is_some() {
                 let comparison = PairwiseComparisonSpec {
                     model: &selected_model,
                     attribute: PairwiseComparisonAttribute {
@@ -837,7 +872,7 @@ pub async fn multi_rerank_with_trace(
                     comparisons_refused += 1;
                     refused_pairs.insert(task.key);
 
-                    if let Some(trace) = trace {
+                    if let Some(trace) = execution.trace {
                         let mut event = build_trace(
                             usage.cached,
                             usage.input_tokens,
@@ -849,7 +884,7 @@ pub async fn multi_rerank_with_trace(
                         trace.record(event)?;
                     }
 
-                    if let Some(observer) = observer {
+                    if let Some(observer) = execution.observer {
                         let event = ComparisonEvent {
                             attribute_id: attr.id.clone(),
                             attribute_index: task.attr_idx,
@@ -911,7 +946,7 @@ pub async fn multi_rerank_with_trace(
                     }
                     *pair_repeats.entry(task.key).or_insert(0.0) += 1.0;
 
-                    if let Some(trace) = trace {
+                    if let Some(trace) = execution.trace {
                         let mut event = build_trace(
                             usage.cached,
                             usage.input_tokens,
@@ -928,7 +963,7 @@ pub async fn multi_rerank_with_trace(
                         trace.record(event)?;
                     }
 
-                    if let Some(observer) = observer {
+                    if let Some(observer) = execution.observer {
                         let event = ComparisonEvent {
                             attribute_id: attr.id.clone(),
                             attribute_index: task.attr_idx,
@@ -950,7 +985,7 @@ pub async fn multi_rerank_with_trace(
                     }
                 }
                 Err(e) => {
-                    if let Some(trace) = trace {
+                    if let Some(trace) = execution.trace {
                         let event = build_trace(false, 0, 0, 0, Some(e.to_string()));
                         trace.record(event)?;
                     }

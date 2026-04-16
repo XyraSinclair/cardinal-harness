@@ -141,15 +141,8 @@ async fn multi_rerank_runs_end_to_end_against_wiremock_gateway() {
     };
 
     let resp = multi_rerank(
-        gateway,
-        None,
-        None,
-        None,
         req,
-        Attribution::new("test"),
-        None,
-        None,
-        None,
+        cardinal_harness::rerank::RerankExecution::new(gateway, Attribution::new("test")),
     )
     .await
     .unwrap();

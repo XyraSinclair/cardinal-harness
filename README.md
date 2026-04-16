@@ -84,15 +84,14 @@ let req = MultiRerankRequest {
 };
 
 let resp = cardinal_harness::rerank::multi_rerank(
-    Arc::new(gateway),
-    Some(&cache),
-    Some(Arc::new(ModelLadderPolicy::default())),
-    Some(&RerankRunOptions { rng_seed: None, cache_only: false }),
     req,
-    Attribution::new("example::quickstart"),
-    None,
-    None,
-    None,
+    cardinal_harness::rerank::RerankExecution::new(
+        Arc::new(gateway),
+        Attribution::new("example::quickstart"),
+    )
+    .cache(&cache)
+    .model_policy(Arc::new(ModelLadderPolicy::default()))
+    .run_options(RerankRunOptions { rng_seed: None, cache_only: false }),
 ).await?;
 
 for entity in &resp.entities {

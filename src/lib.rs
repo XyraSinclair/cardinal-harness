@@ -28,10 +28,9 @@ pub use cache::{PairwiseCache, PairwiseCacheKey};
 pub use discrete::{DiscreteDistribution, WeightedValue};
 pub use gateway::{Attribution, ChatGateway, ProviderGateway, UsageSink};
 pub use rerank::{
-    multi_rerank, multi_rerank_with_trace, rerank, rerank_with_trace, ComparisonError,
-    ComparisonEvent, ComparisonObserver, ComparisonTrace, JsonlTraceSink, MultiRerankError,
-    ObserverError, TraceError, TraceSink, TraceWorker, WarmStartData, WarmStartError,
-    WarmStartProvider,
+    multi_rerank, rerank, ComparisonError, ComparisonEvent, ComparisonObserver, ComparisonTrace,
+    JsonlTraceSink, MultiRerankError, ObserverError, RerankExecution, TraceError, TraceSink,
+    TraceWorker, WarmStartData, WarmStartError, WarmStartProvider,
 };
 
 #[cfg(doctest)]

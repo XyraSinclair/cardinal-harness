@@ -1,18 +1,9 @@
 //! Simple single-attribute reranking.
 //!
 //! This is syntactic sugar over multi-attribute reranking with a single attribute.
-//! Guarantees identical semantics while providing a simpler API surface.
+//! Guarantees identical semantics while providing a simpler request shape.
 
-use std::sync::Arc;
-
-use crate::cache::PairwiseCache;
-use crate::gateway::{Attribution, ChatGateway};
-
-use super::hooks::{ComparisonObserver, WarmStartProvider};
-use super::model_policy::ModelPolicy;
-use super::multi::{multi_rerank_with_trace, MultiRerankError};
-use super::options::RerankRunOptions;
-use super::trace::TraceSink;
+use super::multi::{multi_rerank, MultiRerankError, RerankExecution};
 use super::types::{
     MultiRerankAttributeSpec, MultiRerankEntity, MultiRerankRequest, MultiRerankTopKSpec,
     RerankMeta, RerankRequest, RerankResponse, RerankResult,
@@ -81,61 +72,13 @@ pub fn to_multi_request(req: &RerankRequest) -> MultiRerankRequest {
 /// Run a single-attribute reranking session.
 ///
 /// Internally converts to a multi-attribute request with one attribute.
-/// If a cache is provided, cached pairwise judgements are reused.
-#[allow(clippy::too_many_arguments)]
 pub async fn rerank(
-    gateway: Arc<dyn ChatGateway>,
-    cache: Option<&dyn PairwiseCache>,
-    model_policy: Option<Arc<dyn ModelPolicy>>,
-    run_options: Option<&RerankRunOptions>,
     req: RerankRequest,
-    attribution: Attribution,
-    warm_start: Option<&dyn WarmStartProvider>,
-    observer: Option<&dyn ComparisonObserver>,
-) -> Result<RerankResponse, MultiRerankError> {
-    rerank_with_trace(
-        gateway,
-        cache,
-        model_policy,
-        run_options,
-        req,
-        attribution,
-        warm_start,
-        observer,
-        None,
-    )
-    .await
-}
-
-/// Run a single-attribute reranking session with optional trace output.
-#[allow(clippy::too_many_arguments)]
-pub async fn rerank_with_trace(
-    gateway: Arc<dyn ChatGateway>,
-    cache: Option<&dyn PairwiseCache>,
-    model_policy: Option<Arc<dyn ModelPolicy>>,
-    run_options: Option<&RerankRunOptions>,
-    req: RerankRequest,
-    attribution: Attribution,
-    warm_start: Option<&dyn WarmStartProvider>,
-    observer: Option<&dyn ComparisonObserver>,
-    trace: Option<&dyn TraceSink>,
+    execution: RerankExecution<'_>,
 ) -> Result<RerankResponse, MultiRerankError> {
     let multi_req = to_multi_request(&req);
 
-    // Call multi_rerank for the single-attribute wrapper.
-    let multi_resp = multi_rerank_with_trace(
-        gateway,
-        cache,
-        model_policy,
-        run_options,
-        multi_req,
-        attribution,
-        warm_start,
-        observer,
-        trace,
-        None,
-    )
-    .await?;
+    let multi_resp = multi_rerank(multi_req, execution).await?;
 
     // Map response to simple format
     let results: Vec<RerankResult> = multi_resp
