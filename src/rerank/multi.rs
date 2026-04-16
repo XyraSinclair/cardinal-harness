@@ -1319,15 +1319,24 @@ mod tests {
     }
 
     #[test]
-    fn validate_accepts_any_prompt_template_slug() {
+    fn validate_accepts_canonical_prompt_template_slug() {
         let mut req = base_request();
-        req.attributes[0].prompt_template_slug = Some("anything".to_string());
-        validate_multi_rerank_request(&req).expect("all slugs resolve to canonical_v2");
+        req.attributes[0].prompt_template_slug = Some("canonical_v2".to_string());
+        validate_multi_rerank_request(&req).expect("canonical_v2 should validate");
     }
 
+    #[test]
     fn validate_rejects_empty_prompt_template_slug() {
         let mut req = base_request();
         req.attributes[0].prompt_template_slug = Some("".to_string());
+        let err = validate_multi_rerank_request(&req).unwrap_err();
+        assert!(matches!(err, MultiRerankError::InvalidRequest(_)));
+    }
+
+    #[test]
+    fn validate_rejects_unknown_prompt_template_slug() {
+        let mut req = base_request();
+        req.attributes[0].prompt_template_slug = Some("canonical_v1".to_string());
         let err = validate_multi_rerank_request(&req).unwrap_err();
         assert!(matches!(err, MultiRerankError::InvalidRequest(_)));
     }

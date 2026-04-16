@@ -1,125 +1,39 @@
 # cardinal-harness
 
-The highest quality way to have LLMs put numbers on things.
+`cardinal-harness` is the canonical pairwise-ratio elicitation engine for OpenPriors.
 
-## The problem
+It does one job: turn noisy LLM pairwise ratio judgements into globally consistent cardinal scores with uncertainty, then spend the next comparison where it buys the most information.
 
-You have a list of items — essays, candidates, proposals, models, code changes, anything — and you need quantitative scores, not just a vague ranking. Asking an LLM to "rate this 1–10" is fast but unreliable: scores are miscalibrated, inconsistent across items, and anchored to arbitrary reference points. You can't meaningfully say item A scored 7.2 and item B scored 6.8 and trust the difference.
+## Scope
 
-This is the **prior elicitation problem**: LLMs have internal distributions over quality, but extracting those distributions through direct questioning produces noisy, biased point estimates. The challenge is information-theoretic — how do you design queries that maximally extract the model's latent knowledge per token spent?
+This repo is intentionally narrow. It contains:
 
-## The approach
+- canonical pairwise ratio prompts
+- the ratio ladder and JSON judgement contract
+- robust score fitting over pairwise observations
+- multi-attribute reranking, gating, and stopping
+- OpenRouter gateway, pricing, usage, and SQLite cache support
+- synthetic evaluation and reporting
 
-Instead of absolute scores, **cardinal-harness** asks pairwise ratio questions: *"how many times more [attribute] does A have than B?"* These relative judgments are far more reliable than absolute scores — the same way humans can tell which of two objects is heavier much more accurately than they can guess either object's weight.
+Research workflows, training/export code, agent orchestration, and other experimental layers belong in `openpriors-research`, not here.
 
-Each pairwise ratio judgment (e.g., "A is 2.5x clearer than B") becomes a noisy observation of latent scores in log-space. A robust statistical solver (IRLS with Huber loss) combines all pairwise observations into a globally consistent set of scores, automatically downweighting outlier judgments where the LLM was confused or inconsistent.
+## Core idea
 
-The system tracks its own uncertainty. It knows which items' scores are well-determined and which aren't, and it selects the next most informative pair to query — so it converges on accurate top-K results with the minimum number of LLM calls. It stops when it's confident enough in the ranking, not after a fixed number of comparisons.
+Instead of asking an LLM for unstable absolute scores, ask:
 
-**"Cardinal"** means you get actual numeric scores on a ratio scale — not just ordinal rankings (1st, 2nd, 3rd) but quantitative latent values with uncertainty estimates, so you know both the ranking and how much each item differs from its neighbors.
+> How many times more of attribute X does A have than B?
 
-### Why pairwise ratios specifically?
+Each answer becomes a noisy log-ratio observation. `cardinal-harness` fits latent scores that best explain the full comparison graph, tracks uncertainty, and stops once top-k is sufficiently certain.
 
-Three properties make pairwise ratios the right primitive for LLM prior elicitation:
+## Prompt
 
-1. **Transitivity in log-space.** If the model judges A/B = 2x and B/C = 3x, then ln(A/B) + ln(B/C) = ln(A/C). Pairwise log-ratios form a linear system that can be solved with standard robust regression. Absolute scores don't compose this way.
+There is one supported prompt template: `canonical_v2`.
 
-2. **Calibration-free.** The model never needs to place items on an absolute scale. Each comparison is self-contained — the model sees two concrete items and judges their relative quality. This sidesteps anchor bias, scale compression, and the well-documented tendency of LLMs to cluster scores around 7/10.
+- slug: `canonical_v2`
+- answer shape: `{"higher_ranked":"A|B","ratio":1.0..26.0,"confidence":0.0..1.0}`
+- refusal shape: `{"refused":true}`
 
-3. **Information density.** A single pairwise ratio judgment carries more information than two independent absolute ratings. The ratio directly encodes the *difference* that matters, rather than requiring the system to infer it from two noisy independent measurements.
-
-## Elicitation methods
-
-### Pairwise ratios (primary)
-
-The core method. Ratio ladder from 1.0 to 26.0 (approximately geometric in log-space), with fine gradations near 1.0 for near-ties. A single prompt template (`canonical_v2`) empirically validated across comprehensive sweeps. Legacy slugs (`canonical_v1`, `v3`, etc.) silently alias to it for backward compatibility.
-
-### Likert scale (baseline)
-
-Per-item absolute ratings on configurable scales (5-point, 10-point). Implemented as a comparison baseline — the `eval-likert` CLI command runs head-to-head evaluations showing how pairwise ratios converge faster and more reliably than Likert for the same token budget.
-
-Longer-horizon research on logprob extraction, hybrid elicitation, and other measurement variants now lives in `openpriors-research/docs/cardinal_harness_research_threads.md`.
-
-## Objective functions
-
-The system optimizes for top-K identification, but there is no single metric
-called "ranking quality." Different metrics answer different questions. The
-important distinction is between:
-
-- **Order metrics**: did we get the relative ordering right?
-- **Selection metrics**: did we recover the correct top-K set?
-- **Calibration metrics**: are the uncertainty intervals honest?
-- **Top-heavy utility metrics**: did we make mistakes where they matter most?
-
-### Why both Kendall and Spearman?
-
-They are related but not interchangeable:
-
-- **Kendall tau-b** asks: across all item pairs, how often do predicted and true
-  orderings agree? It is the cleanest "pairwise ordering correctness" metric,
-  and tau-b correctly handles ties.
-- **Spearman rho** asks: how correlated are the predicted and true ranks? It is
-  more sensitive to large rank displacement of individual items, even when most
-  pairwise relations are still correct.
-
-If you care about "how many pairwise ordering mistakes did we make?", look at
-Kendall first. If you care about "did a few items move a long way up or down?",
-Spearman adds signal.
-
-### Metrics we report
-
-| Metric | What it answers | When it is most useful |
-|--------|------------------|------------------------|
-| **Kendall tau-b** | Are pairwise order relations mostly correct? | Default global rank-agreement metric |
-| **Spearman rho** | Are overall ranks strongly correlated? | Detecting large rank displacement |
-| **Top-K precision** | Of the items we selected, how many truly belong in top-K? | Screening false positives in the selected set |
-| **Top-K recall** | Of the true top-K, how many did we recover? | Screening false negatives near the boundary |
-| **Coverage @95% CI** | Are posterior uncertainty intervals calibrated? | Checking whether the solver is overconfident |
-| **nDCG@K** | Did we rank the top region well, with graded relevance? | IR-style evaluation where early positions matter |
-| **CURL** | Did we preserve pairwise order, especially near the top? | Top-heavy ranking quality |
-| **Weighted rank reversals** | Did we create large or high-rank reversals? | Interpretable top-heavy error counting |
-| **Bayesian regret** | How much utility did we lose by selecting the estimated top-K? | Decision-oriented evaluation |
-| **Frontier inversion probability** | How likely is a swap across the K / K+1 boundary? | The planner's stopping and targeting objective |
-
-Two implementation details matter:
-
-- `kendall_tau` / `spearman_rho` are computed on the currently feasible set
-  after gates.
-- `kendall_tau_all` / `spearman_rho_all` are computed on all items, regardless
-  of feasibility.
-
-The planner's query selection objective blends **information gain** (from spectral graph theory — effective resistance) with **rank risk** (weighted probability of frontier inversions). The mixing parameter `lambda_risk` controls the blend: pure information gain explores uniformly, pure rank risk focuses narrowly on the K-boundary.
-
-## Cost model
-
-Cost tracking operates at nanodollar precision (1e-9 USD) with full per-comparison attribution.
-
-### Current: per-token pricing
-
-```text
-cost = input_tokens * input_price + output_tokens * output_price
-```
-
-Provider pricing registry covers Claude, GPT, Kimi, and embedding models. A 20% rerank markup (6/5 ratio) applies on top of provider cost for service billing.
-
-### Model ladder
-
-`ModelLadderPolicy` starts with a high-quality model (Claude Opus 4.5 at $5/$25 per 1M tokens) and downgrades to cheaper models (GPT-5-mini at $0.25/$2) when uncertainty is already low. The ladder respects per-attribute thresholds — high-weight attributes stay on expensive models longer.
-
-## Features
-
-- **Pairwise ratio prompts** on a fixed ladder (1.0 .. 26.0) for consistent, calibrated LLM judgments
-- **Robust IRLS solver** turns noisy ratio observations into globally consistent latent scores with uncertainty
-- **Multi-attribute utility** with gates and weighted top-k focus across multiple dimensions
-- **Dynamic query planning** proposes only the most informative pairs, minimizing LLM calls
-- **Uncertainty-aware stopping** — stops when top-k is sufficiently certain, not after a budget
-- **SQLite cache** for pairwise judgments — repeated runs reuse prior LLM calls
-- **OpenRouter integration** for model access with dynamic model-ladder switching
-- **Typed ANP contexts** (`composable_ratio` vs `pairwise_only_ratio`) with supermatrix utilities
-- **ANP active query helpers** (next context + next pair proposal)
-- **Synthetic evaluation suite** with 6 test scenarios, convergence curves, and head-to-head Likert comparison
-- **Nanodollar cost tracking** with per-comparison attribution, usage sinks, and audit trails
-- **Commander** strategic agent for codebase-scale evaluation (briefing, decomposition, flywheel, extraction, reflection)
+Details live in [docs/PROMPTS.md](docs/PROMPTS.md).
 
 ## Quickstart
 
@@ -128,41 +42,36 @@ export OPENROUTER_API_KEY=your_key_here
 cargo run --example quickstart
 ```
 
-Or use as a library:
+Library use:
 
 ```rust,no_run
 use std::sync::Arc;
 use cardinal_harness::{Attribution, ProviderGateway, SqlitePairwiseCache};
-use cardinal_harness::rerank::{
-    MultiRerankAttributeSpec, MultiRerankEntity, MultiRerankRequest,
-    MultiRerankTopKSpec, ModelLadderPolicy, RerankRunOptions,
-};
 use cardinal_harness::gateway::NoopUsageSink;
+use cardinal_harness::rerank::{
+    ModelLadderPolicy, MultiRerankAttributeSpec, MultiRerankEntity, MultiRerankRequest,
+    MultiRerankTopKSpec, RerankRunOptions,
+};
 
 # async fn demo() -> Result<(), Box<dyn std::error::Error>> {
 let cache = SqlitePairwiseCache::new(SqlitePairwiseCache::default_path())?;
 let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
 
 let req = MultiRerankRequest {
-    // The items to rank — each has a stable id and the text the LLM will see.
     entities: vec![
         MultiRerankEntity { id: "a".into(), text: "First essay...".into() },
         MultiRerankEntity { id: "b".into(), text: "Second essay...".into() },
         MultiRerankEntity { id: "c".into(), text: "Third essay...".into() },
     ],
-    // What to score on. Each attribute gets independent pairwise comparisons.
-    attributes: vec![
-        MultiRerankAttributeSpec {
-            id: "clarity".into(),
-            prompt: "clarity of explanation".into(),
-            prompt_template_slug: Some("canonical_v2".into()),
-            weight: 1.0,
-        },
-    ],
-    // Identify the best 2, stop when ~90% confident (tolerated_error=0.1).
+    attributes: vec![MultiRerankAttributeSpec {
+        id: "clarity".into(),
+        prompt: "clarity of explanation".into(),
+        prompt_template_slug: Some("canonical_v2".into()),
+        weight: 1.0,
+    }],
     topk: MultiRerankTopKSpec {
         k: 2,
-        ..serde_json::from_str("{}").unwrap() // sensible defaults
+        ..serde_json::from_str("{}").unwrap()
     },
     gates: vec![],
     comparison_budget: None,
@@ -181,144 +90,52 @@ let resp = cardinal_harness::rerank::multi_rerank(
     Some(&RerankRunOptions { rng_seed: None, cache_only: false }),
     req,
     Attribution::new("example::quickstart"),
-    None, None, None,
+    None,
+    None,
+    None,
 ).await?;
 
-// Each entity now has quantitative scores with uncertainty:
-for e in &resp.entities {
-    println!("{} (rank {:?}): {:.3} ± {:.3}", e.id, e.rank, e.u_mean, e.u_std);
+for entity in &resp.entities {
+    println!("{} {:?}: {:.3} ± {:.3}", entity.id, entity.rank, entity.u_mean, entity.u_std);
 }
 # Ok(())
 # }
 ```
 
-See `examples/quickstart.rs` for a fully commented version.
-
-## Architecture
-
-```text
-                  ┌─────────────────────────────────────┐
-                  │           rerank::multi              │
-                  │  (orchestration loop + stopping)     │
-                  └──────┬──────────┬───────────────────┘
-                         │          │
-              ┌──────────▼──┐  ┌───▼──────────────┐
-              │ comparison  │  │   trait_search    │
-              │ (LLM calls) │  │ (utility + gates) │
-              └──────┬──────┘  └───┬──────────────┘
-                     │             │
-              ┌──────▼──┐  ┌──────▼──────────┐
-              │ prompts  │  │  rating_engine   │
-              │ (ladder) │  │ (IRLS + planner) │
-              └──────┬──┘  └────────┬─────────┘
-                     │              │
-              ┌──────▼──────────────▼──┐
-              │    gateway + cache     │
-              │ (OpenRouter + SQLite)  │
-              └───────────────────────┘
-```
-
-| Module | Purpose |
-|--------|---------|
-| `rating_engine` | Robust IRLS solver with Huber loss, effective-resistance planner, diagnostics |
-| `trait_search` | Multi-attribute utility composition, MAD normalization, gating, top-K uncertainty |
-| `rerank` | Orchestration loop, pairwise LLM comparison, stopping criteria, trace/hooks |
-| `anp` | Typed ANP contexts, confidence-weighted local fits, weighted supermatrix |
-| `prompts` | Ratio ladder prompt templates with entity context placement |
-| `cache` | SQLite-backed pairwise memoization with composite key hashing |
-| `gateway` | OpenRouter client, pricing registry, usage tracking, model ladder |
-| `pipeline` | Multi-model generate/rank/synthesize pipeline |
-| `commander` | Strategic agent: briefing, decomposition, flywheel, extraction, reflection |
-| `text_chunking` | Token-aware semantic chunking with overlap |
-
-## Pairwise cache
-
-The cache stores judgements keyed on (model, prompt template slug, template hash, attribute, entity text hashes). This avoids repeated LLM calls across runs. Set a custom path via:
-
-```bash
-export CARDINAL_CACHE_PATH=/path/to/cache.sqlite
-```
-
-Prune by age or size:
-
-```bash
-cargo run --bin cardinal -- cache-prune --max-age-days 30
-cargo run --bin cardinal -- cache-prune --max-rows 100000
-```
-
-## Models
-
-OpenRouter model ids are accepted directly. The model ladder starts with high-quality models and downgrades when uncertainty is low:
-
-| Model | Input/Output per 1M tokens | When used |
-|-------|---------------------------|-----------|
-| `anthropic/claude-opus-4.5` | $5.00 / $25.00 | High-uncertainty, high-weight attributes |
-| `openai/gpt-5.2-chat` | $1.75 / $14.00 | Medium-uncertainty comparisons |
-| `openai/gpt-5-mini` | $0.25 / $2.00 | Low-uncertainty, confirms existing rankings |
-| `moonshotai/kimi-k2-0905` | $0.39 / $1.90 | Cost-effective alternative |
-
 ## CLI
 
 ```bash
-# Rerank from JSON request
+# Rerank from JSON
 cargo run --bin cardinal -- rerank --request input.json --out output.json --trace trace.jsonl
 
-# Synthetic evaluation with convergence curves
+# Generate a markdown or JSON report
+cargo run --bin cardinal -- report --request input.json --response output.json --out report.md
+
+# Synthetic evaluation
 cargo run --bin cardinal -- eval --out eval.jsonl --curve-csv curves.csv
-
-# Likert baseline comparison
 cargo run --bin cardinal -- eval-likert --out eval_likert.jsonl --curve-csv curves_likert.csv
-
-# ANP demo (typed judgment contexts)
-cargo run --bin cardinal -- anp-demo --input examples/anp_demo_request.json --out anp_output.json
-
-# ANP typed-vs-forced benchmark
-cargo run --bin cardinal -- eval-anp --out anp_eval.jsonl
-
-# Report generation from request/response JSON
-cargo run --bin cardinal -- report --request request.json --response response.json --out report.md
 
 # Cache management
 cargo run --bin cardinal -- cache-export --out cache.jsonl
 cargo run --bin cardinal -- cache-prune --max-age-days 30
-
-# Policy management
-cargo run --bin cardinal -- policy list
-cargo run --bin cardinal -- policy load --config policy.json
-
-# Reproducible rerank (no network, cached only)
-cargo run --bin cardinal -- rerank --request input.json --out output.json --lock-cache --cache-only --rng-seed 1337
 ```
 
-## Research notes
+## Architecture
 
-Long-form research notes and archived experiments now live in `openpriors-research/docs/`:
-
-- `cardinal_harness_research_threads.md`
-- `cardinal_harness_foundations.md`
-- `cardinal_harness_experiments.md`
+| Module | Purpose |
+|--------|---------|
+| `rating_engine` | Robust IRLS solver and comparison planning |
+| `trait_search` | Multi-attribute utility composition, gating, top-k uncertainty |
+| `rerank` | Orchestration loop, comparison execution, stopping, traces, reports |
+| `prompts` | Canonical pairwise ratio prompt and ratio ladder |
+| `cache` | SQLite-backed memoization for pairwise judgements |
+| `gateway` | OpenRouter client, pricing, usage, attribution |
+| `text_chunking` | Token-aware chunking helpers |
 
 ## Documentation
 
-| Document | Contents |
-|----------|----------|
-| [`docs/ALGORITHM.md`](docs/ALGORITHM.md) | Full design rationale: why pairwise ratios, IRLS, Huber loss, stopping rules |
-| [`docs/PROMPTS.md`](docs/PROMPTS.md) | Prompt template slugs and context placement details |
-| [`docs/ANP.md`](docs/ANP.md) | ANP context typing and supermatrix usage |
-
-Archived research notes were moved to `openpriors-research/docs/` so this repo can stay focused on supported engine docs.
-
-## Contributing
-
-See `CONTRIBUTING.md`.
-
-## Security
-
-See `SECURITY.md`.
-
-## Code of Conduct
-
-See `CODE_OF_CONDUCT.md`.
+- [docs/ALGORITHM.md](docs/ALGORITHM.md): scoring, uncertainty, stopping, and evaluation rationale
+- [docs/PROMPTS.md](docs/PROMPTS.md): the `canonical_v2` prompt contract
 
 ## License
 

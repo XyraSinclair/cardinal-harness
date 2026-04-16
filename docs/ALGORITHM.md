@@ -2,8 +2,8 @@
 
 This document explains not just *what* cardinal-harness does, but *why* each design choice was made.
 
-If you want the same foundations explained in nested increasing-detail form, see
-`docs/FOUNDATIONS_MATRYOSHKA.md`.
+This is the core engine document. Research notes and archived derivations were
+moved out of this repo to keep it focused.
 
 ## Why pairwise comparisons instead of direct scoring?
 
@@ -137,16 +137,11 @@ When scoring on multiple attributes (e.g., clarity *and* depth *and* originality
 
 The planner operates on the combined utility, targeting pairs that reduce uncertainty about the top-K of the *combined* ranking — so it naturally allocates more comparison budget to attributes where the top-K items are poorly separated.
 
-## ANP typed contexts (optional layer)
+## Research layers
 
-For open-ended prioritization tasks with dependency graphs, use the ANP layer in `src/anp.rs`.
-
-- Keep contexts explicitly typed as `composable_ratio` or `pairwise_only_ratio`.
-- Fit local priorities per context from confidence-weighted log-ratio judgments.
-- Use context/pair query helpers to target highest-value next judgments.
-- Propagate only composable contexts through a weighted, damped supermatrix.
-
-See `docs/ANP.md` for data structures and usage.
+ANP-typed contexts, training/export workflows, and orchestration layers were
+intentionally moved out of this repo. This repo stays focused on the canonical
+pairwise-ratio engine.
 
 ## Caching
 

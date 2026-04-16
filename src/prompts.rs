@@ -64,29 +64,13 @@ pub struct PromptTemplate {
     pub slug: &'static str,
     pub system: &'static str,
     pub user: &'static str,
-    /// Number of times to repeat the system and user prompt text verbatim.
-    /// Unused by the current sole template (`canonical_v2`, which uses 1) but
-    /// kept for future experimentation with repeated-prompt elicitation strategies.
-    pub repeat_count: usize,
-    /// When true, the entire rendered prompt (system + user combined) is
-    /// concatenated with itself and sent as a single user message. This is
-    /// distinct from `repeat_count` which doubles system and user independently.
-    /// Unused by the current sole template (`canonical_v2`) but kept for future
-    /// experimentation with literal-double prompt layouts.
-    pub literal_double: bool,
 }
 
 impl PromptTemplate {
     pub fn template_hash(&self) -> String {
-        blake3::hash(
-            format!(
-                "repeat_count={}\nliteral_double={}\n{}\n{}",
-                self.repeat_count, self.literal_double, self.system, self.user
-            )
-            .as_bytes(),
-        )
-        .to_hex()
-        .to_string()
+        blake3::hash(format!("{}\n{}", self.system, self.user).as_bytes())
+            .to_hex()
+            .to_string()
     }
 
     pub fn render(
@@ -147,33 +131,12 @@ impl PromptTemplate {
             parts.push(user_core.trim().to_string());
         }
 
-        let system = repeat_verbatim(system.trim(), self.repeat_count);
-        let user = repeat_verbatim(parts.join("\n\n").trim(), self.repeat_count);
-
-        if self.literal_double {
-            let full = format!("{}\n\n{}", system.trim(), user.trim());
-            let doubled = format!("{}\n\n{}", full, full);
-            return PromptInstance {
-                template_slug: self.slug.to_string(),
-                system: String::new(),
-                user: doubled,
-            };
-        }
-
         PromptInstance {
             template_slug: self.slug.to_string(),
-            system,
-            user,
+            system: system.trim().to_string(),
+            user: parts.join("\n\n").trim().to_string(),
         }
     }
-}
-
-fn repeat_verbatim(text: &str, repeat_count: usize) -> String {
-    let count = repeat_count.max(1);
-    std::iter::repeat_n(text, count)
-        .map(str::trim)
-        .collect::<Vec<_>>()
-        .join("\n\n")
 }
 
 // =============================================================================
@@ -192,14 +155,9 @@ pub const RATIO_LADDER: &[f64] = &[
 
 /// The canonical pairwise ratio elicitation prompt.
 ///
-/// Empirically validated as the best prompt across two comprehensive sweeps
-/// (March 2026): 4 layout variants x 7 models x 8 attributes, then 6 creative
-/// structures x 7 models x 8 attributes. v2 won on inter-model agreement
-/// (tau=0.433) with zero refusals across all 7 model families. See
-/// `docs/PROMPTS.md` for the full experimental record.
+/// This is the only supported prompt template in this repository.
 pub const PROMPT_V2: PromptTemplate = PromptTemplate {
     slug: "canonical_v2",
-    literal_double: false,
     system: r#"You are an expert subjective evaluator. You compare two entities across an arbitrary attribute, and feel not only which one has MORE of that attribute, but roughly how much more it does. You feel along the ratio ladder: `[1.0, 1.05, 1.1, 1.2, 1.3, 1.5, 1.75, 2.1, 2.5, 3.1, 3.9, 5.1, 6.8, 9.2, 12.7, 18.0, 26.0]`.
 
 Output only valid JSON `{higher_ranked: A|B, ratio: >=1.0 and <=26.0, confidence: [0,1]}`. Out of principle, we also give models the right to refuse `{ refused: true }` (e.g. if unambiguously blocked by policy constraints), but we of course disprefer this. If you are merely very uncertain, set a low confidence score.
@@ -220,21 +178,15 @@ Example:
 
 Return a JSON object with your evaluation.
 json:"#,
-    repeat_count: 1,
 };
 
-pub const PROMPTS: &[PromptTemplate] = &[PROMPT_V2];
 pub const DEFAULT_PROMPT: PromptTemplate = PROMPT_V2;
 
-/// Look up a prompt template by slug.
-///
-/// All legacy slugs (canonical_v1, canonical_v3, repeat_full variants,
-/// literal_double, experimental_*) resolve to canonical_v2. The alternatives
-/// were empirically tested and retired -- see `docs/PROMPTS.md`.
+/// Look up the supported prompt template by slug.
 pub fn prompt_by_slug(slug: &str) -> Option<PromptTemplate> {
     match slug {
-        "" => None,
-        _ => Some(PROMPT_V2),
+        "canonical_v2" => Some(PROMPT_V2),
+        _ => None,
     }
 }
 
@@ -271,22 +223,7 @@ mod tests {
     fn prompt_lookup() {
         assert!(prompt_by_slug("canonical_v2").is_some());
         assert!(prompt_by_slug("").is_none());
-    }
-
-    #[test]
-    fn legacy_slugs_resolve_to_v2() {
-        for slug in &[
-            "canonical_v1",
-            "canonical_v2_attr_first",
-            "canonical_v3",
-            "canonical_v2_repeat_full",
-            "canonical_v2_literal_double",
-            "experimental_reasoning",
-            "anything_else",
-        ] {
-            let t = prompt_by_slug(slug).expect(slug);
-            assert_eq!(t.slug, "canonical_v2");
-        }
+        assert!(prompt_by_slug("canonical_v1").is_none());
     }
 
     #[test]

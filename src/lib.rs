@@ -11,16 +11,11 @@
 //! estimates. The system selects the most informative pairs to query and stops
 //! when the top-K ranking is sufficiently certain.
 //!
-//! See `docs/ALGORITHM.md` for the full design rationale.
+//! See `docs/ALGORITHM.md` for the design rationale.
 
-pub mod anp;
 pub mod cache;
-#[cfg(feature = "sqlite-store")]
-pub mod commander;
 pub mod discrete;
 pub mod gateway;
-pub mod logprob_resampling;
-pub mod pipeline;
 pub mod prompts;
 pub mod rating_engine;
 pub mod rerank;

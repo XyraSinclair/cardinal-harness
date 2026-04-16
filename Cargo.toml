@@ -23,7 +23,6 @@ chrono = { version = "0.4", features = ["serde"] }
 fancy-regex = "0.17"
 fs2 = { version = "0.4", optional = true }
 futures = "0.3"
-glob = "0.3"
 nalgebra = "0.34"
 rand = "0.8"
 regex = "1"
@@ -35,7 +34,6 @@ statrs = "0.18"
 tempfile = "3"
 thiserror = "2"
 tiktoken-rs = "0.9"
-toml = "0.8"
 tokio = { version = "1", features = ["full"] }
 tracing = "0.1"
 uuid = { version = "1", features = ["v4", "serde"] }
