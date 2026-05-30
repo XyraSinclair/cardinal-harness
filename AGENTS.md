@@ -9,7 +9,6 @@ It is the algorithmic core for:
 - robust IRLS solving over noisy pairwise judgments
 - uncertainty-aware reranking and top-k stopping
 - OpenRouter-backed gateway calls, pricing, usage tracking, and cacheing
-- higher-level `pipeline`, `flywheel`, and `commander` workflows
 
 ## Collaboration Mode
 
