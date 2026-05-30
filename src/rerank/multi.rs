@@ -848,6 +848,9 @@ pub async fn multi_rerank(
                     higher_ranked: None,
                     ratio: None,
                     confidence: None,
+                    pairwise_logprob_posterior: None,
+                    output_logprob_token_count: None,
+                    pairwise_logprob_posterior_error: None,
                     refused: false,
                     cached,
                     swapped: task.swapped,
@@ -881,6 +884,12 @@ pub async fn multi_rerank(
                             None,
                         );
                         event.refused = true;
+                        event.output_logprob_token_count =
+                            usage.output_logprobs.as_ref().map(Vec::len);
+                        if !usage.cached && event.output_logprob_token_count.is_none() {
+                            event.pairwise_logprob_posterior_error =
+                                Some("provider_returned_no_output_logprobs".to_string());
+                        }
                         trace.record(event)?;
                     }
 
@@ -960,6 +969,19 @@ pub async fn multi_rerank(
                         });
                         event.ratio = Some(ratio);
                         event.confidence = Some(confidence);
+                        event.pairwise_logprob_posterior = usage.pairwise_logprob_posterior.clone();
+                        event.output_logprob_token_count =
+                            usage.output_logprobs.as_ref().map(Vec::len);
+                        if !usage.cached && event.pairwise_logprob_posterior.is_none() {
+                            event.pairwise_logprob_posterior_error = match event
+                                .output_logprob_token_count
+                            {
+                                Some(count) => Some(format!(
+                                    "posterior_parse_failed_from_{count}_output_logprob_tokens"
+                                )),
+                                None => Some("provider_returned_no_output_logprobs".to_string()),
+                            };
+                        }
                         trace.record(event)?;
                     }
 

@@ -11,7 +11,15 @@ use super::pricing::chat_cost;
 use super::types::*;
 
 /// Maximum allowed response content length (1MB).
-const MAX_RESPONSE_LEN: usize = 1_024 * 1_024;
+const DEFAULT_MAX_RESPONSE_LEN: usize = 1_024 * 1_024;
+
+fn max_response_len() -> usize {
+    std::env::var("OPENROUTER_MAX_RESPONSE_BYTES")
+        .ok()
+        .and_then(|value| value.parse::<usize>().ok())
+        .filter(|value| *value > 0)
+        .unwrap_or(DEFAULT_MAX_RESPONSE_LEN)
+}
 
 /// Maximum allowed input characters (~125k tokens).
 const MAX_INPUT_CHARS: usize = 500_000;
@@ -340,7 +348,7 @@ impl OpenRouterAdapter {
         let mut bytes = Vec::new();
         while let Some(chunk) = response.chunk().await? {
             let new_len = bytes.len() + chunk.len();
-            if new_len > MAX_RESPONSE_LEN {
+            if new_len > max_response_len() {
                 return Err(ProviderError::provider(
                     "openrouter",
                     format!("Response too large: {new_len} bytes"),
@@ -440,8 +448,9 @@ impl OpenRouterAdapter {
             .unwrap_or_else(|| (String::new(), None));
 
         // Normalize content for downstream parsers.
-        if content.len() > MAX_RESPONSE_LEN {
-            content.truncate(MAX_RESPONSE_LEN);
+        let max_response_len = max_response_len();
+        if content.len() > max_response_len {
+            content.truncate(max_response_len);
         }
 
         // Check for refusal in content

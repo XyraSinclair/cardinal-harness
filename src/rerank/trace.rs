@@ -6,6 +6,8 @@ use std::path::Path;
 use std::sync::mpsc;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use crate::gateway::PairwiseLogprobPosterior;
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ComparisonTrace {
     pub timestamp_ms: i64,
@@ -26,6 +28,21 @@ pub struct ComparisonTrace {
     pub higher_ranked: Option<String>,
     pub ratio: Option<f64>,
     pub confidence: Option<f64>,
+    /// Compact posterior inferred from provider output logprobs, when
+    /// available. This records probability mass over preferred side, ratio
+    /// bucket, semantic answer, and signed log-ratio without dumping raw token
+    /// logprobs into every trace row.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pairwise_logprob_posterior: Option<PairwiseLogprobPosterior>,
+    /// Number of output token logprob entries returned by the provider. This
+    /// lets audits distinguish provider-level absence from posterior parsing
+    /// failures.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output_logprob_token_count: Option<usize>,
+    /// Diagnostic reason when `pairwise_logprob_posterior` is absent for a
+    /// non-cached observation where logprobs were requested.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pairwise_logprob_posterior_error: Option<String>,
     pub refused: bool,
     pub cached: bool,
     /// Whether entity A/B presentation order was swapped to counteract

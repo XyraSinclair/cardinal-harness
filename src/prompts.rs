@@ -180,12 +180,29 @@ Return a JSON object with your evaluation.
 json:"#,
 };
 
+/// Pairwise prompt variant for logprob PMF capture.
+///
+/// This asks for a discrete ratio bucket instead of a decimal ratio so output
+/// logprobs can be mapped onto the ratio ladder without reconstructing
+/// multi-token decimal continuations.
+pub const PROMPT_BUCKET_V1: PromptTemplate = PromptTemplate {
+    slug: "canonical_bucket_v1",
+    system: r#"You are an expert subjective evaluator. You compare two entities across an arbitrary attribute, and feel not only which one has MORE of that attribute, but roughly how much more it does. You feel along this indexed ratio ladder:
+0=1.0, 1=1.05, 2=1.1, 3=1.2, 4=1.3, 5=1.5, 6=1.75, 7=2.1, 8=2.5, 9=3.1, 10=3.9, 11=5.1, 12=6.8, 13=9.2, 14=12.7, 15=18.0, 16=26.0.
+
+Output only valid JSON `{higher_ranked: A|B, ratio_bucket: integer 0..16, confidence: [0,1]}`. Use `ratio_bucket` to choose the closest ratio ladder index. Out of principle, we also give models the right to refuse `{ refused: true }` (e.g. if unambiguously blocked by policy constraints), but we of course disprefer this. If you are merely very uncertain, set a low confidence score.
+Example:
+{"higher_ranked": "B", "ratio_bucket": 4, "confidence": 0.74} or { refused: true }"#,
+    user: PROMPT_V2.user,
+};
+
 pub const DEFAULT_PROMPT: PromptTemplate = PROMPT_V2;
 
 /// Look up the supported prompt template by slug.
 pub fn prompt_by_slug(slug: &str) -> Option<PromptTemplate> {
     match slug {
         "canonical_v2" => Some(PROMPT_V2),
+        "canonical_bucket_v1" => Some(PROMPT_BUCKET_V1),
         _ => None,
     }
 }
@@ -222,6 +239,7 @@ mod tests {
     #[test]
     fn prompt_lookup() {
         assert!(prompt_by_slug("canonical_v2").is_some());
+        assert!(prompt_by_slug("canonical_bucket_v1").is_some());
         assert!(prompt_by_slug("").is_none());
         assert!(prompt_by_slug("canonical_v1").is_none());
     }
