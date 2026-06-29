@@ -34,8 +34,8 @@ pub use hooks::{
 };
 pub use model_policy::{ModelLadderPolicy, ModelPolicy, ModelPolicyContext};
 pub use multi::{
-    apply_rerank_markup, estimate_max_rerank_charge, multi_rerank, MultiRerankError,
-    RerankChargeEstimate, RerankExecution,
+    apply_rerank_markup, estimate_max_rerank_charge, multi_rerank, validate_multi_rerank_request,
+    MultiRerankError, RerankChargeEstimate, RerankExecution,
 };
 pub use options::RerankRunOptions;
 pub use policy_registry::{load_policy_from_path, PolicyConfig, PolicyRegistry, PolicySpec};

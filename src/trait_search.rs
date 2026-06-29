@@ -22,6 +22,8 @@ const MIN_MEMBERSHIP_WEIGHT: f64 = 0.05;
 /// Cap planner candidates to avoid O(N^2) explosions.
 const MAX_PLANNER_CANDIDATES: usize = 50_000;
 
+pub(crate) type AttributeUnits = (f64, Vec<f64>, Vec<f64>, Vec<f64>);
+
 // ------------------------------------------------------------------
 // Math utilities
 // ------------------------------------------------------------------
@@ -42,7 +44,7 @@ fn median(sorted: &[f64]) -> f64 {
 /// one sparse attribute can dominate if its posterior variance is enormous.
 /// This caps each contribution at median + 3*IQR of the entity's contributions,
 /// preventing a single under-observed attribute from nuking global confidence.
-fn robust_capped_sum(values: &mut Vec<f64>) -> f64 {
+fn robust_capped_sum(values: &mut [f64]) -> f64 {
     let n = values.len();
     if n == 0 {
         return 0.0;
@@ -51,7 +53,7 @@ fn robust_capped_sum(values: &mut Vec<f64>) -> f64 {
         return values.iter().sum();
     }
 
-    let mut sorted = values.clone();
+    let mut sorted = values.to_vec();
     sorted.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
 
     let q1 = sorted[n / 4];
@@ -91,8 +93,11 @@ fn stddev_population(scores: &[f64], indices: &[usize]) -> f64 {
 
 /// Compute robust MAD scale for scores (for weight normalization).
 fn compute_attribute_scale(scores: &[f64]) -> f64 {
-    let n = scores.len();
-    let mut finite: Vec<usize> = (0..n).filter(|&i| scores[i].is_finite()).collect();
+    let mut finite: Vec<usize> = scores
+        .iter()
+        .enumerate()
+        .filter_map(|(i, score)| score.is_finite().then_some(i))
+        .collect();
 
     if finite.is_empty() {
         return SCALE_FLOOR;
@@ -124,9 +129,13 @@ fn compute_attribute_scale(scores: &[f64]) -> f64 {
 ///
 /// Derived units are computed over finite scores (non-finite scores get 0.0).
 /// Returns (mad_scale, z_scores, min_normalized, percentiles).
-pub(crate) fn compute_attribute_units(scores: &[f64]) -> (f64, Vec<f64>, Vec<f64>, Vec<f64>) {
+pub(crate) fn compute_attribute_units(scores: &[f64]) -> AttributeUnits {
     let n = scores.len();
-    let mut finite: Vec<usize> = (0..n).filter(|&i| scores[i].is_finite()).collect();
+    let mut finite: Vec<usize> = scores
+        .iter()
+        .enumerate()
+        .filter_map(|(i, score)| score.is_finite().then_some(i))
+        .collect();
 
     let mut z = vec![0.0; n];
     let mut min_norm = vec![0.0; n];
@@ -162,10 +171,10 @@ pub(crate) fn compute_attribute_units(scores: &[f64]) -> (f64, Vec<f64>, Vec<f64
     };
     let mad_sigma = (mad * MAD_TO_SIGMA).max(SCALE_FLOOR);
 
-    for i in 0..n {
-        if scores[i].is_finite() {
-            z[i] = (scores[i] - med) / mad_sigma;
-            min_norm[i] = (scores[i] - min_val) + 1.0;
+    for (i, score) in scores.iter().copied().enumerate() {
+        if score.is_finite() {
+            z[i] = (score - med) / mad_sigma;
+            min_norm[i] = (score - min_val) + 1.0;
         }
     }
 
@@ -871,11 +880,11 @@ impl TraitSearchManager {
         let mut total_degree = vec![0usize; n];
         for attr in &self.config.attributes {
             if let Some(engine) = self.engines.get(&attr.id) {
-                for i in 0..n {
+                for (i, degree) in total_degree.iter_mut().enumerate() {
                     if engine.has_min_degree(i, min_degree) {
-                        total_degree[i] += min_degree;
+                        *degree += min_degree;
                     } else if engine.has_min_degree(i, 1) {
-                        total_degree[i] += 1;
+                        *degree += 1;
                     }
                 }
             }
@@ -884,8 +893,8 @@ impl TraitSearchManager {
         // Find entities needing exploration (total degree < min_degree * n_attrs)
         // Simplified: any entity with 0 total edges needs exploration most urgently
         let mut needy: Vec<usize> = Vec::new();
-        for i in 0..n {
-            if self.entities[i].feasible && total_degree[i] < min_degree {
+        for (i, (&degree, entity)) in total_degree.iter().zip(self.entities.iter()).enumerate() {
+            if entity.feasible && degree < min_degree {
                 needy.push(i);
             }
         }
@@ -1131,18 +1140,22 @@ impl TraitSearchManager {
             let inv_scale2 = inv_scale * inv_scale;
             let w2 = w * w;
 
-            for i in 0..n {
-                u_mean[i] += w * (scores[i] * inv_scale);
-                let contribution = w2 * (diag_cov[i].max(0.0) * inv_scale2);
-                attr_var_contributions[i].push(contribution);
+            for (i, ((mean, attr_contribs), &diag_var)) in u_mean
+                .iter_mut()
+                .zip(attr_var_contributions.iter_mut())
+                .zip(diag_cov.iter())
+                .enumerate()
+            {
+                *mean += w * (scores[i] * inv_scale);
+                let contribution = w2 * (diag_var.max(0.0) * inv_scale2);
+                attr_contribs.push(contribution);
             }
         }
 
         // For each entity, cap outlier variance contributions.
         // Use robust fence: cap at median + 3*IQR of that entity's contributions.
-        for i in 0..n {
-            let contribs = &mut attr_var_contributions[i];
-            u_var[i] = robust_capped_sum(contribs);
+        for (var, contribs) in u_var.iter_mut().zip(attr_var_contributions.iter_mut()) {
+            *var = robust_capped_sum(contribs);
         }
 
         let mut feasible_mask = vec![true; n];
@@ -1192,13 +1205,13 @@ impl TraitSearchManager {
 
             match gate.op.as_str() {
                 ">=" => {
-                    for i in 0..n {
-                        feasible_mask[i] &= gate_vals[i] >= gate.threshold;
+                    for (feasible, &gate_val) in feasible_mask.iter_mut().zip(gate_vals.iter()) {
+                        *feasible &= gate_val >= gate.threshold;
                     }
                 }
                 "<=" => {
-                    for i in 0..n {
-                        feasible_mask[i] &= gate_vals[i] <= gate.threshold;
+                    for (feasible, &gate_val) in feasible_mask.iter_mut().zip(gate_vals.iter()) {
+                        *feasible &= gate_val <= gate.threshold;
                     }
                 }
                 _ => {
@@ -1209,9 +1222,12 @@ impl TraitSearchManager {
             }
         }
 
-        for idx in 0..n {
-            let feasible = feasible_mask[idx];
-            let state = &mut self.entities[idx];
+        for (idx, (state, &feasible)) in self
+            .entities
+            .iter_mut()
+            .zip(feasible_mask.iter())
+            .enumerate()
+        {
             state.feasible = feasible;
             if feasible {
                 state.u_mean = u_mean[idx];
@@ -1450,8 +1466,7 @@ impl TraitSearchManager {
             }
         }
 
-        for (pos, &idx) in active.iter().enumerate() {
-            let contribs = &mut per_entity_contribs[pos];
+        for (&idx, contribs) in active.iter().zip(per_entity_contribs.iter_mut()) {
             self.entities[idx].u_var = robust_capped_sum(contribs);
         }
     }

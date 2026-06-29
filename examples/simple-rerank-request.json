@@ -1,0 +1,26 @@
+{
+  "query": "Which candidate project should be reviewed first?",
+  "documents": [
+    {
+      "id": "project_a",
+      "text": "Small refactor with clear ownership and low operational risk."
+    },
+    {
+      "id": "project_b",
+      "text": "Customer-facing bug with several duplicate reports and a known reproduction."
+    },
+    {
+      "id": "project_c",
+      "text": "Exploratory performance work with uncertain impact and no current regression."
+    }
+  ],
+  "attribute_id": "priority",
+  "attribute_prompt": "priority for immediate engineering review",
+  "top_k": 1,
+  "comparison_budget": 8,
+  "tolerated_error": 0.1,
+  "model": "openai/gpt-5-mini",
+  "rater_id": "docs-simple-example",
+  "comparison_concurrency": 2,
+  "max_pair_repeats": 1
+}

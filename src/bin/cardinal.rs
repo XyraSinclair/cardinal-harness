@@ -8,9 +8,9 @@ use std::sync::Arc;
 use cardinal_harness::cache::SqlitePairwiseCache;
 use cardinal_harness::gateway::{NoopUsageSink, ProviderGateway};
 use cardinal_harness::rerank::{
-    build_report, load_policy_from_path, render_report_markdown, JsonlTraceSink, ModelPolicy,
-    MultiRerankRequest, MultiRerankResponse, PolicyRegistry, RerankReportOptions, RerankRunOptions,
-    TraceSink,
+    build_report, load_policy_from_path, render_report_markdown, validate_multi_rerank_request,
+    JsonlTraceSink, ModelPolicy, MultiRerankRequest, MultiRerankResponse, PolicyRegistry,
+    RerankReportOptions, RerankRunOptions, TraceSink,
 };
 use cardinal_harness::Attribution;
 use clap::{Parser, Subcommand};
@@ -89,6 +89,11 @@ enum Commands {
         policy: Option<String>,
         #[arg(long)]
         cache_only: bool,
+    },
+    /// Validate a multi-rerank request JSON without touching the network or cache
+    Validate {
+        #[arg(long)]
+        request: PathBuf,
     },
     /// Run a rerank from JSON input
     Rerank {
@@ -250,6 +255,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 std::fs::write(out, markdown)?;
             }
         }
+        Commands::Validate { request } => {
+            let req: MultiRerankRequest = read_json(&request)?;
+            validate_multi_rerank_request(&req)?;
+            println!("valid request: {}", request.display());
+        }
         Commands::Rerank {
             request,
             out,
@@ -263,6 +273,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             trace,
         } => {
             let req: MultiRerankRequest = read_json(&request)?;
+            validate_multi_rerank_request(&req)?;
             let cache_path = cache.unwrap_or_else(SqlitePairwiseCache::default_path);
             let cache = SqlitePairwiseCache::new(cache_path)?;
             let _lock = if lock_cache {

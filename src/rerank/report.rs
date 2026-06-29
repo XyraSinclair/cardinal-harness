@@ -57,6 +57,9 @@ pub struct ReportSummary {
     pub latency_ms: u128,
     pub model_used: String,
     pub rater_id_used: String,
+    pub provider_input_tokens: u32,
+    pub provider_output_tokens: u32,
+    pub provider_cost_nanodollars: i64,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -142,6 +145,9 @@ impl ReportSummary {
             latency_ms: meta.latency_ms,
             model_used: meta.model_used.clone(),
             rater_id_used: meta.rater_id_used.clone(),
+            provider_input_tokens: meta.provider_input_tokens,
+            provider_output_tokens: meta.provider_output_tokens,
+            provider_cost_nanodollars: meta.provider_cost_nanodollars,
         }
     }
 }
@@ -180,8 +186,8 @@ pub fn render_report_markdown(report: &RerankReport) -> String {
     out.push_str("# Rerank Report\n\n");
     out.push_str(&format!("- Request hash: `{}`\n", report.request_hash));
     out.push_str(&format!(
-        "- Stop reason: {:?}\n",
-        report.summary.stop_reason
+        "- Stop reason: `{}`\n",
+        stop_reason_label(report.summary.stop_reason)
     ));
     out.push_str(&format!("- k: {}\n", report.summary.k));
     out.push_str(&format!(
@@ -199,9 +205,26 @@ pub fn render_report_markdown(report: &RerankReport) -> String {
         report.summary.comparisons_refused,
         report.summary.comparisons_cached
     ));
+    out.push_str(&format!(
+        "- Comparison budget: {}\n",
+        report.summary.comparison_budget
+    ));
     out.push_str(&format!("- Model used: {}\n", report.summary.model_used));
     out.push_str(&format!("- Rater ID: {}\n", report.summary.rater_id_used));
     out.push_str(&format!("- Latency: {} ms\n", report.summary.latency_ms));
+    out.push_str(&format!(
+        "- Provider tokens input/output/total: {}/{}/{}\n",
+        report.summary.provider_input_tokens,
+        report.summary.provider_output_tokens,
+        report
+            .summary
+            .provider_input_tokens
+            .saturating_add(report.summary.provider_output_tokens)
+    ));
+    out.push_str(&format!(
+        "- Provider cost: {}\n",
+        format_nanodollars(report.summary.provider_cost_nanodollars)
+    ));
     if let Some(seed) = report.run_stamp.rng_seed {
         out.push_str(&format!("- RNG seed: {seed}\n"));
     }
@@ -212,6 +235,19 @@ pub fn render_report_markdown(report: &RerankReport) -> String {
         out.push_str("- Cache-only mode: true\n");
     }
 
+    out.push_str("\n## Warnings / Degraded State\n\n");
+    let warnings = report_warnings(report);
+    if warnings.is_empty() {
+        out.push_str("- None.\n");
+    } else {
+        for warning in warnings {
+            out.push_str(&format!("- {warning}\n"));
+        }
+    }
+
+    out.push_str("\n## Run Status\n\n");
+    out.push_str(stop_reason_interpretation(report.summary.stop_reason));
+    out.push('\n');
     out.push_str("\n## Attributes\n\n");
     for attr in &report.attributes {
         out.push_str(&format!(
@@ -236,9 +272,120 @@ pub fn render_report_markdown(report: &RerankReport) -> String {
             "- {} (rank {:?}, feasible {}, u_mean {:.3}, u_std {:.3}, p_flip {:.3})\n",
             entity.id, entity.rank, entity.feasible, entity.u_mean, entity.u_std, entity.p_flip
         ));
+
+        if let Some(attribute_scores) = &entity.attribute_scores {
+            let mut attribute_ids: Vec<&String> = attribute_scores.keys().collect();
+            attribute_ids.sort();
+
+            for attribute_id in attribute_ids {
+                let score = &attribute_scores[attribute_id];
+                out.push_str(&format!(
+                    "  - `{}`: latent {:.3} ± {:.3}, z {:.3}, min_norm {:.3}, percentile {:.3}\n",
+                    attribute_id,
+                    score.latent_mean,
+                    score.latent_std,
+                    score.z_score,
+                    score.min_normalized,
+                    score.percentile
+                ));
+            }
+        }
+    }
+    out
+}
+
+fn report_warnings(report: &RerankReport) -> Vec<String> {
+    let summary = &report.summary;
+    let mut warnings = Vec::new();
+
+    if !is_converged_stop_reason(summary.stop_reason) {
+        warnings.push(format!(
+            "Run stopped with non-converged stop reason `{}`; inspect uncertainty before sharing this as a settled ordering.",
+            stop_reason_label(summary.stop_reason)
+        ));
+    }
+    if summary.global_topk_error > summary.tolerated_error {
+        warnings.push(format!(
+            "Global top-k error {:.4} exceeds tolerated error {:.4}.",
+            summary.global_topk_error, summary.tolerated_error
+        ));
     }
 
-    out
+    if summary.comparisons_refused > 0 {
+        warnings.push(format!(
+            "{} comparison(s) were refused and could not contribute to the ranking.",
+            summary.comparisons_refused
+        ));
+    }
+
+    if summary.comparisons_cached > 0 {
+        warnings.push(format!(
+            "{} comparison(s) came from cache rather than a fresh provider call.",
+            summary.comparisons_cached
+        ));
+    }
+
+    let provider_tokens = summary
+        .provider_input_tokens
+        .saturating_add(summary.provider_output_tokens);
+    if provider_tokens > 0 && summary.provider_cost_nanodollars <= 0 {
+        warnings.push(
+            "Provider token usage is non-zero but provider cost is unavailable or zero; do not read this as a free run."
+                .to_string(),
+        );
+    }
+
+    warnings
+}
+
+fn is_converged_stop_reason(reason: RerankStopReason) -> bool {
+    matches!(
+        reason,
+        RerankStopReason::ToleratedErrorMet | RerankStopReason::CertifiedStop
+    )
+}
+
+fn format_nanodollars(nanodollars: i64) -> String {
+    if nanodollars <= 0 {
+        return "$0.000000000".to_string();
+    }
+    format!("${:.9}", nanodollars as f64 / 1_000_000_000.0)
+}
+
+fn stop_reason_label(reason: RerankStopReason) -> &'static str {
+    match reason {
+        RerankStopReason::ToleratedErrorMet => "tolerated_error_met",
+        RerankStopReason::CertifiedStop => "certified_stop",
+        RerankStopReason::BudgetExhausted => "budget_exhausted",
+        RerankStopReason::LatencyBudgetExceeded => "latency_budget_exceeded",
+        RerankStopReason::Cancelled => "cancelled",
+        RerankStopReason::NoProposals => "no_proposals",
+        RerankStopReason::NoNewPairs => "no_new_pairs",
+    }
+}
+
+fn stop_reason_interpretation(reason: RerankStopReason) -> &'static str {
+    match reason {
+        RerankStopReason::ToleratedErrorMet => {
+            "The run stopped because the estimated top-k error is within the requested tolerance."
+        }
+        RerankStopReason::CertifiedStop => {
+            "The run stopped because the certified separation check found a stable top-k boundary."
+        }
+        RerankStopReason::BudgetExhausted => {
+            "The run used the configured comparison budget before meeting the stopping tolerance; inspect the top-k error before treating the frontier as settled."
+        }
+        RerankStopReason::LatencyBudgetExceeded => {
+            "The run stopped because it hit the configured latency budget; inspect the top-k error before treating the frontier as settled."
+        }
+        RerankStopReason::Cancelled => "The run was cancelled before normal convergence.",
+        RerankStopReason::NoProposals => {
+            "The planner found no comparison that could improve the ranking under the current constraints."
+        }
+        RerankStopReason::NoNewPairs => {
+            "The planner found candidate comparisons, but all eligible pairs were already known or blocked."
+        }
+    }
 }
 
 fn hash_request(req: &MultiRerankRequest) -> String {

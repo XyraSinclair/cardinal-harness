@@ -22,6 +22,7 @@ use crate::trait_search::{
 };
 
 type AttrUnits = (Vec<f64>, Vec<f64>, Vec<f64>, Vec<f64>);
+type LikertInference = (Vec<f64>, Vec<f64>, Vec<bool>);
 
 #[derive(Debug, thiserror::Error)]
 pub enum EvaluationError {
@@ -192,15 +193,11 @@ fn compute_curl(
         true_rank.insert(idx, r + 1);
     }
 
-    let n = indices.len();
     let mut weighted_concordant = 0.0;
     let mut weighted_total = 0.0;
 
-    for ii in 0..n {
-        for jj in (ii + 1)..n {
-            let a = indices[ii];
-            let b = indices[jj];
-
+    for (ii, &a) in indices.iter().enumerate() {
+        for &b in indices.iter().skip(ii + 1) {
             let pr_a = pred_rank[&a] as f64;
             let pr_b = pred_rank[&b] as f64;
             let tr_a = true_rank[&a] as f64;
@@ -268,16 +265,22 @@ fn compute_ndcg_at_k(pred_scores: &[f64], true_scores: &[f64], indices: &[usize]
 
     let k_eff = k.min(pred_order.len());
 
-    let dcg: f64 = (0..k_eff)
-        .map(|i| {
-            let rel = relevance(pred_order[i]);
+    let dcg: f64 = pred_order
+        .iter()
+        .take(k_eff)
+        .enumerate()
+        .map(|(i, &idx)| {
+            let rel = relevance(idx);
             (2.0_f64.powf(rel) - 1.0) / (i as f64 + 2.0).log2()
         })
         .sum();
 
-    let idcg: f64 = (0..k_eff)
-        .map(|i| {
-            let rel = relevance(ideal_order[i]);
+    let idcg: f64 = ideal_order
+        .iter()
+        .take(k_eff)
+        .enumerate()
+        .map(|(i, &idx)| {
+            let rel = relevance(idx);
             (2.0_f64.powf(rel) - 1.0) / (i as f64 + 2.0).log2()
         })
         .sum();
@@ -327,8 +330,7 @@ fn compute_weighted_rank_reversals(
     }
 
     let mut wrr = 0.0;
-    for true_r in 0..k_eff {
-        let idx = true_order[true_r];
+    for (true_r, &idx) in true_order.iter().take(k_eff).enumerate() {
         let pred_r = pred_rank_map[&idx];
         let displacement = (pred_r as f64 - (true_r + 1) as f64).abs();
         let weight = 1.0 / (true_r + 1) as f64;
@@ -376,10 +378,8 @@ fn compute_topk_discordance(
     let relevant: Vec<usize> = pred_topk.union(&true_topk).copied().collect();
 
     let mut discordances = 0;
-    for i in 0..relevant.len() {
-        for j in (i + 1)..relevant.len() {
-            let a = relevant[i];
-            let b = relevant[j];
+    for (i, &a) in relevant.iter().enumerate() {
+        for &b in relevant.iter().skip(i + 1) {
             let pred_cmp = pred_scores[a].partial_cmp(&pred_scores[b]);
             let true_cmp = true_scores[a].partial_cmp(&true_scores[b]);
             if let (Some(p), Some(t)) = (pred_cmp, true_cmp) {
@@ -597,6 +597,10 @@ pub fn synthetic_cases() -> Vec<SyntheticCase> {
             outlier_rate: 0.0,
             seed: 45,
         },
+        // This is intentionally adversarial: sparse active comparisons plus
+        // high-confidence flipped pairwise observations.  It is a regression
+        // target, not evidence that the robust solver already beats direct
+        // scoring under outliers.
         SyntheticCase {
             name: "outlier_robustness_25",
             attributes: vec![SyntheticAttribute {
@@ -946,11 +950,15 @@ pub fn run_synthetic_case(case: &SyntheticCase) -> Result<EvaluationResult, Eval
     let mut pred_scores = vec![0.0; n];
     let mut pred_vars = vec![0.0; n];
     let mut pred_feasible = vec![true; n];
-    for i in 0..n {
+    for (i, (score, (var, feasible))) in pred_scores
+        .iter_mut()
+        .zip(pred_vars.iter_mut().zip(pred_feasible.iter_mut()))
+        .enumerate()
+    {
         let state = manager.entity_state(i);
-        pred_scores[i] = state.u_mean;
-        pred_vars[i] = state.u_var;
-        pred_feasible[i] = state.feasible;
+        *score = state.u_mean;
+        *var = state.u_var;
+        *feasible = state.feasible;
     }
 
     let true_scores = compute_ground_truth_scores(&case.attributes);
@@ -961,15 +969,32 @@ pub fn run_synthetic_case(case: &SyntheticCase) -> Result<EvaluationResult, Eval
     let kendall_tau_all = kendall_tau_b(&pred_scores, &true_scores);
     let spearman_rho_all = spearman_rho(&pred_scores, &true_scores);
 
+    // Gate-aware top-k metrics intentionally compare the predicted feasible
+    // frontier against the true feasible frontier.  Otherwise a false
+    // infeasible gate decision would remove a missed true top-k item from the
+    // denominator and overstate performance on gated synthetic cases.
+    let true_eval_indices: Vec<usize> = (0..n).filter(|&i| true_feasible[i]).collect();
+
     let (kendall_tau, spearman_rho, topk_precision, topk_recall) = if eval_indices.len() >= 2 {
         let pred_eval: Vec<f64> = eval_indices.iter().map(|&i| pred_scores[i]).collect();
         let true_eval: Vec<f64> = eval_indices.iter().map(|&i| true_scores[i]).collect();
-        let k = case.topk.k.min(eval_indices.len());
         (
             kendall_tau_b(&pred_eval, &true_eval),
             spearman_rho(&pred_eval, &true_eval),
-            topk_precision(&pred_scores, &true_scores, &eval_indices, k),
-            topk_recall(&pred_scores, &true_scores, &eval_indices, k),
+            topk_precision_against_truth(
+                &pred_scores,
+                &true_scores,
+                &eval_indices,
+                &true_eval_indices,
+                case.topk.k,
+            ),
+            topk_recall_against_truth(
+                &pred_scores,
+                &true_scores,
+                &eval_indices,
+                &true_eval_indices,
+                case.topk.k,
+            ),
         )
     } else {
         (0.0, 0.0, 0.0, 0.0)
@@ -983,8 +1008,8 @@ pub fn run_synthetic_case(case: &SyntheticCase) -> Result<EvaluationResult, Eval
         let mut tp = 0usize;
         let mut fp = 0usize;
         let mut fn_ = 0usize;
-        for i in 0..n {
-            match (pred_feasible[i], true_feasible[i]) {
+        for (&pred, &truth) in pred_feasible.iter().zip(true_feasible.iter()) {
+            match (pred, truth) {
                 (true, true) => tp += 1,
                 (true, false) => fp += 1,
                 (false, true) => fn_ += 1,
@@ -1109,18 +1134,25 @@ pub fn run_likert_baseline_case(
             }
         }
 
-        // Track an error trajectory using feasible-only top-k precision.
+        // Track the same gate-aware error used by the final metrics: predicted
+        // top-k comes from the current predicted-feasible set, but the target
+        // top-k comes from the true feasible set.  Using one shared feasible
+        // set here would let gate false-negatives erase items from the target
+        // denominator and make gated synthetic cases look better than they are.
         if (step + 1) % stride == 0 || step + 1 == rating_budget {
             let (pred_scores, _, pred_feasible) =
                 infer_scores_from_likert(case, levels, &sums, &counts, false)?;
             let true_scores = compute_ground_truth_scores(&case.attributes);
-            let eval_indices: Vec<usize> = (0..n).filter(|&i| pred_feasible[i]).collect();
-            let k = case.topk.k.min(eval_indices.len());
-            let p = if eval_indices.len() >= 2 && k > 0 {
-                topk_precision(&pred_scores, &true_scores, &eval_indices, k)
-            } else {
-                0.0
-            };
+            let true_feasible = compute_true_feasible(&case.attributes, &case.gates)?;
+            let pred_indices: Vec<usize> = (0..n).filter(|&i| pred_feasible[i]).collect();
+            let true_indices: Vec<usize> = (0..n).filter(|&i| true_feasible[i]).collect();
+            let p = topk_precision_against_truth(
+                &pred_scores,
+                &true_scores,
+                &pred_indices,
+                &true_indices,
+                case.topk.k,
+            );
             error_trajectory.push((1.0 - p).clamp(0.0, 1.0));
         }
     }
@@ -1134,15 +1166,28 @@ pub fn run_likert_baseline_case(
     let kendall_tau_all = kendall_tau_b(&pred_scores, &true_scores);
     let spearman_rho_all = spearman_rho(&pred_scores, &true_scores);
 
+    let true_eval_indices: Vec<usize> = (0..n).filter(|&i| true_feasible[i]).collect();
+
     let (kendall_tau, spearman_rho, topk_precision_v, topk_recall_v) = if eval_indices.len() >= 2 {
         let pred_eval: Vec<f64> = eval_indices.iter().map(|&i| pred_scores[i]).collect();
         let true_eval: Vec<f64> = eval_indices.iter().map(|&i| true_scores[i]).collect();
-        let k = case.topk.k.min(eval_indices.len());
         (
             kendall_tau_b(&pred_eval, &true_eval),
             spearman_rho(&pred_eval, &true_eval),
-            topk_precision(&pred_scores, &true_scores, &eval_indices, k),
-            topk_recall(&pred_scores, &true_scores, &eval_indices, k),
+            topk_precision_against_truth(
+                &pred_scores,
+                &true_scores,
+                &eval_indices,
+                &true_eval_indices,
+                case.topk.k,
+            ),
+            topk_recall_against_truth(
+                &pred_scores,
+                &true_scores,
+                &eval_indices,
+                &true_eval_indices,
+                case.topk.k,
+            ),
         )
     } else {
         (0.0, 0.0, 0.0, 0.0)
@@ -1156,8 +1201,8 @@ pub fn run_likert_baseline_case(
         let mut tp = 0usize;
         let mut fp = 0usize;
         let mut fn_ = 0usize;
-        for i in 0..n {
-            match (pred_feasible[i], true_feasible[i]) {
+        for (&pred, &truth) in pred_feasible.iter().zip(true_feasible.iter()) {
+            match (pred, truth) {
                 (true, true) => tp += 1,
                 (true, false) => fp += 1,
                 (false, true) => fn_ += 1,
@@ -1251,7 +1296,7 @@ fn infer_scores_from_likert(
     sums: &HashMap<&str, Vec<f64>>,
     counts: &HashMap<&str, Vec<u32>>,
     strict_for_gates: bool,
-) -> Result<(Vec<f64>, Vec<f64>, Vec<bool>), EvaluationError> {
+) -> Result<LikertInference, EvaluationError> {
     let n = case.attributes.first().map(|a| a.scores.len()).unwrap_or(0);
     let levels = levels.max(2);
     let mid = (levels as f64 + 1.0) / 2.0;
@@ -1279,16 +1324,20 @@ fn infer_scores_from_likert(
         let mut means = vec![mid; n];
         let mut mean_vars = vec![prior_var; n];
 
-        for i in 0..n {
-            if c[i] > 0 {
-                means[i] = s[i] / c[i] as f64;
-                let denom = c[i] as f64;
+        for ((mean, mean_var), (&sum, &count)) in means
+            .iter_mut()
+            .zip(mean_vars.iter_mut())
+            .zip(s.iter().zip(c.iter()))
+        {
+            if count > 0 {
+                *mean = sum / count as f64;
+                let denom = count as f64;
                 let v = if noise_var > 0.0 {
                     noise_var / denom
                 } else {
                     0.0
                 };
-                mean_vars[i] = v.max(0.0);
+                *mean_var = v.max(0.0);
             }
         }
 
@@ -1314,9 +1363,13 @@ fn infer_scores_from_likert(
         let inv2 = inv * inv;
         let w = attr.weight;
         let w2 = w * w;
-        for i in 0..n {
-            u_mean[i] += w * (means[i] * inv);
-            u_var[i] += w2 * (mean_vars[i].max(0.0) * inv2);
+        for ((u, var), (&mean, &mean_var)) in u_mean
+            .iter_mut()
+            .zip(u_var.iter_mut())
+            .zip(means.iter().zip(mean_vars.iter()))
+        {
+            *u += w * (mean * inv);
+            *var += w2 * (mean_var.max(0.0) * inv2);
         }
     }
 
@@ -1329,14 +1382,14 @@ fn infer_scores_from_likert(
         let c = counts
             .get(gate.attribute_id)
             .expect("gate count missing in likert baseline");
-        for i in 0..n {
+        for (i, feasible_i) in feasible.iter_mut().enumerate() {
             if strict_for_gates && c[i] == 0 {
-                feasible[i] = false;
+                *feasible_i = false;
                 continue;
             }
             let value = gate.unit.select(latent[i], z[i], min_norm[i], pct[i]);
             let pass = gate.op.passes(value, gate.threshold);
-            feasible[i] &= pass;
+            *feasible_i &= pass;
         }
     }
 
@@ -1497,10 +1550,10 @@ fn compute_true_feasible(
         let Some((latent, z, min_norm, pct)) = attr_units.get(gate.attribute_id) else {
             continue;
         };
-        for i in 0..n {
+        for (i, feasible_i) in feasible.iter_mut().enumerate() {
             let value = gate.unit.select(latent[i], z[i], min_norm[i], pct[i]);
             let pass = gate.op.passes(value, gate.threshold);
-            feasible[i] = feasible[i] && pass;
+            *feasible_i &= pass;
         }
     }
 
@@ -1518,10 +1571,10 @@ fn kendall_tau_b(x: &[f64], y: &[f64]) -> f64 {
     let mut ties_x = 0f64;
     let mut ties_y = 0f64;
 
-    for i in 0..n {
-        for j in (i + 1)..n {
-            let dx = x[i] - x[j];
-            let dy = y[i] - y[j];
+    for (i, (&xi, &yi)) in x.iter().zip(y.iter()).enumerate() {
+        for (&xj, &yj) in x.iter().zip(y.iter()).skip(i + 1) {
+            let dx = xi - xj;
+            let dy = yi - yj;
 
             if dx == 0.0 && dy == 0.0 {
                 continue;
@@ -1560,9 +1613,9 @@ fn spearman_rho(x: &[f64], y: &[f64]) -> f64 {
     let mut den_x = 0.0;
     let mut den_y = 0.0;
 
-    for i in 0..n {
-        let dx = rx[i] - mean_x;
-        let dy = ry[i] - mean_y;
+    for (&x_rank, &y_rank) in rx.iter().zip(ry.iter()) {
+        let dx = x_rank - mean_x;
+        let dy = y_rank - mean_y;
         num += dx * dy;
         den_x += dx * dx;
         den_y += dy * dy;
@@ -1603,8 +1656,22 @@ fn ranks_with_ties(scores: &[f64]) -> Vec<f64> {
 }
 
 fn topk_precision(pred_scores: &[f64], true_scores: &[f64], indices: &[usize], k: usize) -> f64 {
-    let pred_set = topk_set(pred_scores, indices, k, false);
-    let true_set = topk_set(true_scores, indices, k, true);
+    topk_precision_against_truth(pred_scores, true_scores, indices, indices, k)
+}
+
+fn topk_recall(pred_scores: &[f64], true_scores: &[f64], indices: &[usize], k: usize) -> f64 {
+    topk_recall_against_truth(pred_scores, true_scores, indices, indices, k)
+}
+
+fn topk_precision_against_truth(
+    pred_scores: &[f64],
+    true_scores: &[f64],
+    pred_indices: &[usize],
+    true_indices: &[usize],
+    k: usize,
+) -> f64 {
+    let pred_set = topk_set(pred_scores, pred_indices, k, false);
+    let true_set = topk_set(true_scores, true_indices, k, true);
     if pred_set.is_empty() {
         return 0.0;
     }
@@ -1612,9 +1679,15 @@ fn topk_precision(pred_scores: &[f64], true_scores: &[f64], indices: &[usize], k
     inter as f64 / pred_set.len() as f64
 }
 
-fn topk_recall(pred_scores: &[f64], true_scores: &[f64], indices: &[usize], k: usize) -> f64 {
-    let pred_set = topk_set(pred_scores, indices, k, false);
-    let true_set = topk_set(true_scores, indices, k, true);
+fn topk_recall_against_truth(
+    pred_scores: &[f64],
+    true_scores: &[f64],
+    pred_indices: &[usize],
+    true_indices: &[usize],
+    k: usize,
+) -> f64 {
+    let pred_set = topk_set(pred_scores, pred_indices, k, false);
+    let true_set = topk_set(true_scores, true_indices, k, true);
     if true_set.is_empty() {
         return 0.0;
     }
@@ -1955,6 +2028,39 @@ mod tests {
         assert!(top2.contains(&0)); // score 10
         assert!(top2.contains(&2)); // score 8
         assert_eq!(top2.len(), 2);
+    }
+
+    #[test]
+    fn gate_aware_topk_recall_penalizes_false_infeasible_items() {
+        let pred_scores = vec![100.0, 90.0, 80.0, 70.0];
+        let true_scores = vec![100.0, 90.0, 80.0, 70.0];
+        let pred_feasible = vec![1, 2, 3];
+        let true_feasible = vec![0, 1, 2, 3];
+
+        // A gated run must not get to erase a true top-k item from the target
+        // set merely because the gate predicted that item infeasible.
+        assert!(
+            (topk_precision_against_truth(
+                &pred_scores,
+                &true_scores,
+                &pred_feasible,
+                &true_feasible,
+                2,
+            ) - 0.5)
+                .abs()
+                < 1e-6
+        );
+        assert!(
+            (topk_recall_against_truth(
+                &pred_scores,
+                &true_scores,
+                &pred_feasible,
+                &true_feasible,
+                2,
+            ) - 0.5)
+                .abs()
+                < 1e-6
+        );
     }
 
     #[test]

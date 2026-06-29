@@ -7,7 +7,7 @@ use std::collections::HashMap;
 use std::sync::OnceLock;
 
 /// Pricing information for a model.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ModelPricing {
     /// Provider name.
     pub provider: &'static str,
@@ -15,6 +15,53 @@ pub struct ModelPricing {
     pub input_nanos_per_token: i64,
     /// Cost per output token in nanodollars.
     pub output_nanos_per_token: i64,
+}
+
+const DEFAULT_CHAT_ESTIMATE: ModelPricing = ModelPricing::new("unknown", 1_000, 5_000);
+
+/// Whether a chat cost was priced from a known model entry or from the fallback estimate.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ChatCostStatus {
+    /// The model has an exact entry in the local pricing table.
+    Exact {
+        /// Pricing entry used for the calculation.
+        pricing: ModelPricing,
+        /// Calculated cost in nanodollars.
+        cost_nanodollars: i64,
+    },
+    /// The model is unknown, so the cost uses the documented fallback estimate.
+    Estimated {
+        /// Fallback pricing used for the calculation.
+        pricing: ModelPricing,
+        /// Calculated cost in nanodollars.
+        cost_nanodollars: i64,
+    },
+}
+
+impl ChatCostStatus {
+    /// Calculated cost in nanodollars.
+    pub fn cost_nanodollars(self) -> i64 {
+        match self {
+            Self::Exact {
+                cost_nanodollars, ..
+            }
+            | Self::Estimated {
+                cost_nanodollars, ..
+            } => cost_nanodollars,
+        }
+    }
+
+    /// True when the model was absent from the pricing table and fallback pricing was used.
+    pub fn is_estimate(self) -> bool {
+        matches!(self, Self::Estimated { .. })
+    }
+
+    /// Pricing entry used for the calculation.
+    pub fn pricing(self) -> ModelPricing {
+        match self {
+            Self::Exact { pricing, .. } | Self::Estimated { pricing, .. } => pricing,
+        }
+    }
 }
 
 impl ModelPricing {
@@ -142,12 +189,23 @@ pub fn embedding_cost_batch(model: &str, tokens: u32) -> i64 {
     pricing.calculate_cost(tokens, 0)
 }
 
+/// Calculate chat cost and expose whether pricing was exact or estimated.
+pub fn chat_cost_status(model: &str, input_tokens: u32, output_tokens: u32) -> ChatCostStatus {
+    match get_pricing(model) {
+        Some(pricing) => ChatCostStatus::Exact {
+            pricing,
+            cost_nanodollars: pricing.calculate_cost(input_tokens, output_tokens),
+        },
+        None => ChatCostStatus::Estimated {
+            pricing: DEFAULT_CHAT_ESTIMATE,
+            cost_nanodollars: DEFAULT_CHAT_ESTIMATE.calculate_cost(input_tokens, output_tokens),
+        },
+    }
+}
+
 /// Calculate chat cost.
 pub fn chat_cost(model: &str, input_tokens: u32, output_tokens: u32) -> i64 {
-    // Default to a mid-range model if unknown
-    let default = ModelPricing::new("unknown", 1_000, 5_000);
-    let pricing = get_pricing(model).unwrap_or(default);
-    pricing.calculate_cost(input_tokens, output_tokens)
+    chat_cost_status(model, input_tokens, output_tokens).cost_nanodollars()
 }
 
 // =============================================================================
@@ -293,6 +351,42 @@ mod tests {
         // Total: 6,000,000 nanos = $0.006
         let cost = chat_cost("anthropic/claude-haiku-4.5", 1_000, 1_000);
         assert_eq!(cost, 6_000_000);
+    }
+
+    #[test]
+    fn test_chat_cost_status_known_model_is_exact() {
+        let status = chat_cost_status("anthropic/claude-haiku-4.5", 1_000, 1_000);
+
+        assert!(!status.is_estimate());
+        assert_eq!(status.cost_nanodollars(), 6_000_000);
+        assert_eq!(status.pricing(), CLAUDE_HAIKU_4_5);
+        assert_eq!(
+            status,
+            ChatCostStatus::Exact {
+                pricing: CLAUDE_HAIKU_4_5,
+                cost_nanodollars: 6_000_000
+            }
+        );
+    }
+
+    #[test]
+    fn test_chat_cost_status_unknown_model_is_estimated() {
+        let status = chat_cost_status("provider/not-in-pricing-table", 1_000, 1_000);
+
+        assert!(status.is_estimate());
+        assert_eq!(status.cost_nanodollars(), 6_000_000);
+        assert_eq!(status.pricing(), DEFAULT_CHAT_ESTIMATE);
+        assert_eq!(
+            status,
+            ChatCostStatus::Estimated {
+                pricing: DEFAULT_CHAT_ESTIMATE,
+                cost_nanodollars: 6_000_000
+            }
+        );
+        assert_eq!(
+            chat_cost("provider/not-in-pricing-table", 1_000, 1_000),
+            status.cost_nanodollars()
+        );
     }
 
     // =========================================================================

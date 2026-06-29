@@ -1,0 +1,41 @@
+{
+  "entities": [
+    {
+      "id": "essay_a",
+      "text": "The proposal states a clear thesis, but gives few concrete examples."
+    },
+    {
+      "id": "essay_b",
+      "text": "The proposal lists three worked examples and explains the trade-offs for each."
+    },
+    {
+      "id": "essay_c",
+      "text": "The proposal is concise and readable, but leaves implementation details implicit."
+    }
+  ],
+  "attributes": [
+    {
+      "id": "clarity",
+      "prompt": "clarity of explanation",
+      "prompt_template_slug": "canonical_v2",
+      "weight": 0.6
+    },
+    {
+      "id": "evidence",
+      "prompt": "strength of concrete evidence and examples",
+      "prompt_template_slug": "canonical_bucket_v1",
+      "weight": 0.4
+    }
+  ],
+  "topk": {
+    "k": 2,
+    "tolerated_error": 0.1
+  },
+  "gates": [],
+  "comparison_budget": 12,
+  "model": "openai/gpt-5-mini",
+  "rater_id": "docs-example",
+  "comparison_concurrency": 2,
+  "max_pair_repeats": 1,
+  "randomize_presentation_order": true
+}

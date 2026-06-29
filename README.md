@@ -4,6 +4,10 @@
 
 It does one job: turn noisy LLM pairwise ratio judgements into globally consistent cardinal scores with uncertainty, then spend the next comparison where it buys the most information.
 
+Use it when direct scores are unstable but pairwise comparisons are meaningful: research ideas, prompts, candidate plans, reviewer notes, or any shortlist where "how much better?" carries information. Do not use it for deterministic rankings, scalar metrics, or cases where the attribute itself is incoherent.
+
+The trade is explicit: it costs more than one-shot scoring, saves comparisons versus exhaustive pairwise judging, and returns uncertainty plus receipts instead of only a sorted list.
+
 ## Scope
 
 This repo is intentionally narrow. It contains:
@@ -25,15 +29,16 @@ Instead of asking an LLM for unstable absolute scores, ask:
 
 Each answer becomes a noisy log-ratio observation. `cardinal-harness` fits latent scores that best explain the full comparison graph, tracks uncertainty, and stops once top-k is sufficiently certain.
 
-## Prompt
+## Prompt surfaces
 
-There is one supported prompt template: `canonical_v2`.
+Two prompt templates are supported:
 
-- slug: `canonical_v2`
-- answer shape: `{"higher_ranked":"A|B","ratio":1.0..26.0,"confidence":0.0..1.0}`
-- refusal shape: `{"refused":true}`
+| Slug | Output shape | Use when |
+|------|--------------|----------|
+| `canonical_v2` | `{"higher_ranked":"A|B","ratio":1.0..26.0,"confidence":0.0..1.0}` | Default pairwise-ratio judgement. Use this unless you specifically need bucket-token logprobs. |
+| `canonical_bucket_v1` | `{"higher_ranked":"A|B","ratio_bucket":0..16,"confidence":0.0..1.0}` | Bucket-index variant for runs that need to map output logprobs onto the fixed ratio ladder. |
 
-Details live in [docs/PROMPTS.md](docs/PROMPTS.md).
+Both templates use the same ratio ladder and the same refusal shape: `{"refused":true}`. Unknown `prompt_template_slug` values are rejected. Details live in [docs/PROMPTS.md](docs/PROMPTS.md).
 
 ## Quickstart
 
@@ -103,13 +108,35 @@ for entity in &resp.entities {
 
 ## CLI
 
+The CLI `rerank` command reads a `MultiRerankRequest` JSON file. A copy-pasteable example lives at [`examples/multi-rerank-request.json`](examples/multi-rerank-request.json). Use `validate` first when you want schema and invariant checks without an API key, cache, or network call.
+
 ```bash
-# Rerank from JSON
-cargo run --bin cardinal -- rerank --request input.json --out output.json --trace trace.jsonl
+# Validate request JSON locally before running a model.
+cargo run --bin cardinal -- validate \
+  --request examples/multi-rerank-request.json
 
-# Generate a markdown or JSON report
-cargo run --bin cardinal -- report --request input.json --response output.json --out report.md
+export OPENROUTER_API_KEY=your_key_here
 
+# Rerank from JSON. The example includes both canonical_v2 and canonical_bucket_v1 attributes.
+cargo run --bin cardinal -- rerank \
+  --request examples/multi-rerank-request.json \
+  --out output.json \
+  --trace trace.jsonl \
+  --report report.md
+
+# Generate a markdown or JSON report later from a saved request + response.
+cargo run --bin cardinal -- report \
+  --request examples/multi-rerank-request.json \
+  --response output.json \
+  --out report.md
+
+# Simple single-attribute request shape for library/API callers.
+# See examples/simple-rerank-request.json; the current CLI accepts the multi-rerank shape above.
+```
+
+Other maintenance commands:
+
+```bash
 # Synthetic evaluation
 cargo run --bin cardinal -- eval --out eval.jsonl --curve-csv curves.csv
 cargo run --bin cardinal -- eval-likert --out eval_likert.jsonl --curve-csv curves_likert.csv
@@ -131,10 +158,26 @@ cargo run --bin cardinal -- cache-prune --max-age-days 30
 | `gateway` | OpenRouter client, pricing, usage, attribution |
 | `text_chunking` | Token-aware chunking helpers |
 
+
+Data flow:
+
+```text
+request JSON
+  -> rerank manager
+  -> per-attribute rating engines
+  -> active planner
+  -> OpenRouter gateway + SQLite cache
+  -> trace JSONL + response JSON + markdown report
+```
+
 ## Documentation
 
 - [docs/ALGORITHM.md](docs/ALGORITHM.md): scoring, uncertainty, stopping, and evaluation rationale
-- [docs/PROMPTS.md](docs/PROMPTS.md): the `canonical_v2` prompt contract
+- [docs/MODEL.md](docs/MODEL.md): compact mathematical contract, assumptions, and failure modes
+- [docs/PROMPTS.md](docs/PROMPTS.md): supported prompt templates, output contracts, and JSON request examples
+- [docs/WORKED_EXAMPLE.md](docs/WORKED_EXAMPLE.md): concrete rerank walkthrough with request shape, gates, stop reasons, uncertainty, cache, and reproducibility receipts
+- [docs/EVALUATION.md](docs/EVALUATION.md): checked-in synthetic evaluation receipt and baseline comparison
+- [docs/BENCHMARKS.md](docs/BENCHMARKS.md): scaling harness and current dense-solver receipt
 
 ## License
 

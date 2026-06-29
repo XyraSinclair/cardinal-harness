@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::path::PathBuf;
 use std::process::Command;
 
 use cardinal_harness::rerank::{
@@ -33,17 +34,57 @@ fn approx_eq(a: f64, b: f64, tol: f64) -> bool {
     (a - b).abs() <= tol
 }
 
+fn cardinal_bin() -> PathBuf {
+    let cargo_bin = option_env!("CARGO_BIN_EXE_cardinal").filter(|path| !path.is_empty());
+    if let Some(path) = cargo_bin {
+        let path = PathBuf::from(path);
+        if path.exists() {
+            return path;
+        }
+    }
+
+    let test_exe =
+        std::env::current_exe().expect("failed to resolve current integration test binary path");
+    let deps_dir = test_exe.parent().unwrap_or_else(|| {
+        panic!(
+            "integration test binary path has no parent directory: {}",
+            test_exe.display()
+        )
+    });
+    let target_dir = deps_dir.parent().unwrap_or_else(|| {
+        panic!(
+            "integration test binary parent has no target directory: {}",
+            deps_dir.display()
+        )
+    });
+    let fallback = target_dir.join(format!("cardinal{}", std::env::consts::EXE_SUFFIX));
+
+    if fallback.exists() {
+        return fallback;
+    }
+
+    panic!(
+        "failed to locate compiled cardinal binary; CARGO_BIN_EXE_cardinal={:?}; \
+         integration test binary={}; fallback path={}. Run `cargo test --test cli_smoke` \
+         so Cargo builds the cardinal binary before the smoke tests run",
+        cargo_bin,
+        test_exe.display(),
+        fallback.display()
+    );
+}
+
 fn run_cli_eval(case: &str) -> EvalResult {
     let dir = tempdir().unwrap();
     let out_path = dir.path().join("eval.jsonl");
 
-    let status = Command::new(env!("CARGO_BIN_EXE_cardinal"))
+    let bin = cardinal_bin();
+    let status = Command::new(&bin)
         .args(["eval", "--case", case])
         .arg("--out")
         .arg(&out_path)
         .status()
-        .unwrap();
-    assert!(status.success());
+        .unwrap_or_else(|err| panic!("failed to run cardinal eval at {}: {err}", bin.display()));
+    assert!(status.success(), "cardinal eval exited with {status}");
 
     let raw = std::fs::read_to_string(&out_path).unwrap();
     let first_line = raw.lines().next().unwrap();
@@ -72,13 +113,22 @@ fn run_cli_eval_likert(case: &str) -> LikertEvalResult {
     let dir = tempdir().unwrap();
     let out_path = dir.path().join("eval_likert.jsonl");
 
-    let status = Command::new(env!("CARGO_BIN_EXE_cardinal"))
+    let bin = cardinal_bin();
+    let status = Command::new(&bin)
         .args(["eval-likert", "--case", case])
         .arg("--out")
         .arg(&out_path)
         .status()
-        .unwrap();
-    assert!(status.success());
+        .unwrap_or_else(|err| {
+            panic!(
+                "failed to run cardinal eval-likert at {}: {err}",
+                bin.display()
+            )
+        });
+    assert!(
+        status.success(),
+        "cardinal eval-likert exited with {status}"
+    );
 
     let raw = std::fs::read_to_string(&out_path).unwrap();
     let first_line = raw.lines().next().unwrap();
@@ -187,12 +237,90 @@ fn cli_eval_likert_smoke_and_determinism() {
 }
 
 #[test]
+fn cli_validate_example_request_smoke() {
+    let request_path =
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("examples/multi-rerank-request.json");
+
+    let bin = cardinal_bin();
+    let output = Command::new(&bin)
+        .args(["validate", "--request"])
+        .arg(&request_path)
+        .output()
+        .unwrap_or_else(|err| {
+            panic!(
+                "failed to run cardinal validate at {}: {err}",
+                bin.display()
+            )
+        });
+
+    assert!(
+        output.status.success(),
+        "cardinal validate exited with {}; stderr={}",
+        output.status,
+        String::from_utf8_lossy(&output.stderr)
+    );
+    assert!(
+        String::from_utf8_lossy(&output.stdout).contains("valid request:"),
+        "stdout did not confirm validation: {}",
+        String::from_utf8_lossy(&output.stdout)
+    );
+    assert!(
+        output.stderr.is_empty(),
+        "validate should not warn on the checked-in example request; stderr={}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+}
+
+#[test]
+fn cli_rerank_validates_before_gateway_setup() {
+    let dir = tempdir().unwrap();
+    let request_path = dir.path().join("invalid-request.json");
+    let out_path = dir.path().join("out.json");
+    std::fs::write(
+        &request_path,
+        serde_json::json!({
+            "entities": [
+                {"id": "a", "text": "A"},
+                {"id": "b", "text": "B"}
+            ],
+            "attributes": [
+                {"id": "clarity", "prompt": "clarity", "weight": 1.0}
+            ],
+            "topk": {"k": 0}
+        })
+        .to_string(),
+    )
+    .unwrap();
+
+    let bin = cardinal_bin();
+    let output = Command::new(&bin)
+        .args(["rerank", "--request"])
+        .arg(&request_path)
+        .arg("--out")
+        .arg(&out_path)
+        .env_remove("OPENROUTER_API_KEY")
+        .output()
+        .unwrap_or_else(|err| panic!("failed to run cardinal rerank at {}: {err}", bin.display()));
+
+    assert!(
+        !output.status.success(),
+        "invalid request should fail before gateway setup"
+    );
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("topk.k must be >= 1"),
+        "expected validation error before gateway setup; stderr={stderr}"
+    );
+}
+
+#[test]
 fn cli_report_json_smoke() {
     let dir = tempdir().unwrap();
 
     let request_path = dir.path().join("request.json");
     let response_path = dir.path().join("response.json");
     let out_path = dir.path().join("report.json");
+    let md_path = dir.path().join("report.md");
 
     let req = MultiRerankRequest {
         entities: vec![
@@ -276,21 +404,21 @@ fn cli_report_json_smoke() {
             },
         ],
         meta: MultiRerankMeta {
-            global_topk_error: 0.0,
+            global_topk_error: 0.2,
             tolerated_error: req.topk.tolerated_error,
             k: req.topk.k,
             band_size: req.topk.band_size,
-            comparisons_attempted: 1,
-            comparisons_used: 1,
-            comparisons_refused: 0,
-            comparisons_cached: 0,
-            comparison_budget: 1,
+            comparisons_attempted: 3,
+            comparisons_used: 2,
+            comparisons_refused: 1,
+            comparisons_cached: 1,
+            comparison_budget: 3,
             latency_ms: 1,
             model_used: "openai/gpt-5-mini".into(),
             rater_id_used: "openai/gpt-5-mini".into(),
-            provider_input_tokens: 0,
-            provider_output_tokens: 0,
-            provider_cost_nanodollars: 0,
+            provider_input_tokens: 123,
+            provider_output_tokens: 45,
+            provider_cost_nanodollars: 123_456_789,
             stop_reason: RerankStopReason::BudgetExhausted,
         },
     };
@@ -298,7 +426,8 @@ fn cli_report_json_smoke() {
     std::fs::write(&request_path, serde_json::to_string_pretty(&req).unwrap()).unwrap();
     std::fs::write(&response_path, serde_json::to_string_pretty(&resp).unwrap()).unwrap();
 
-    let status = Command::new(env!("CARGO_BIN_EXE_cardinal"))
+    let bin = cardinal_bin();
+    let status = Command::new(&bin)
         .args(["report", "--format", "json"])
         .arg("--request")
         .arg(&request_path)
@@ -307,8 +436,8 @@ fn cli_report_json_smoke() {
         .arg("--out")
         .arg(&out_path)
         .status()
-        .unwrap();
-    assert!(status.success());
+        .unwrap_or_else(|err| panic!("failed to run cardinal report at {}: {err}", bin.display()));
+    assert!(status.success(), "cardinal report exited with {status}");
 
     let raw = std::fs::read_to_string(&out_path).unwrap();
     let v: serde_json::Value = serde_json::from_str(&raw).unwrap();
@@ -327,6 +456,24 @@ fn cli_report_json_smoke() {
         "budget_exhausted"
     );
     assert_eq!(
+        v.pointer("/summary/provider_input_tokens")
+            .and_then(|n| n.as_u64())
+            .unwrap(),
+        123
+    );
+    assert_eq!(
+        v.pointer("/summary/provider_output_tokens")
+            .and_then(|n| n.as_u64())
+            .unwrap(),
+        45
+    );
+    assert_eq!(
+        v.pointer("/summary/provider_cost_nanodollars")
+            .and_then(|n| n.as_i64())
+            .unwrap(),
+        123_456_789
+    );
+    assert_eq!(
         v.pointer("/attributes/0/id")
             .and_then(|s| s.as_str())
             .unwrap(),
@@ -338,4 +485,30 @@ fn cli_report_json_smoke() {
             .unwrap(),
         "a"
     );
+
+    let status = Command::new(&bin)
+        .args(["report"])
+        .arg("--request")
+        .arg(&request_path)
+        .arg("--response")
+        .arg(&response_path)
+        .arg("--out")
+        .arg(&md_path)
+        .status()
+        .unwrap_or_else(|err| panic!("failed to run cardinal report at {}: {err}", bin.display()));
+    assert!(status.success(), "cardinal report exited with {status}");
+
+    let markdown = std::fs::read_to_string(&md_path).unwrap();
+    assert!(markdown.contains("## Run Status"));
+    assert!(markdown.contains("Stop reason: `budget_exhausted`"));
+    assert!(markdown.contains("Comparison budget: 3"));
+    assert!(markdown.contains("Provider tokens input/output/total: 123/45/168"));
+    assert!(markdown.contains("Provider cost: $0.123456789"));
+    assert!(markdown.contains("## Warnings / Degraded State"));
+    assert!(markdown.contains("non-converged stop reason `budget_exhausted`"));
+    assert!(markdown.contains("Global top-k error 0.2000 exceeds tolerated error 0.1000"));
+    assert!(markdown.contains("1 comparison(s) were refused"));
+    assert!(markdown.contains("1 comparison(s) came from cache"));
+    assert!(markdown.contains("budget before meeting the stopping tolerance"));
+    assert!(markdown.contains("`clarity`: latent 1.000 ± 0.100"));
 }

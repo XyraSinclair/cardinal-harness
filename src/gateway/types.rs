@@ -1034,14 +1034,7 @@ pub fn pairwise_logprob_posterior(
         });
 
     let neighbor_indices: Vec<usize> = (0..ratio_ladder.len())
-        .filter(|&i| {
-            let dist = if i > selected_idx {
-                i - selected_idx
-            } else {
-                selected_idx - i
-            };
-            dist <= 1
-        })
+        .filter(|&i| i.abs_diff(selected_idx) <= 1)
         .collect();
     let ratio_distribution = DiscreteDistribution::new(
         RatioBucket::all()
@@ -1287,7 +1280,7 @@ mod tests {
             },
             TokenLogprob {
                 token: "2.5".to_string(),
-                logprob: (-0.22_f64).into(), // ~0.80 probability
+                logprob: -0.22_f64, // ~0.80 probability
                 top_alternatives: vec![
                     TokenAlternative {
                         token: "2.1".to_string(),
