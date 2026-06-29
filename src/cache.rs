@@ -454,7 +454,7 @@ impl SqlitePairwiseCache {
                         "DELETE FROM pairwise_cache WHERE updated_at < ?1",
                         params![cutoff],
                     )?;
-                    deleted = deleted.saturating_add(removed as usize);
+                    deleted = deleted.saturating_add(removed);
                 }
 
                 if let Some(max_rows) = max_rows {

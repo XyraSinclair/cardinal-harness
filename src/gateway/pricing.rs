@@ -248,12 +248,10 @@ impl CacheAwarePricing {
         is_first_in_batch: bool,
     ) -> ComparisonCostEstimate {
         // Compute cache-eligible tokens (aligned to page boundary).
-        let cacheable = if self.cache_page_size > 0 {
-            let pages = shared_prefix_tokens as usize / self.cache_page_size;
-            (pages * self.cache_page_size) as u32
-        } else {
-            shared_prefix_tokens
-        };
+        let cacheable = (shared_prefix_tokens as usize)
+            .checked_div(self.cache_page_size)
+            .map(|pages| (pages * self.cache_page_size) as u32)
+            .unwrap_or(shared_prefix_tokens);
         let uncacheable_prefix = shared_prefix_tokens - cacheable;
 
         let (cached_input_tokens, cache_write_tokens) = if is_first_in_batch {
