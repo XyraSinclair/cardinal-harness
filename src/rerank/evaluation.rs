@@ -212,12 +212,32 @@ fn compute_curl(
 
             weighted_total += w;
 
-            let pred_cmp = (pred_scores[a] - pred_scores[b]).signum();
-            let true_cmp = (true_scores[a] - true_scores[b]).signum();
-            if pred_cmp * true_cmp >= 0.0 {
-                // Concordant or tied.
-                weighted_concordant += w;
-            }
+            let pred_diff = pred_scores[a] - pred_scores[b];
+            let true_diff = true_scores[a] - true_scores[b];
+            let pred_cmp = if pred_diff > 0.0 {
+                1
+            } else if pred_diff < 0.0 {
+                -1
+            } else {
+                0
+            };
+            let true_cmp = if true_diff > 0.0 {
+                1
+            } else if true_diff < 0.0 {
+                -1
+            } else {
+                0
+            };
+            let concordance_credit = if pred_cmp == 0 && true_cmp == 0 {
+                1.0
+            } else if pred_cmp == 0 || true_cmp == 0 {
+                0.5
+            } else if pred_cmp == true_cmp {
+                1.0
+            } else {
+                0.0
+            };
+            weighted_concordant += w * concordance_credit;
         }
     }
 
@@ -453,7 +473,7 @@ pub struct EvaluationResult {
 // =============================================================================
 
 /// Configuration for the Likert baseline simulator.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, serde::Serialize)]
 pub struct LikertEvalConfig {
     /// Number of discrete levels in the Likert scale (e.g. 5 or 10).
     pub levels: usize,
@@ -498,6 +518,68 @@ pub struct LikertEvaluationResult {
     pub metrics: LikertEvaluationMetrics,
     /// Trajectory of `1 - topk_precision` as more ratings are collected.
     pub error_trajectory: Vec<f64>,
+}
+
+#[derive(Debug, Clone, Copy, serde::Serialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum ComparisonOutcome {
+    CardinalWin,
+    LikertWin,
+    Tie,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct ComparisonMetricDelta {
+    pub cardinal: f64,
+    pub likert: f64,
+    /// Cardinal minus Likert. Positive is better for quality metrics; for
+    /// `comparisons_used`, lower resource use is better and `outcome` applies
+    /// that direction explicitly.
+    pub delta: f64,
+    pub higher_is_better: bool,
+    pub outcome: ComparisonOutcome,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct EvaluationComparisonDeltas {
+    pub topk_precision: ComparisonMetricDelta,
+    pub topk_recall: ComparisonMetricDelta,
+    pub kendall_tau_b: ComparisonMetricDelta,
+    pub coverage_95ci: ComparisonMetricDelta,
+    pub comparisons_used: ComparisonMetricDelta,
+}
+
+#[derive(Debug, Clone, serde::Serialize, Default)]
+pub struct EvaluationWinLossTie {
+    pub cardinal_wins: usize,
+    pub likert_wins: usize,
+    pub ties: usize,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct EvaluationComparisonMetricValues {
+    pub topk_precision: f64,
+    pub topk_recall: f64,
+    pub kendall_tau_b: f64,
+    pub coverage_95ci: f64,
+    pub comparisons_used: f64,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct EvaluationComparisonCase {
+    pub case_name: String,
+    pub cardinal: EvaluationComparisonMetricValues,
+    pub likert: EvaluationComparisonMetricValues,
+    pub cardinal_minus_likert: EvaluationComparisonDeltas,
+    pub win_loss_tie: EvaluationWinLossTie,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct EvaluationComparisonSummary {
+    pub likert_config: LikertEvalConfig,
+    pub metric_names: [&'static str; 5],
+    pub aggregate_win_loss_tie: EvaluationWinLossTie,
+    pub cases: Vec<EvaluationComparisonCase>,
 }
 
 // =============================================================================
@@ -596,6 +678,33 @@ pub fn synthetic_cases() -> Vec<SyntheticCase> {
             refusal_rate: 0.0,
             outlier_rate: 0.0,
             seed: 45,
+        },
+        SyntheticCase {
+            name: "scale_compression_40",
+            attributes: vec![SyntheticAttribute {
+                id: "attr_compressed",
+                weight: 1.0,
+                // One extreme item makes 10-level direct ratings collapse the
+                // remaining candidates into the same bucket.  The best
+                // non-outliers are deliberately placed late so tie-breaking by
+                // input order is not accidentally correct.
+                scores: [
+                    vec![1000.0],
+                    (0..31).map(|i| 1.0 + (i as f64 * 0.03)).collect::<Vec<_>>(),
+                    vec![10.0, 9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0],
+                ]
+                .concat(),
+            }],
+            gates: vec![],
+            topk: default_topk(5),
+            comparison_budget: Some(160),
+            latency_budget_ms: None,
+            max_pair_repeats: None,
+            prewarm_pairs_per_attr: 0,
+            noise_sigma: 0.0,
+            refusal_rate: 0.0,
+            outlier_rate: 0.0,
+            seed: 49,
         },
         // This is intentionally adversarial: sparse active comparisons plus
         // high-confidence flipped pairwise observations.  It is a regression
@@ -844,9 +953,12 @@ pub fn run_synthetic_case(case: &SyntheticCase) -> Result<EvaluationResult, Eval
         }
 
         let batch_size = DEFAULT_BATCH_SIZE.min(remaining_budget);
-        let proposal_request_size = (batch_size.saturating_mul(3)).max(batch_size);
+        // Ask for the number of proposals we will actually execute.  Oversampling
+        // here changes the planner policy because forced exploration is budgeted
+        // inside `propose_batch`; a 3x request turns the first executed batch into
+        // mostly exploration rather than the configured frontier/exploration mix.
         let proposals = manager
-            .propose_batch(rater_id, proposal_request_size, PlannerMode::Hybrid)
+            .propose_batch(rater_id, batch_size, PlannerMode::Hybrid)
             .expect("generating trait search proposals should succeed");
 
         if proposals.is_empty() {
@@ -1260,8 +1372,144 @@ pub fn run_likert_baseline_suite(
         .collect()
 }
 
+/// Run pairwise cardinal and Likert baselines side-by-side and emit mechanical deltas.
+pub fn run_evaluation_comparison_summary(
+    filter: Option<&str>,
+    likert_cfg: LikertEvalConfig,
+) -> Result<EvaluationComparisonSummary, EvaluationError> {
+    let cardinal_results = run_synthetic_suite(filter)?;
+    let likert_results = run_likert_baseline_suite(filter, likert_cfg)?;
+    let likert_by_case: HashMap<&str, &LikertEvaluationResult> = likert_results
+        .iter()
+        .map(|result| (result.case_name.as_str(), result))
+        .collect();
+
+    let mut aggregate_win_loss_tie = EvaluationWinLossTie::default();
+    let mut cases = Vec::with_capacity(cardinal_results.len());
+
+    for cardinal in cardinal_results {
+        let likert = likert_by_case
+            .get(cardinal.case_name.as_str())
+            .expect("synthetic and Likert suites should select identical case names");
+        let cardinal_metrics = cardinal.metrics;
+        let likert_metrics = likert.metrics.clone();
+        let cardinal_values = EvaluationComparisonMetricValues {
+            topk_precision: cardinal_metrics.topk_precision,
+            topk_recall: cardinal_metrics.topk_recall,
+            kendall_tau_b: cardinal_metrics.kendall_tau,
+            coverage_95ci: cardinal_metrics.coverage_95ci,
+            comparisons_used: cardinal_metrics.comparisons_used as f64,
+        };
+        let likert_values = EvaluationComparisonMetricValues {
+            topk_precision: likert_metrics.topk_precision,
+            topk_recall: likert_metrics.topk_recall,
+            kendall_tau_b: likert_metrics.kendall_tau,
+            coverage_95ci: likert_metrics.coverage_95ci,
+            comparisons_used: likert_metrics.ratings_used as f64,
+        };
+        let cardinal_minus_likert = EvaluationComparisonDeltas {
+            topk_precision: compare_metric_delta(
+                cardinal_values.topk_precision,
+                likert_values.topk_precision,
+                true,
+            ),
+            topk_recall: compare_metric_delta(
+                cardinal_values.topk_recall,
+                likert_values.topk_recall,
+                true,
+            ),
+            kendall_tau_b: compare_metric_delta(
+                cardinal_values.kendall_tau_b,
+                likert_values.kendall_tau_b,
+                true,
+            ),
+            coverage_95ci: compare_metric_delta(
+                cardinal_values.coverage_95ci,
+                likert_values.coverage_95ci,
+                true,
+            ),
+            comparisons_used: compare_metric_delta(
+                cardinal_values.comparisons_used,
+                likert_values.comparisons_used,
+                false,
+            ),
+        };
+        let win_loss_tie = win_loss_tie_for_deltas(&cardinal_minus_likert);
+        add_win_loss_tie(&mut aggregate_win_loss_tie, &win_loss_tie);
+        cases.push(EvaluationComparisonCase {
+            case_name: cardinal.case_name,
+            cardinal: cardinal_values,
+            likert: likert_values,
+            cardinal_minus_likert,
+            win_loss_tie,
+        });
+    }
+
+    Ok(EvaluationComparisonSummary {
+        likert_config: likert_cfg,
+        metric_names: [
+            "topk_precision",
+            "topk_recall",
+            "kendall_tau_b",
+            "coverage_95ci",
+            "comparisons_used",
+        ],
+        aggregate_win_loss_tie,
+        cases,
+    })
+}
+
 // =============================================================================
 // Helpers
+const COMPARISON_TIE_EPSILON: f64 = 1e-12;
+
+fn compare_metric_delta(
+    cardinal: f64,
+    likert: f64,
+    higher_is_better: bool,
+) -> ComparisonMetricDelta {
+    let delta = cardinal - likert;
+    let outcome = if delta.abs() <= COMPARISON_TIE_EPSILON {
+        ComparisonOutcome::Tie
+    } else if (delta > 0.0) == higher_is_better {
+        ComparisonOutcome::CardinalWin
+    } else {
+        ComparisonOutcome::LikertWin
+    };
+
+    ComparisonMetricDelta {
+        cardinal,
+        likert,
+        delta,
+        higher_is_better,
+        outcome,
+    }
+}
+
+fn win_loss_tie_for_deltas(deltas: &EvaluationComparisonDeltas) -> EvaluationWinLossTie {
+    let mut counts = EvaluationWinLossTie::default();
+    for outcome in [
+        deltas.topk_precision.outcome,
+        deltas.topk_recall.outcome,
+        deltas.kendall_tau_b.outcome,
+        deltas.coverage_95ci.outcome,
+        deltas.comparisons_used.outcome,
+    ] {
+        match outcome {
+            ComparisonOutcome::CardinalWin => counts.cardinal_wins += 1,
+            ComparisonOutcome::LikertWin => counts.likert_wins += 1,
+            ComparisonOutcome::Tie => counts.ties += 1,
+        }
+    }
+    counts
+}
+
+fn add_win_loss_tie(total: &mut EvaluationWinLossTie, case: &EvaluationWinLossTie) {
+    total.cardinal_wins += case.cardinal_wins;
+    total.likert_wins += case.likert_wins;
+    total.ties += case.ties;
+}
+
 // =============================================================================
 
 const DEFAULT_BATCH_SIZE: usize = 32;
@@ -1879,6 +2127,26 @@ mod tests {
         assert!(
             curl_swap2 < curl_swap_low,
             "top swap ({curl_swap2:.4}) should be worse than low swap ({curl_swap_low:.4})"
+        );
+    }
+
+    #[test]
+    fn test_curl_penalizes_one_sided_ties() {
+        let truth = vec![4.0, 3.0, 2.0, 1.0];
+        let tied_pred = vec![1.0; 4];
+        let reversed = vec![1.0, 2.0, 3.0, 4.0];
+        let indices: Vec<usize> = (0..4).collect();
+
+        let tied_curl = compute_curl(&tied_pred, &truth, &indices, CurlWeight::Harmonic);
+        let reversed_curl = compute_curl(&reversed, &truth, &indices, CurlWeight::Harmonic);
+
+        assert!(
+            tied_curl > reversed_curl,
+            "ties should be less bad than reversals: tied={tied_curl}, reversed={reversed_curl}"
+        );
+        assert!(
+            tied_curl < 1.0,
+            "one-sided predicted ties must not receive full concordance credit"
         );
     }
 

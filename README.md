@@ -137,9 +137,10 @@ cargo run --bin cardinal -- report \
 Other maintenance commands:
 
 ```bash
-# Synthetic evaluation
-cargo run --bin cardinal -- eval --out eval.jsonl --curve-csv curves.csv
-cargo run --bin cardinal -- eval-likert --out eval_likert.jsonl --curve-csv curves_likert.csv
+# Synthetic evaluation receipts
+cargo run --bin cardinal -- eval --out artifacts/eval/synthetic_eval.jsonl --curve-csv artifacts/eval/synthetic_curves.csv
+cargo run --bin cardinal -- eval-likert --out artifacts/eval/likert_eval.jsonl --curve-csv artifacts/eval/likert_curves.csv
+cargo run --bin cardinal -- eval-compare --out artifacts/eval/comparison_summary.json
 
 # Cache management
 cargo run --bin cardinal -- cache-export --out cache.jsonl
@@ -176,7 +177,7 @@ request JSON
 - [docs/MODEL.md](docs/MODEL.md): compact mathematical contract, assumptions, and failure modes
 - [docs/PROMPTS.md](docs/PROMPTS.md): supported prompt templates, output contracts, and JSON request examples
 - [docs/WORKED_EXAMPLE.md](docs/WORKED_EXAMPLE.md): concrete rerank walkthrough with request shape, gates, stop reasons, uncertainty, cache, and reproducibility receipts
-- [docs/EVALUATION.md](docs/EVALUATION.md): checked-in synthetic evaluation receipt and baseline comparison
+- [docs/EVALUATION.md](docs/EVALUATION.md): checked-in synthetic evaluation receipts, raw artifacts, and an honest cardinal-vs-Likert comparison
 - [docs/BENCHMARKS.md](docs/BENCHMARKS.md): scaling harness and current dense-solver receipt
 
 ## License

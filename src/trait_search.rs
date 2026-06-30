@@ -596,6 +596,18 @@ impl TraitSearchManager {
         }
 
         let mut band_candidates = self.build_frontier_candidates(&incumbents, &challengers);
+        // Cross-boundary pairs decide membership, but they can over-anchor the
+        // active set to one extreme item.  Add local rank-neighbor pairs inside
+        // the uncertainty band so compressed/tied frontiers get direct
+        // comparisons rather than only comparisons against the current top item.
+        let neighbor_window = self.config.topk.band_size.max(1);
+        for (pos, &i) in self.band_indices.iter().enumerate() {
+            let end = (pos + neighbor_window + 1).min(self.band_indices.len());
+            for &j in &self.band_indices[(pos + 1)..end] {
+                let (a, b) = if i < j { (i, j) } else { (j, i) };
+                band_candidates.push((a, b));
+            }
+        }
         if let Some((i_star, j_star)) = critical_pair {
             // Connectivity guardrail: ensure boundary items have minimal degree.
             let min_degree = 2;

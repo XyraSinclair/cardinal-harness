@@ -1,4 +1,7 @@
-use cardinal_harness::rerank::evaluation::{run_synthetic_suite, synthetic_cases};
+use cardinal_harness::rerank::evaluation::{
+    run_evaluation_comparison_summary, run_likert_baseline_suite, run_synthetic_suite,
+    synthetic_cases, ComparisonOutcome, LikertEvalConfig,
+};
 
 fn assert_prob(x: f64) {
     assert!(
@@ -56,4 +59,113 @@ fn gated_case_produces_reasonable_gate_metrics() {
     // Regression guards: gating should work on this synthetic.
     assert!(gate_precision >= 0.8);
     assert!(gate_recall >= 0.8);
+}
+
+#[test]
+fn scale_compression_case_exposes_likert_quantization_loss() {
+    let cardinal = run_synthetic_suite(Some("scale_compression_40"))
+        .expect("cardinal synthetic suite should run");
+    let likert =
+        run_likert_baseline_suite(Some("scale_compression_40"), LikertEvalConfig::default())
+            .expect("likert baseline suite should run");
+
+    assert_eq!(cardinal.len(), 1);
+    assert_eq!(likert.len(), 1);
+
+    let cardinal_metrics = &cardinal[0].metrics;
+    let likert_metrics = &likert[0].metrics;
+
+    assert_eq!(cardinal_metrics.comparisons_refused, 0);
+    assert_eq!(likert_metrics.ratings_refused, 0);
+    assert!(
+        cardinal_metrics.topk_precision >= 0.99,
+        "cardinal should recover the compressed top-k, got precision {}",
+        cardinal_metrics.topk_precision
+    );
+    assert!(
+        likert_metrics.topk_precision <= 0.4,
+        "10-level Likert should lose the compressed non-outlier ordering, got precision {}",
+        likert_metrics.topk_precision
+    );
+    assert!(
+        cardinal_metrics.kendall_tau_all > likert_metrics.kendall_tau_all + 0.5,
+        "cardinal tau {} should materially exceed Likert tau {}",
+        cardinal_metrics.kendall_tau_all,
+        likert_metrics.kendall_tau_all
+    );
+}
+
+#[test]
+fn comparison_summary_makes_cardinal_minus_likert_receipts_explicit() {
+    let summary = run_evaluation_comparison_summary(None, LikertEvalConfig::default())
+        .expect("comparison summary should run");
+
+    assert_eq!(
+        summary.metric_names,
+        [
+            "topk_precision",
+            "topk_recall",
+            "kendall_tau_b",
+            "coverage_95ci",
+            "comparisons_used",
+        ]
+    );
+    assert_eq!(summary.cases.len(), synthetic_cases().len());
+
+    let mut observed_counts = (0usize, 0usize, 0usize);
+    for case in &summary.cases {
+        let deltas = &case.cardinal_minus_likert;
+
+        assert_eq!(
+            deltas.topk_precision.delta,
+            deltas.topk_precision.cardinal - deltas.topk_precision.likert
+        );
+        assert_eq!(
+            deltas.topk_recall.delta,
+            deltas.topk_recall.cardinal - deltas.topk_recall.likert
+        );
+        assert_eq!(
+            deltas.kendall_tau_b.delta,
+            deltas.kendall_tau_b.cardinal - deltas.kendall_tau_b.likert
+        );
+        assert_eq!(
+            deltas.coverage_95ci.delta,
+            deltas.coverage_95ci.cardinal - deltas.coverage_95ci.likert
+        );
+        assert_eq!(
+            deltas.comparisons_used.delta,
+            deltas.comparisons_used.cardinal - deltas.comparisons_used.likert
+        );
+
+        for outcome in [
+            deltas.topk_precision.outcome,
+            deltas.topk_recall.outcome,
+            deltas.kendall_tau_b.outcome,
+            deltas.coverage_95ci.outcome,
+            deltas.comparisons_used.outcome,
+        ] {
+            match outcome {
+                ComparisonOutcome::CardinalWin => observed_counts.0 += 1,
+                ComparisonOutcome::LikertWin => observed_counts.1 += 1,
+                ComparisonOutcome::Tie => observed_counts.2 += 1,
+            }
+        }
+
+        assert_eq!(
+            case.win_loss_tie.cardinal_wins
+                + case.win_loss_tie.likert_wins
+                + case.win_loss_tie.ties,
+            summary.metric_names.len()
+        );
+    }
+
+    assert_eq!(
+        summary.aggregate_win_loss_tie.cardinal_wins,
+        observed_counts.0
+    );
+    assert_eq!(
+        summary.aggregate_win_loss_tie.likert_wins,
+        observed_counts.1
+    );
+    assert_eq!(summary.aggregate_win_loss_tie.ties, observed_counts.2);
 }

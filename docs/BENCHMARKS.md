@@ -28,14 +28,14 @@ Build/profile metadata from each raw row:
 
 | n | density | observations | candidates | solve ms | planner ms |
 |---:|---|---:|---:|---:|---:|
-| 10 | sparse_chain | 9 | 45 | 0.510 | 0.042 |
-| 10 | banded_3 | 24 | 45 | 0.345 | 0.044 |
-| 50 | sparse_chain | 49 | 1,225 | 8.591 | 1.284 |
-| 50 | banded_3 | 144 | 1,225 | 9.737 | 1.218 |
-| 100 | sparse_chain | 99 | 4,950 | 65.713 | 5.350 |
-| 100 | banded_3 | 294 | 4,950 | 71.763 | 5.833 |
-| 250 | sparse_chain | 249 | 31,125 | 903.869 | 35.123 |
-| 250 | banded_3 | 744 | 31,125 | 936.506 | 37.018 |
+| 10 | sparse_chain | 9 | 45 | 0.583 | 0.041 |
+| 10 | banded_3 | 24 | 45 | 0.333 | 0.038 |
+| 50 | sparse_chain | 49 | 1,225 | 8.848 | 0.979 |
+| 50 | banded_3 | 144 | 1,225 | 9.317 | 1.170 |
+| 100 | sparse_chain | 99 | 4,950 | 47.721 | 3.339 |
+| 100 | banded_3 | 294 | 4,950 | 48.282 | 3.875 |
+| 250 | sparse_chain | 249 | 31,125 | 678.102 | 25.407 |
+| 250 | banded_3 | 744 | 31,125 | 716.094 | 25.245 |
 
 Raw output: `artifacts/bench/scaling.jsonl`.
 

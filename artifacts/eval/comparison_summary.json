@@ -1,0 +1,492 @@
+{
+  "likert_config": {
+    "levels": 10,
+    "budget_multiplier": 1.0
+  },
+  "metric_names": [
+    "topk_precision",
+    "topk_recall",
+    "kendall_tau_b",
+    "coverage_95ci",
+    "comparisons_used"
+  ],
+  "aggregate_win_loss_tie": {
+    "cardinal_wins": 10,
+    "likert_wins": 12,
+    "ties": 18
+  },
+  "cases": [
+    {
+      "case_name": "clean_ordering_10",
+      "cardinal": {
+        "topk_precision": 1.0,
+        "topk_recall": 1.0,
+        "kendall_tau_b": 1.0,
+        "coverage_95ci": 1.0,
+        "comparisons_used": 40.0
+      },
+      "likert": {
+        "topk_precision": 1.0,
+        "topk_recall": 1.0,
+        "kendall_tau_b": 1.0,
+        "coverage_95ci": 1.0,
+        "comparisons_used": 40.0
+      },
+      "cardinal_minus_likert": {
+        "topk_precision": {
+          "cardinal": 1.0,
+          "likert": 1.0,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "outcome": "tie"
+        },
+        "topk_recall": {
+          "cardinal": 1.0,
+          "likert": 1.0,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "outcome": "tie"
+        },
+        "kendall_tau_b": {
+          "cardinal": 1.0,
+          "likert": 1.0,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "outcome": "tie"
+        },
+        "coverage_95ci": {
+          "cardinal": 1.0,
+          "likert": 1.0,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "outcome": "tie"
+        },
+        "comparisons_used": {
+          "cardinal": 40.0,
+          "likert": 40.0,
+          "delta": 0.0,
+          "higher_is_better": false,
+          "outcome": "tie"
+        }
+      },
+      "win_loss_tie": {
+        "cardinal_wins": 0,
+        "likert_wins": 0,
+        "ties": 5
+      }
+    },
+    {
+      "case_name": "noisy_ordering_50",
+      "cardinal": {
+        "topk_precision": 0.6,
+        "topk_recall": 0.6,
+        "kendall_tau_b": 0.6408163265306123,
+        "coverage_95ci": 1.0,
+        "comparisons_used": 200.0
+      },
+      "likert": {
+        "topk_precision": 0.6,
+        "topk_recall": 0.6,
+        "kendall_tau_b": 0.7346721100353129,
+        "coverage_95ci": 0.8,
+        "comparisons_used": 200.0
+      },
+      "cardinal_minus_likert": {
+        "topk_precision": {
+          "cardinal": 0.6,
+          "likert": 0.6,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "outcome": "tie"
+        },
+        "topk_recall": {
+          "cardinal": 0.6,
+          "likert": 0.6,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "outcome": "tie"
+        },
+        "kendall_tau_b": {
+          "cardinal": 0.6408163265306123,
+          "likert": 0.7346721100353129,
+          "delta": -0.09385578350470059,
+          "higher_is_better": true,
+          "outcome": "likert_win"
+        },
+        "coverage_95ci": {
+          "cardinal": 1.0,
+          "likert": 0.8,
+          "delta": 0.19999999999999996,
+          "higher_is_better": true,
+          "outcome": "cardinal_win"
+        },
+        "comparisons_used": {
+          "cardinal": 200.0,
+          "likert": 200.0,
+          "delta": 0.0,
+          "higher_is_better": false,
+          "outcome": "tie"
+        }
+      },
+      "win_loss_tie": {
+        "cardinal_wins": 1,
+        "likert_wins": 1,
+        "ties": 3
+      }
+    },
+    {
+      "case_name": "multi_attr_weighted_20",
+      "cardinal": {
+        "topk_precision": 0.8,
+        "topk_recall": 0.8,
+        "kendall_tau_b": 0.8947368421052632,
+        "coverage_95ci": 1.0,
+        "comparisons_used": 240.0
+      },
+      "likert": {
+        "topk_precision": 1.0,
+        "topk_recall": 1.0,
+        "kendall_tau_b": 0.9052631578947369,
+        "coverage_95ci": 0.75,
+        "comparisons_used": 240.0
+      },
+      "cardinal_minus_likert": {
+        "topk_precision": {
+          "cardinal": 0.8,
+          "likert": 1.0,
+          "delta": -0.19999999999999996,
+          "higher_is_better": true,
+          "outcome": "likert_win"
+        },
+        "topk_recall": {
+          "cardinal": 0.8,
+          "likert": 1.0,
+          "delta": -0.19999999999999996,
+          "higher_is_better": true,
+          "outcome": "likert_win"
+        },
+        "kendall_tau_b": {
+          "cardinal": 0.8947368421052632,
+          "likert": 0.9052631578947369,
+          "delta": -0.010526315789473717,
+          "higher_is_better": true,
+          "outcome": "likert_win"
+        },
+        "coverage_95ci": {
+          "cardinal": 1.0,
+          "likert": 0.75,
+          "delta": 0.25,
+          "higher_is_better": true,
+          "outcome": "cardinal_win"
+        },
+        "comparisons_used": {
+          "cardinal": 240.0,
+          "likert": 240.0,
+          "delta": 0.0,
+          "higher_is_better": false,
+          "outcome": "tie"
+        }
+      },
+      "win_loss_tie": {
+        "cardinal_wins": 1,
+        "likert_wins": 3,
+        "ties": 1
+      }
+    },
+    {
+      "case_name": "clustered_scores_30",
+      "cardinal": {
+        "topk_precision": 1.0,
+        "topk_recall": 1.0,
+        "kendall_tau_b": 0.8304547985373998,
+        "coverage_95ci": 1.0,
+        "comparisons_used": 120.0
+      },
+      "likert": {
+        "topk_precision": 1.0,
+        "topk_recall": 1.0,
+        "kendall_tau_b": 0.868198620259849,
+        "coverage_95ci": 0.03333333333333333,
+        "comparisons_used": 120.0
+      },
+      "cardinal_minus_likert": {
+        "topk_precision": {
+          "cardinal": 1.0,
+          "likert": 1.0,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "outcome": "tie"
+        },
+        "topk_recall": {
+          "cardinal": 1.0,
+          "likert": 1.0,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "outcome": "tie"
+        },
+        "kendall_tau_b": {
+          "cardinal": 0.8304547985373998,
+          "likert": 0.868198620259849,
+          "delta": -0.03774382172244917,
+          "higher_is_better": true,
+          "outcome": "likert_win"
+        },
+        "coverage_95ci": {
+          "cardinal": 1.0,
+          "likert": 0.03333333333333333,
+          "delta": 0.9666666666666667,
+          "higher_is_better": true,
+          "outcome": "cardinal_win"
+        },
+        "comparisons_used": {
+          "cardinal": 120.0,
+          "likert": 120.0,
+          "delta": 0.0,
+          "higher_is_better": false,
+          "outcome": "tie"
+        }
+      },
+      "win_loss_tie": {
+        "cardinal_wins": 1,
+        "likert_wins": 1,
+        "ties": 3
+      }
+    },
+    {
+      "case_name": "scale_compression_40",
+      "cardinal": {
+        "topk_precision": 1.0,
+        "topk_recall": 1.0,
+        "kendall_tau_b": 0.8205128205128205,
+        "coverage_95ci": 0.975,
+        "comparisons_used": 160.0
+      },
+      "likert": {
+        "topk_precision": 0.2,
+        "topk_recall": 0.2,
+        "kendall_tau_b": 0.223606797749979,
+        "coverage_95ci": 0.0,
+        "comparisons_used": 160.0
+      },
+      "cardinal_minus_likert": {
+        "topk_precision": {
+          "cardinal": 1.0,
+          "likert": 0.2,
+          "delta": 0.8,
+          "higher_is_better": true,
+          "outcome": "cardinal_win"
+        },
+        "topk_recall": {
+          "cardinal": 1.0,
+          "likert": 0.2,
+          "delta": 0.8,
+          "higher_is_better": true,
+          "outcome": "cardinal_win"
+        },
+        "kendall_tau_b": {
+          "cardinal": 0.8205128205128205,
+          "likert": 0.223606797749979,
+          "delta": 0.5969060227628415,
+          "higher_is_better": true,
+          "outcome": "cardinal_win"
+        },
+        "coverage_95ci": {
+          "cardinal": 0.975,
+          "likert": 0.0,
+          "delta": 0.975,
+          "higher_is_better": true,
+          "outcome": "cardinal_win"
+        },
+        "comparisons_used": {
+          "cardinal": 160.0,
+          "likert": 160.0,
+          "delta": 0.0,
+          "higher_is_better": false,
+          "outcome": "tie"
+        }
+      },
+      "win_loss_tie": {
+        "cardinal_wins": 4,
+        "likert_wins": 0,
+        "ties": 1
+      }
+    },
+    {
+      "case_name": "outlier_robustness_25",
+      "cardinal": {
+        "topk_precision": 0.4,
+        "topk_recall": 0.4,
+        "kendall_tau_b": 0.5666666666666667,
+        "coverage_95ci": 1.0,
+        "comparisons_used": 100.0
+      },
+      "likert": {
+        "topk_precision": 0.8,
+        "topk_recall": 0.8,
+        "kendall_tau_b": 0.8302814171342258,
+        "coverage_95ci": 0.36,
+        "comparisons_used": 100.0
+      },
+      "cardinal_minus_likert": {
+        "topk_precision": {
+          "cardinal": 0.4,
+          "likert": 0.8,
+          "delta": -0.4,
+          "higher_is_better": true,
+          "outcome": "likert_win"
+        },
+        "topk_recall": {
+          "cardinal": 0.4,
+          "likert": 0.8,
+          "delta": -0.4,
+          "higher_is_better": true,
+          "outcome": "likert_win"
+        },
+        "kendall_tau_b": {
+          "cardinal": 0.5666666666666667,
+          "likert": 0.8302814171342258,
+          "delta": -0.2636147504675591,
+          "higher_is_better": true,
+          "outcome": "likert_win"
+        },
+        "coverage_95ci": {
+          "cardinal": 1.0,
+          "likert": 0.36,
+          "delta": 0.64,
+          "higher_is_better": true,
+          "outcome": "cardinal_win"
+        },
+        "comparisons_used": {
+          "cardinal": 100.0,
+          "likert": 100.0,
+          "delta": 0.0,
+          "higher_is_better": false,
+          "outcome": "tie"
+        }
+      },
+      "win_loss_tie": {
+        "cardinal_wins": 1,
+        "likert_wins": 3,
+        "ties": 1
+      }
+    },
+    {
+      "case_name": "gated_feasibility_30",
+      "cardinal": {
+        "topk_precision": 0.8,
+        "topk_recall": 0.8,
+        "kendall_tau_b": 0.6666666666666666,
+        "coverage_95ci": 1.0,
+        "comparisons_used": 120.0
+      },
+      "likert": {
+        "topk_precision": 1.0,
+        "topk_recall": 1.0,
+        "kendall_tau_b": 0.8308675641104959,
+        "coverage_95ci": 0.25,
+        "comparisons_used": 120.0
+      },
+      "cardinal_minus_likert": {
+        "topk_precision": {
+          "cardinal": 0.8,
+          "likert": 1.0,
+          "delta": -0.19999999999999996,
+          "higher_is_better": true,
+          "outcome": "likert_win"
+        },
+        "topk_recall": {
+          "cardinal": 0.8,
+          "likert": 1.0,
+          "delta": -0.19999999999999996,
+          "higher_is_better": true,
+          "outcome": "likert_win"
+        },
+        "kendall_tau_b": {
+          "cardinal": 0.6666666666666666,
+          "likert": 0.8308675641104959,
+          "delta": -0.16420089744382926,
+          "higher_is_better": true,
+          "outcome": "likert_win"
+        },
+        "coverage_95ci": {
+          "cardinal": 1.0,
+          "likert": 0.25,
+          "delta": 0.75,
+          "higher_is_better": true,
+          "outcome": "cardinal_win"
+        },
+        "comparisons_used": {
+          "cardinal": 120.0,
+          "likert": 120.0,
+          "delta": 0.0,
+          "higher_is_better": false,
+          "outcome": "tie"
+        }
+      },
+      "win_loss_tie": {
+        "cardinal_wins": 1,
+        "likert_wins": 3,
+        "ties": 1
+      }
+    },
+    {
+      "case_name": "inconsistent_cycle_12",
+      "cardinal": {
+        "topk_precision": 0.8,
+        "topk_recall": 0.8,
+        "kendall_tau_b": 0.6363636363636364,
+        "coverage_95ci": 0.25,
+        "comparisons_used": 200.0
+      },
+      "likert": {
+        "topk_precision": 0.8,
+        "topk_recall": 0.8,
+        "kendall_tau_b": 0.8484848484848485,
+        "coverage_95ci": 0.16666666666666666,
+        "comparisons_used": 200.0
+      },
+      "cardinal_minus_likert": {
+        "topk_precision": {
+          "cardinal": 0.8,
+          "likert": 0.8,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "outcome": "tie"
+        },
+        "topk_recall": {
+          "cardinal": 0.8,
+          "likert": 0.8,
+          "delta": 0.0,
+          "higher_is_better": true,
+          "outcome": "tie"
+        },
+        "kendall_tau_b": {
+          "cardinal": 0.6363636363636364,
+          "likert": 0.8484848484848485,
+          "delta": -0.21212121212121215,
+          "higher_is_better": true,
+          "outcome": "likert_win"
+        },
+        "coverage_95ci": {
+          "cardinal": 0.25,
+          "likert": 0.16666666666666666,
+          "delta": 0.08333333333333334,
+          "higher_is_better": true,
+          "outcome": "cardinal_win"
+        },
+        "comparisons_used": {
+          "cardinal": 200.0,
+          "likert": 200.0,
+          "delta": 0.0,
+          "higher_is_better": false,
+          "outcome": "tie"
+        }
+      },
+      "win_loss_tie": {
+        "cardinal_wins": 1,
+        "likert_wins": 1,
+        "ties": 3
+      }
+    }
+  ]
+}

@@ -12,7 +12,7 @@ When you ask an LLM to "rate this essay 1–10", the scores are:
 - **Anchor-dependent**: the first item scored sets an arbitrary reference point.
 - **Inconsistent**: the same item can get different absolute scores in different contexts.
 
-Pairwise comparisons ("which is better, and by how much?") avoid all of these problems. Relative judgments are more stable because the LLM has a concrete reference (the other item) rather than an abstract scale. This is well-established in psychometrics and preference learning — it's the same reason tournament systems work better than asking each player to self-report a skill number.
+Pairwise comparisons ("which is better, and by how much?") can reduce these failure modes when the attribute is coherent and the two items give the rater a useful reference point. They are not magic: the evaluation receipt should be read as local evidence for specific synthetic regimes, not as proof that pairwise prompts universally beat direct scoring.
 
 ## Why ratios instead of just "which is better?"
 
@@ -32,7 +32,7 @@ Given a set of noisy pairwise log-ratio observations, we need to recover a consi
 
 **Why robust regression?** LLMs are noisy judges. Some comparisons are outliers — the model misunderstands, hallucinates, or produces an inconsistent judgment. Ordinary least squares would let one bad comparison distort all the scores. Huber loss provides a smooth transition between L2 (for small residuals) and L1 (for large residuals), automatically downweighting outliers without discarding them entirely.
 
-**Why IRLS specifically?** Iteratively Reweighted Least Squares turns the robust regression into a sequence of ordinary weighted least-squares problems, each solvable via Cholesky decomposition. This is numerically stable, well-understood, and efficient for the problem sizes we handle (up to ~5,000 items with dense matrices).
+**Why IRLS specifically?** Iteratively Reweighted Least Squares turns the robust regression into a sequence of ordinary weighted least-squares problems, each solvable via Cholesky decomposition in the current implementation. This is numerically stable and well-understood for the small and medium active sets covered by the checked-in scaling receipt; larger production frontiers need sparse linear algebra or smaller active sets.
 
 **Why Huber over other robust losses?** Huber loss (with k=1.5) is the standard choice in robust statistics. It's less aggressive than Tukey's biweight (which can zero-out observations entirely) but more robust than plain L2. The k=1.5 threshold means observations with residuals beyond 1.5 standard deviations get downweighted but never fully discarded.
 
@@ -66,7 +66,7 @@ The planner uses **effective resistance** from spectral graph theory: the expect
 
 The system doesn't just track individual score uncertainties — it estimates the probability that the current top-K ranking is wrong. Specifically, for each item near the K-boundary, it computes the **frontier inversion probability**: the probability that an item currently ranked just below K actually belongs above K (or vice versa), using a Gaussian approximation of the score difference.
 
-The global top-K error is the sum of these boundary flip probabilities. The system stops when this error falls below `tolerated_error`, or when it achieves a **certified separation bound** — meaning the gap between item K and item K+1 is large enough relative to their joint uncertainty that no plausible re-estimation would flip them.
+The global top-K error is the sum of these boundary flip probabilities. The system stops when this error falls below `tolerated_error`, or when it achieves a **certified separation bound** — meaning the estimated gap between item K and item K+1 is large enough relative to their current joint uncertainty that the modeled boundary is stable.
 
 The `stop_sigma_inflate` parameter (default 1.25) inflates the uncertainty estimate for the stopping check to be conservative — the system would rather ask one extra question than stop prematurely with an incorrect ranking.
 

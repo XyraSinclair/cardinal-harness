@@ -1,0 +1,16 @@
+Offline cardinal-vs-Likert synthetic comparison
+Cardinal receipt: artifacts/eval/offline-workflow/cardinal_synthetic.jsonl
+Likert receipt:   artifacts/eval/offline-workflow/likert_baseline.jsonl
+Delta CSV:        artifacts/eval/offline-workflow/cardinal_vs_likert_delta.csv
+
+By topk_precision: cardinal wins 1 case(s), Likert wins 3 case(s), ties 4 case(s).
+Positive deltas mean cardinal is higher on the named metric.
+
+- clean_ordering_10: cardinal 1 vs Likert 1 (delta 0; tie)
+- clustered_scores_30: cardinal 1 vs Likert 1 (delta 0; tie)
+- gated_feasibility_30: cardinal 0.8 vs Likert 1 (delta -0.2; likert)
+- inconsistent_cycle_12: cardinal 0.8 vs Likert 0.8 (delta 0; tie)
+- multi_attr_weighted_20: cardinal 0.8 vs Likert 1 (delta -0.2; likert)
+- noisy_ordering_50: cardinal 0.6 vs Likert 0.6 (delta 0; tie)
+- outlier_robustness_25: cardinal 0.4 vs Likert 0.8 (delta -0.4; likert)
+- scale_compression_40: cardinal 1 vs Likert 0.2 (delta 0.8; cardinal)

@@ -102,7 +102,65 @@ For `canonical_v2`, the analogous illustrative shape would be:
 
 Do not read these snippets as evidence that `proposal_b` will win on a live provider. They show only the JSON shape the parser accepts.
 
-## 3. Run the rerank
+## 3. Offline comparison workflow, no API key required
+
+Before running a live provider, you can reproduce the synthetic comparison surface entirely offline. This workflow generates the cardinal pairwise synthetic receipt, generates the Likert/scalar baseline receipt, then writes a small delta report from the two JSONL files.
+
+```bash
+mkdir -p artifacts/eval/offline-workflow
+
+cargo run --bin cardinal -- eval \
+  --out artifacts/eval/offline-workflow/cardinal_synthetic.jsonl \
+  --curve-csv artifacts/eval/offline-workflow/cardinal_curves.csv
+
+cargo run --bin cardinal -- eval-likert \
+  --out artifacts/eval/offline-workflow/likert_baseline.jsonl \
+  --curve-csv artifacts/eval/offline-workflow/likert_curves.csv
+
+python3 examples/offline_eval_delta.py \
+  --cardinal artifacts/eval/offline-workflow/cardinal_synthetic.jsonl \
+  --likert artifacts/eval/offline-workflow/likert_baseline.jsonl \
+  --csv artifacts/eval/offline-workflow/cardinal_vs_likert_delta.csv \
+  --summary artifacts/eval/offline-workflow/cardinal_vs_likert_summary.txt
+```
+
+Named artifacts produced by that workflow:
+
+```text
+artifacts/eval/offline-workflow/cardinal_synthetic.jsonl
+artifacts/eval/offline-workflow/cardinal_curves.csv
+artifacts/eval/offline-workflow/likert_baseline.jsonl
+artifacts/eval/offline-workflow/likert_curves.csv
+artifacts/eval/offline-workflow/cardinal_vs_likert_delta.csv
+artifacts/eval/offline-workflow/cardinal_vs_likert_summary.txt
+```
+
+Inspect the summary first:
+
+```bash
+cat artifacts/eval/offline-workflow/cardinal_vs_likert_summary.txt
+```
+
+The generated files are synthetic receipts, not model outputs. They are useful for checking where pairwise-ratio inference beats the Likert baseline under the current deterministic simulator and where it loses. Do not cite them as proof that cardinal reranking is universally better than scalar ratings.
+
+To focus on one case while debugging, pass the same case name to both generators:
+
+```bash
+cargo run --bin cardinal -- eval \
+  --case noisy_ordering_50 \
+  --out artifacts/eval/offline-workflow/cardinal_noisy_ordering_50.jsonl \
+  --curve-csv artifacts/eval/offline-workflow/cardinal_noisy_ordering_50_curves.csv
+
+cargo run --bin cardinal -- eval-likert \
+  --case noisy_ordering_50 \
+  --out artifacts/eval/offline-workflow/likert_noisy_ordering_50.jsonl \
+  --curve-csv artifacts/eval/offline-workflow/likert_noisy_ordering_50_curves.csv
+```
+
+That single-case mode is still offline and deterministic; it just produces a smaller receipt.
+
+
+## 4. Run the rerank with a live provider
 
 Validate the request first if you want schema and invariant checks without an API key, cache, or network call:
 
@@ -136,7 +194,7 @@ cargo run --bin cardinal -- rerank \
 
 The seed controls harness-side randomization, including presentation-order randomization. It does not make a remote LLM deterministic unless the provider and model settings are also deterministic.
 
-## 4. Generate or regenerate the report
+## 5. Generate or regenerate the report
 
 A report can be regenerated later from the saved request and response. This is useful when report rendering changes but the run itself should not be repeated.
 
@@ -157,7 +215,7 @@ cargo run --bin cardinal -- report \
   --out worked-example-report.json
 ```
 
-## 5. Read the result without overclaiming
+## 6. Read the result without overclaiming
 
 The response has two important parts:
 
@@ -239,7 +297,7 @@ Per entity:
 
 A narrow-looking rank with high `global_topk_error` is not settled. A low `global_topk_error` with an incoherent attribute prompt is still only a precise answer to a bad question.
 
-## 6. Cache and reproducibility receipts
+## 7. Cache and reproducibility receipts
 
 With SQLite cache enabled by the default CLI path, repeated comparisons can be served from `.cardinal_pairwise_cache.sqlite`. Cache hits matter for both cost and reproducibility:
 
@@ -277,7 +335,7 @@ cargo run --bin cardinal -- rerank \
 
 Do not compare cache-only latency or provider-cost fields to a live run as if they measure model performance. Cache hits report zero provider tokens and zero provider cost for the cached comparison path because no provider call was made.
 
-## 7. What would make this example untrustworthy
+## 8. What would make this example untrustworthy
 
 This harness is useful only when the attribute is meaningful and the receipts are preserved. Be skeptical if:
 

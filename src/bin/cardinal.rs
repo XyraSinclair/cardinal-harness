@@ -67,6 +67,17 @@ enum Commands {
         #[arg(long, default_value_t = 1.0)]
         budget_multiplier: f64,
     },
+    /// Compare cardinal pairwise evaluation against the Likert baseline
+    EvalCompare {
+        #[arg(long)]
+        case: Option<String>,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long, default_value_t = 10)]
+        levels: usize,
+        #[arg(long, default_value_t = 1.0)]
+        budget_multiplier: f64,
+    },
     /// Generate a report from a request + response JSON
     Report {
         #[arg(long)]
@@ -223,6 +234,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }
             }
+        }
+        Commands::EvalCompare {
+            case,
+            out,
+            levels,
+            budget_multiplier,
+        } => {
+            let cfg = cardinal_harness::rerank::evaluation::LikertEvalConfig {
+                levels,
+                budget_multiplier,
+            };
+            let summary = cardinal_harness::rerank::evaluation::run_evaluation_comparison_summary(
+                case.as_deref(),
+                cfg,
+            )?;
+            let mut file = File::create(out)?;
+            serde_json::to_writer_pretty(&mut file, &summary)?;
+            writeln!(file)?;
         }
         Commands::Report {
             request,
