@@ -1,0 +1,62 @@
+{
+  "attributes": [
+    {
+      "id": "credibility_risk",
+      "prompt": "risk to public credibility if cardinal-harness is shared widely as a serious empirical artifact",
+      "prompt_template_slug": "canonical_v2",
+      "weight": 0.45
+    },
+    {
+      "id": "falsifiability_gap",
+      "prompt": "how much this issue blocks concrete falsifiable live evidence rather than merely improving polish",
+      "prompt_template_slug": "canonical_bucket_v1",
+      "weight": 0.35
+    },
+    {
+      "id": "fix_leverage",
+      "prompt": "leverage of fixing this issue for making the project safer to share widely",
+      "prompt_template_slug": "canonical_v2",
+      "weight": 0.2
+    }
+  ],
+  "comparison_budget": 84,
+  "comparison_concurrency": 4,
+  "entities": [
+    {
+      "id": "no_large_live_receipt",
+      "text": "Risk: the repo has strong synthetic/offline receipts but still needs a larger preserved live-LLM benchmark pack across task families, models, costs, and traces before making broad empirical claims."
+    },
+    {
+      "id": "dependency_audit_warnings",
+      "text": "Risk: cargo audit currently exits with allowed transitive warnings for paste, anyhow, and rand. These are not necessarily exploitable here, but public release readers will notice them."
+    },
+    {
+      "id": "provider_metadata_drift",
+      "text": "Risk: OpenRouter model IDs, pricing, supported parameters, and logprob behavior change over time. Checked-in policy recipes can become stale unless refreshed and dated."
+    },
+    {
+      "id": "cost_estimate_semantics",
+      "text": "Risk: provider_cost_nanodollars is exact only when OpenRouter reports cost or local pricing table has an exact entry. Fallback estimates must stay labeled or readers may overtrust cost comparisons."
+    },
+    {
+      "id": "cache_provenance",
+      "text": "Risk: cached comparisons improve reproducibility and cost, but a public receipt must make cache hits, model IDs, prompt hashes, and request hashes obvious enough to audit."
+    },
+    {
+      "id": "baseline_breadth",
+      "text": "Risk: Likert and ordinal controls are present locally, but the live evidence should compare multiple real prompt families and budget policies rather than one weak baseline."
+    },
+    {
+      "id": "api_surface_complexity",
+      "text": "Risk: the crate exposes advanced reranking, trace, policy, cache, gateway, and evaluation surfaces. A first-time public user may struggle unless the core path stays visibly small."
+    }
+  ],
+  "gates": [],
+  "max_pair_repeats": 1,
+  "randomize_presentation_order": true,
+  "rater_id": "live-openrouter-public_release_risks",
+  "topk": {
+    "k": 3,
+    "tolerated_error": 0.08
+  }
+}

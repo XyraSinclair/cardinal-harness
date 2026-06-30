@@ -1,0 +1,209 @@
+{
+  "entities": [
+    {
+      "id": "evaluation_doc",
+      "rank": 1,
+      "feasible": true,
+      "u_mean": 3.211053629967467,
+      "u_std": 1.710162256794822,
+      "p_flip": 0.4508618930616959,
+      "attribute_scores": {
+        "public_readiness": {
+          "latent_mean": 0.6648835127446462,
+          "latent_std": 0.7845850271939704,
+          "z_score": 0.34892603475399786,
+          "min_normalized": 1.6648835127446462,
+          "percentile": 0.5833333333333334
+        },
+        "evidence_value": {
+          "latent_mean": 1.0796737867531123,
+          "latent_std": 0.6927368710238563,
+          "z_score": 0.49371320423903503,
+          "min_normalized": 2.079673786753112,
+          "percentile": 0.5833333333333334
+        },
+        "operator_reproducibility": {
+          "latent_mean": 1.3282503933273908,
+          "latent_std": 0.7282981880339239,
+          "z_score": 0.9073643755719711,
+          "min_normalized": 2.328250393327391,
+          "percentile": 0.75
+        }
+      }
+    },
+    {
+      "id": "worked_example",
+      "rank": 2,
+      "feasible": true,
+      "u_mean": 3.1361769348027586,
+      "u_std": 1.6203219068944716,
+      "p_flip": 0.45833780973416427,
+      "attribute_scores": {
+        "evidence_value": {
+          "latent_mean": 1.2336209735229686,
+          "latent_std": 0.7125049140213388,
+          "z_score": 0.7823911943484592,
+          "min_normalized": 2.2336209735229686,
+          "percentile": 0.9166666666666666
+        },
+        "operator_reproducibility": {
+          "latent_mean": 1.6089543792510752,
+          "latent_std": 0.7325086095667009,
+          "z_score": 1.417763944676604,
+          "min_normalized": 2.608954379251075,
+          "percentile": 0.9166666666666666
+        },
+        "public_readiness": {
+          "latent_mean": 0.44741513846360537,
+          "latent_std": 0.7245147183014605,
+          "z_score": -0.34892603475399786,
+          "min_normalized": 1.4474151384636054,
+          "percentile": 0.4166666666666667
+        }
+      }
+    },
+    {
+      "id": "readme",
+      "rank": 3,
+      "feasible": true,
+      "u_mean": 2.7824664280601716,
+      "u_std": 1.7611587453766686,
+      "p_flip": 0.5,
+      "attribute_scores": {
+        "operator_reproducibility": {
+          "latent_mean": 0.9469406827932535,
+          "latent_std": 0.8365311499554855,
+          "z_score": 0.21403502610933908,
+          "min_normalized": 1.9469406827932536,
+          "percentile": 0.5833333333333334
+        },
+        "public_readiness": {
+          "latent_mean": 1.12675622611931,
+          "latent_std": 0.7974649787611318,
+          "z_score": 1.8310671963982208,
+          "min_normalized": 2.1267562261193103,
+          "percentile": 0.9166666666666666
+        },
+        "evidence_value": {
+          "latent_mean": 0.0,
+          "latent_std": 0.7125049140213388,
+          "z_score": -1.530864608927913,
+          "min_normalized": 1.0,
+          "percentile": 0.08333333333333333
+        }
+      }
+    },
+    {
+      "id": "prompts_doc",
+      "rank": 4,
+      "feasible": true,
+      "u_mean": 2.49757335901464,
+      "u_std": 1.7608538560748246,
+      "p_flip": 0.5322349986115064,
+      "attribute_scores": {
+        "operator_reproducibility": {
+          "latent_mean": 0.5863522565953829,
+          "latent_std": 0.8365311499554855,
+          "z_score": -0.44161714338121927,
+          "min_normalized": 1.586352256595383,
+          "percentile": 0.25
+        },
+        "evidence_value": {
+          "latent_mean": 0.553095651475665,
+          "latent_std": 0.7117085895167338,
+          "z_score": -0.49371320423903525,
+          "min_normalized": 1.5530956514756649,
+          "percentile": 0.4166666666666667
+        },
+        "public_readiness": {
+          "latent_mean": 0.8219495085140671,
+          "latent_std": 0.7974649787611318,
+          "z_score": 0.8529479669517056,
+          "min_normalized": 1.8219495085140671,
+          "percentile": 0.75
+        }
+      }
+    },
+    {
+      "id": "benchmarks_doc",
+      "rank": 5,
+      "feasible": true,
+      "u_mean": 1.6516882077052726,
+      "u_std": 1.6165104344572565,
+      "p_flip": 0.631133704016536,
+      "attribute_scores": {
+        "evidence_value": {
+          "latent_mean": 1.2046326619261136,
+          "latent_std": 0.6973575746734603,
+          "z_score": 0.7280330231857993,
+          "min_normalized": 2.2046326619261136,
+          "percentile": 0.75
+        },
+        "operator_reproducibility": {
+          "latent_mean": 0.7115153862493422,
+          "latent_std": 0.8290839160765777,
+          "z_score": -0.21403502610933928,
+          "min_normalized": 1.7115153862493422,
+          "percentile": 0.4166666666666667
+        },
+        "public_readiness": {
+          "latent_mean": 0.0,
+          "latent_std": 0.7128704143553026,
+          "z_score": -1.784673100681524,
+          "min_normalized": 1.0,
+          "percentile": 0.08333333333333333
+        }
+      }
+    },
+    {
+      "id": "model_doc",
+      "rank": 6,
+      "feasible": true,
+      "u_mean": 1.236379368229337,
+      "u_std": 1.7139039990931695,
+      "p_flip": 0.6718278671365012,
+      "attribute_scores": {
+        "public_readiness": {
+          "latent_mean": 0.4015727113674361,
+          "latent_std": 0.786213490588328,
+          "z_score": -0.4960335520014847,
+          "min_normalized": 1.401572711367436,
+          "percentile": 0.25
+        },
+        "evidence_value": {
+          "latent_mean": 0.485243179656777,
+          "latent_std": 0.690507436281617,
+          "z_score": -0.6209484957673912,
+          "min_normalized": 1.485243179656777,
+          "percentile": 0.25
+        },
+        "operator_reproducibility": {
+          "latent_mean": 0.0,
+          "latent_std": 0.7380095148938268,
+          "z_score": -1.5077720756848054,
+          "min_normalized": 1.0,
+          "percentile": 0.08333333333333333
+        }
+      }
+    }
+  ],
+  "meta": {
+    "global_topk_error": 3.217605417196167,
+    "tolerated_error": 0.08,
+    "k": 3,
+    "band_size": 5,
+    "comparisons_attempted": 45,
+    "comparisons_used": 45,
+    "comparisons_refused": 0,
+    "comparisons_cached": 0,
+    "comparison_budget": 72,
+    "latency_ms": 335979,
+    "model_used": "deepseek/deepseek-v4-flash",
+    "rater_id_used": "live-openrouter-public_evidence_surfaces",
+    "provider_input_tokens": 23718,
+    "provider_output_tokens": 21154,
+    "provider_cost_nanodollars": 8822069,
+    "provider_cost_is_estimate": false,
+    "stop_reason": "no_new_pairs"
+  }
+}

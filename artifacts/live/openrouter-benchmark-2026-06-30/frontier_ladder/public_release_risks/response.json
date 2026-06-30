@@ -1,0 +1,240 @@
+{
+  "entities": [
+    {
+      "id": "no_large_live_receipt",
+      "rank": 1,
+      "feasible": true,
+      "u_mean": 5.486121479510535,
+      "u_std": 2.822934141350903,
+      "p_flip": 0.23113364912886403,
+      "attribute_scores": {
+        "fix_leverage": {
+          "latent_mean": 0.857934636406059,
+          "latent_std": 0.8499680266467975,
+          "z_score": 0.7876233535650632,
+          "min_normalized": 1.8579346364060592,
+          "percentile": 0.7857142857142857
+        },
+        "falsifiability_gap": {
+          "latent_mean": 1.347267920358081,
+          "latent_std": 0.8059786637778925,
+          "z_score": 2.6619277287222696,
+          "min_normalized": 2.347267920358081,
+          "percentile": 0.9285714285714286
+        },
+        "credibility_risk": {
+          "latent_mean": 0.9280119321940067,
+          "latent_std": 0.7885412878600522,
+          "z_score": 3.5629841619462956,
+          "min_normalized": 1.9280119321940066,
+          "percentile": 0.9285714285714286
+        }
+      }
+    },
+    {
+      "id": "baseline_breadth",
+      "rank": 2,
+      "feasible": true,
+      "u_mean": 4.031586511337215,
+      "u_std": 2.809444450519508,
+      "p_flip": 0.318409470361251,
+      "attribute_scores": {
+        "falsifiability_gap": {
+          "latent_mean": 0.7702493820932046,
+          "latent_std": 0.7868602411795046,
+          "z_score": 0.9882709395900113,
+          "min_normalized": 1.7702493820932046,
+          "percentile": 0.7857142857142857
+        },
+        "fix_leverage": {
+          "latent_mean": 0.3723436303532165,
+          "latent_std": 0.8387184264234252,
+          "z_score": -0.20596223428041704,
+          "min_normalized": 1.3723436303532166,
+          "percentile": 0.35714285714285715
+        },
+        "credibility_risk": {
+          "latent_mean": 0.835950205145583,
+          "latent_std": 0.7885412878600522,
+          "z_score": 3.12615438060607,
+          "min_normalized": 1.8359502051455832,
+          "percentile": 0.7857142857142857
+        }
+      }
+    },
+    {
+      "id": "provider_metadata_drift",
+      "rank": 3,
+      "feasible": true,
+      "u_mean": 1.437540148163493,
+      "u_std": 2.684746096409342,
+      "p_flip": 0.5,
+      "attribute_scores": {
+        "falsifiability_gap": {
+          "latent_mean": 0.5247912456800962,
+          "latent_std": 0.7340187930375249,
+          "z_score": 0.27631343872550684,
+          "min_normalized": 1.5247912456800963,
+          "percentile": 0.6428571428571429
+        },
+        "fix_leverage": {
+          "latent_mean": 0.1433616073673426,
+          "latent_std": 0.794267108750276,
+          "z_score": -0.6744907594765952,
+          "min_normalized": 1.1433616073673427,
+          "percentile": 0.21428571428571427
+        },
+        "credibility_risk": {
+          "latent_mean": 0.1771142383861718,
+          "latent_std": 0.7578036288567249,
+          "z_score": 0.0,
+          "min_normalized": 1.1771142383861717,
+          "percentile": 0.5
+        }
+      }
+    },
+    {
+      "id": "cost_estimate_semantics",
+      "rank": 4,
+      "feasible": true,
+      "u_mean": 1.2905623534734572,
+      "u_std": 2.690149173449274,
+      "p_flip": 0.5109079776914198,
+      "attribute_scores": {
+        "credibility_risk": {
+          "latent_mean": 0.2425484302088916,
+          "latent_std": 0.7632014659186201,
+          "z_score": 0.3104830272308314,
+          "min_normalized": 1.2425484302088916,
+          "percentile": 0.6428571428571429
+        },
+        "falsifiability_gap": {
+          "latent_mean": 0.34730118363054563,
+          "latent_std": 0.7175860448700512,
+          "z_score": -0.23850095224016754,
+          "min_normalized": 1.3473011836305457,
+          "percentile": 0.35714285714285715
+        },
+        "fix_leverage": {
+          "latent_mean": 0.0,
+          "latent_std": 0.7956330539514389,
+          "z_score": -0.9678282083894224,
+          "min_normalized": 1.0,
+          "percentile": 0.07142857142857142
+        }
+      }
+    },
+    {
+      "id": "api_surface_complexity",
+      "rank": 5,
+      "feasible": true,
+      "u_mean": 1.0107854985543576,
+      "u_std": 2.7479806141574468,
+      "p_flip": 0.5313073500072716,
+      "attribute_scores": {
+        "fix_leverage": {
+          "latent_mean": 0.9948693296858635,
+          "latent_std": 0.7992284013794814,
+          "z_score": 1.0678104575742533,
+          "min_normalized": 1.9948693296858635,
+          "percentile": 0.9285714285714286
+        },
+        "credibility_risk": {
+          "latent_mean": 0.034965541461005833,
+          "latent_std": 0.7832059638637354,
+          "z_score": -0.6744907594765952,
+          "min_normalized": 1.034965541461006,
+          "percentile": 0.21428571428571427
+        },
+        "falsifiability_gap": {
+          "latent_mean": 0.19698709121714075,
+          "latent_std": 0.7183125818634845,
+          "z_score": -0.6744907594765952,
+          "min_normalized": 1.1969870912171408,
+          "percentile": 0.21428571428571427
+        }
+      }
+    },
+    {
+      "id": "cache_provenance",
+      "rank": 6,
+      "feasible": true,
+      "u_mean": 0.9334679590131343,
+      "u_std": 2.7604689862954523,
+      "p_flip": 0.5368788230775301,
+      "attribute_scores": {
+        "falsifiability_gap": {
+          "latent_mean": 0.4295280008191248,
+          "latent_std": 0.7332246233551651,
+          "z_score": 0.0,
+          "min_normalized": 1.4295280008191247,
+          "percentile": 0.5
+        },
+        "credibility_risk": {
+          "latent_mean": 0.0,
+          "latent_std": 0.7832059638637353,
+          "z_score": -0.8404010711832157,
+          "min_normalized": 1.0,
+          "percentile": 0.07142857142857142
+        },
+        "fix_leverage": {
+          "latent_mean": 0.4730027077156317,
+          "latent_std": 0.8321282667454044,
+          "z_score": 0.0,
+          "min_normalized": 1.4730027077156316,
+          "percentile": 0.5
+        }
+      }
+    },
+    {
+      "id": "dependency_audit_warnings",
+      "rank": 7,
+      "feasible": true,
+      "u_mean": 0.6559307487259198,
+      "u_std": 2.71549822680191,
+      "p_flip": 0.5575526103791119,
+      "attribute_scores": {
+        "fix_leverage": {
+          "latent_mean": 0.574141428723052,
+          "latent_std": 0.8499680266467975,
+          "z_score": 0.2069436507544422,
+          "min_normalized": 1.574141428723052,
+          "percentile": 0.6428571428571429
+        },
+        "credibility_risk": {
+          "latent_mean": 0.09716255040361788,
+          "latent_std": 0.7499488363395229,
+          "z_score": -0.3793680555311612,
+          "min_normalized": 1.0971625504036178,
+          "percentile": 0.35714285714285715
+        },
+        "falsifiability_gap": {
+          "latent_mean": 0.0,
+          "latent_std": 0.8059786637778925,
+          "z_score": -1.2458567741255764,
+          "min_normalized": 1.0,
+          "percentile": 0.07142857142857142
+        }
+      }
+    }
+  ],
+  "meta": {
+    "global_topk_error": 3.8584725827515114,
+    "tolerated_error": 0.08,
+    "k": 3,
+    "band_size": 5,
+    "comparisons_attempted": 63,
+    "comparisons_used": 63,
+    "comparisons_refused": 0,
+    "comparisons_cached": 0,
+    "comparison_budget": 84,
+    "latency_ms": 43430,
+    "model_used": "anthropic/claude-opus-4.6",
+    "rater_id_used": "live-openrouter-public_release_risks",
+    "provider_input_tokens": 30525,
+    "provider_output_tokens": 1701,
+    "provider_cost_nanodollars": 195150000,
+    "provider_cost_is_estimate": false,
+    "stop_reason": "no_new_pairs"
+  }
+}

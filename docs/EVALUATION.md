@@ -1,6 +1,6 @@
 # Evaluation Evidence
 
-This page is the checked-in receipt for the synthetic evaluation harness. It records what the current code and deterministic simulator produce. It is not a benchmark claim about live LLM traffic, and it does not show a universal win over scalar ratings.
+This page is the checked-in receipt surface for the offline synthetic harness and the preserved live OpenRouter receipt pack. The offline receipt records what the current code and deterministic simulator produce. The live receipt proves current provider integration and reporting paths work against real traffic. Neither receipt shows a universal win over scalar ratings.
 
 ## Reproduce the receipt
 
@@ -43,6 +43,32 @@ Optional generated aid:
 - `cargo run --bin cardinal -- eval-compare --mode ordinal --out artifacts/eval/comparison_summary_ordinal.json` compares the same active-comparison loop using ordinal "which item is higher?" judgements instead of ratio magnitudes.
 
 Do not compare the two curve CSV `error` columns directly. `synthetic_curves.csv` records the cardinal model's estimated top-k boundary error and can exceed 1. `likert_curves.csv` records observed `1 - topk_precision`. They are trajectory receipts with different semantics, not a shared y-axis.
+
+## Live OpenRouter receipt pack
+
+Source directory: `artifacts/live/openrouter-benchmark-2026-06-30/`.
+
+The live pack was generated through `examples/live_openrouter_benchmark.py` with `OPENROUTER_API_KEY` set. It runs `cardinal rerank` on three project-relevant case families, preserving each policy's request JSON, response JSON, trace JSONL, markdown report, cache export, `summary.json`, and `summary.md`.
+
+Aggregate receipt:
+
+| Policy | Comparisons | Cached | Refused | Cost USD | Top public evidence | Top routing policy | Top release risks |
+|---|---:|---:|---:|---:|---|---|---|
+| `quality_only_opus_46` | 153 | 0 | 0 | $0.482300 | worked_example, readme, evaluation_doc | frontier_ladder_2026_06, qwen_3_7_max | no_large_live_receipt, baseline_breadth, provider_metadata_drift |
+| `frontier_ladder_2026_06` | 153 | 0 | 0 | $0.482175 | readme, worked_example, evaluation_doc | frontier_ladder_2026_06, qwen_3_7_max | no_large_live_receipt, baseline_breadth, provider_metadata_drift |
+| `cost_aware_fast_deepseek_v4_flash` | 153 | 0 | 0 | $0.029860 | evaluation_doc, worked_example, readme | frontier_ladder_2026_06, quality_only_opus_46 | no_large_live_receipt, cache_provenance, provider_metadata_drift |
+
+Across the three policy runs, the pack used 459 fresh provider comparisons, 0 cached comparisons, 0 refusals, 234,299 provider input tokens, 80,983 provider output tokens, and $0.994335 provider-reported cost. It proves the OpenRouter gateway, model-policy JSON, prompt parsing, trace writing, markdown report generation, and cache export work against live provider traffic for these cases. It is not a scalar/Likert benchmark, and it does not replace a larger task-family suite with external baselines and held-out prompts.
+
+Re-run one policy:
+
+```bash
+python3 examples/live_openrouter_benchmark.py \
+  --out-dir artifacts/live/openrouter-benchmark-2026-06-30/quality_only \
+  --policy-config examples/model-policy-quality-only.json
+```
+
+Refresh `combined-summary.json` and this directory's `README.md` after re-running policy directories; they are aggregate receipts, not source data.
 
 ## Method
 
@@ -101,7 +127,7 @@ The repo has a deterministic local evaluation surface with checked-in raw artifa
 
 ## Known gaps
 
-- No live LLM receipt is checked in for the headline comparison.
+- No live scalar/Likert or ordinal baseline receipt is checked in for the headline comparison; the live pack currently exercises cardinal policies only.
 - The baseline is a deterministic 10-level scalar simulator, not a tuned family of scalar prompts.
 - The current resource control is equal call count, not equal tokens, equal latency, or equal dollars.
 - The current synthetic cardinal runs all end with `budget_exhausted`; they do not demonstrate cost-saving convergence.

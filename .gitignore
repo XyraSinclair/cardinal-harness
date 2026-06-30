@@ -17,6 +17,8 @@ target
 # Local pairwise cache
 .cardinal_pairwise_cache.sqlite
 .cardinal_pairwise_cache.lock
+artifacts/live/**/cache.sqlite
+artifacts/live/**/cache.lock
 scorecard.png
 
 # RustRover

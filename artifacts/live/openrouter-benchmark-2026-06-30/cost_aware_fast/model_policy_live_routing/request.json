@@ -1,0 +1,58 @@
+{
+  "attributes": [
+    {
+      "id": "public_benchmark_reliability",
+      "prompt": "reliability as a judge for public benchmark receipts where brittle or unserious judgments would damage credibility",
+      "prompt_template_slug": "canonical_v2",
+      "weight": 0.45
+    },
+    {
+      "id": "cost_discipline",
+      "prompt": "cost discipline for repeated real OpenRouter benchmark runs without sacrificing the validity of the evidence",
+      "prompt_template_slug": "canonical_bucket_v1",
+      "weight": 0.3
+    },
+    {
+      "id": "freshness_and_capability",
+      "prompt": "current-generation capability and parameter support fit for cardinal pairwise ratio judging on OpenRouter",
+      "prompt_template_slug": "canonical_v2",
+      "weight": 0.25
+    }
+  ],
+  "comparison_budget": 72,
+  "comparison_concurrency": 4,
+  "entities": [
+    {
+      "id": "quality_only_opus_46",
+      "text": "Fixed policy: anthropic/claude-opus-4.6. Highest-cost, high-quality judge path for public receipts where answer quality and careful comparative reasoning matter more than cost."
+    },
+    {
+      "id": "frontier_ladder_2026_06",
+      "text": "Ladder policy: starts anthropic/claude-opus-4.6, can step through google/gemini-3.1-pro-preview, then openai/gpt-5.4-mini as uncertainty falls. Intended to preserve quality on hard comparisons while reducing spend on easier or lower-impact comparisons."
+    },
+    {
+      "id": "cost_aware_deepseek_v4_flash",
+      "text": "Fixed policy: deepseek/deepseek-v4-flash. Very low-cost current-generation route for high-volume sweeps, smoke tests, and prompt-surface iteration where exhaustive expensive judging would be wasteful."
+    },
+    {
+      "id": "qwen_3_7_max",
+      "text": "Direct current OpenRouter model candidate: qwen/qwen3.7-max. Large context, current high-capability model with logprob support listed in live OpenRouter metadata."
+    },
+    {
+      "id": "glm_5_2",
+      "text": "Direct current OpenRouter model candidate: z-ai/glm-5.2. Large context, very low prompt cost, supports logprobs and structured outputs in live OpenRouter metadata."
+    },
+    {
+      "id": "kimi_k2_thinking",
+      "text": "Direct current OpenRouter model candidate: moonshotai/kimi-k2-thinking. Thinking-oriented current model, moderate context, useful as a diverse reasoning judge candidate."
+    }
+  ],
+  "gates": [],
+  "max_pair_repeats": 1,
+  "randomize_presentation_order": true,
+  "rater_id": "live-openrouter-model_policy_live_routing",
+  "topk": {
+    "k": 2,
+    "tolerated_error": 0.08
+  }
+}

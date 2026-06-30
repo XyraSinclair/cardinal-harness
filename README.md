@@ -26,11 +26,12 @@ Research workflows, training/export code, agent orchestration, and other experim
 The public evidence is deliberately reproducible and deliberately narrow:
 
 - Offline synthetic evaluation and Likert/scalar comparison receipts live under `artifacts/eval/`.
+- Preserved real OpenRouter smoke receipts live under `artifacts/live/openrouter-benchmark-2026-06-30/`; they cover three cardinal policy runs, 459 fresh provider comparisons, 0 cache hits, 0 refusals, and $0.994335 provider-reported cost.
 - The compact five-metric `comparison_summary.json` is mixed: 10 cardinal wins, 12 Likert wins, and 18 ties across the checked-in cases. The offline raw-receipt delta adds gate metrics and currently reports 10/12/20 across 42 comparable rows.
 - All current cardinal synthetic runs stop at `budget_exhausted`; the receipts do not prove early stopping or lower cost.
 - Equal call counts are not equal token cost. Pairwise prompts compare two items; scalar prompts rate one item.
 
-The next empirical proof target is a live, frozen benchmark suite with preserved request/response/trace/report/cache receipts, equalized token or dollar budgets, and scalar, ordinal-pairwise, and pairwise-ratio baselines on the same tasks.
+The next empirical proof target is a live, frozen head-to-head benchmark with equalized token or dollar budgets and scalar, ordinal-pairwise, pairwise-ratio, and high-budget reference regimes on the same held-out tasks.
 
 ## Core idea
 
@@ -192,6 +193,14 @@ python3 examples/offline_eval_delta.py \
 
 # Optional control: active ordinal pairwise judgements without ratio magnitude.
 cargo run --bin cardinal -- eval-compare --mode ordinal --out artifacts/eval/comparison_summary_ordinal.json
+
+# Real OpenRouter receipt pack; requires OPENROUTER_API_KEY and spends provider credits.
+python3 examples/live_openrouter_benchmark.py \
+  --out-dir artifacts/live/openrouter-benchmark-2026-06-30/quality_only \
+  --policy-config examples/model-policy-quality-only.json
+
+# Preserved receipts from the 2026-06-30 run cover quality-only, frontier-ladder,
+# and cost-aware-fast policies under artifacts/live/openrouter-benchmark-2026-06-30/.
 
 # Cache management
 cargo run --bin cardinal -- cache-export --out cache.jsonl

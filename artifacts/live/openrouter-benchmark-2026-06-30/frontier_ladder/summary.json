@@ -1,0 +1,174 @@
+{
+  "case_count": 3,
+  "cases": [
+    {
+      "cache_export": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/frontier_ladder/public_evidence_surfaces/cache-export.jsonl",
+      "cache_rows": 45,
+      "case": "public_evidence_surfaces",
+      "comparison_budget": 72,
+      "comparisons_attempted": 45,
+      "comparisons_cached": 0,
+      "comparisons_refused": 0,
+      "comparisons_used": 45,
+      "description": "Rank current cardinal-harness documentation surfaces by public-release evidence value.",
+      "global_topk_error": 3.714922563016046,
+      "model_used": "anthropic/claude-opus-4.6",
+      "policy": "frontier_ladder_2026_06",
+      "provider_cost_is_estimate": false,
+      "provider_cost_nanodollars": 143400000,
+      "provider_cost_usd": 0.1434,
+      "provider_input_tokens": 22605,
+      "provider_output_tokens": 1215,
+      "report": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/frontier_ladder/public_evidence_surfaces/report.md",
+      "request": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/frontier_ladder/public_evidence_surfaces/request.json",
+      "response": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/frontier_ladder/public_evidence_surfaces/response.json",
+      "stop_reason": "no_new_pairs",
+      "top_entities": [
+        {
+          "id": "readme",
+          "p_flip": 0.4195134885035342,
+          "rank": 1,
+          "u_mean": 3.671998992517402,
+          "u_std": 3.1789352796649637
+        },
+        {
+          "id": "worked_example",
+          "p_flip": 0.4510838500856822,
+          "rank": 2,
+          "u_mean": 3.158817907137033,
+          "u_std": 3.0331839924398265
+        },
+        {
+          "id": "evaluation_doc",
+          "p_flip": 0.5,
+          "rank": 3,
+          "u_mean": 2.4177537893380787,
+          "u_std": 2.995497644895294
+        }
+      ],
+      "trace": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/frontier_ladder/public_evidence_surfaces/trace.jsonl",
+      "trace_cost_estimate_rows": 0,
+      "trace_cost_nanodollars": 143400000,
+      "trace_cost_usd": 0.1434,
+      "trace_models": [
+        "anthropic/claude-opus-4.6"
+      ],
+      "trace_rows": 45
+    },
+    {
+      "cache_export": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/frontier_ladder/model_policy_live_routing/cache-export.jsonl",
+      "cache_rows": 45,
+      "case": "model_policy_live_routing",
+      "comparison_budget": 72,
+      "comparisons_attempted": 45,
+      "comparisons_cached": 0,
+      "comparisons_refused": 0,
+      "comparisons_used": 45,
+      "description": "Rank candidate OpenRouter routing policies for a real public benchmark run.",
+      "global_topk_error": 2.9547777097057235,
+      "model_used": "anthropic/claude-opus-4.6",
+      "policy": "frontier_ladder_2026_06",
+      "provider_cost_is_estimate": false,
+      "provider_cost_nanodollars": 143625000,
+      "provider_cost_usd": 0.143625,
+      "provider_input_tokens": 22650,
+      "provider_output_tokens": 1215,
+      "report": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/frontier_ladder/model_policy_live_routing/report.md",
+      "request": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/frontier_ladder/model_policy_live_routing/request.json",
+      "response": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/frontier_ladder/model_policy_live_routing/response.json",
+      "stop_reason": "no_new_pairs",
+      "top_entities": [
+        {
+          "id": "frontier_ladder_2026_06",
+          "p_flip": 0.31515207715200466,
+          "rank": 1,
+          "u_mean": 3.2955950957770095,
+          "u_std": 1.24246211744191
+        },
+        {
+          "id": "qwen_3_7_max",
+          "p_flip": 0.5,
+          "rank": 2,
+          "u_mean": 2.1007317975806465,
+          "u_std": 1.2420951958767368
+        }
+      ],
+      "trace": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/frontier_ladder/model_policy_live_routing/trace.jsonl",
+      "trace_cost_estimate_rows": 0,
+      "trace_cost_nanodollars": 143625000,
+      "trace_cost_usd": 0.143625,
+      "trace_models": [
+        "anthropic/claude-opus-4.6"
+      ],
+      "trace_rows": 45
+    },
+    {
+      "cache_export": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/frontier_ladder/public_release_risks/cache-export.jsonl",
+      "cache_rows": 63,
+      "case": "public_release_risks",
+      "comparison_budget": 84,
+      "comparisons_attempted": 63,
+      "comparisons_cached": 0,
+      "comparisons_refused": 0,
+      "comparisons_used": 63,
+      "description": "Rank remaining public-release risks by credibility impact and actionability.",
+      "global_topk_error": 3.8584725827515114,
+      "model_used": "anthropic/claude-opus-4.6",
+      "policy": "frontier_ladder_2026_06",
+      "provider_cost_is_estimate": false,
+      "provider_cost_nanodollars": 195150000,
+      "provider_cost_usd": 0.19515,
+      "provider_input_tokens": 30525,
+      "provider_output_tokens": 1701,
+      "report": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/frontier_ladder/public_release_risks/report.md",
+      "request": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/frontier_ladder/public_release_risks/request.json",
+      "response": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/frontier_ladder/public_release_risks/response.json",
+      "stop_reason": "no_new_pairs",
+      "top_entities": [
+        {
+          "id": "no_large_live_receipt",
+          "p_flip": 0.23113364912886403,
+          "rank": 1,
+          "u_mean": 5.486121479510535,
+          "u_std": 2.822934141350903
+        },
+        {
+          "id": "baseline_breadth",
+          "p_flip": 0.318409470361251,
+          "rank": 2,
+          "u_mean": 4.031586511337215,
+          "u_std": 2.809444450519508
+        },
+        {
+          "id": "provider_metadata_drift",
+          "p_flip": 0.5,
+          "rank": 3,
+          "u_mean": 1.437540148163493,
+          "u_std": 2.684746096409342
+        }
+      ],
+      "trace": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/frontier_ladder/public_release_risks/trace.jsonl",
+      "trace_cost_estimate_rows": 0,
+      "trace_cost_nanodollars": 195150000,
+      "trace_cost_usd": 0.19515,
+      "trace_models": [
+        "anthropic/claude-opus-4.6"
+      ],
+      "trace_rows": 63
+    }
+  ],
+  "out_dir": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/frontier_ladder",
+  "policy": "frontier_ladder_2026_06",
+  "policy_config": "examples/model-policy-frontier-ladder.json",
+  "totals": {
+    "comparisons_cached": 0,
+    "comparisons_refused": 0,
+    "comparisons_used": 153,
+    "provider_cost_nanodollars": 482175000,
+    "provider_cost_usd": 0.48217499999999996,
+    "provider_input_tokens": 75780,
+    "provider_output_tokens": 4131,
+    "trace_cost_estimate_rows": 0,
+    "trace_rows": 153
+  }
+}
