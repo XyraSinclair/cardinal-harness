@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
 """Run a real OpenRouter-backed method comparison for structured list judgments.
 
-This script compares four live judging regimes on the same attribute-weighted
-cases:
+This script compares live judging regimes on the same frozen,
+attribute-weighted cases:
 
 - scalar_matrix: one structured score matrix call per case
 - list_sort: one structured whole-list sorting call per case
 - ordinal_pairwise: pairwise direction-only judgments per attribute
 - cardinal_pairwise_ratio: pairwise direction + magnitude judgments per attribute
 
-A fifth reference regime, reference_pairwise_ratio, is run with a configurable
-reference model and used as the frozen comparison target for metrics. Every call
-writes a key-free request body, raw OpenRouter response body, parsed judgment,
-usage, and cost accounting into the output directory.
+A reference_pairwise_ratio regime is run with a configurable reference model
+and used as the comparison target for metrics. Cases are loaded from
+examples/live-method-suite.json by default so the benchmark prompt surface is
+versioned separately from the runner. Every call writes a key-free request body,
+raw OpenRouter response body, parsed judgment, usage, and cost accounting into
+the output directory.
 """
 
 from __future__ import annotations
@@ -31,7 +33,7 @@ from typing import Any
 
 OPENROUTER_MODELS_URL = "https://openrouter.ai/api/v1/models?output_modalities=text"
 OPENROUTER_CHAT_URL = "https://openrouter.ai/api/v1/chat/completions"
-
+DEFAULT_SUITE_PATH = Path(__file__).with_name("live-method-suite.json")
 
 @dataclass(frozen=True)
 class Attribute:
@@ -54,137 +56,80 @@ class LiveJudgmentCase:
     attributes: tuple[Attribute, ...]
 
 
-CASES: tuple[LiveJudgmentCase, ...] = (
-    LiveJudgmentCase(
-        name="public_artifact_work",
-        description="Prioritize work that makes cardinal-harness more shareable as a serious public artifact.",
-        items=(
-            Item(
-                "live_baseline_suite",
-                "Build a preserved real-LLM head-to-head suite comparing scalar/list, ordinal pairwise, and cardinal pairwise judgments on identical attribute-weighted tasks, with request/response/trace/cost artifacts.",
-            ),
-            Item(
-                "portable_receipts",
-                "Make every checked-in receipt portable from a fresh clone: relative paths, model IDs, prompt hashes, cache hit counts, provider cost semantics, and explicit non-convergence flags.",
-            ),
-            Item(
-                "dependency_audit_cleanup",
-                "Remove or quarantine transitive cargo-audit warnings for paste, anyhow, and rand so the public release has a cleaner security posture.",
-            ),
-            Item(
-                "first_user_path",
-                "Compress the first-time user path into one obvious command, one tiny request file, one expected output, and one explanation of when cardinal ranking is worth its cost.",
-            ),
-            Item(
-                "large_frozen_benchmark",
-                "Create a larger frozen benchmark suite with multiple task families, repeated runs, equalized budgets, raw artifacts, and a clear statistical report.",
-            ),
-        ),
-        attributes=(
-            Attribute(
-                "evidence_leverage",
-                "how much completing this work increases concrete falsifiable evidence for robust LLM list judgment",
-                0.45,
-            ),
-            Attribute(
-                "shareability_gain",
-                "how much this work improves confidence that a serious external reader would share the artifact",
-                0.35,
-            ),
-            Attribute(
-                "implementation_tractability",
-                "how tractable this work is to implement cleanly without creating a sprawling subsystem",
-                0.20,
-            ),
-        ),
-    ),
-    LiveJudgmentCase(
-        name="judgment_method_properties",
-        description="Rank judging regimes for sorting a list robustly by multiple attributes under real LLM noise.",
-        items=(
-            Item(
-                "single_scalar_rating",
-                "Ask the model to assign each item an independent 1-10 or 0-100 score for every attribute, then sort by the weighted sum.",
-            ),
-            Item(
-                "whole_list_sort",
-                "Ask the model to directly return one ranked list after considering all attributes and weights at once.",
-            ),
-            Item(
-                "ordinal_pairwise",
-                "Ask pairwise questions that only choose which item is better on an attribute, then aggregate wins into a ranking.",
-            ),
-            Item(
-                "cardinal_pairwise_ratio",
-                "Ask pairwise questions for both the better item and how many times more it has the attribute, then fit a latent score model.",
-            ),
-            Item(
-                "bandit_policy_cardinal",
-                "Use cardinal pairwise questions plus an uncertainty-aware policy that spends comparisons where top-k uncertainty is highest.",
-            ),
-        ),
-        attributes=(
-            Attribute(
-                "noise_resistance",
-                "resistance to model calibration drift, anchoring, presentation order, and local inconsistency",
-                0.40,
-            ),
-            Attribute(
-                "information_per_call",
-                "amount of ranking information extracted per provider call under the same model and prompt budget",
-                0.35,
-            ),
-            Attribute(
-                "auditability",
-                "ability for another engineer to inspect individual judgments and understand why the final order changed",
-                0.25,
-            ),
-        ),
-    ),
-    LiveJudgmentCase(
-        name="model_policy_options",
-        description="Rank live OpenRouter judging policies for public structured-judgment receipts.",
-        items=(
-            Item(
-                "quality_only_opus_46",
-                "Fixed anthropic/claude-opus-4.6 policy. High-cost path for public receipts where careful comparative reasoning matters more than spend.",
-            ),
-            Item(
-                "sonnet_reference_then_fast",
-                "Use anthropic/claude-sonnet-4.6 for a frozen reference or disputed cases, then use a cheaper current model for repeated candidate-regime sweeps.",
-            ),
-            Item(
-                "deepseek_v4_flash_fast",
-                "Fixed deepseek/deepseek-v4-flash policy for cheap high-volume smoke tests, prompt iteration, and broad first-pass sweeps.",
-            ),
-            Item(
-                "glm_5_2_logprob_candidate",
-                "Use z-ai/glm-5.2 when logprob support, low prompt cost, and large context matter more than maximum brand credibility.",
-            ),
-            Item(
-                "kimi_k2_thinking_diverse",
-                "Use moonshotai/kimi-k2-thinking as a diverse reasoning judge for contested comparisons or cross-model adjudication.",
-            ),
-        ),
-        attributes=(
-            Attribute(
-                "public_receipt_credibility",
-                "credibility as a judge model for evidence that will be shown to serious external readers",
-                0.45,
-            ),
-            Attribute(
-                "cost_discipline",
-                "ability to support many repeated live benchmark runs without wasting provider spend",
-                0.30,
-            ),
-            Attribute(
-                "route_freshness",
-                "current OpenRouter availability, parameter support, and fit for structured judgment prompts",
-                0.25,
-            ),
-        ),
-    ),
-)
+def expect_str(row: dict[str, Any], key: str, context: str) -> str:
+    value = row.get(key)
+    if not isinstance(value, str) or not value.strip():
+        raise SystemExit(f"{context} missing non-empty string field {key!r}")
+    return value
+
+
+def parse_items(rows: Any, case_name: str) -> tuple[Item, ...]:
+    if not isinstance(rows, list) or not rows:
+        raise SystemExit(f"case {case_name!r} must contain a non-empty items list")
+    items: list[Item] = []
+    seen: set[str] = set()
+    for index, row in enumerate(rows):
+        if not isinstance(row, dict):
+            raise SystemExit(f"case {case_name!r} item {index} must be an object")
+        item = Item(expect_str(row, "id", f"case {case_name!r} item {index}"), expect_str(row, "text", f"case {case_name!r} item {index}"))
+        if item.id in seen:
+            raise SystemExit(f"case {case_name!r} has duplicate item id {item.id!r}")
+        seen.add(item.id)
+        items.append(item)
+    if len(items) < 2:
+        raise SystemExit(f"case {case_name!r} must contain at least two items")
+    return tuple(items)
+
+
+def parse_attributes(rows: Any, case_name: str) -> tuple[Attribute, ...]:
+    if not isinstance(rows, list) or not rows:
+        raise SystemExit(f"case {case_name!r} must contain a non-empty attributes list")
+    attributes: list[Attribute] = []
+    seen: set[str] = set()
+    for index, row in enumerate(rows):
+        if not isinstance(row, dict):
+            raise SystemExit(f"case {case_name!r} attribute {index} must be an object")
+        attr_id = expect_str(row, "id", f"case {case_name!r} attribute {index}")
+        if attr_id in seen:
+            raise SystemExit(f"case {case_name!r} has duplicate attribute id {attr_id!r}")
+        seen.add(attr_id)
+        try:
+            weight = float(row.get("weight"))
+        except (TypeError, ValueError) as err:
+            raise SystemExit(f"case {case_name!r} attribute {attr_id!r} has invalid weight") from err
+        if not math.isfinite(weight) or weight <= 0.0:
+            raise SystemExit(f"case {case_name!r} attribute {attr_id!r} weight must be positive and finite")
+        attributes.append(Attribute(attr_id, expect_str(row, "prompt", f"case {case_name!r} attribute {attr_id!r}"), weight))
+    return tuple(attributes)
+
+
+def load_suite(path: Path) -> tuple[str, str, tuple[LiveJudgmentCase, ...]]:
+    suite = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(suite, dict):
+        raise SystemExit(f"suite file must contain a JSON object: {path}")
+    suite_name = expect_str(suite, "name", "suite")
+    suite_description = expect_str(suite, "description", f"suite {suite_name!r}")
+    raw_cases = suite.get("cases")
+    if not isinstance(raw_cases, list) or not raw_cases:
+        raise SystemExit(f"suite {suite_name!r} must contain a non-empty cases list")
+    cases: list[LiveJudgmentCase] = []
+    seen: set[str] = set()
+    for index, row in enumerate(raw_cases):
+        if not isinstance(row, dict):
+            raise SystemExit(f"suite {suite_name!r} case {index} must be an object")
+        case_name = expect_str(row, "name", f"suite {suite_name!r} case {index}")
+        if case_name in seen:
+            raise SystemExit(f"suite {suite_name!r} has duplicate case name {case_name!r}")
+        seen.add(case_name)
+        cases.append(
+            LiveJudgmentCase(
+                name=case_name,
+                description=expect_str(row, "description", f"case {case_name!r}"),
+                items=parse_items(row.get("items"), case_name),
+                attributes=parse_attributes(row.get("attributes"), case_name),
+            )
+        )
+    return suite_name, suite_description, tuple(cases)
 
 
 class OpenRouterClient:
@@ -316,17 +261,49 @@ def extract_content(response_body: dict[str, Any]) -> str:
 
 def parse_json_object(text: str) -> dict[str, Any]:
     stripped = text.strip()
-    if stripped.startswith("```"):
-        lines = stripped.splitlines()
-        stripped = "\n".join(lines[1:-1]).strip()
-    start = stripped.find("{")
-    end = stripped.rfind("}")
-    if start < 0 or end < start:
-        raise SystemExit(f"model output did not contain a JSON object: {stripped[:300]}")
-    value = json.loads(stripped[start : end + 1])
-    if not isinstance(value, dict):
+    decoder = json.JSONDecoder()
+
+    candidates: list[str] = [stripped]
+    lines = stripped.splitlines()
+    in_fence = False
+    fence_lines: list[str] = []
+    for line in lines:
+        if line.strip().startswith("```"):
+            if in_fence:
+                candidates.insert(0, "\n".join(fence_lines).strip())
+                fence_lines = []
+                in_fence = False
+            else:
+                in_fence = True
+            continue
+        if in_fence:
+            fence_lines.append(line)
+
+    if stripped.startswith("```") and stripped.endswith("```") and len(lines) >= 3:
+        candidates.insert(0, "\n".join(lines[1:-1]).strip())
+
+    for candidate in candidates:
+        if not candidate:
+            continue
+        try:
+            value = json.loads(candidate)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(value, dict):
+            return value
         raise SystemExit("model output JSON was not an object")
-    return value
+
+    for start, char in enumerate(stripped):
+        if char != "{":
+            continue
+        try:
+            value, _end = decoder.raw_decode(stripped[start:])
+        except json.JSONDecodeError:
+            continue
+        if isinstance(value, dict):
+            return value
+
+    raise SystemExit(f"model output did not contain a JSON object: {stripped[:300]}")
 
 
 def summarize_usage(response_body: dict[str, Any], pricing: dict[str, float], latency_ms: int) -> dict[str, Any]:
@@ -347,6 +324,7 @@ def summarize_usage(response_body: dict[str, Any], pricing: dict[str, float], la
     return {
         "prompt_tokens": prompt_tokens,
         "completion_tokens": completion_tokens,
+        "total_tokens": prompt_tokens + completion_tokens,
         "cost_nanodollars": cost_nanodollars,
         "cost_usd": cost_nanodollars / 1_000_000_000,
         "cost_is_estimate": is_estimate,
@@ -400,9 +378,10 @@ def validate_item_id(item_id: str, case: LiveJudgmentCase) -> None:
 
 def pair_higher_id(raw_value: Any, case: LiveJudgmentCase, left: Item, right: Item, method: str) -> str:
     raw = str(raw_value).strip()
-    if raw.upper() == "A":
+    normalized = raw.lower()
+    if normalized in {"a", "item a", "option a", "left"}:
         return left.id
-    if raw.upper() == "B":
+    if normalized in {"b", "item b", "option b", "right"}:
         return right.id
     validate_item_id(raw, case)
     if raw not in {left.id, right.id}:
@@ -613,11 +592,15 @@ def method_result(
 
 
 def aggregate_usage(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    prompt_tokens = sum(int(row.get("prompt_tokens", 0)) for row in rows)
+    completion_tokens = sum(int(row.get("completion_tokens", 0)) for row in rows)
+    cost_nanodollars = sum(int(row.get("cost_nanodollars", 0)) for row in rows)
     return {
-        "prompt_tokens": sum(int(row.get("prompt_tokens", 0)) for row in rows),
-        "completion_tokens": sum(int(row.get("completion_tokens", 0)) for row in rows),
-        "cost_nanodollars": sum(int(row.get("cost_nanodollars", 0)) for row in rows),
-        "cost_usd": sum(int(row.get("cost_nanodollars", 0)) for row in rows) / 1_000_000_000,
+        "prompt_tokens": prompt_tokens,
+        "completion_tokens": completion_tokens,
+        "total_tokens": prompt_tokens + completion_tokens,
+        "cost_nanodollars": cost_nanodollars,
+        "cost_usd": cost_nanodollars / 1_000_000_000,
         "cost_is_estimate": any(bool(row.get("cost_is_estimate")) for row in rows),
         "latency_ms": sum(int(row.get("latency_ms", 0)) for row in rows),
         "calls": sum(int(row.get("calls", 1)) for row in rows),
@@ -663,20 +646,79 @@ def compare_to_reference(reference: dict[str, Any], result: dict[str, Any], k: i
     }
 
 
+def agreement_score(metrics: dict[str, Any]) -> float:
+    tau_unit = (float(metrics["kendall_tau"]) + 1.0) / 2.0
+    topk = float(metrics["topk_jaccard"])
+    return (tau_unit + topk) / 2.0
+
+
+def budget_normalized_methods(cases_out: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    buckets: dict[str, dict[str, Any]] = {}
+    for case in cases_out:
+        rows = [case["reference"], *case["methods"]]
+        for result in rows:
+            method = result["method"]
+            bucket = buckets.setdefault(
+                method,
+                {
+                    "method": method,
+                    "model": result["model"],
+                    "case_count": 0,
+                    "agreement_score_total": 0.0,
+                    "kendall_tau_total": 0.0,
+                    "topk_jaccard_total": 0.0,
+                    "usages": [],
+                },
+            )
+            metrics = result["metrics_vs_reference"]
+            bucket["case_count"] += 1
+            bucket["agreement_score_total"] += agreement_score(metrics)
+            bucket["kendall_tau_total"] += float(metrics["kendall_tau"])
+            bucket["topk_jaccard_total"] += float(metrics["topk_jaccard"])
+            bucket["usages"].append(result["usage"])
+    normalized: list[dict[str, Any]] = []
+    for bucket in buckets.values():
+        usage = aggregate_usage(bucket["usages"])
+        case_count = int(bucket["case_count"])
+        agreement_total = float(bucket["agreement_score_total"])
+        calls = int(usage["calls"])
+        total_tokens = int(usage["total_tokens"])
+        cost_usd = float(usage["cost_usd"])
+        normalized.append(
+            {
+                "method": bucket["method"],
+                "model": bucket["model"],
+                "case_count": case_count,
+                "mean_kendall_tau": bucket["kendall_tau_total"] / case_count,
+                "mean_topk_jaccard": bucket["topk_jaccard_total"] / case_count,
+                "mean_agreement_score": agreement_total / case_count,
+                "agreement_score_total": agreement_total,
+                "usage": usage,
+                "agreement_score_per_call": agreement_total / calls if calls else None,
+                "agreement_score_per_1k_tokens": agreement_total / (total_tokens / 1000.0) if total_tokens else None,
+                "agreement_score_per_usd": agreement_total / cost_usd if cost_usd else None,
+            }
+        )
+    return sorted(normalized, key=lambda row: (-row["mean_agreement_score"], row["method"]))
+
+
 def write_markdown(summary: dict[str, Any], path: Path) -> None:
     lines = [
         "# Live Structured-Judgment Method Comparison",
         "",
         "This receipt is generated from real OpenRouter chat-completion calls.",
-        "It compares structured judgment regimes on the same attribute-weighted item lists.",
+        "It compares structured judgment regimes on the same frozen attribute-weighted item lists.",
         "The reference is another live LLM regime, not human ground truth.",
         "",
+        f"Suite: `{summary['suite']['name']}`",
+        f"Suite path: `{summary['suite']['path']}`",
         f"Candidate model: `{summary['candidate_model']}`",
         f"Reference model: `{summary['reference_model']}`",
         f"Cases: {summary['case_count']}",
         f"OpenRouter calls: {summary['totals']['calls']}",
         f"Prompt tokens: {summary['totals']['prompt_tokens']}",
         f"Completion tokens: {summary['totals']['completion_tokens']}",
+        f"Total tokens: {summary['totals']['total_tokens']}",
         f"Provider cost: ${summary['totals']['cost_usd']:.6f}",
         f"Any estimated cost rows: {summary['totals']['cost_is_estimate']}",
         "",
@@ -704,11 +746,45 @@ def write_markdown(summary: dict[str, Any], path: Path) -> None:
     lines.extend(
         [
             "",
+            "## Budget-normalized aggregate",
+            "",
+            "`agreement_score` averages normalized Kendall tau `((tau + 1) / 2)` and top-k Jaccard.",
+            "The per-call/token/dollar columns are descriptive normalizations of this run, not a substitute for a separately equalized-budget experiment.",
+            "",
+            "| Method | Mean tau | Mean top-k | Mean agreement | Calls | Total tokens | Cost USD | Agreement/call | Agreement/1k tokens | Agreement/USD |",
+            "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+        ]
+    )
+    for row in summary["budget_normalized_methods"]:
+        usage = row["usage"]
+        per_usd = row["agreement_score_per_usd"]
+        lines.append(
+            "| "
+            + " | ".join(
+                [
+                    f"`{row['method']}`",
+                    f"{row['mean_kendall_tau']:.3f}",
+                    f"{row['mean_topk_jaccard']:.3f}",
+                    f"{row['mean_agreement_score']:.3f}",
+                    str(usage["calls"]),
+                    str(usage["total_tokens"]),
+                    f"${usage['cost_usd']:.6f}",
+                    f"{row['agreement_score_per_call']:.4f}",
+                    f"{row['agreement_score_per_1k_tokens']:.4f}",
+                    "n/a" if per_usd is None else f"{per_usd:.2f}",
+                ]
+            )
+            + " |"
+        )
+    lines.extend(
+        [
+            "",
             "## Interpretation guardrails",
             "",
             "- These are real provider calls, but the reference is still an LLM reference, not an external oracle.",
             "- High agreement with the reference means a regime recovered this live reference ordering on this task family and budget.",
             "- Low agreement is useful evidence of prompt/regime brittleness, not proof that the model is incapable.",
+            "- Budget-normalized columns are useful for comparing this run's efficiency; they do not prove equal-token or equal-dollar dominance.",
             "- Cost comparisons are only headline-safe when `cost_is_estimate` is false for every row being compared.",
             "",
         ]
@@ -716,23 +792,34 @@ def write_markdown(summary: dict[str, Any], path: Path) -> None:
     path.write_text("\n".join(lines), encoding="utf-8")
 
 
-def selected_cases(names: list[str] | None) -> list[LiveJudgmentCase]:
+def selected_cases(cases: tuple[LiveJudgmentCase, ...], names: list[str] | None) -> list[LiveJudgmentCase]:
     if not names:
-        return list(CASES)
+        return list(cases)
     wanted = set(names)
-    cases = [case for case in CASES if case.name in wanted]
-    missing = wanted - {case.name for case in cases}
+    selected = [case for case in cases if case.name in wanted]
+    missing = wanted - {case.name for case in selected}
     if missing:
-        raise SystemExit(f"unknown case(s): {', '.join(sorted(missing))}")
-    return cases
+        available = ", ".join(case.name for case in cases)
+        raise SystemExit(f"unknown case(s): {', '.join(sorted(missing))}; available cases: {available}")
+    return selected
+
+
+def portable_path(path: Path) -> str:
+    resolved = path.resolve()
+    cwd = Path.cwd().resolve()
+    try:
+        return str(resolved.relative_to(cwd))
+    except ValueError:
+        return str(path)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run real OpenRouter method comparisons for structured list judgments.")
     parser.add_argument("--out-dir", required=True, type=Path)
-    parser.add_argument("--candidate-model", default="openai/gpt-4.1-mini")
+    parser.add_argument("--suite", type=Path, default=DEFAULT_SUITE_PATH)
+    parser.add_argument("--candidate-model", default="openai/gpt-5.4-mini")
     parser.add_argument("--reference-model", default="anthropic/claude-sonnet-4.6")
-    parser.add_argument("--case", action="append", choices=[case.name for case in CASES])
+    parser.add_argument("--case", action="append")
     parser.add_argument("--max-usd", type=float, default=5.0)
     parser.add_argument("--temperature", type=float, default=0.1)
     args = parser.parse_args()
@@ -746,9 +833,10 @@ def main() -> None:
     client = OpenRouterClient(api_key, out_dir, max_usd=args.max_usd, temperature=args.temperature)
     client.assert_model(args.candidate_model)
     client.assert_model(args.reference_model)
+    suite_name, suite_description, cases = load_suite(args.suite)
 
     cases_out: list[dict[str, Any]] = []
-    for case in selected_cases(args.case):
+    for case in selected_cases(cases, args.case):
         case_dir = out_dir / case.name
         case_manifest = {
             "name": case.name,
@@ -784,10 +872,16 @@ def main() -> None:
     total_usage = aggregate_usage([result["usage"] for result in all_results])
     total_usage["calls"] = client.call_count
     summary = {
+        "suite": {
+            "name": suite_name,
+            "description": suite_description,
+            "path": portable_path(args.suite),
+        },
         "candidate_model": args.candidate_model,
         "reference_model": args.reference_model,
         "case_count": len(cases_out),
         "totals": total_usage,
+        "budget_normalized_methods": budget_normalized_methods(cases_out),
         "cases": cases_out,
         "metadata": {
             "models_url": OPENROUTER_MODELS_URL,

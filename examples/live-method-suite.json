@@ -1,0 +1,264 @@
+{
+  "name": "live_method_suite_v1",
+  "description": "Frozen public structured-judgment cases for live OpenRouter method comparisons. The suite is small enough to rerun, but intentionally spans project prioritization, method design, model routing, onboarding, benchmark rigor, and failure triage.",
+  "cases": [
+    {
+      "name": "public_artifact_work",
+      "description": "Prioritize work that makes cardinal-harness more shareable as a serious public artifact.",
+      "items": [
+        {
+          "id": "live_baseline_suite",
+          "text": "Build a preserved real-LLM head-to-head suite comparing scalar/list, ordinal pairwise, and cardinal pairwise judgments on identical attribute-weighted tasks, with request/response/trace/cost artifacts."
+        },
+        {
+          "id": "portable_receipts",
+          "text": "Make every checked-in receipt portable from a fresh clone: relative paths, model IDs, prompt hashes, cache hit counts, provider cost semantics, and explicit non-convergence flags."
+        },
+        {
+          "id": "dependency_audit_cleanup",
+          "text": "Remove or quarantine transitive cargo-audit warnings for paste, anyhow, and rand so the public release has a cleaner security posture."
+        },
+        {
+          "id": "first_user_path",
+          "text": "Compress the first-time user path into one obvious command, one tiny request file, one expected output, and one explanation of when cardinal ranking is worth its cost."
+        },
+        {
+          "id": "large_frozen_benchmark",
+          "text": "Create a larger frozen benchmark suite with multiple task families, repeated runs, equalized budgets, raw artifacts, and a clear statistical report."
+        }
+      ],
+      "attributes": [
+        {
+          "id": "evidence_leverage",
+          "prompt": "how much completing this work increases concrete falsifiable evidence for robust LLM list judgment",
+          "weight": 0.45
+        },
+        {
+          "id": "shareability_gain",
+          "prompt": "how much this work improves confidence that a serious external reader would share the artifact",
+          "weight": 0.35
+        },
+        {
+          "id": "implementation_tractability",
+          "prompt": "how tractable this work is to implement cleanly without creating a sprawling subsystem",
+          "weight": 0.2
+        }
+      ]
+    },
+    {
+      "name": "judgment_method_properties",
+      "description": "Rank judging regimes for sorting a list robustly by multiple attributes under real LLM noise.",
+      "items": [
+        {
+          "id": "single_scalar_rating",
+          "text": "Ask the model to assign each item an independent 1-10 or 0-100 score for every attribute, then sort by the weighted sum."
+        },
+        {
+          "id": "whole_list_sort",
+          "text": "Ask the model to directly return one ranked list after considering all attributes and weights at once."
+        },
+        {
+          "id": "ordinal_pairwise",
+          "text": "Ask pairwise questions that only choose which item is better on an attribute, then aggregate wins into a ranking."
+        },
+        {
+          "id": "cardinal_pairwise_ratio",
+          "text": "Ask pairwise questions for both the better item and how many times more it has the attribute, then fit a latent score model."
+        },
+        {
+          "id": "bandit_policy_cardinal",
+          "text": "Use cardinal pairwise questions plus an uncertainty-aware policy that spends comparisons where top-k uncertainty is highest."
+        }
+      ],
+      "attributes": [
+        {
+          "id": "noise_resistance",
+          "prompt": "resistance to model calibration drift, anchoring, presentation order, and local inconsistency",
+          "weight": 0.4
+        },
+        {
+          "id": "information_per_call",
+          "prompt": "amount of ranking information extracted per provider call under the same model and prompt budget",
+          "weight": 0.35
+        },
+        {
+          "id": "auditability",
+          "prompt": "ability for another engineer to inspect individual judgments and understand why the final order changed",
+          "weight": 0.25
+        }
+      ]
+    },
+    {
+      "name": "model_policy_options",
+      "description": "Rank live OpenRouter judging policies for public structured-judgment receipts.",
+      "items": [
+        {
+          "id": "quality_only_opus_46",
+          "text": "Fixed anthropic/claude-opus-4.6 policy. High-cost path for public receipts where careful comparative reasoning matters more than spend."
+        },
+        {
+          "id": "sonnet_reference_then_fast",
+          "text": "Use anthropic/claude-sonnet-4.6 for a frozen reference or disputed cases, then use a cheaper current model for repeated candidate-regime sweeps."
+        },
+        {
+          "id": "deepseek_v4_flash_fast",
+          "text": "Fixed deepseek/deepseek-v4-flash policy for cheap high-volume smoke tests, prompt iteration, and broad first-pass sweeps."
+        },
+        {
+          "id": "glm_5_2_logprob_candidate",
+          "text": "Use z-ai/glm-5.2 when logprob support, low prompt cost, and large context matter more than maximum brand credibility."
+        },
+        {
+          "id": "kimi_k2_thinking_diverse",
+          "text": "Use moonshotai/kimi-k2-thinking as a diverse reasoning judge for contested comparisons or cross-model adjudication."
+        }
+      ],
+      "attributes": [
+        {
+          "id": "public_receipt_credibility",
+          "prompt": "credibility as a judge model for evidence that will be shown to serious external readers",
+          "weight": 0.45
+        },
+        {
+          "id": "cost_discipline",
+          "prompt": "ability to support many repeated live benchmark runs without wasting provider spend",
+          "weight": 0.3
+        },
+        {
+          "id": "route_freshness",
+          "prompt": "current OpenRouter availability, parameter support, and fit for structured judgment prompts",
+          "weight": 0.25
+        }
+      ]
+    },
+    {
+      "name": "first_user_path",
+      "description": "Rank onboarding improvements for an engineer trying cardinal-harness from a fresh clone.",
+      "items": [
+        {
+          "id": "copy_paste_quickstart",
+          "text": "A five-minute quickstart with one request JSON, one command, one expected top-k output, and one short explanation of the receipt fields."
+        },
+        {
+          "id": "worked_artifact_walkthrough",
+          "text": "A guided walkthrough from messy shortlist to attributes, pairwise prompts, cache reuse, report reading, and decision caveats."
+        },
+        {
+          "id": "when_not_to_use_cardinal",
+          "text": "A prominent section showing cases where scalar metrics, deterministic sorting, or whole-list ranking are cheaper and more appropriate."
+        },
+        {
+          "id": "public_api_recipe",
+          "text": "A minimal library example that constructs a MultiRerankRequest, installs a model policy, runs one attribute, and emits a report."
+        },
+        {
+          "id": "receipt_debugging_guide",
+          "text": "A troubleshooting guide for cache misses, model refusals, cost estimates, non-convergence, and inconsistent pairwise judgments."
+        }
+      ],
+      "attributes": [
+        {
+          "id": "time_to_first_success",
+          "prompt": "how much this reduces the time before a new user gets a meaningful successful run",
+          "weight": 0.4
+        },
+        {
+          "id": "misuse_prevention",
+          "prompt": "how strongly this prevents users from applying cardinal ranking where it is the wrong tool",
+          "weight": 0.35
+        },
+        {
+          "id": "maintenance_cost",
+          "prompt": "how cheap this is to maintain as the code and models evolve",
+          "weight": 0.25
+        }
+      ]
+    },
+    {
+      "name": "benchmark_design_rigor",
+      "description": "Prioritize benchmark-design requirements for making a live method-comparison result publishable.",
+      "items": [
+        {
+          "id": "equal_dollar_budget",
+          "text": "Run every method under a fixed provider-dollar cap and report how much agreement each method buys before the cap is exhausted."
+        },
+        {
+          "id": "repeated_model_swaps",
+          "text": "Repeat the same suite across multiple candidate and reference models so method effects are separated from one model's quirks."
+        },
+        {
+          "id": "human_adjudicated_slice",
+          "text": "Collect a small human-adjudicated slice that can calibrate whether the live LLM reference itself is plausible."
+        },
+        {
+          "id": "failure_mode_taxonomy",
+          "text": "Tag each disagreement by likely source: prompt ambiguity, reference brittleness, ratio-scale misuse, cost constraint, or genuine method weakness."
+        },
+        {
+          "id": "pre_registered_cases",
+          "text": "Freeze the case list, attributes, weights, models, budget policy, and scoring script before running a public benchmark."
+        }
+      ],
+      "attributes": [
+        {
+          "id": "claim_validity",
+          "prompt": "how much this increases the validity of any public benchmark claim",
+          "weight": 0.5
+        },
+        {
+          "id": "reproducibility",
+          "prompt": "how much this lets another researcher reproduce or falsify the result",
+          "weight": 0.3
+        },
+        {
+          "id": "cost_feasibility",
+          "prompt": "how feasible this is to execute without excessive provider spend or manual effort",
+          "weight": 0.2
+        }
+      ]
+    },
+    {
+      "name": "public_release_risks",
+      "description": "Rank the risks that would most undermine sharing cardinal-harness widely as a serious artifact.",
+      "items": [
+        {
+          "id": "overclaiming_evidence",
+          "text": "The README or report implies method superiority beyond the checked receipt, making a careful reader distrust the whole project."
+        },
+        {
+          "id": "unportable_artifacts",
+          "text": "A fresh clone cannot verify receipts because paths, cache files, generated artifacts, or model metadata are missing."
+        },
+        {
+          "id": "security_advisory_noise",
+          "text": "Dependency audit warnings distract from the artifact's quality and make users hesitate before installing the crate."
+        },
+        {
+          "id": "opaque_failure_cases",
+          "text": "Known cases where cardinal performs badly are buried instead of explained as useful constraints on the method."
+        },
+        {
+          "id": "first_run_complexity",
+          "text": "The first real run requires too many concepts, flags, and files before the user sees a result worth caring about."
+        }
+      ],
+      "attributes": [
+        {
+          "id": "trust_damage",
+          "prompt": "how much this would damage trust from a careful external reader",
+          "weight": 0.45
+        },
+        {
+          "id": "fix_leverage",
+          "prompt": "how much fixing this would improve the overall release with one focused change",
+          "weight": 0.35
+        },
+        {
+          "id": "likelihood",
+          "prompt": "how likely this risk is to occur during public sharing without additional work",
+          "weight": 0.2
+        }
+      ]
+    }
+  ]
+}

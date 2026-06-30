@@ -1,0 +1,89 @@
+{
+  "scores": [
+    {
+      "attributes": {
+        "claim_validity": {
+          "confidence": 0.93,
+          "score": 92
+        },
+        "cost_feasibility": {
+          "confidence": 0.8,
+          "score": 74
+        },
+        "reproducibility": {
+          "confidence": 0.88,
+          "score": 86
+        }
+      },
+      "id": "equal_dollar_budget"
+    },
+    {
+      "attributes": {
+        "claim_validity": {
+          "confidence": 0.91,
+          "score": 88
+        },
+        "cost_feasibility": {
+          "confidence": 0.72,
+          "score": 58
+        },
+        "reproducibility": {
+          "confidence": 0.84,
+          "score": 82
+        }
+      },
+      "id": "repeated_model_swaps"
+    },
+    {
+      "attributes": {
+        "claim_validity": {
+          "confidence": 0.87,
+          "score": 79
+        },
+        "cost_feasibility": {
+          "confidence": 0.76,
+          "score": 66
+        },
+        "reproducibility": {
+          "confidence": 0.79,
+          "score": 63
+        }
+      },
+      "id": "human_adjudicated_slice"
+    },
+    {
+      "attributes": {
+        "claim_validity": {
+          "confidence": 0.84,
+          "score": 73
+        },
+        "cost_feasibility": {
+          "confidence": 0.9,
+          "score": 89
+        },
+        "reproducibility": {
+          "confidence": 0.82,
+          "score": 71
+        }
+      },
+      "id": "failure_mode_taxonomy"
+    },
+    {
+      "attributes": {
+        "claim_validity": {
+          "confidence": 0.97,
+          "score": 97
+        },
+        "cost_feasibility": {
+          "confidence": 0.88,
+          "score": 85
+        },
+        "reproducibility": {
+          "confidence": 0.98,
+          "score": 98
+        }
+      },
+      "id": "pre_registered_cases"
+    }
+  ]
+}

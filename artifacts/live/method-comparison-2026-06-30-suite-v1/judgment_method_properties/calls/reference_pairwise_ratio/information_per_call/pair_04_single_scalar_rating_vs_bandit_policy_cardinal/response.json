@@ -1,0 +1,46 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "I need to compare how much ranking information is extracted per provider call for these two methods.\n\n**A (single_scalar_rating):** Each call produces one score for one item on one attribute. To rank N items across M attributes, you need N\u00d7M calls. Each call gives a single scalar value. The information per call is limited - just one number that then gets combined via weighted sum. There's no direct comparison information between items.\n\n**B (bandit_policy_cardinal):** Each call is a pairwise comparison that directly produces relative ordering information between two items. Cardinal pairwise questions give not just direction but magnitude of preference. The uncertainty-aware policy focuses comparisons where they matter most (top-k uncertainty), meaning each call is targeted to maximally reduce ranking uncertainty. A single pairwise call directly informs the relative ranking of two items simultaneously.\n\n**Analysis:**\n- A single scalar rating gives one data point about one item's absolute position. To derive rankings, you need many such scores and hope the scale is consistent.\n- A cardinal pairwise comparison directly gives relative ranking information between two items, plus magnitude. The bandit policy ensures each call is spent where it reduces the most ranking uncertainty.\n\nPairwise comparisons are known to be more information-efficient for ranking tasks. Each pairwise call resolves uncertainty about the relative order of two items directly. The bandit policy multiplies this by targeting high-uncertainty regions.\n\nThe ratio: B extracts substantially more ranking information per call. A pairwise comparison with cardinal information and smart targeting could easily be 5-8x more informative per call than an independent scalar rating, since: (1) it directly compares two items, (2) cardinal magnitude adds information, (3) the policy targets where uncertainty is highest.\n\nI'd estimate roughly 6-8x more information per call for B.\n\n```json\n{\"higher_id\":\"B\",\"ratio\":7.0,\"confidence\":0.72}\n```",
+        "reasoning": null,
+        "refusal": null,
+        "role": "assistant"
+      },
+      "native_finish_reason": "end_turn"
+    }
+  ],
+  "created": 1782861310,
+  "id": "gen-1782861310-DJQbo6M74UJGGR4rcxK6",
+  "model": "anthropic/claude-4.6-sonnet-20260217",
+  "object": "chat.completion",
+  "provider": "Anthropic",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 426,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.007038,
+    "cost_details": {
+      "upstream_inference_completions_cost": 0.00639,
+      "upstream_inference_cost": 0.007038,
+      "upstream_inference_prompt_cost": 0.000648
+    },
+    "is_byok": false,
+    "prompt_tokens": 216,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 642
+  }
+}

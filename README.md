@@ -27,9 +27,9 @@ The public evidence is deliberately reproducible and deliberately narrow:
 
 - Offline synthetic evaluation and Likert/scalar comparison receipts live under `artifacts/eval/`.
 - Preserved real OpenRouter cardinal-policy receipts live under `artifacts/live/openrouter-benchmark-2026-06-30/`; they cover three policy runs, 459 fresh provider comparisons, 0 cache hits, 0 refusals, and $0.994335 provider-reported cost.
-- A live structured-judgment method comparison lives under `artifacts/live/method-comparison-2026-06-30/`; it compares scalar matrix, whole-list sort, ordinal pairwise, and cardinal pairwise-ratio regimes against a separate LLM reference across three task families.
+- A live structured-judgment method comparison lives under `artifacts/live/method-comparison-2026-06-30-suite-v1/`; it compares scalar matrix, whole-list sort, ordinal pairwise, and cardinal pairwise-ratio regimes against a separate LLM reference across six frozen task families.
 - The compact five-metric offline `comparison_summary.json` is mixed: 10 cardinal wins, 12 Likert wins, and 18 ties across the checked-in cases. The offline raw-receipt delta adds gate metrics and currently reports 10/12/20 across 42 comparable rows.
-- The live method comparison is also mixed: cardinal ties the best candidate regime on two cases and sharply disagrees with the LLM reference on `model_policy_options`.
+- The live method comparison is also mixed: cardinal ties the best candidate regime on `public_artifact_work` and `benchmark_design_rigor`, stays close on `judgment_method_properties` and `public_release_risks`, and lags sharply on `model_policy_options` and `first_user_path`.
 - All current cardinal synthetic runs stop at `budget_exhausted`; the receipts do not prove early stopping or lower cost.
 - Equal call counts are not equal token cost. Pairwise prompts compare two items; scalar prompts rate one item.
 
@@ -207,8 +207,8 @@ python3 examples/live_openrouter_benchmark.py \
 # list sort, ordinal pairwise, and cardinal pairwise-ratio regimes against
 # a live pairwise-ratio reference. Requires OPENROUTER_API_KEY.
 python3 examples/live_method_comparison.py \
-  --out-dir artifacts/live/method-comparison-2026-06-30 \
-  --candidate-model openai/gpt-4.1-mini \
+  --out-dir artifacts/live/method-comparison-2026-06-30-suite-v1 \
+  --candidate-model openai/gpt-5.4-mini \
   --reference-model anthropic/claude-sonnet-4.6 \
   --max-usd 10
 

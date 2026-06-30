@@ -1,0 +1,10 @@
+{
+  "calls": 1,
+  "completion_tokens": 497,
+  "cost_is_estimate": false,
+  "cost_nanodollars": 8097000,
+  "cost_usd": 0.008097,
+  "latency_ms": 14576,
+  "prompt_tokens": 214,
+  "total_tokens": 711
+}

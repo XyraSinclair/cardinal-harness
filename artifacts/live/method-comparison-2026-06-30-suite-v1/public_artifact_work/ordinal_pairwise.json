@@ -1,0 +1,287 @@
+{
+  "attribute_scores": {
+    "dependency_audit_cleanup": {
+      "evidence_leverage": 0.0,
+      "implementation_tractability": 0.5508196721311476,
+      "shareability_gain": 0.0
+    },
+    "first_user_path": {
+      "evidence_leverage": 0.24800000000000003,
+      "implementation_tractability": 0.7967213114754098,
+      "shareability_gain": 0.255072463768116
+    },
+    "large_frozen_benchmark": {
+      "evidence_leverage": 0.7466666666666666,
+      "implementation_tractability": 0.27868852459016397,
+      "shareability_gain": 0.7971014492753624
+    },
+    "live_baseline_suite": {
+      "evidence_leverage": 1.0,
+      "implementation_tractability": 0.0,
+      "shareability_gain": 0.4985507246376812
+    },
+    "portable_receipts": {
+      "evidence_leverage": 0.4453333333333333,
+      "implementation_tractability": 1.0,
+      "shareability_gain": 1.0
+    }
+  },
+  "extra": {
+    "pairs": [
+      {
+        "attribute": "evidence_leverage",
+        "confidence": 0.97,
+        "higher_id": "live_baseline_suite",
+        "left": "live_baseline_suite",
+        "right": "portable_receipts"
+      },
+      {
+        "attribute": "evidence_leverage",
+        "confidence": 0.94,
+        "higher_id": "live_baseline_suite",
+        "left": "live_baseline_suite",
+        "right": "dependency_audit_cleanup"
+      },
+      {
+        "attribute": "evidence_leverage",
+        "confidence": 0.97,
+        "higher_id": "live_baseline_suite",
+        "left": "live_baseline_suite",
+        "right": "first_user_path"
+      },
+      {
+        "attribute": "evidence_leverage",
+        "confidence": 0.87,
+        "higher_id": "live_baseline_suite",
+        "left": "live_baseline_suite",
+        "right": "large_frozen_benchmark"
+      },
+      {
+        "attribute": "evidence_leverage",
+        "confidence": 0.89,
+        "higher_id": "portable_receipts",
+        "left": "portable_receipts",
+        "right": "dependency_audit_cleanup"
+      },
+      {
+        "attribute": "evidence_leverage",
+        "confidence": 0.78,
+        "higher_id": "portable_receipts",
+        "left": "portable_receipts",
+        "right": "first_user_path"
+      },
+      {
+        "attribute": "evidence_leverage",
+        "confidence": 0.86,
+        "higher_id": "large_frozen_benchmark",
+        "left": "portable_receipts",
+        "right": "large_frozen_benchmark"
+      },
+      {
+        "attribute": "evidence_leverage",
+        "confidence": 0.93,
+        "higher_id": "first_user_path",
+        "left": "dependency_audit_cleanup",
+        "right": "first_user_path"
+      },
+      {
+        "attribute": "evidence_leverage",
+        "confidence": 0.97,
+        "higher_id": "large_frozen_benchmark",
+        "left": "dependency_audit_cleanup",
+        "right": "large_frozen_benchmark"
+      },
+      {
+        "attribute": "evidence_leverage",
+        "confidence": 0.97,
+        "higher_id": "large_frozen_benchmark",
+        "left": "first_user_path",
+        "right": "large_frozen_benchmark"
+      },
+      {
+        "attribute": "shareability_gain",
+        "confidence": 0.86,
+        "higher_id": "portable_receipts",
+        "left": "live_baseline_suite",
+        "right": "portable_receipts"
+      },
+      {
+        "attribute": "shareability_gain",
+        "confidence": 0.86,
+        "higher_id": "live_baseline_suite",
+        "left": "live_baseline_suite",
+        "right": "dependency_audit_cleanup"
+      },
+      {
+        "attribute": "shareability_gain",
+        "confidence": 0.86,
+        "higher_id": "live_baseline_suite",
+        "left": "live_baseline_suite",
+        "right": "first_user_path"
+      },
+      {
+        "attribute": "shareability_gain",
+        "confidence": 0.89,
+        "higher_id": "large_frozen_benchmark",
+        "left": "live_baseline_suite",
+        "right": "large_frozen_benchmark"
+      },
+      {
+        "attribute": "shareability_gain",
+        "confidence": 0.84,
+        "higher_id": "portable_receipts",
+        "left": "portable_receipts",
+        "right": "dependency_audit_cleanup"
+      },
+      {
+        "attribute": "shareability_gain",
+        "confidence": 0.89,
+        "higher_id": "portable_receipts",
+        "left": "portable_receipts",
+        "right": "first_user_path"
+      },
+      {
+        "attribute": "shareability_gain",
+        "confidence": 0.86,
+        "higher_id": "portable_receipts",
+        "left": "portable_receipts",
+        "right": "large_frozen_benchmark"
+      },
+      {
+        "attribute": "shareability_gain",
+        "confidence": 0.88,
+        "higher_id": "first_user_path",
+        "left": "dependency_audit_cleanup",
+        "right": "first_user_path"
+      },
+      {
+        "attribute": "shareability_gain",
+        "confidence": 0.92,
+        "higher_id": "large_frozen_benchmark",
+        "left": "dependency_audit_cleanup",
+        "right": "large_frozen_benchmark"
+      },
+      {
+        "attribute": "shareability_gain",
+        "confidence": 0.94,
+        "higher_id": "large_frozen_benchmark",
+        "left": "first_user_path",
+        "right": "large_frozen_benchmark"
+      },
+      {
+        "attribute": "implementation_tractability",
+        "confidence": 0.74,
+        "higher_id": "portable_receipts",
+        "left": "live_baseline_suite",
+        "right": "portable_receipts"
+      },
+      {
+        "attribute": "implementation_tractability",
+        "confidence": 0.86,
+        "higher_id": "dependency_audit_cleanup",
+        "left": "live_baseline_suite",
+        "right": "dependency_audit_cleanup"
+      },
+      {
+        "attribute": "implementation_tractability",
+        "confidence": 0.91,
+        "higher_id": "first_user_path",
+        "left": "live_baseline_suite",
+        "right": "first_user_path"
+      },
+      {
+        "attribute": "implementation_tractability",
+        "confidence": 0.85,
+        "higher_id": "large_frozen_benchmark",
+        "left": "live_baseline_suite",
+        "right": "large_frozen_benchmark"
+      },
+      {
+        "attribute": "implementation_tractability",
+        "confidence": 0.87,
+        "higher_id": "portable_receipts",
+        "left": "portable_receipts",
+        "right": "dependency_audit_cleanup"
+      },
+      {
+        "attribute": "implementation_tractability",
+        "confidence": 0.77,
+        "higher_id": "portable_receipts",
+        "left": "portable_receipts",
+        "right": "first_user_path"
+      },
+      {
+        "attribute": "implementation_tractability",
+        "confidence": 0.67,
+        "higher_id": "portable_receipts",
+        "left": "portable_receipts",
+        "right": "large_frozen_benchmark"
+      },
+      {
+        "attribute": "implementation_tractability",
+        "confidence": 0.83,
+        "higher_id": "first_user_path",
+        "left": "dependency_audit_cleanup",
+        "right": "first_user_path"
+      },
+      {
+        "attribute": "implementation_tractability",
+        "confidence": 0.82,
+        "higher_id": "dependency_audit_cleanup",
+        "left": "dependency_audit_cleanup",
+        "right": "large_frozen_benchmark"
+      },
+      {
+        "attribute": "implementation_tractability",
+        "confidence": 0.69,
+        "higher_id": "first_user_path",
+        "left": "first_user_path",
+        "right": "large_frozen_benchmark"
+      }
+    ]
+  },
+  "method": "ordinal_pairwise",
+  "metrics_vs_reference": {
+    "candidate_ranked_ids": [
+      "portable_receipts",
+      "large_frozen_benchmark",
+      "live_baseline_suite",
+      "first_user_path",
+      "dependency_audit_cleanup"
+    ],
+    "kendall_tau": 0.4,
+    "reference_ranked_ids": [
+      "large_frozen_benchmark",
+      "live_baseline_suite",
+      "first_user_path",
+      "portable_receipts",
+      "dependency_audit_cleanup"
+    ],
+    "topk_jaccard": 0.5
+  },
+  "model": "openai/gpt-5.4-mini",
+  "ranked_ids": [
+    "portable_receipts",
+    "large_frozen_benchmark",
+    "live_baseline_suite",
+    "first_user_path",
+    "dependency_audit_cleanup"
+  ],
+  "usage": {
+    "calls": 30,
+    "completion_tokens": 752,
+    "cost_is_estimate": false,
+    "cost_nanodollars": 7696500,
+    "cost_usd": 0.0076965,
+    "latency_ms": 38278,
+    "prompt_tokens": 5750,
+    "total_tokens": 6502
+  },
+  "utility": {
+    "dependency_audit_cleanup": 0.11016393442622952,
+    "first_user_path": 0.3602196246139226,
+    "large_frozen_benchmark": 0.6707232121644096,
+    "live_baseline_suite": 0.6244927536231885,
+    "portable_receipts": 0.7504
+  }
+}

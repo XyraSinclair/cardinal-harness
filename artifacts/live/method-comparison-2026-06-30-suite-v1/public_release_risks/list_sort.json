@@ -1,0 +1,83 @@
+{
+  "attribute_scores": {
+    "first_run_complexity": {
+      "fix_leverage": 0.25,
+      "likelihood": 0.25,
+      "trust_damage": 0.25
+    },
+    "opaque_failure_cases": {
+      "fix_leverage": 0.5,
+      "likelihood": 0.5,
+      "trust_damage": 0.5
+    },
+    "overclaiming_evidence": {
+      "fix_leverage": 1.0,
+      "likelihood": 1.0,
+      "trust_damage": 1.0
+    },
+    "security_advisory_noise": {
+      "fix_leverage": 0.0,
+      "likelihood": 0.0,
+      "trust_damage": 0.0
+    },
+    "unportable_artifacts": {
+      "fix_leverage": 0.75,
+      "likelihood": 0.75,
+      "trust_damage": 0.75
+    }
+  },
+  "extra": {
+    "confidence": 0.86,
+    "ranked_ids_raw": [
+      "overclaiming_evidence",
+      "unportable_artifacts",
+      "opaque_failure_cases",
+      "first_run_complexity",
+      "security_advisory_noise"
+    ]
+  },
+  "method": "list_sort",
+  "metrics_vs_reference": {
+    "candidate_ranked_ids": [
+      "overclaiming_evidence",
+      "unportable_artifacts",
+      "opaque_failure_cases",
+      "first_run_complexity",
+      "security_advisory_noise"
+    ],
+    "kendall_tau": 0.8,
+    "reference_ranked_ids": [
+      "unportable_artifacts",
+      "overclaiming_evidence",
+      "opaque_failure_cases",
+      "first_run_complexity",
+      "security_advisory_noise"
+    ],
+    "topk_jaccard": 1.0
+  },
+  "model": "openai/gpt-5.4-mini",
+  "ranked_ids": [
+    "overclaiming_evidence",
+    "unportable_artifacts",
+    "opaque_failure_cases",
+    "first_run_complexity",
+    "security_advisory_noise"
+  ],
+  "usage": {
+    "calls": 1,
+    "completion_tokens": 51,
+    "cost_is_estimate": false,
+    "cost_nanodollars": 479250,
+    "cost_usd": 0.00047925,
+    "latency_ms": 1828,
+    "prompt_tokens": 333,
+    "total_tokens": 384
+  },
+  "utility": {
+    "first_run_complexity": 0.25,
+    "opaque_failure_cases": 0.5,
+    "overclaiming_evidence": 1.0,
+    "security_advisory_noise": 0.0,
+    "unportable_artifacts": 0.75
+  }
+}

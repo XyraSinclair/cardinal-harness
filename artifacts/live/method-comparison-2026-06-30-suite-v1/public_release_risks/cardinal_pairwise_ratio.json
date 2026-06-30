@@ -1,0 +1,317 @@
+{
+  "attribute_scores": {
+    "first_run_complexity": {
+      "fix_leverage": 0.46450073281611143,
+      "likelihood": 0.38771412277329886,
+      "trust_damage": 0.3985728901381999
+    },
+    "opaque_failure_cases": {
+      "fix_leverage": 0.3800838691022323,
+      "likelihood": 1.0,
+      "trust_damage": 0.37729503653369284
+    },
+    "overclaiming_evidence": {
+      "fix_leverage": 1.0,
+      "likelihood": 0.5145974558634437,
+      "trust_damage": 1.0
+    },
+    "security_advisory_noise": {
+      "fix_leverage": 0.0,
+      "likelihood": 0.0,
+      "trust_damage": 0.0
+    },
+    "unportable_artifacts": {
+      "fix_leverage": 0.6895305649953549,
+      "likelihood": 0.7516443699497222,
+      "trust_damage": 0.5969967828818586
+    }
+  },
+  "extra": {
+    "pairs": [
+      {
+        "attribute": "trust_damage",
+        "confidence": 0.83,
+        "higher_id": "overclaiming_evidence",
+        "left": "overclaiming_evidence",
+        "ratio": 4.0,
+        "right": "unportable_artifacts"
+      },
+      {
+        "attribute": "trust_damage",
+        "confidence": 0.83,
+        "higher_id": "overclaiming_evidence",
+        "left": "overclaiming_evidence",
+        "ratio": 3.5,
+        "right": "security_advisory_noise"
+      },
+      {
+        "attribute": "trust_damage",
+        "confidence": 0.84,
+        "higher_id": "overclaiming_evidence",
+        "left": "overclaiming_evidence",
+        "ratio": 3.0,
+        "right": "opaque_failure_cases"
+      },
+      {
+        "attribute": "trust_damage",
+        "confidence": 0.86,
+        "higher_id": "overclaiming_evidence",
+        "left": "overclaiming_evidence",
+        "ratio": 3.0,
+        "right": "first_run_complexity"
+      },
+      {
+        "attribute": "trust_damage",
+        "confidence": 0.93,
+        "higher_id": "unportable_artifacts",
+        "left": "unportable_artifacts",
+        "ratio": 8.0,
+        "right": "security_advisory_noise"
+      },
+      {
+        "attribute": "trust_damage",
+        "confidence": 0.89,
+        "higher_id": "opaque_failure_cases",
+        "left": "unportable_artifacts",
+        "ratio": 2.5,
+        "right": "opaque_failure_cases"
+      },
+      {
+        "attribute": "trust_damage",
+        "confidence": 0.89,
+        "higher_id": "unportable_artifacts",
+        "left": "unportable_artifacts",
+        "ratio": 3.0,
+        "right": "first_run_complexity"
+      },
+      {
+        "attribute": "trust_damage",
+        "confidence": 0.79,
+        "higher_id": "opaque_failure_cases",
+        "left": "security_advisory_noise",
+        "ratio": 1.2,
+        "right": "opaque_failure_cases"
+      },
+      {
+        "attribute": "trust_damage",
+        "confidence": 0.79,
+        "higher_id": "first_run_complexity",
+        "left": "security_advisory_noise",
+        "ratio": 2.0,
+        "right": "first_run_complexity"
+      },
+      {
+        "attribute": "trust_damage",
+        "confidence": 0.86,
+        "higher_id": "first_run_complexity",
+        "left": "opaque_failure_cases",
+        "ratio": 2.5,
+        "right": "first_run_complexity"
+      },
+      {
+        "attribute": "fix_leverage",
+        "confidence": 0.61,
+        "higher_id": "overclaiming_evidence",
+        "left": "overclaiming_evidence",
+        "ratio": 1.0,
+        "right": "unportable_artifacts"
+      },
+      {
+        "attribute": "fix_leverage",
+        "confidence": 0.73,
+        "higher_id": "overclaiming_evidence",
+        "left": "overclaiming_evidence",
+        "ratio": 3.0,
+        "right": "security_advisory_noise"
+      },
+      {
+        "attribute": "fix_leverage",
+        "confidence": 0.81,
+        "higher_id": "overclaiming_evidence",
+        "left": "overclaiming_evidence",
+        "ratio": 2.0,
+        "right": "opaque_failure_cases"
+      },
+      {
+        "attribute": "fix_leverage",
+        "confidence": 0.84,
+        "higher_id": "overclaiming_evidence",
+        "left": "overclaiming_evidence",
+        "ratio": 2.5,
+        "right": "first_run_complexity"
+      },
+      {
+        "attribute": "fix_leverage",
+        "confidence": 0.87,
+        "higher_id": "unportable_artifacts",
+        "left": "unportable_artifacts",
+        "ratio": 3.0,
+        "right": "security_advisory_noise"
+      },
+      {
+        "attribute": "fix_leverage",
+        "confidence": 0.75,
+        "higher_id": "opaque_failure_cases",
+        "left": "unportable_artifacts",
+        "ratio": 1.5,
+        "right": "opaque_failure_cases"
+      },
+      {
+        "attribute": "fix_leverage",
+        "confidence": 0.76,
+        "higher_id": "unportable_artifacts",
+        "left": "unportable_artifacts",
+        "ratio": 1.2,
+        "right": "first_run_complexity"
+      },
+      {
+        "attribute": "fix_leverage",
+        "confidence": 0.77,
+        "higher_id": "opaque_failure_cases",
+        "left": "security_advisory_noise",
+        "ratio": 1.5,
+        "right": "opaque_failure_cases"
+      },
+      {
+        "attribute": "fix_leverage",
+        "confidence": 0.67,
+        "higher_id": "first_run_complexity",
+        "left": "security_advisory_noise",
+        "ratio": 1.2,
+        "right": "first_run_complexity"
+      },
+      {
+        "attribute": "fix_leverage",
+        "confidence": 0.87,
+        "higher_id": "first_run_complexity",
+        "left": "opaque_failure_cases",
+        "ratio": 2.0,
+        "right": "first_run_complexity"
+      },
+      {
+        "attribute": "likelihood",
+        "confidence": 0.64,
+        "higher_id": "overclaiming_evidence",
+        "left": "overclaiming_evidence",
+        "ratio": 1.0,
+        "right": "unportable_artifacts"
+      },
+      {
+        "attribute": "likelihood",
+        "confidence": 0.77,
+        "higher_id": "overclaiming_evidence",
+        "left": "overclaiming_evidence",
+        "ratio": 3.0,
+        "right": "security_advisory_noise"
+      },
+      {
+        "attribute": "likelihood",
+        "confidence": 0.86,
+        "higher_id": "opaque_failure_cases",
+        "left": "overclaiming_evidence",
+        "ratio": 3.0,
+        "right": "opaque_failure_cases"
+      },
+      {
+        "attribute": "likelihood",
+        "confidence": 0.62,
+        "higher_id": "overclaiming_evidence",
+        "left": "overclaiming_evidence",
+        "ratio": 1.0,
+        "right": "first_run_complexity"
+      },
+      {
+        "attribute": "likelihood",
+        "confidence": 0.83,
+        "higher_id": "unportable_artifacts",
+        "left": "unportable_artifacts",
+        "ratio": 3.0,
+        "right": "security_advisory_noise"
+      },
+      {
+        "attribute": "likelihood",
+        "confidence": 0.87,
+        "higher_id": "opaque_failure_cases",
+        "left": "unportable_artifacts",
+        "ratio": 2.5,
+        "right": "opaque_failure_cases"
+      },
+      {
+        "attribute": "likelihood",
+        "confidence": 0.89,
+        "higher_id": "unportable_artifacts",
+        "left": "unportable_artifacts",
+        "ratio": 4.0,
+        "right": "first_run_complexity"
+      },
+      {
+        "attribute": "likelihood",
+        "confidence": 0.84,
+        "higher_id": "opaque_failure_cases",
+        "left": "security_advisory_noise",
+        "ratio": 2.0,
+        "right": "opaque_failure_cases"
+      },
+      {
+        "attribute": "likelihood",
+        "confidence": 0.82,
+        "higher_id": "first_run_complexity",
+        "left": "security_advisory_noise",
+        "ratio": 3.0,
+        "right": "first_run_complexity"
+      },
+      {
+        "attribute": "likelihood",
+        "confidence": 0.78,
+        "higher_id": "opaque_failure_cases",
+        "left": "opaque_failure_cases",
+        "ratio": 2.0,
+        "right": "first_run_complexity"
+      }
+    ]
+  },
+  "method": "cardinal_pairwise_ratio",
+  "metrics_vs_reference": {
+    "candidate_ranked_ids": [
+      "overclaiming_evidence",
+      "unportable_artifacts",
+      "opaque_failure_cases",
+      "first_run_complexity",
+      "security_advisory_noise"
+    ],
+    "kendall_tau": 0.8,
+    "reference_ranked_ids": [
+      "unportable_artifacts",
+      "overclaiming_evidence",
+      "opaque_failure_cases",
+      "first_run_complexity",
+      "security_advisory_noise"
+    ],
+    "topk_jaccard": 1.0
+  },
+  "model": "openai/gpt-5.4-mini",
+  "ranked_ids": [
+    "overclaiming_evidence",
+    "unportable_artifacts",
+    "opaque_failure_cases",
+    "first_run_complexity",
+    "security_advisory_noise"
+  ],
+  "usage": {
+    "calls": 30,
+    "completion_tokens": 918,
+    "cost_is_estimate": false,
+    "cost_nanodollars": 8364000,
+    "cost_usd": 0.008364,
+    "latency_ms": 45737,
+    "prompt_tokens": 5644,
+    "total_tokens": 6562
+  },
+  "utility": {
+    "first_run_complexity": 0.4194758816024887,
+    "opaque_failure_cases": 0.502812120625943,
+    "overclaiming_evidence": 0.9029194911726888,
+    "security_advisory_noise": 0.0,
+    "unportable_artifacts": 0.660313124035155
+  }
+}

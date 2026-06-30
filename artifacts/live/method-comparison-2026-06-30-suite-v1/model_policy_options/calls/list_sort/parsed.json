@@ -1,0 +1,10 @@
+{
+  "confidence": "0.71",
+  "ranked_ids": [
+    "sonnet_reference_then_fast",
+    "quality_only_opus_46",
+    "kimi_k2_thinking_diverse",
+    "glm_5_2_logprob_candidate",
+    "deepseek_v4_flash_fast"
+  ]
+}

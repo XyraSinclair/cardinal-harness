@@ -1,0 +1,18 @@
+{
+  "max_tokens": 800,
+  "messages": [
+    {
+      "content": "You are a rigorous structured-judgment engine. Judge only the stated attribute. Use the item text, not outside popularity. Return strict JSON only. Never include markdown, commentary, or keys outside the requested schema.",
+      "role": "system"
+    },
+    {
+      "content": "Case: public_artifact_work\nAttribute shareability_gain: how much this work improves confidence that a serious external reader would share the artifact\n\nA (portable_receipts): Make every checked-in receipt portable from a fresh clone: relative paths, model IDs, prompt hashes, cache hit counts, provider cost semantics, and explicit non-convergence flags.\n\nB (first_user_path): Compress the first-time user path into one obvious command, one tiny request file, one expected output, and one explanation of when cardinal ranking is worth its cost.\n\nTask: Which item has more of this attribute, and how many times more? Use ratio=1 only for near ties; cap large gaps at 26. Output JSON exactly: {\"higher_id\":\"item id\",\"ratio\":1.0,\"confidence\":0.0}.",
+      "role": "user"
+    }
+  ],
+  "model": "openai/gpt-5.4-mini",
+  "response_format": {
+    "type": "json_object"
+  },
+  "temperature": 0.1
+}

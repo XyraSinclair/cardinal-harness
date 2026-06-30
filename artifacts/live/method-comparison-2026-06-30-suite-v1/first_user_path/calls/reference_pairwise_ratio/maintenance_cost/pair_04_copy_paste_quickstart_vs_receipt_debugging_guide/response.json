@@ -1,0 +1,46 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "I need to evaluate which item has lower maintenance cost (cheaper to maintain as code and models evolve).\n\n**A (copy_paste_quickstart):** A minimal quickstart with one request JSON, one command, one expected top-k output, and one short explanation. This is very simple - but it has hardcoded expected outputs and specific JSON structures that may break when models update. The \"expected top-k output\" is particularly fragile as model outputs change with versions.\n\n**B (receipt_debugging_guide):** A troubleshooting guide covering cache misses, model refusals, cost estimates, non-convergence, and inconsistent pairwise judgments. This is conceptual/explanatory content about debugging patterns. These concepts are relatively stable - cache misses, refusals, cost estimation approaches, convergence issues are enduring problems. The guide describes symptoms and approaches rather than exact outputs.\n\n**Comparison:**\n- A has hardcoded expected outputs that will become outdated as models evolve, requiring updates to keep accurate\n- A's specific JSON structure may need updates as APIs change\n- B describes debugging patterns and concepts that remain relevant across model versions\n- B's content about \"why things go wrong\" is more durable than \"here's exactly what you'll see\"\n\nHowever, B covers more complex topics (non-convergence, inconsistent pairwise judgments) that might need updates as new failure modes emerge. But overall, B's conceptual troubleshooting content is more stable than A's hardcoded expected outputs.\n\nB is moderately cheaper to maintain than A. The ratio isn't huge - A is simple but brittle; B is more complex but more durable. I'd estimate B is about 3x cheaper to maintain.\n\n{\"higher_id\":\"B\",\"ratio\":3.0,\"confidence\":0.6}",
+        "reasoning": null,
+        "refusal": null,
+        "role": "assistant"
+      },
+      "native_finish_reason": "end_turn"
+    }
+  ],
+  "created": 1782861908,
+  "id": "gen-1782861908-yw8ASuhCeMfb1mdXA7GR",
+  "model": "anthropic/claude-4.6-sonnet-20260217",
+  "object": "chat.completion",
+  "provider": "Anthropic",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 400,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.006654,
+    "cost_details": {
+      "upstream_inference_completions_cost": 0.006,
+      "upstream_inference_cost": 0.006654,
+      "upstream_inference_prompt_cost": 0.000654
+    },
+    "is_byok": false,
+    "prompt_tokens": 218,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 618
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "max_tokens": 800,
+  "messages": [
+    {
+      "content": "You are a rigorous structured-judgment engine. Judge only the stated attribute. Use the item text, not outside popularity. Return strict JSON only. Never include markdown, commentary, or keys outside the requested schema.",
+      "role": "system"
+    },
+    {
+      "content": "Case: public_release_risks\nAttribute fix_leverage: how much fixing this would improve the overall release with one focused change\n\nA (unportable_artifacts): A fresh clone cannot verify receipts because paths, cache files, generated artifacts, or model metadata are missing.\n\nB (security_advisory_noise): Dependency audit warnings distract from the artifact's quality and make users hesitate before installing the crate.\n\nTask: Which item has more of this attribute, and how many times more? Use ratio=1 only for near ties; cap large gaps at 26. Output JSON exactly: {\"higher_id\":\"item id\",\"ratio\":1.0,\"confidence\":0.0}.",
+      "role": "user"
+    }
+  ],
+  "model": "anthropic/claude-sonnet-4.6",
+  "response_format": {
+    "type": "json_object"
+  },
+  "temperature": 0.1
+}

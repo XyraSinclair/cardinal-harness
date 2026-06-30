@@ -1,0 +1,317 @@
+{
+  "attribute_scores": {
+    "equal_dollar_budget": {
+      "claim_validity": 0.0,
+      "cost_feasibility": 0.6794004408340197,
+      "reproducibility": 0.10736757142141477
+    },
+    "failure_mode_taxonomy": {
+      "claim_validity": 0.26438056592601966,
+      "cost_feasibility": 0.5297817448158657,
+      "reproducibility": 0.0
+    },
+    "human_adjudicated_slice": {
+      "claim_validity": 0.27126264689695034,
+      "cost_feasibility": 1.0,
+      "reproducibility": 0.29947793868019706
+    },
+    "pre_registered_cases": {
+      "claim_validity": 1.0,
+      "cost_feasibility": 0.37605766759267734,
+      "reproducibility": 1.0
+    },
+    "repeated_model_swaps": {
+      "claim_validity": 0.28727289264285155,
+      "cost_feasibility": 0.0,
+      "reproducibility": 0.3378032168883397
+    }
+  },
+  "extra": {
+    "pairs": [
+      {
+        "attribute": "claim_validity",
+        "confidence": 0.72,
+        "higher_id": "repeated_model_swaps",
+        "left": "equal_dollar_budget",
+        "ratio": 3.5,
+        "right": "repeated_model_swaps"
+      },
+      {
+        "attribute": "claim_validity",
+        "confidence": 0.72,
+        "higher_id": "human_adjudicated_slice",
+        "left": "equal_dollar_budget",
+        "ratio": 3.0,
+        "right": "human_adjudicated_slice"
+      },
+      {
+        "attribute": "claim_validity",
+        "confidence": 0.72,
+        "higher_id": "failure_mode_taxonomy",
+        "left": "equal_dollar_budget",
+        "ratio": 4.5,
+        "right": "failure_mode_taxonomy"
+      },
+      {
+        "attribute": "claim_validity",
+        "confidence": 0.82,
+        "higher_id": "pre_registered_cases",
+        "left": "equal_dollar_budget",
+        "ratio": 6.0,
+        "right": "pre_registered_cases"
+      },
+      {
+        "attribute": "claim_validity",
+        "confidence": 0.65,
+        "higher_id": "repeated_model_swaps",
+        "left": "repeated_model_swaps",
+        "ratio": 4.0,
+        "right": "human_adjudicated_slice"
+      },
+      {
+        "attribute": "claim_validity",
+        "confidence": 0.72,
+        "higher_id": "failure_mode_taxonomy",
+        "left": "repeated_model_swaps",
+        "ratio": 4.0,
+        "right": "failure_mode_taxonomy"
+      },
+      {
+        "attribute": "claim_validity",
+        "confidence": 0.82,
+        "higher_id": "pre_registered_cases",
+        "left": "repeated_model_swaps",
+        "ratio": 8.0,
+        "right": "pre_registered_cases"
+      },
+      {
+        "attribute": "claim_validity",
+        "confidence": 0.72,
+        "higher_id": "human_adjudicated_slice",
+        "left": "human_adjudicated_slice",
+        "ratio": 3.0,
+        "right": "failure_mode_taxonomy"
+      },
+      {
+        "attribute": "claim_validity",
+        "confidence": 0.85,
+        "higher_id": "pre_registered_cases",
+        "left": "human_adjudicated_slice",
+        "ratio": 8.0,
+        "right": "pre_registered_cases"
+      },
+      {
+        "attribute": "claim_validity",
+        "confidence": 0.85,
+        "higher_id": "pre_registered_cases",
+        "left": "failure_mode_taxonomy",
+        "ratio": 18.0,
+        "right": "pre_registered_cases"
+      },
+      {
+        "attribute": "reproducibility",
+        "confidence": 0.72,
+        "higher_id": "repeated_model_swaps",
+        "left": "equal_dollar_budget",
+        "ratio": 4.0,
+        "right": "repeated_model_swaps"
+      },
+      {
+        "attribute": "reproducibility",
+        "confidence": 0.65,
+        "higher_id": "human_adjudicated_slice",
+        "left": "equal_dollar_budget",
+        "ratio": 3.5,
+        "right": "human_adjudicated_slice"
+      },
+      {
+        "attribute": "reproducibility",
+        "confidence": 0.72,
+        "higher_id": "equal_dollar_budget",
+        "left": "equal_dollar_budget",
+        "ratio": 3.5,
+        "right": "failure_mode_taxonomy"
+      },
+      {
+        "attribute": "reproducibility",
+        "confidence": 0.85,
+        "higher_id": "pre_registered_cases",
+        "left": "equal_dollar_budget",
+        "ratio": 18.0,
+        "right": "pre_registered_cases"
+      },
+      {
+        "attribute": "reproducibility",
+        "confidence": 0.4,
+        "higher_id": "human_adjudicated_slice",
+        "left": "repeated_model_swaps",
+        "ratio": 1.5,
+        "right": "human_adjudicated_slice"
+      },
+      {
+        "attribute": "reproducibility",
+        "confidence": 0.65,
+        "higher_id": "repeated_model_swaps",
+        "left": "repeated_model_swaps",
+        "ratio": 3.0,
+        "right": "failure_mode_taxonomy"
+      },
+      {
+        "attribute": "reproducibility",
+        "confidence": 0.82,
+        "higher_id": "pre_registered_cases",
+        "left": "repeated_model_swaps",
+        "ratio": 8.0,
+        "right": "pre_registered_cases"
+      },
+      {
+        "attribute": "reproducibility",
+        "confidence": 0.72,
+        "higher_id": "human_adjudicated_slice",
+        "left": "human_adjudicated_slice",
+        "ratio": 3.0,
+        "right": "failure_mode_taxonomy"
+      },
+      {
+        "attribute": "reproducibility",
+        "confidence": 0.85,
+        "higher_id": "pre_registered_cases",
+        "left": "human_adjudicated_slice",
+        "ratio": 18.0,
+        "right": "pre_registered_cases"
+      },
+      {
+        "attribute": "reproducibility",
+        "confidence": 0.85,
+        "higher_id": "pre_registered_cases",
+        "left": "failure_mode_taxonomy",
+        "ratio": 18.0,
+        "right": "pre_registered_cases"
+      },
+      {
+        "attribute": "cost_feasibility",
+        "confidence": 0.75,
+        "higher_id": "equal_dollar_budget",
+        "left": "equal_dollar_budget",
+        "ratio": 4.0,
+        "right": "repeated_model_swaps"
+      },
+      {
+        "attribute": "cost_feasibility",
+        "confidence": 0.72,
+        "higher_id": "human_adjudicated_slice",
+        "left": "equal_dollar_budget",
+        "ratio": 6.0,
+        "right": "human_adjudicated_slice"
+      },
+      {
+        "attribute": "cost_feasibility",
+        "confidence": 0.72,
+        "higher_id": "equal_dollar_budget",
+        "left": "equal_dollar_budget",
+        "ratio": 3.0,
+        "right": "failure_mode_taxonomy"
+      },
+      {
+        "attribute": "cost_feasibility",
+        "confidence": 0.75,
+        "higher_id": "equal_dollar_budget",
+        "left": "equal_dollar_budget",
+        "ratio": 4.0,
+        "right": "pre_registered_cases"
+      },
+      {
+        "attribute": "cost_feasibility",
+        "confidence": 0.72,
+        "higher_id": "human_adjudicated_slice",
+        "left": "repeated_model_swaps",
+        "ratio": 6.0,
+        "right": "human_adjudicated_slice"
+      },
+      {
+        "attribute": "cost_feasibility",
+        "confidence": 0.72,
+        "higher_id": "failure_mode_taxonomy",
+        "left": "repeated_model_swaps",
+        "ratio": 4.0,
+        "right": "failure_mode_taxonomy"
+      },
+      {
+        "attribute": "cost_feasibility",
+        "confidence": 0.82,
+        "higher_id": "pre_registered_cases",
+        "left": "repeated_model_swaps",
+        "ratio": 8.0,
+        "right": "pre_registered_cases"
+      },
+      {
+        "attribute": "cost_feasibility",
+        "confidence": 0.78,
+        "higher_id": "human_adjudicated_slice",
+        "left": "human_adjudicated_slice",
+        "ratio": 4.0,
+        "right": "failure_mode_taxonomy"
+      },
+      {
+        "attribute": "cost_feasibility",
+        "confidence": 0.75,
+        "higher_id": "human_adjudicated_slice",
+        "left": "human_adjudicated_slice",
+        "ratio": 4.0,
+        "right": "pre_registered_cases"
+      },
+      {
+        "attribute": "cost_feasibility",
+        "confidence": 0.72,
+        "higher_id": "failure_mode_taxonomy",
+        "left": "failure_mode_taxonomy",
+        "ratio": 4.0,
+        "right": "pre_registered_cases"
+      }
+    ]
+  },
+  "method": "reference_pairwise_ratio",
+  "metrics_vs_reference": {
+    "candidate_ranked_ids": [
+      "pre_registered_cases",
+      "human_adjudicated_slice",
+      "repeated_model_swaps",
+      "failure_mode_taxonomy",
+      "equal_dollar_budget"
+    ],
+    "kendall_tau": 1.0,
+    "reference_ranked_ids": [
+      "pre_registered_cases",
+      "human_adjudicated_slice",
+      "repeated_model_swaps",
+      "failure_mode_taxonomy",
+      "equal_dollar_budget"
+    ],
+    "topk_jaccard": 1.0
+  },
+  "model": "anthropic/claude-sonnet-4.6",
+  "ranked_ids": [
+    "pre_registered_cases",
+    "human_adjudicated_slice",
+    "repeated_model_swaps",
+    "failure_mode_taxonomy",
+    "equal_dollar_budget"
+  ],
+  "usage": {
+    "calls": 30,
+    "completion_tokens": 4310,
+    "cost_is_estimate": false,
+    "cost_nanodollars": 83400000,
+    "cost_usd": 0.0834,
+    "latency_ms": 137702,
+    "prompt_tokens": 6250,
+    "total_tokens": 10560
+  },
+  "utility": {
+    "equal_dollar_budget": 0.16809035959322838,
+    "failure_mode_taxonomy": 0.23814663192618296,
+    "human_adjudicated_slice": 0.4254747050525343,
+    "pre_registered_cases": 0.8752115335185355,
+    "repeated_model_swaps": 0.24497741138792767
+  }
+}

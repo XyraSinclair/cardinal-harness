@@ -1,0 +1,46 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "I need to compare how much each item increases the validity of public benchmark claims.\n\n**Item A (equal_dollar_budget):** Running every method under a fixed provider-dollar cap ensures cost-controlled comparisons. This addresses fairness in resource allocation and prevents one method from buying more agreement through higher spending. It's a meaningful methodological control, but it doesn't prevent post-hoc selection of favorable cases, cherry-picking results, or adjusting scoring after seeing outcomes.\n\n**Item B (pre_registered_cases):** Freezing the case list, attributes, weights, models, budget policy, and scoring script *before* running a public benchmark is the gold standard for preventing p-hacking, HARKing (Hypothesizing After Results are Known), and selective reporting. Pre-registration is the primary mechanism that transforms a benchmark from a potentially manipulable exercise into a credible scientific claim. It addresses the most fundamental threats to validity: researcher degrees of freedom, outcome switching, and post-hoc rationalization.\n\n**Comparison:**\n- Pre-registration (B) directly attacks the core validity threats in benchmarking: you can't adjust what you measure after seeing results\n- Equal dollar budget (A) is a useful fairness/comparability control but doesn't prevent the many other ways benchmarks can be gamed\n- B addresses multiple validity dimensions simultaneously (construct validity, internal validity, reporting validity)\n- A addresses one specific confound (cost differential)\n\nPre-registration is widely recognized as the single most impactful methodological improvement for benchmark validity. Equal dollar budget is helpful but secondary. The gap is substantial but not extreme - B is perhaps 5-8x more impactful for validity claims.\n\n{\"higher_id\":\"B\",\"ratio\":6.0,\"confidence\":0.82}",
+        "reasoning": null,
+        "refusal": null,
+        "role": "assistant"
+      },
+      "native_finish_reason": "end_turn"
+    }
+  ],
+  "created": 1782862074,
+  "id": "gen-1782862074-TnQx1wxnGHS0Ho1df7jM",
+  "model": "anthropic/claude-4.6-sonnet-20260217",
+  "object": "chat.completion",
+  "provider": "Anthropic",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 387,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.006414,
+    "cost_details": {
+      "upstream_inference_completions_cost": 0.005805,
+      "upstream_inference_cost": 0.006414,
+      "upstream_inference_prompt_cost": 0.000609
+    },
+    "is_byok": false,
+    "prompt_tokens": 203,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 590
+  }
+}

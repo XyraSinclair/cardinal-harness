@@ -1,0 +1,43 @@
+{
+  "attributes": [
+    {
+      "id": "claim_validity",
+      "prompt": "how much this increases the validity of any public benchmark claim",
+      "weight": 0.5
+    },
+    {
+      "id": "reproducibility",
+      "prompt": "how much this lets another researcher reproduce or falsify the result",
+      "weight": 0.3
+    },
+    {
+      "id": "cost_feasibility",
+      "prompt": "how feasible this is to execute without excessive provider spend or manual effort",
+      "weight": 0.2
+    }
+  ],
+  "description": "Prioritize benchmark-design requirements for making a live method-comparison result publishable.",
+  "items": [
+    {
+      "id": "equal_dollar_budget",
+      "text": "Run every method under a fixed provider-dollar cap and report how much agreement each method buys before the cap is exhausted."
+    },
+    {
+      "id": "repeated_model_swaps",
+      "text": "Repeat the same suite across multiple candidate and reference models so method effects are separated from one model's quirks."
+    },
+    {
+      "id": "human_adjudicated_slice",
+      "text": "Collect a small human-adjudicated slice that can calibrate whether the live LLM reference itself is plausible."
+    },
+    {
+      "id": "failure_mode_taxonomy",
+      "text": "Tag each disagreement by likely source: prompt ambiguity, reference brittleness, ratio-scale misuse, cost constraint, or genuine method weakness."
+    },
+    {
+      "id": "pre_registered_cases",
+      "text": "Freeze the case list, attributes, weights, models, budget policy, and scoring script before running a public benchmark."
+    }
+  ],
+  "name": "benchmark_design_rigor"
+}

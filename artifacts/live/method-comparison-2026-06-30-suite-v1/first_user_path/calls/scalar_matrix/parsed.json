@@ -1,0 +1,89 @@
+{
+  "scores": [
+    {
+      "attributes": {
+        "maintenance_cost": {
+          "confidence": 0.86,
+          "score": 82
+        },
+        "misuse_prevention": {
+          "confidence": 0.93,
+          "score": 20
+        },
+        "time_to_first_success": {
+          "confidence": 0.98,
+          "score": 95
+        }
+      },
+      "id": "copy_paste_quickstart"
+    },
+    {
+      "attributes": {
+        "maintenance_cost": {
+          "confidence": 0.8,
+          "score": 68
+        },
+        "misuse_prevention": {
+          "confidence": 0.88,
+          "score": 35
+        },
+        "time_to_first_success": {
+          "confidence": 0.89,
+          "score": 72
+        }
+      },
+      "id": "worked_artifact_walkthrough"
+    },
+    {
+      "attributes": {
+        "maintenance_cost": {
+          "confidence": 0.92,
+          "score": 90
+        },
+        "misuse_prevention": {
+          "confidence": 0.97,
+          "score": 96
+        },
+        "time_to_first_success": {
+          "confidence": 0.95,
+          "score": 18
+        }
+      },
+      "id": "when_not_to_use_cardinal"
+    },
+    {
+      "attributes": {
+        "maintenance_cost": {
+          "confidence": 0.84,
+          "score": 76
+        },
+        "misuse_prevention": {
+          "confidence": 0.9,
+          "score": 28
+        },
+        "time_to_first_success": {
+          "confidence": 0.93,
+          "score": 88
+        }
+      },
+      "id": "public_api_recipe"
+    },
+    {
+      "attributes": {
+        "maintenance_cost": {
+          "confidence": 0.82,
+          "score": 60
+        },
+        "misuse_prevention": {
+          "confidence": 0.87,
+          "score": 40
+        },
+        "time_to_first_success": {
+          "confidence": 0.9,
+          "score": 42
+        }
+      },
+      "id": "receipt_debugging_guide"
+    }
+  ]
+}

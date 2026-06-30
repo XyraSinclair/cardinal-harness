@@ -72,31 +72,36 @@ Refresh `combined-summary.json` and this directory's `README.md` after re-runnin
 
 ## Live structured-judgment method comparison
 
-Source directory: `artifacts/live/method-comparison-2026-06-30/`.
+Source directory: `artifacts/live/method-comparison-2026-06-30-suite-v1/`.
 
-The method comparison was generated through `examples/live_method_comparison.py` with `OPENROUTER_API_KEY` set. It runs three attribute-weighted case families through scalar matrix scoring, whole-list sorting, ordinal pairwise judging, and cardinal pairwise-ratio judging, then compares each method with a separate live pairwise-ratio reference model.
+The method comparison was generated through `examples/live_method_comparison.py` with `OPENROUTER_API_KEY` set. It runs six frozen, attribute-weighted case families through scalar matrix scoring, whole-list sorting, ordinal pairwise judging, and cardinal pairwise-ratio judging, then compares each method with a separate live pairwise-ratio reference model.
 
 Aggregate receipt:
 
 | Case | Best candidate agreement with reference | Cardinal pairwise-ratio agreement | Notable disagreement |
 |---|---|---|---|
-| `public_artifact_work` | all four candidate methods tie at Kendall tau 0.600 / top-k Jaccard 0.500 | Kendall tau 0.600 / top-k Jaccard 0.500 | all candidate methods recover the same ordering |
-| `judgment_method_properties` | scalar matrix, list sort, and cardinal pairwise-ratio tie at Kendall tau 0.600 / top-k Jaccard 1.000 | Kendall tau 0.600 / top-k Jaccard 1.000 | ordinal pairwise drops to Kendall tau 0.400 while preserving the same top-k set |
-| `model_policy_options` | list sort reaches Kendall tau 0.600 / top-k Jaccard 1.000 | Kendall tau -0.800 / top-k Jaccard 0.200 | cardinal pairwise-ratio sharply disagrees with the reference on this routing-policy case |
+| `public_artifact_work` | list sort and cardinal tie at Kendall tau 0.800 / top-k Jaccard 0.500 | Kendall tau 0.800 / top-k Jaccard 0.500 | ordinal pairwise trails at Kendall tau 0.400 |
+| `judgment_method_properties` | list sort reaches Kendall tau 0.800 / top-k Jaccard 1.000 | Kendall tau 0.600 / top-k Jaccard 1.000 | scalar matrix misses the same top-k set; ordinal and cardinal recover it |
+| `model_policy_options` | list sort reaches Kendall tau 0.800 / top-k Jaccard 1.000 | Kendall tau -0.200 / top-k Jaccard 0.500 | cardinal pairwise-ratio ranks the policy options in the opposite direction on several pairs |
+| `first_user_path` | list sort reaches Kendall tau 0.800 / top-k Jaccard 0.500 | Kendall tau 0.000 / top-k Jaccard 0.200 | both pairwise regimes underperform scalar/list prompts on first-run onboarding priorities |
+| `benchmark_design_rigor` | list sort and cardinal tie at Kendall tau 0.600 / top-k Jaccard 0.500 | Kendall tau 0.600 / top-k Jaccard 0.500 | all methods agree on the first item but differ on the middle of the list |
+| `public_release_risks` | scalar matrix reaches Kendall tau 1.000 / top-k Jaccard 1.000 | Kendall tau 0.800 / top-k Jaccard 1.000 | cardinal recovers the risk set but swaps the first two risks relative to the reference |
 
-Across the three cases, the comparison used 276 OpenRouter calls, 57,797 prompt tokens, 25,061 completion tokens, and $0.395864 provider-reported cost. Every row used exact provider-reported or local pricing metadata (`cost_is_estimate = false`). The reference is still an LLM regime, not human ground truth or a hidden exhaustive oracle; low agreement is evidence of prompt/regime brittleness on these cases, not proof that the candidate model cannot perform the task.
+Across the six cases, the comparison used 552 OpenRouter calls, 111,282 prompt tokens, 50,809 completion tokens, and $0.806604 provider-reported cost. Every row used exact provider-reported or local pricing metadata (`cost_is_estimate = false`). Budget-normalized aggregates are intentionally mixed: list sort has the highest mean agreement score (0.817) with 6 calls and $0.003072, scalar matrix reaches 0.650 with 6 calls and $0.009421, cardinal pairwise-ratio reaches 0.667 with 180 calls and $0.052380, and ordinal pairwise reaches 0.558 with 180 calls and $0.043618.
+
+The reference is still an LLM regime, not human ground truth or a hidden exhaustive oracle; low agreement is evidence of prompt/regime brittleness on these cases, not proof that the candidate model cannot perform the task.
 
 Re-run the comparison:
 
 ```bash
 python3 examples/live_method_comparison.py \
-  --out-dir artifacts/live/method-comparison-2026-06-30 \
-  --candidate-model openai/gpt-4.1-mini \
+  --out-dir artifacts/live/method-comparison-2026-06-30-suite-v1 \
+  --candidate-model openai/gpt-5.4-mini \
   --reference-model anthropic/claude-sonnet-4.6 \
   --max-usd 10
 ```
 
-`summary.json` is the machine-readable aggregate. `summary.md` and `README.md` are generated views of the same data. Each case directory also preserves `case.json`, one JSON result per method, and per-call request/response/parsed/usage receipts under `calls/`.
+`summary.json` is the machine-readable aggregate. `summary.md` and `README.md` are generated views of the same data. `examples/live-method-suite.json` is the frozen suite input. Each case directory also preserves `case.json`, one JSON result per method, and per-call request/response/parsed/usage receipts under `calls/`.
 
 ## Method
 

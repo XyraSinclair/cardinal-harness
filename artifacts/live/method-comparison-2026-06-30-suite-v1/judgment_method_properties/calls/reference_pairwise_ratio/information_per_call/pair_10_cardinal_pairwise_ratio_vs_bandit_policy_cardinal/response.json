@@ -1,0 +1,46 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "I need to compare how much ranking information is extracted per provider call for these two methods.\n\n**A (cardinal_pairwise_ratio):** Each call asks a pairwise question that yields both a direction (which is better) and a magnitude (how many times more). This cardinal magnitude information is richer than ordinal comparisons. The latent score model fitting uses all this information. However, comparisons are made without strategic allocation - they're distributed without targeting uncertainty.\n\n**B (bandit_policy_cardinal):** Each call also asks cardinal pairwise questions (same type as A - direction + magnitude), but additionally uses an uncertainty-aware policy to direct comparisons where top-k uncertainty is highest. This means each call is strategically placed to maximize information gain about the ranking, particularly for distinguishing top-k items.\n\n**Analysis:**\n\nBoth methods use the same type of question (cardinal pairwise with magnitude), so the raw information content per individual call is similar. The key difference is:\n\n- A uses cardinal questions but allocates them without strategic targeting\n- B uses the same cardinal questions BUT with a bandit policy that targets high-uncertainty regions\n\nThe attribute is \"information per provider call under the same model and prompt budget.\" The bandit policy in B means each call is chosen to maximize information about the ranking - so the *effective* information extracted per call (in terms of ranking resolution) is higher in B because calls aren't wasted on already-certain comparisons.\n\nHowever, the question is about information extracted per call, not total efficiency. The bandit policy increases the *expected* information per call by selecting comparisons strategically. A's calls may include redundant or low-value comparisons, reducing average information per call.\n\nB extracts more ranking information per call because the uncertainty-aware allocation ensures each call targets the most informative comparison. The difference is meaningful but not enormous - both use cardinal questions, so B is perhaps 2-4x more efficient per call in terms of ranking information (not 10x, since the cardinal magnitude already provides substantial information in A).\n\nI'd estimate B has roughly 3x more information per call due to the strategic allocation on top of the same cardinal question type.\n\n```json\n{\"higher_id\":\"B\",\"ratio\":3.0,\"confidence\":0.62}\n```",
+        "reasoning": null,
+        "refusal": null,
+        "role": "assistant"
+      },
+      "native_finish_reason": "end_turn"
+    }
+  ],
+  "created": 1782861375,
+  "id": "gen-1782861375-lhVXpTGY2FWllW4AXebU",
+  "model": "anthropic/claude-4.6-sonnet-20260217",
+  "object": "chat.completion",
+  "provider": "Anthropic",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 497,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.008097,
+    "cost_details": {
+      "upstream_inference_completions_cost": 0.007455,
+      "upstream_inference_cost": 0.008097,
+      "upstream_inference_prompt_cost": 0.000642
+    },
+    "is_byok": false,
+    "prompt_tokens": 214,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 711
+  }
+}

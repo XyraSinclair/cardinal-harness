@@ -1,0 +1,287 @@
+{
+  "attribute_scores": {
+    "equal_dollar_budget": {
+      "claim_validity": 0.0,
+      "cost_feasibility": 0.924187725631769,
+      "reproducibility": 0.412532637075718
+    },
+    "failure_mode_taxonomy": {
+      "claim_validity": 0.7090909090909091,
+      "cost_feasibility": 0.2815884476534296,
+      "reproducibility": 0.4699738903394256
+    },
+    "human_adjudicated_slice": {
+      "claim_validity": 0.45454545454545453,
+      "cost_feasibility": 0.9205776173285198,
+      "reproducibility": 0.0
+    },
+    "pre_registered_cases": {
+      "claim_validity": 1.0,
+      "cost_feasibility": 1.0,
+      "reproducibility": 1.0
+    },
+    "repeated_model_swaps": {
+      "claim_validity": 0.24155844155844156,
+      "cost_feasibility": 0.0,
+      "reproducibility": 0.45691906005221933
+    }
+  },
+  "extra": {
+    "pairs": [
+      {
+        "attribute": "claim_validity",
+        "confidence": 0.93,
+        "higher_id": "repeated_model_swaps",
+        "left": "equal_dollar_budget",
+        "right": "repeated_model_swaps"
+      },
+      {
+        "attribute": "claim_validity",
+        "confidence": 0.89,
+        "higher_id": "human_adjudicated_slice",
+        "left": "equal_dollar_budget",
+        "right": "human_adjudicated_slice"
+      },
+      {
+        "attribute": "claim_validity",
+        "confidence": 0.84,
+        "higher_id": "failure_mode_taxonomy",
+        "left": "equal_dollar_budget",
+        "right": "failure_mode_taxonomy"
+      },
+      {
+        "attribute": "claim_validity",
+        "confidence": 0.98,
+        "higher_id": "pre_registered_cases",
+        "left": "equal_dollar_budget",
+        "right": "pre_registered_cases"
+      },
+      {
+        "attribute": "claim_validity",
+        "confidence": 0.86,
+        "higher_id": "human_adjudicated_slice",
+        "left": "repeated_model_swaps",
+        "right": "human_adjudicated_slice"
+      },
+      {
+        "attribute": "claim_validity",
+        "confidence": 0.95,
+        "higher_id": "failure_mode_taxonomy",
+        "left": "repeated_model_swaps",
+        "right": "failure_mode_taxonomy"
+      },
+      {
+        "attribute": "claim_validity",
+        "confidence": 0.98,
+        "higher_id": "pre_registered_cases",
+        "left": "repeated_model_swaps",
+        "right": "pre_registered_cases"
+      },
+      {
+        "attribute": "claim_validity",
+        "confidence": 0.94,
+        "higher_id": "failure_mode_taxonomy",
+        "left": "human_adjudicated_slice",
+        "right": "failure_mode_taxonomy"
+      },
+      {
+        "attribute": "claim_validity",
+        "confidence": 0.95,
+        "higher_id": "pre_registered_cases",
+        "left": "human_adjudicated_slice",
+        "right": "pre_registered_cases"
+      },
+      {
+        "attribute": "claim_validity",
+        "confidence": 0.94,
+        "higher_id": "pre_registered_cases",
+        "left": "failure_mode_taxonomy",
+        "right": "pre_registered_cases"
+      },
+      {
+        "attribute": "reproducibility",
+        "confidence": 0.89,
+        "higher_id": "repeated_model_swaps",
+        "left": "equal_dollar_budget",
+        "right": "repeated_model_swaps"
+      },
+      {
+        "attribute": "reproducibility",
+        "confidence": 0.84,
+        "higher_id": "equal_dollar_budget",
+        "left": "equal_dollar_budget",
+        "right": "human_adjudicated_slice"
+      },
+      {
+        "attribute": "reproducibility",
+        "confidence": 0.74,
+        "higher_id": "equal_dollar_budget",
+        "left": "equal_dollar_budget",
+        "right": "failure_mode_taxonomy"
+      },
+      {
+        "attribute": "reproducibility",
+        "confidence": 0.98,
+        "higher_id": "pre_registered_cases",
+        "left": "equal_dollar_budget",
+        "right": "pre_registered_cases"
+      },
+      {
+        "attribute": "reproducibility",
+        "confidence": 0.86,
+        "higher_id": "repeated_model_swaps",
+        "left": "repeated_model_swaps",
+        "right": "human_adjudicated_slice"
+      },
+      {
+        "attribute": "reproducibility",
+        "confidence": 0.87,
+        "higher_id": "failure_mode_taxonomy",
+        "left": "repeated_model_swaps",
+        "right": "failure_mode_taxonomy"
+      },
+      {
+        "attribute": "reproducibility",
+        "confidence": 0.98,
+        "higher_id": "pre_registered_cases",
+        "left": "repeated_model_swaps",
+        "right": "pre_registered_cases"
+      },
+      {
+        "attribute": "reproducibility",
+        "confidence": 0.93,
+        "higher_id": "failure_mode_taxonomy",
+        "left": "human_adjudicated_slice",
+        "right": "failure_mode_taxonomy"
+      },
+      {
+        "attribute": "reproducibility",
+        "confidence": 0.95,
+        "higher_id": "pre_registered_cases",
+        "left": "human_adjudicated_slice",
+        "right": "pre_registered_cases"
+      },
+      {
+        "attribute": "reproducibility",
+        "confidence": 0.92,
+        "higher_id": "pre_registered_cases",
+        "left": "failure_mode_taxonomy",
+        "right": "pre_registered_cases"
+      },
+      {
+        "attribute": "cost_feasibility",
+        "confidence": 0.86,
+        "higher_id": "equal_dollar_budget",
+        "left": "equal_dollar_budget",
+        "right": "repeated_model_swaps"
+      },
+      {
+        "attribute": "cost_feasibility",
+        "confidence": 0.86,
+        "higher_id": "equal_dollar_budget",
+        "left": "equal_dollar_budget",
+        "right": "human_adjudicated_slice"
+      },
+      {
+        "attribute": "cost_feasibility",
+        "confidence": 0.84,
+        "higher_id": "equal_dollar_budget",
+        "left": "equal_dollar_budget",
+        "right": "failure_mode_taxonomy"
+      },
+      {
+        "attribute": "cost_feasibility",
+        "confidence": 0.93,
+        "higher_id": "pre_registered_cases",
+        "left": "equal_dollar_budget",
+        "right": "pre_registered_cases"
+      },
+      {
+        "attribute": "cost_feasibility",
+        "confidence": 0.86,
+        "higher_id": "human_adjudicated_slice",
+        "left": "repeated_model_swaps",
+        "right": "human_adjudicated_slice"
+      },
+      {
+        "attribute": "cost_feasibility",
+        "confidence": 0.78,
+        "higher_id": "failure_mode_taxonomy",
+        "left": "repeated_model_swaps",
+        "right": "failure_mode_taxonomy"
+      },
+      {
+        "attribute": "cost_feasibility",
+        "confidence": 0.92,
+        "higher_id": "pre_registered_cases",
+        "left": "repeated_model_swaps",
+        "right": "pre_registered_cases"
+      },
+      {
+        "attribute": "cost_feasibility",
+        "confidence": 0.85,
+        "higher_id": "human_adjudicated_slice",
+        "left": "human_adjudicated_slice",
+        "right": "failure_mode_taxonomy"
+      },
+      {
+        "attribute": "cost_feasibility",
+        "confidence": 0.84,
+        "higher_id": "human_adjudicated_slice",
+        "left": "human_adjudicated_slice",
+        "right": "pre_registered_cases"
+      },
+      {
+        "attribute": "cost_feasibility",
+        "confidence": 0.92,
+        "higher_id": "pre_registered_cases",
+        "left": "failure_mode_taxonomy",
+        "right": "pre_registered_cases"
+      }
+    ]
+  },
+  "method": "ordinal_pairwise",
+  "metrics_vs_reference": {
+    "candidate_ranked_ids": [
+      "pre_registered_cases",
+      "failure_mode_taxonomy",
+      "human_adjudicated_slice",
+      "equal_dollar_budget",
+      "repeated_model_swaps"
+    ],
+    "kendall_tau": 0.4,
+    "reference_ranked_ids": [
+      "pre_registered_cases",
+      "human_adjudicated_slice",
+      "repeated_model_swaps",
+      "failure_mode_taxonomy",
+      "equal_dollar_budget"
+    ],
+    "topk_jaccard": 0.5
+  },
+  "model": "openai/gpt-5.4-mini",
+  "ranked_ids": [
+    "pre_registered_cases",
+    "failure_mode_taxonomy",
+    "human_adjudicated_slice",
+    "equal_dollar_budget",
+    "repeated_model_swaps"
+  ],
+  "usage": {
+    "calls": 30,
+    "completion_tokens": 717,
+    "cost_is_estimate": false,
+    "cost_nanodollars": 7069500,
+    "cost_usd": 0.0070695,
+    "latency_ms": 37340,
+    "prompt_tokens": 5124,
+    "total_tokens": 5841
+  },
+  "utility": {
+    "equal_dollar_budget": 0.3085973362490692,
+    "failure_mode_taxonomy": 0.5518553111779682,
+    "human_adjudicated_slice": 0.4113882507384312,
+    "pre_registered_cases": 1.0,
+    "repeated_model_swaps": 0.2578549387948866
+  }
+}

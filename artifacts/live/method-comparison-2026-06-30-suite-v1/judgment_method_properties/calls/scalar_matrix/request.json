@@ -1,0 +1,18 @@
+{
+  "max_tokens": 2200,
+  "messages": [
+    {
+      "content": "You are a rigorous structured-judgment engine. Judge only the stated attribute. Use the item text, not outside popularity. Return strict JSON only. Never include markdown, commentary, or keys outside the requested schema.",
+      "role": "system"
+    },
+    {
+      "content": "Case: judgment_method_properties\nDescription: Rank judging regimes for sorting a list robustly by multiple attributes under real LLM noise.\n\nAttributes:\n- noise_resistance (weight 0.4): resistance to model calibration drift, anchoring, presentation order, and local inconsistency\n- information_per_call (weight 0.35): amount of ranking information extracted per provider call under the same model and prompt budget\n- auditability (weight 0.25): ability for another engineer to inspect individual judgments and understand why the final order changed\n\nItems:\n- single_scalar_rating: Ask the model to assign each item an independent 1-10 or 0-100 score for every attribute, then sort by the weighted sum.\n- whole_list_sort: Ask the model to directly return one ranked list after considering all attributes and weights at once.\n- ordinal_pairwise: Ask pairwise questions that only choose which item is better on an attribute, then aggregate wins into a ranking.\n- cardinal_pairwise_ratio: Ask pairwise questions for both the better item and how many times more it has the attribute, then fit a latent score model.\n- bandit_policy_cardinal: Use cardinal pairwise questions plus an uncertainty-aware policy that spends comparisons where top-k uncertainty is highest.\n\nTask: Score every item independently on every attribute. Output JSON exactly like this schema: {\"scores\": [{\"id\": \"item id\", \"attributes\": {\"attribute_id\": {\"score\": \"number from 0 to 100\", \"confidence\": \"number from 0 to 1\"}}}]}",
+      "role": "user"
+    }
+  ],
+  "model": "openai/gpt-5.4-mini",
+  "response_format": {
+    "type": "json_object"
+  },
+  "temperature": 0.1
+}
