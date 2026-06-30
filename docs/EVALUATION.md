@@ -1,6 +1,6 @@
 # Evaluation Evidence
 
-This page is the checked-in receipt surface for the offline synthetic harness and the preserved live OpenRouter receipt pack. The offline receipt records what the current code and deterministic simulator produce. The live receipt proves current provider integration and reporting paths work against real traffic. Neither receipt shows a universal win over scalar ratings.
+This page is the checked-in receipt surface for the offline synthetic harness, the live OpenRouter cardinal-policy receipt pack, and the live structured-judgment method comparison. The offline receipt records what the current code and deterministic simulator produce. The live receipts prove current provider integration and reporting paths work against real traffic. None of these receipts shows a universal win over scalar ratings.
 
 ## Reproduce the receipt
 
@@ -70,6 +70,34 @@ python3 examples/live_openrouter_benchmark.py \
 
 Refresh `combined-summary.json` and this directory's `README.md` after re-running policy directories; they are aggregate receipts, not source data.
 
+## Live structured-judgment method comparison
+
+Source directory: `artifacts/live/method-comparison-2026-06-30/`.
+
+The method comparison was generated through `examples/live_method_comparison.py` with `OPENROUTER_API_KEY` set. It runs three attribute-weighted case families through scalar matrix scoring, whole-list sorting, ordinal pairwise judging, and cardinal pairwise-ratio judging, then compares each method with a separate live pairwise-ratio reference model.
+
+Aggregate receipt:
+
+| Case | Best candidate agreement with reference | Cardinal pairwise-ratio agreement | Notable disagreement |
+|---|---|---|---|
+| `public_artifact_work` | all four candidate methods tie at Kendall tau 0.600 / top-k Jaccard 0.500 | Kendall tau 0.600 / top-k Jaccard 0.500 | all candidate methods recover the same ordering |
+| `judgment_method_properties` | scalar matrix, list sort, and cardinal pairwise-ratio tie at Kendall tau 0.600 / top-k Jaccard 1.000 | Kendall tau 0.600 / top-k Jaccard 1.000 | ordinal pairwise drops to Kendall tau 0.400 while preserving the same top-k set |
+| `model_policy_options` | list sort reaches Kendall tau 0.600 / top-k Jaccard 1.000 | Kendall tau -0.800 / top-k Jaccard 0.200 | cardinal pairwise-ratio sharply disagrees with the reference on this routing-policy case |
+
+Across the three cases, the comparison used 276 OpenRouter calls, 57,797 prompt tokens, 25,061 completion tokens, and $0.395864 provider-reported cost. Every row used exact provider-reported or local pricing metadata (`cost_is_estimate = false`). The reference is still an LLM regime, not human ground truth or a hidden exhaustive oracle; low agreement is evidence of prompt/regime brittleness on these cases, not proof that the candidate model cannot perform the task.
+
+Re-run the comparison:
+
+```bash
+python3 examples/live_method_comparison.py \
+  --out-dir artifacts/live/method-comparison-2026-06-30 \
+  --candidate-model openai/gpt-4.1-mini \
+  --reference-model anthropic/claude-sonnet-4.6 \
+  --max-usd 10
+```
+
+`summary.json` is the machine-readable aggregate. `summary.md` and `README.md` are generated views of the same data. Each case directory also preserves `case.json`, one JSON result per method, and per-call request/response/parsed/usage receipts under `calls/`.
+
 ## Method
 
 The suite runs the same synthetic cases through two deterministic evaluators:
@@ -127,7 +155,7 @@ The repo has a deterministic local evaluation surface with checked-in raw artifa
 
 ## Known gaps
 
-- No live scalar/Likert or ordinal baseline receipt is checked in for the headline comparison; the live pack currently exercises cardinal policies only.
+- The live method comparison now includes scalar, list-sort, ordinal, and cardinal regimes, but its reference is another LLM method rather than human ground truth or an exhaustive non-LLM oracle.
 - The baseline is a deterministic 10-level scalar simulator, not a tuned family of scalar prompts.
 - The current resource control is equal call count, not equal tokens, equal latency, or equal dollars.
 - The current synthetic cardinal runs all end with `budget_exhausted`; they do not demonstrate cost-saving convergence.
@@ -135,11 +163,12 @@ The repo has a deterministic local evaluation surface with checked-in raw artifa
 
 ## Next empirical proof target
 
-The next public-grade receipt should freeze a task suite and compare at least four regimes on the same inputs:
+The next public-grade receipt should turn the live comparison into a larger frozen benchmark suite:
 
-1. scalar/Likert ratings;
-2. ordinal pairwise judgements without ratio magnitude;
-3. pairwise-ratio judgements with the current planner;
-4. an exhaustive or high-budget pairwise reference where feasible.
+1. more task families and held-out prompts;
+2. repeated runs or model swaps to separate method behavior from one model's quirks;
+3. equal-call, equal-token, and equal-dollar budget views;
+4. a higher-budget or externally judged reference where feasible;
+5. stratified reporting by task family, budget type, and failure mode.
 
-For each regime, preserve request JSON, response JSON, trace JSONL, generated report, cache export when used, model IDs, token/cost accounting, and the exact comparison budget policy. The headline should be stratified by task family and budget type. A credible claim is not "cardinal wins"; it is "under this budget and task family, this pairwise-ratio policy improves these metrics while losing or tying these others."
+For each regime, preserve request JSON, response JSON, trace JSONL, generated report, cache export when used, model IDs, token/cost accounting, and the exact comparison budget policy. The credible claim is still not "cardinal wins"; it is "under this budget and task family, this pairwise-ratio policy improves these metrics while losing or tying these others."

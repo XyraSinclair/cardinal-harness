@@ -1,0 +1,316 @@
+{
+  "attribute_scores": {
+    "deepseek_v4_flash_fast": {
+      "cost_discipline": 1.0,
+      "public_receipt_credibility": 0.0,
+      "route_freshness": 1.0
+    },
+    "glm_5_2_logprob_candidate": {
+      "cost_discipline": 0.7502194164664896,
+      "public_receipt_credibility": 0.34131301886797594,
+      "route_freshness": 0.7450215550632644
+    },
+    "kimi_k2_thinking_diverse": {
+      "cost_discipline": 0.32037102455732325,
+      "public_receipt_credibility": 0.768782982406736,
+      "route_freshness": 0.44303159525157093
+    },
+    "quality_only_opus_46": {
+      "cost_discipline": 0.0,
+      "public_receipt_credibility": 1.0,
+      "route_freshness": 0.3119468496851647
+    },
+    "sonnet_reference_then_fast": {
+      "cost_discipline": 0.5176476102559533,
+      "public_receipt_credibility": 0.8133382377353777,
+      "route_freshness": 0.0
+    }
+  },
+  "extra": {
+    "pairs": [
+      {
+        "attribute": "public_receipt_credibility",
+        "confidence": 0.9,
+        "higher_id": "quality_only_opus_46",
+        "left": "quality_only_opus_46",
+        "ratio": 3.0,
+        "right": "sonnet_reference_then_fast"
+      },
+      {
+        "attribute": "public_receipt_credibility",
+        "confidence": 0.9,
+        "higher_id": "quality_only_opus_46",
+        "left": "quality_only_opus_46",
+        "ratio": 10.0,
+        "right": "deepseek_v4_flash_fast"
+      },
+      {
+        "attribute": "public_receipt_credibility",
+        "confidence": 0.9,
+        "higher_id": "quality_only_opus_46",
+        "left": "quality_only_opus_46",
+        "ratio": 5.0,
+        "right": "glm_5_2_logprob_candidate"
+      },
+      {
+        "attribute": "public_receipt_credibility",
+        "confidence": 0.9,
+        "higher_id": "quality_only_opus_46",
+        "left": "quality_only_opus_46",
+        "ratio": 3.0,
+        "right": "kimi_k2_thinking_diverse"
+      },
+      {
+        "attribute": "public_receipt_credibility",
+        "confidence": 0.9,
+        "higher_id": "sonnet_reference_then_fast",
+        "left": "sonnet_reference_then_fast",
+        "ratio": 26.0,
+        "right": "deepseek_v4_flash_fast"
+      },
+      {
+        "attribute": "public_receipt_credibility",
+        "confidence": 0.9,
+        "higher_id": "sonnet_reference_then_fast",
+        "left": "sonnet_reference_then_fast",
+        "ratio": 10.0,
+        "right": "glm_5_2_logprob_candidate"
+      },
+      {
+        "attribute": "public_receipt_credibility",
+        "confidence": 0.9,
+        "higher_id": "kimi_k2_thinking_diverse",
+        "left": "sonnet_reference_then_fast",
+        "ratio": 3.0,
+        "right": "kimi_k2_thinking_diverse"
+      },
+      {
+        "attribute": "public_receipt_credibility",
+        "confidence": 0.8,
+        "higher_id": "glm_5_2_logprob_candidate",
+        "left": "deepseek_v4_flash_fast",
+        "ratio": 5.0,
+        "right": "glm_5_2_logprob_candidate"
+      },
+      {
+        "attribute": "public_receipt_credibility",
+        "confidence": 0.9,
+        "higher_id": "kimi_k2_thinking_diverse",
+        "left": "deepseek_v4_flash_fast",
+        "ratio": 5.0,
+        "right": "kimi_k2_thinking_diverse"
+      },
+      {
+        "attribute": "public_receipt_credibility",
+        "confidence": 0.9,
+        "higher_id": "kimi_k2_thinking_diverse",
+        "left": "glm_5_2_logprob_candidate",
+        "ratio": 3.0,
+        "right": "kimi_k2_thinking_diverse"
+      },
+      {
+        "attribute": "cost_discipline",
+        "confidence": 0.9,
+        "higher_id": "sonnet_reference_then_fast",
+        "left": "quality_only_opus_46",
+        "ratio": 10.0,
+        "right": "sonnet_reference_then_fast"
+      },
+      {
+        "attribute": "cost_discipline",
+        "confidence": 0.9,
+        "higher_id": "deepseek_v4_flash_fast",
+        "left": "quality_only_opus_46",
+        "ratio": 10.0,
+        "right": "deepseek_v4_flash_fast"
+      },
+      {
+        "attribute": "cost_discipline",
+        "confidence": 0.9,
+        "higher_id": "glm_5_2_logprob_candidate",
+        "left": "quality_only_opus_46",
+        "ratio": 26.0,
+        "right": "glm_5_2_logprob_candidate"
+      },
+      {
+        "attribute": "cost_discipline",
+        "confidence": 0.9,
+        "higher_id": "kimi_k2_thinking_diverse",
+        "left": "quality_only_opus_46",
+        "ratio": 10.0,
+        "right": "kimi_k2_thinking_diverse"
+      },
+      {
+        "attribute": "cost_discipline",
+        "confidence": 0.9,
+        "higher_id": "deepseek_v4_flash_fast",
+        "left": "sonnet_reference_then_fast",
+        "ratio": 10.0,
+        "right": "deepseek_v4_flash_fast"
+      },
+      {
+        "attribute": "cost_discipline",
+        "confidence": 0.9,
+        "higher_id": "glm_5_2_logprob_candidate",
+        "left": "sonnet_reference_then_fast",
+        "ratio": 10.0,
+        "right": "glm_5_2_logprob_candidate"
+      },
+      {
+        "attribute": "cost_discipline",
+        "confidence": 0.9,
+        "higher_id": "sonnet_reference_then_fast",
+        "left": "sonnet_reference_then_fast",
+        "ratio": 10.0,
+        "right": "kimi_k2_thinking_diverse"
+      },
+      {
+        "attribute": "cost_discipline",
+        "confidence": 0.9,
+        "higher_id": "deepseek_v4_flash_fast",
+        "left": "deepseek_v4_flash_fast",
+        "ratio": 5.0,
+        "right": "glm_5_2_logprob_candidate"
+      },
+      {
+        "attribute": "cost_discipline",
+        "confidence": 0.9,
+        "higher_id": "deepseek_v4_flash_fast",
+        "left": "deepseek_v4_flash_fast",
+        "ratio": 26.0,
+        "right": "kimi_k2_thinking_diverse"
+      },
+      {
+        "attribute": "cost_discipline",
+        "confidence": 0.8,
+        "higher_id": "glm_5_2_logprob_candidate",
+        "left": "glm_5_2_logprob_candidate",
+        "ratio": 2.0,
+        "right": "kimi_k2_thinking_diverse"
+      },
+      {
+        "attribute": "route_freshness",
+        "confidence": 0.9,
+        "higher_id": "sonnet_reference_then_fast",
+        "left": "quality_only_opus_46",
+        "ratio": 3.0,
+        "right": "sonnet_reference_then_fast"
+      },
+      {
+        "attribute": "route_freshness",
+        "confidence": 0.9,
+        "higher_id": "quality_only_opus_46",
+        "left": "quality_only_opus_46",
+        "ratio": 3.0,
+        "right": "deepseek_v4_flash_fast"
+      },
+      {
+        "attribute": "route_freshness",
+        "confidence": 0.8,
+        "higher_id": "glm_5_2_logprob_candidate",
+        "left": "quality_only_opus_46",
+        "ratio": 3.0,
+        "right": "glm_5_2_logprob_candidate"
+      },
+      {
+        "attribute": "route_freshness",
+        "confidence": 0.8,
+        "higher_id": "kimi_k2_thinking_diverse",
+        "left": "quality_only_opus_46",
+        "ratio": 2.0,
+        "right": "kimi_k2_thinking_diverse"
+      },
+      {
+        "attribute": "route_freshness",
+        "confidence": 0.9,
+        "higher_id": "deepseek_v4_flash_fast",
+        "left": "sonnet_reference_then_fast",
+        "ratio": 3.0,
+        "right": "deepseek_v4_flash_fast"
+      },
+      {
+        "attribute": "route_freshness",
+        "confidence": 0.8,
+        "higher_id": "glm_5_2_logprob_candidate",
+        "left": "sonnet_reference_then_fast",
+        "ratio": 3.0,
+        "right": "glm_5_2_logprob_candidate"
+      },
+      {
+        "attribute": "route_freshness",
+        "confidence": 0.9,
+        "higher_id": "kimi_k2_thinking_diverse",
+        "left": "sonnet_reference_then_fast",
+        "ratio": 26.0,
+        "right": "kimi_k2_thinking_diverse"
+      },
+      {
+        "attribute": "route_freshness",
+        "confidence": 0.8,
+        "higher_id": "deepseek_v4_flash_fast",
+        "left": "deepseek_v4_flash_fast",
+        "ratio": 3.0,
+        "right": "glm_5_2_logprob_candidate"
+      },
+      {
+        "attribute": "route_freshness",
+        "confidence": 0.9,
+        "higher_id": "deepseek_v4_flash_fast",
+        "left": "deepseek_v4_flash_fast",
+        "ratio": 26.0,
+        "right": "kimi_k2_thinking_diverse"
+      },
+      {
+        "attribute": "route_freshness",
+        "confidence": 0.9,
+        "higher_id": "glm_5_2_logprob_candidate",
+        "left": "glm_5_2_logprob_candidate",
+        "ratio": 3.0,
+        "right": "kimi_k2_thinking_diverse"
+      }
+    ]
+  },
+  "method": "cardinal_pairwise_ratio",
+  "metrics_vs_reference": {
+    "candidate_ranked_ids": [
+      "glm_5_2_logprob_candidate",
+      "kimi_k2_thinking_diverse",
+      "deepseek_v4_flash_fast",
+      "quality_only_opus_46",
+      "sonnet_reference_then_fast"
+    ],
+    "kendall_tau": -0.8,
+    "reference_ranked_ids": [
+      "sonnet_reference_then_fast",
+      "quality_only_opus_46",
+      "kimi_k2_thinking_diverse",
+      "deepseek_v4_flash_fast",
+      "glm_5_2_logprob_candidate"
+    ],
+    "topk_jaccard": 0.2
+  },
+  "model": "openai/gpt-4.1-mini",
+  "ranked_ids": [
+    "glm_5_2_logprob_candidate",
+    "kimi_k2_thinking_diverse",
+    "deepseek_v4_flash_fast",
+    "quality_only_opus_46",
+    "sonnet_reference_then_fast"
+  ],
+  "usage": {
+    "calls": 30,
+    "completion_tokens": 570,
+    "cost_is_estimate": false,
+    "cost_nanodollars": 3451200,
+    "cost_usd": 0.0034512,
+    "latency_ms": 44736,
+    "prompt_tokens": 6348
+  },
+  "utility": {
+    "deepseek_v4_flash_fast": 0.55,
+    "glm_5_2_logprob_candidate": 0.5649120721963521,
+    "kimi_k2_thinking_diverse": 0.5528215482631209,
+    "quality_only_opus_46": 0.5279867124212911,
+    "sonnet_reference_then_fast": 0.521296490057706
+  }
+}

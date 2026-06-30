@@ -1,0 +1,89 @@
+{
+  "scores": [
+    {
+      "attributes": {
+        "evidence_leverage": {
+          "confidence": 0.9,
+          "score": 90
+        },
+        "implementation_tractability": {
+          "confidence": 0.8,
+          "score": 60
+        },
+        "shareability_gain": {
+          "confidence": 0.85,
+          "score": 85
+        }
+      },
+      "id": "live_baseline_suite"
+    },
+    {
+      "attributes": {
+        "evidence_leverage": {
+          "confidence": 0.8,
+          "score": 70
+        },
+        "implementation_tractability": {
+          "confidence": 0.9,
+          "score": 75
+        },
+        "shareability_gain": {
+          "confidence": 0.85,
+          "score": 80
+        }
+      },
+      "id": "portable_receipts"
+    },
+    {
+      "attributes": {
+        "evidence_leverage": {
+          "confidence": 0.7,
+          "score": 20
+        },
+        "implementation_tractability": {
+          "confidence": 0.95,
+          "score": 90
+        },
+        "shareability_gain": {
+          "confidence": 0.7,
+          "score": 30
+        }
+      },
+      "id": "dependency_audit_cleanup"
+    },
+    {
+      "attributes": {
+        "evidence_leverage": {
+          "confidence": 0.75,
+          "score": 50
+        },
+        "implementation_tractability": {
+          "confidence": 0.9,
+          "score": 85
+        },
+        "shareability_gain": {
+          "confidence": 0.85,
+          "score": 75
+        }
+      },
+      "id": "first_user_path"
+    },
+    {
+      "attributes": {
+        "evidence_leverage": {
+          "confidence": 0.85,
+          "score": 85
+        },
+        "implementation_tractability": {
+          "confidence": 0.75,
+          "score": 55
+        },
+        "shareability_gain": {
+          "confidence": 0.8,
+          "score": 80
+        }
+      },
+      "id": "large_frozen_benchmark"
+    }
+  ]
+}

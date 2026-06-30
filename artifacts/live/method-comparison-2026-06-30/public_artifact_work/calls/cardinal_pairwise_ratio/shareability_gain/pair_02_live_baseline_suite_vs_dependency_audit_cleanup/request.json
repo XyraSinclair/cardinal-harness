@@ -1,0 +1,18 @@
+{
+  "max_tokens": 800,
+  "messages": [
+    {
+      "content": "You are a rigorous structured-judgment engine. Judge only the stated attribute. Use the item text, not outside popularity. Return strict JSON only. Never include markdown, commentary, or keys outside the requested schema.",
+      "role": "system"
+    },
+    {
+      "content": "Case: public_artifact_work\nAttribute shareability_gain: how much this work improves confidence that a serious external reader would share the artifact\n\nA (live_baseline_suite): Build a preserved real-LLM head-to-head suite comparing scalar/list, ordinal pairwise, and cardinal pairwise judgments on identical attribute-weighted tasks, with request/response/trace/cost artifacts.\n\nB (dependency_audit_cleanup): Remove or quarantine transitive cargo-audit warnings for paste, anyhow, and rand so the public release has a cleaner security posture.\n\nTask: Which item has more of this attribute, and how many times more? Use ratio=1 only for near ties; cap large gaps at 26. Output JSON exactly: {\"higher_id\":\"item id\",\"ratio\":1.0,\"confidence\":0.0}.",
+      "role": "user"
+    }
+  ],
+  "model": "openai/gpt-4.1-mini",
+  "response_format": {
+    "type": "json_object"
+  },
+  "temperature": 0.1
+}

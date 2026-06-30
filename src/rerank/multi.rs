@@ -22,7 +22,7 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use futures::stream::{self, StreamExt};
-use rand::Rng;
+use rand::{rngs::StdRng, Rng, SeedableRng};
 
 use crate::cache::PairwiseCache;
 use crate::gateway::pricing as provider_pricing;
@@ -604,6 +604,10 @@ pub async fn multi_rerank(
 
     let mut refused_pairs: HashSet<(usize, usize, usize)> = HashSet::new();
     let mut models_used: HashSet<String> = HashSet::new();
+    let mut presentation_rng = execution
+        .run_options
+        .rng_seed
+        .map(|seed| StdRng::seed_from_u64(seed ^ 0xC0A7_5EED_5EED_5EED));
 
     let stop_reason = 'rerank: loop {
         if let Some(flag) = execution.cancel_flag {
@@ -675,7 +679,11 @@ pub async fn multi_rerank(
             }
 
             let swapped = if req.randomize_presentation_order {
-                rand::thread_rng().gen_bool(0.5)
+                if let Some(rng) = presentation_rng.as_mut() {
+                    rng.gen_bool(0.5)
+                } else {
+                    rand::thread_rng().gen_bool(0.5)
+                }
             } else {
                 false
             };
@@ -785,8 +793,13 @@ pub async fn multi_rerank(
                 attribute_attempted[task.attr_idx].saturating_add(1);
 
             let attr = &req.attributes[task.attr_idx];
-            let entity_a = &req.entities[task.i];
-            let entity_b = &req.entities[task.j];
+            let (trace_entity_a_index, trace_entity_b_index) = if task.swapped {
+                (task.j, task.i)
+            } else {
+                (task.i, task.j)
+            };
+            let trace_entity_a = &req.entities[trace_entity_a_index];
+            let trace_entity_b = &req.entities[trace_entity_b_index];
 
             models_used.insert(selected_model.clone());
             let attr_id = attr.id.as_str();
@@ -800,12 +813,12 @@ pub async fn multi_rerank(
                         prompt_template_slug: attr.prompt_template_slug.as_deref(),
                     },
                     entity_a: PairwiseComparisonEntity {
-                        id: &entity_a.id,
-                        text: &entity_a.text,
+                        id: &trace_entity_a.id,
+                        text: &trace_entity_a.text,
                     },
                     entity_b: PairwiseComparisonEntity {
-                        id: &entity_b.id,
-                        text: &entity_b.text,
+                        id: &trace_entity_b.id,
+                        text: &trace_entity_b.text,
                     },
                 };
                 let template = comparison.prompt_template();
@@ -839,10 +852,10 @@ pub async fn multi_rerank(
                     attribute_prompt_hash: fields.attribute_prompt_hash.clone(),
                     prompt_template_slug: fields.prompt_template_slug.clone(),
                     template_hash: fields.template_hash.clone(),
-                    entity_a_id: entity_a.id.clone(),
-                    entity_b_id: entity_b.id.clone(),
-                    entity_a_index: task.i,
-                    entity_b_index: task.j,
+                    entity_a_id: trace_entity_a.id.clone(),
+                    entity_b_id: trace_entity_b.id.clone(),
+                    entity_a_index: trace_entity_a_index,
+                    entity_b_index: trace_entity_b_index,
                     entity_a_hash: fields.entity_a_hash.clone(),
                     entity_b_hash: fields.entity_b_hash.clone(),
                     cache_key_hash: fields.cache_key_hash.clone(),
@@ -902,10 +915,10 @@ pub async fn multi_rerank(
                         let event = ComparisonEvent {
                             attribute_id: attr.id.clone(),
                             attribute_index: task.attr_idx,
-                            entity_a_id: entity_a.id.clone(),
-                            entity_b_id: entity_b.id.clone(),
-                            entity_a_index: task.i,
-                            entity_b_index: task.j,
+                            entity_a_id: trace_entity_a.id.clone(),
+                            entity_b_id: trace_entity_b.id.clone(),
+                            entity_a_index: trace_entity_a_index,
+                            entity_b_index: trace_entity_b_index,
                             model: selected_model.clone(),
                             judgement: PairwiseJudgement::Refused,
                             usage,
@@ -996,10 +1009,10 @@ pub async fn multi_rerank(
                         let event = ComparisonEvent {
                             attribute_id: attr.id.clone(),
                             attribute_index: task.attr_idx,
-                            entity_a_id: entity_a.id.clone(),
-                            entity_b_id: entity_b.id.clone(),
-                            entity_a_index: task.i,
-                            entity_b_index: task.j,
+                            entity_a_id: trace_entity_a.id.clone(),
+                            entity_b_id: trace_entity_b.id.clone(),
+                            entity_a_index: trace_entity_a_index,
+                            entity_b_index: trace_entity_b_index,
                             model: selected_model.clone(),
                             judgement: PairwiseJudgement::Observation {
                                 higher_ranked,

@@ -1,0 +1,46 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "I need to assess which item better improves confidence that a serious external reader would share the artifact.\n\n**A (live_baseline_suite):** A preserved real-LLM head-to-head suite with request/response/trace/cost artifacts is technically impressive and comprehensive. However, it's complex, requires significant context to understand, and is primarily useful to researchers already invested in the methodology. A serious external reader might find it interesting but would need to deeply understand the domain to want to share it. The artifact is dense and specialized.\n\n**B (first_user_path):** Compressing the first-time user path into one obvious command, one tiny request file, one expected output, and one explanation of when cardinal ranking is worth its cost \u2014 this is highly shareable. It's immediately legible, actionable, and answers the \"why should I care?\" question directly. A serious external reader encountering this would quickly grasp the value proposition and be motivated to share it with others who might benefit. The clarity and accessibility dramatically increase shareability.\n\n**Comparison:** Shareability depends on accessibility, clarity of value proposition, and low friction for the reader to \"get it\" quickly. B directly optimizes for these factors \u2014 it's a minimal, clear entry point that demonstrates value immediately. A is valuable but primarily to specialists who are already engaged. B would be shared far more readily by a serious external reader encountering the work for the first time.\n\nThe gap is meaningful but not extreme \u2014 A does have real substance that some readers would share. B is perhaps 5-6x more shareable in terms of the confidence boost it provides.\n\n```json\n{\"higher_id\":\"B\",\"ratio\":5.0,\"confidence\":0.78}\n```",
+        "reasoning": null,
+        "refusal": null,
+        "role": "assistant"
+      },
+      "native_finish_reason": "end_turn"
+    }
+  ],
+  "created": 1782849309,
+  "id": "gen-1782849309-bKNaZdBZ2L0jYSqLQUw3",
+  "model": "anthropic/claude-4.6-sonnet-20260217",
+  "object": "chat.completion",
+  "provider": "Anthropic",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 372,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.006303,
+    "cost_details": {
+      "upstream_inference_completions_cost": 0.00558,
+      "upstream_inference_cost": 0.006303,
+      "upstream_inference_prompt_cost": 0.000723
+    },
+    "is_byok": false,
+    "prompt_tokens": 241,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 613
+  }
+}

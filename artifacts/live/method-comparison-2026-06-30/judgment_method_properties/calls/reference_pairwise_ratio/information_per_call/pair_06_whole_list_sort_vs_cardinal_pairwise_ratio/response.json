@@ -1,0 +1,46 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "I need to compare how much ranking information is extracted per provider call for these two judgment methods.\n\n**A (whole_list_sort):** In a single call, the model ranks all N items simultaneously. This produces a complete ordering of N items in one call. The information content of a full ranking of N items is log2(N!) bits. For even modest N (say 10 items), this is ~21.8 bits per call.\n\n**B (cardinal_pairwise_ratio):** Each call asks about a pair of items - which is better AND by how much (a ratio). This gives both ordinal (which is better) and cardinal (how much better) information. A single pairwise comparison yields ~1 bit of ordinal information plus some cardinal magnitude information. However, to cover N items, you need O(N\u00b2) calls or at least O(N log N) calls to build a full ranking.\n\n**Comparison:**\n- A extracts O(log N!) \u2248 O(N log N) bits of ordinal information in **one call**\n- B extracts ~1-2 bits of ordinal+cardinal information per call, but requires many calls to rank N items\n\nThe question is about information per call. \n\n- A (whole_list_sort): One call \u2192 full ranking of all items. Very high information per call.\n- B (cardinal_pairwise_ratio): One call \u2192 one pairwise comparison with ratio. Low information per call, but each call is more precise/cardinal.\n\nHowever, B does extract cardinal ratio information (not just ordinal), which is richer per comparison. But per call, A still wins massively because it handles all N items at once vs. just 2 items.\n\nFor N items:\n- A: ~log2(N!) bits per call\n- B: ~log2(N) + some cardinal bits per call (roughly)\n\nA is dramatically higher in information per call. For N=10, A gives ~21 bits vs B gives maybe 3-4 bits. That's roughly a 5-7x ratio in bits, but in practical terms for ranking purposes, A produces a complete ranking in 1 call while B needs many calls.\n\nThe ratio of information per call is substantial. For typical list sizes (10-20 items), A extracts perhaps 5-15x more ranking information per call. I'll estimate around 8x, capped reasonably.\n\n{\"higher_id\":\"A\",\"ratio\":8.0,\"confidence\":0.82}",
+        "reasoning": null,
+        "refusal": null,
+        "role": "assistant"
+      },
+      "native_finish_reason": "end_turn"
+    }
+  ],
+  "created": 1782849683,
+  "id": "gen-1782849683-PRX9i4O2ZvAaQp6gbmHi",
+  "model": "anthropic/claude-4.6-sonnet-20260217",
+  "object": "chat.completion",
+  "provider": "Anthropic",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 559,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.009003,
+    "cost_details": {
+      "upstream_inference_completions_cost": 0.008385,
+      "upstream_inference_cost": 0.009003,
+      "upstream_inference_prompt_cost": 0.000618
+    },
+    "is_byok": false,
+    "prompt_tokens": 206,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 765
+  }
+}

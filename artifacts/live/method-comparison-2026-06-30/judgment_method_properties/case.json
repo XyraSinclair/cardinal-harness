@@ -1,0 +1,43 @@
+{
+  "attributes": [
+    {
+      "id": "noise_resistance",
+      "prompt": "resistance to model calibration drift, anchoring, presentation order, and local inconsistency",
+      "weight": 0.4
+    },
+    {
+      "id": "information_per_call",
+      "prompt": "amount of ranking information extracted per provider call under the same model and prompt budget",
+      "weight": 0.35
+    },
+    {
+      "id": "auditability",
+      "prompt": "ability for another engineer to inspect individual judgments and understand why the final order changed",
+      "weight": 0.25
+    }
+  ],
+  "description": "Rank judging regimes for sorting a list robustly by multiple attributes under real LLM noise.",
+  "items": [
+    {
+      "id": "single_scalar_rating",
+      "text": "Ask the model to assign each item an independent 1-10 or 0-100 score for every attribute, then sort by the weighted sum."
+    },
+    {
+      "id": "whole_list_sort",
+      "text": "Ask the model to directly return one ranked list after considering all attributes and weights at once."
+    },
+    {
+      "id": "ordinal_pairwise",
+      "text": "Ask pairwise questions that only choose which item is better on an attribute, then aggregate wins into a ranking."
+    },
+    {
+      "id": "cardinal_pairwise_ratio",
+      "text": "Ask pairwise questions for both the better item and how many times more it has the attribute, then fit a latent score model."
+    },
+    {
+      "id": "bandit_policy_cardinal",
+      "text": "Use cardinal pairwise questions plus an uncertainty-aware policy that spends comparisons where top-k uncertainty is highest."
+    }
+  ],
+  "name": "judgment_method_properties"
+}

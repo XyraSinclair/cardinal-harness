@@ -1,0 +1,46 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "{\"higher_id\":\"large_frozen_benchmark\",\"ratio\":10.0,\"confidence\":0.9}",
+        "reasoning": null,
+        "refusal": null,
+        "role": "assistant"
+      },
+      "native_finish_reason": "completed"
+    }
+  ],
+  "created": 1782849492,
+  "id": "gen-1782849492-Glmvg1Z2jB5leaoMAx2f",
+  "model": "openai/gpt-4.1-mini-2025-04-14",
+  "object": "chat.completion",
+  "provider": "Azure",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 23,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.0001188,
+    "cost_details": {
+      "upstream_inference_completions_cost": 3.68e-05,
+      "upstream_inference_cost": 0.0001188,
+      "upstream_inference_prompt_cost": 8.2e-05
+    },
+    "is_byok": false,
+    "prompt_tokens": 205,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 228
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "max_tokens": 700,
+  "messages": [
+    {
+      "content": "You are a rigorous structured-judgment engine. Judge only the stated attribute. Use the item text, not outside popularity. Return strict JSON only. Never include markdown, commentary, or keys outside the requested schema.",
+      "role": "system"
+    },
+    {
+      "content": "Case: public_artifact_work\nAttribute shareability_gain: how much this work improves confidence that a serious external reader would share the artifact\n\nA (dependency_audit_cleanup): Remove or quarantine transitive cargo-audit warnings for paste, anyhow, and rand so the public release has a cleaner security posture.\n\nB (first_user_path): Compress the first-time user path into one obvious command, one tiny request file, one expected output, and one explanation of when cardinal ranking is worth its cost.\n\nTask: Which item has more of this attribute? Choose one item ID. Output JSON exactly: {\"higher_id\":\"item id\",\"confidence\":0.0}.",
+      "role": "user"
+    }
+  ],
+  "model": "openai/gpt-4.1-mini",
+  "response_format": {
+    "type": "json_object"
+  },
+  "temperature": 0.1
+}

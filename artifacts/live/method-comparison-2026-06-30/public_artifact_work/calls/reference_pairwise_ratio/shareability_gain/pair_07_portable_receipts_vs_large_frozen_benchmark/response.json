@@ -1,0 +1,46 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "I need to assess which item more improves confidence that a serious external reader would share the artifact.\n\n**Item A (portable_receipts):** Makes receipts reproducible from a fresh clone - relative paths, model IDs, prompt hashes, cache hit counts, provider cost semantics, non-convergence flags. This addresses technical reproducibility and auditability. A serious reader would appreciate this for verification, but it's more of a hygiene/infrastructure improvement. It makes existing artifacts more trustworthy but doesn't fundamentally change what's being shared.\n\n**Item B (large_frozen_benchmark):** Creates a larger frozen benchmark suite with multiple task families, repeated runs, equalized budgets, raw artifacts, and a clear statistical report. This directly produces a substantial, shareable artifact - a benchmark suite with statistical rigor. Multiple task families and repeated runs increase generalizability. Equalized budgets make comparisons fair. Raw artifacts allow independent analysis. A clear statistical report makes findings accessible and credible.\n\n**Comparison:**\n- Shareability is about whether an external reader would want to share the artifact with others (signal it's worth attention).\n- Item B produces something with broader scope, statistical validity, and direct scientific value - exactly what gets shared in ML/AI research communities.\n- Item A improves reproducibility of existing receipts, which is valuable but more of a prerequisite than a driver of shareability. It makes things verifiable but doesn't make them more interesting or impactful.\n- A serious external reader shares things that are novel, rigorous, and broadly useful. Item B hits all three more directly.\n- Item A is perhaps 2-3x less impactful on shareability - it's a supporting improvement, while B is the main event.\n\nThe gap is meaningful but not enormous - both contribute to credibility. I'd estimate B is about 4-5x more impactful on shareability.\n\n```json\n{\"higher_id\":\"large_frozen_benchmark\",\"ratio\":4.5,\"confidence\":0.72}\n```",
+        "reasoning": null,
+        "refusal": null,
+        "role": "assistant"
+      },
+      "native_finish_reason": "end_turn"
+    }
+  ],
+  "created": 1782849340,
+  "id": "gen-1782849340-qpVs3pl0EJBvohFQXRAZ",
+  "model": "anthropic/claude-4.6-sonnet-20260217",
+  "object": "chat.completion",
+  "provider": "Anthropic",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 444,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.007335,
+    "cost_details": {
+      "upstream_inference_completions_cost": 0.00666,
+      "upstream_inference_cost": 0.007335,
+      "upstream_inference_prompt_cost": 0.000675
+    },
+    "is_byok": false,
+    "prompt_tokens": 225,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 669
+  }
+}

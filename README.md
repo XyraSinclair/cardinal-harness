@@ -6,7 +6,7 @@ It does one job: turn noisy LLM pairwise ratio judgements into globally consiste
 
 Use it for list work where "how much better?" carries information: prompts, research ideas, candidate plans, reviewer notes, worktrees, backlog items, or any shortlist where the top cluster matters more than a cheap total order. Do not use it for deterministic rankings, scalar metrics, or cases where the attribute itself is incoherent.
 
-The trade is explicit: it costs more than one-shot scoring, saves comparisons versus exhaustive pairwise judging, and returns uncertainty plus receipts instead of only a sorted list. The checked-in synthetic receipts are mixed: they show a strong cardinal win on a scale-compression case, Likert/scalar wins on several ranking metrics, and no proof of universal cardinal superiority.
+The trade is explicit: it costs more than one-shot scoring, saves comparisons versus exhaustive pairwise judging, and returns uncertainty plus receipts instead of only a sorted list. The checked-in receipts are deliberately mixed: the offline synthetic suite shows a strong cardinal win on a scale-compression case and Likert/scalar wins on several ranking metrics; the live OpenRouter method comparison shows agreement and disagreement against an LLM reference, not universal cardinal superiority.
 
 ## Scope
 
@@ -26,12 +26,14 @@ Research workflows, training/export code, agent orchestration, and other experim
 The public evidence is deliberately reproducible and deliberately narrow:
 
 - Offline synthetic evaluation and Likert/scalar comparison receipts live under `artifacts/eval/`.
-- Preserved real OpenRouter smoke receipts live under `artifacts/live/openrouter-benchmark-2026-06-30/`; they cover three cardinal policy runs, 459 fresh provider comparisons, 0 cache hits, 0 refusals, and $0.994335 provider-reported cost.
-- The compact five-metric `comparison_summary.json` is mixed: 10 cardinal wins, 12 Likert wins, and 18 ties across the checked-in cases. The offline raw-receipt delta adds gate metrics and currently reports 10/12/20 across 42 comparable rows.
+- Preserved real OpenRouter cardinal-policy receipts live under `artifacts/live/openrouter-benchmark-2026-06-30/`; they cover three policy runs, 459 fresh provider comparisons, 0 cache hits, 0 refusals, and $0.994335 provider-reported cost.
+- A live structured-judgment method comparison lives under `artifacts/live/method-comparison-2026-06-30/`; it compares scalar matrix, whole-list sort, ordinal pairwise, and cardinal pairwise-ratio regimes against a separate LLM reference across three task families.
+- The compact five-metric offline `comparison_summary.json` is mixed: 10 cardinal wins, 12 Likert wins, and 18 ties across the checked-in cases. The offline raw-receipt delta adds gate metrics and currently reports 10/12/20 across 42 comparable rows.
+- The live method comparison is also mixed: cardinal ties the best candidate regime on two cases and sharply disagrees with the LLM reference on `model_policy_options`.
 - All current cardinal synthetic runs stop at `budget_exhausted`; the receipts do not prove early stopping or lower cost.
 - Equal call counts are not equal token cost. Pairwise prompts compare two items; scalar prompts rate one item.
 
-The next empirical proof target is a live, frozen head-to-head benchmark with equalized token or dollar budgets and scalar, ordinal-pairwise, pairwise-ratio, and high-budget reference regimes on the same held-out tasks.
+The next empirical proof target is a larger frozen benchmark with repeated runs, equalized token or dollar budgets, more held-out task families, and human or high-budget external reference judgements.
 
 ## Core idea
 
@@ -201,6 +203,14 @@ python3 examples/live_openrouter_benchmark.py \
 
 # Preserved receipts from the 2026-06-30 run cover quality-only, frontier-ladder,
 # and cost-aware-fast policies under artifacts/live/openrouter-benchmark-2026-06-30/.
+# Live structured-judgment method comparison; compares scalar matrix,
+# list sort, ordinal pairwise, and cardinal pairwise-ratio regimes against
+# a live pairwise-ratio reference. Requires OPENROUTER_API_KEY.
+python3 examples/live_method_comparison.py \
+  --out-dir artifacts/live/method-comparison-2026-06-30 \
+  --candidate-model openai/gpt-4.1-mini \
+  --reference-model anthropic/claude-sonnet-4.6 \
+  --max-usd 10
 
 # Cache management
 cargo run --bin cardinal -- cache-export --out cache.jsonl

@@ -1,0 +1,316 @@
+{
+  "attribute_scores": {
+    "bandit_policy_cardinal": {
+      "auditability": 1.0,
+      "information_per_call": 1.0,
+      "noise_resistance": 1.0
+    },
+    "cardinal_pairwise_ratio": {
+      "auditability": 0.6136895908116253,
+      "information_per_call": 0.4253148387954916,
+      "noise_resistance": 0.5601959556279675
+    },
+    "ordinal_pairwise": {
+      "auditability": 0.8190334529860056,
+      "information_per_call": 0.0,
+      "noise_resistance": 0.7353394856851705
+    },
+    "single_scalar_rating": {
+      "auditability": 0.9779646805511296,
+      "information_per_call": 0.14004839554293277,
+      "noise_resistance": 0.0
+    },
+    "whole_list_sort": {
+      "auditability": 0.0,
+      "information_per_call": 0.9346367656615755,
+      "noise_resistance": 0.21697481083380496
+    }
+  },
+  "extra": {
+    "pairs": [
+      {
+        "attribute": "noise_resistance",
+        "confidence": 0.9,
+        "higher_id": "whole_list_sort",
+        "left": "single_scalar_rating",
+        "ratio": 3.0,
+        "right": "whole_list_sort"
+      },
+      {
+        "attribute": "noise_resistance",
+        "confidence": 0.9,
+        "higher_id": "ordinal_pairwise",
+        "left": "single_scalar_rating",
+        "ratio": 3.0,
+        "right": "ordinal_pairwise"
+      },
+      {
+        "attribute": "noise_resistance",
+        "confidence": 0.9,
+        "higher_id": "cardinal_pairwise_ratio",
+        "left": "single_scalar_rating",
+        "ratio": 2.0,
+        "right": "cardinal_pairwise_ratio"
+      },
+      {
+        "attribute": "noise_resistance",
+        "confidence": 0.8,
+        "higher_id": "bandit_policy_cardinal",
+        "left": "single_scalar_rating",
+        "ratio": 3.0,
+        "right": "bandit_policy_cardinal"
+      },
+      {
+        "attribute": "noise_resistance",
+        "confidence": 0.9,
+        "higher_id": "ordinal_pairwise",
+        "left": "whole_list_sort",
+        "ratio": 3.0,
+        "right": "ordinal_pairwise"
+      },
+      {
+        "attribute": "noise_resistance",
+        "confidence": 0.9,
+        "higher_id": "cardinal_pairwise_ratio",
+        "left": "whole_list_sort",
+        "ratio": 3.0,
+        "right": "cardinal_pairwise_ratio"
+      },
+      {
+        "attribute": "noise_resistance",
+        "confidence": 0.9,
+        "higher_id": "bandit_policy_cardinal",
+        "left": "whole_list_sort",
+        "ratio": 3.0,
+        "right": "bandit_policy_cardinal"
+      },
+      {
+        "attribute": "noise_resistance",
+        "confidence": 0.9,
+        "higher_id": "ordinal_pairwise",
+        "left": "ordinal_pairwise",
+        "ratio": 2.0,
+        "right": "cardinal_pairwise_ratio"
+      },
+      {
+        "attribute": "noise_resistance",
+        "confidence": 0.9,
+        "higher_id": "bandit_policy_cardinal",
+        "left": "ordinal_pairwise",
+        "ratio": 3.0,
+        "right": "bandit_policy_cardinal"
+      },
+      {
+        "attribute": "noise_resistance",
+        "confidence": 0.85,
+        "higher_id": "bandit_policy_cardinal",
+        "left": "cardinal_pairwise_ratio",
+        "ratio": 2.0,
+        "right": "bandit_policy_cardinal"
+      },
+      {
+        "attribute": "information_per_call",
+        "confidence": 0.9,
+        "higher_id": "whole_list_sort",
+        "left": "single_scalar_rating",
+        "ratio": 10.0,
+        "right": "whole_list_sort"
+      },
+      {
+        "attribute": "information_per_call",
+        "confidence": 0.9,
+        "higher_id": "single_scalar_rating",
+        "left": "single_scalar_rating",
+        "ratio": 10.0,
+        "right": "ordinal_pairwise"
+      },
+      {
+        "attribute": "information_per_call",
+        "confidence": 0.9,
+        "higher_id": "cardinal_pairwise_ratio",
+        "left": "single_scalar_rating",
+        "ratio": 10.0,
+        "right": "cardinal_pairwise_ratio"
+      },
+      {
+        "attribute": "information_per_call",
+        "confidence": 0.9,
+        "higher_id": "bandit_policy_cardinal",
+        "left": "single_scalar_rating",
+        "ratio": 10.0,
+        "right": "bandit_policy_cardinal"
+      },
+      {
+        "attribute": "information_per_call",
+        "confidence": 0.9,
+        "higher_id": "whole_list_sort",
+        "left": "whole_list_sort",
+        "ratio": 10.0,
+        "right": "ordinal_pairwise"
+      },
+      {
+        "attribute": "information_per_call",
+        "confidence": 0.9,
+        "higher_id": "whole_list_sort",
+        "left": "whole_list_sort",
+        "ratio": 26.0,
+        "right": "cardinal_pairwise_ratio"
+      },
+      {
+        "attribute": "information_per_call",
+        "confidence": 0.9,
+        "higher_id": "bandit_policy_cardinal",
+        "left": "whole_list_sort",
+        "ratio": 10.0,
+        "right": "bandit_policy_cardinal"
+      },
+      {
+        "attribute": "information_per_call",
+        "confidence": 0.9,
+        "higher_id": "cardinal_pairwise_ratio",
+        "left": "ordinal_pairwise",
+        "ratio": 2.0,
+        "right": "cardinal_pairwise_ratio"
+      },
+      {
+        "attribute": "information_per_call",
+        "confidence": 0.9,
+        "higher_id": "bandit_policy_cardinal",
+        "left": "ordinal_pairwise",
+        "ratio": 3.0,
+        "right": "bandit_policy_cardinal"
+      },
+      {
+        "attribute": "information_per_call",
+        "confidence": 0.9,
+        "higher_id": "bandit_policy_cardinal",
+        "left": "cardinal_pairwise_ratio",
+        "ratio": 2.0,
+        "right": "bandit_policy_cardinal"
+      },
+      {
+        "attribute": "auditability",
+        "confidence": 0.9,
+        "higher_id": "single_scalar_rating",
+        "left": "single_scalar_rating",
+        "ratio": 10.0,
+        "right": "whole_list_sort"
+      },
+      {
+        "attribute": "auditability",
+        "confidence": 0.9,
+        "higher_id": "single_scalar_rating",
+        "left": "single_scalar_rating",
+        "ratio": 5.0,
+        "right": "ordinal_pairwise"
+      },
+      {
+        "attribute": "auditability",
+        "confidence": 0.9,
+        "higher_id": "single_scalar_rating",
+        "left": "single_scalar_rating",
+        "ratio": 2.0,
+        "right": "cardinal_pairwise_ratio"
+      },
+      {
+        "attribute": "auditability",
+        "confidence": 0.9,
+        "higher_id": "bandit_policy_cardinal",
+        "left": "single_scalar_rating",
+        "ratio": 5.0,
+        "right": "bandit_policy_cardinal"
+      },
+      {
+        "attribute": "auditability",
+        "confidence": 0.9,
+        "higher_id": "ordinal_pairwise",
+        "left": "whole_list_sort",
+        "ratio": 5.0,
+        "right": "ordinal_pairwise"
+      },
+      {
+        "attribute": "auditability",
+        "confidence": 0.9,
+        "higher_id": "cardinal_pairwise_ratio",
+        "left": "whole_list_sort",
+        "ratio": 2.0,
+        "right": "cardinal_pairwise_ratio"
+      },
+      {
+        "attribute": "auditability",
+        "confidence": 0.9,
+        "higher_id": "bandit_policy_cardinal",
+        "left": "whole_list_sort",
+        "ratio": 10.0,
+        "right": "bandit_policy_cardinal"
+      },
+      {
+        "attribute": "auditability",
+        "confidence": 0.9,
+        "higher_id": "ordinal_pairwise",
+        "left": "ordinal_pairwise",
+        "ratio": 2.0,
+        "right": "cardinal_pairwise_ratio"
+      },
+      {
+        "attribute": "auditability",
+        "confidence": 0.9,
+        "higher_id": "ordinal_pairwise",
+        "left": "ordinal_pairwise",
+        "ratio": 2.0,
+        "right": "bandit_policy_cardinal"
+      },
+      {
+        "attribute": "auditability",
+        "confidence": 0.9,
+        "higher_id": "cardinal_pairwise_ratio",
+        "left": "cardinal_pairwise_ratio",
+        "ratio": 1.0,
+        "right": "bandit_policy_cardinal"
+      }
+    ]
+  },
+  "method": "cardinal_pairwise_ratio",
+  "metrics_vs_reference": {
+    "candidate_ranked_ids": [
+      "bandit_policy_cardinal",
+      "cardinal_pairwise_ratio",
+      "ordinal_pairwise",
+      "whole_list_sort",
+      "single_scalar_rating"
+    ],
+    "kendall_tau": 0.6,
+    "reference_ranked_ids": [
+      "ordinal_pairwise",
+      "bandit_policy_cardinal",
+      "cardinal_pairwise_ratio",
+      "whole_list_sort",
+      "single_scalar_rating"
+    ],
+    "topk_jaccard": 1.0
+  },
+  "model": "openai/gpt-4.1-mini",
+  "ranked_ids": [
+    "bandit_policy_cardinal",
+    "cardinal_pairwise_ratio",
+    "ordinal_pairwise",
+    "whole_list_sort",
+    "single_scalar_rating"
+  ],
+  "usage": {
+    "calls": 30,
+    "completion_tokens": 568,
+    "cost_is_estimate": false,
+    "cost_nanodollars": 3260800,
+    "cost_usd": 0.0032608,
+    "latency_ms": 45259,
+    "prompt_tokens": 5880
+  },
+  "utility": {
+    "bandit_policy_cardinal": 1.0,
+    "cardinal_pairwise_ratio": 0.5263609735325154,
+    "ordinal_pairwise": 0.49889415752056965,
+    "single_scalar_rating": 0.29350810857780885,
+    "whole_list_sort": 0.4139127923150734
+  }
+}

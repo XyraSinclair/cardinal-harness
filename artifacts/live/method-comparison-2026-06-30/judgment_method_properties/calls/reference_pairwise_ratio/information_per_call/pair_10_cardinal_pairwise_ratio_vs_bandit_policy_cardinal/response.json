@@ -1,0 +1,46 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "I need to compare how much ranking information is extracted per provider call for these two methods.\n\n**A (cardinal_pairwise_ratio):** Each call asks a pairwise question that yields both a direction (which is better) and a magnitude (how many times more). This cardinal magnitude information is richer than ordinal comparisons. The latent score model fitting uses all this information. However, comparisons are made without strategic allocation - they're distributed without targeting uncertainty.\n\n**B (bandit_policy_cardinal):** This also uses cardinal pairwise questions (same richness per individual call as A), but adds an uncertainty-aware policy that directs comparisons toward where top-k uncertainty is highest. This means each call is strategically placed to maximize information gain about the ranking. The policy ensures comparisons happen where they matter most, extracting more *ranking* information per call because calls aren't wasted on already-certain pairs.\n\n**Key distinction:** The attribute is \"information per provider call under the same model and prompt budget.\" \n\n- Both methods use cardinal pairwise questions, so the raw information content per individual question is similar.\n- However, B's bandit policy means that given a fixed budget of calls, more of those calls are directed toward uncertain regions, yielding more total ranking information per call on average.\n- A distributes comparisons without this optimization, so some calls may be spent on pairs where the outcome is already predictable, yielding less marginal ranking information per call.\n\nB extracts more ranking information per call due to the strategic allocation, but the base information per call (cardinal vs ordinal) is the same. The gain from bandit allocation is meaningful but not enormous - perhaps 2-4x more effective use of the call budget for ranking purposes.\n\n{\"higher_id\":\"B\",\"ratio\":3.0,\"confidence\":0.65}",
+        "reasoning": null,
+        "refusal": null,
+        "role": "assistant"
+      },
+      "native_finish_reason": "end_turn"
+    }
+  ],
+  "created": 1782849728,
+  "id": "gen-1782849728-LK3C2uOykoYXzTV4o7E3",
+  "model": "anthropic/claude-4.6-sonnet-20260217",
+  "object": "chat.completion",
+  "provider": "Anthropic",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 401,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.006657,
+    "cost_details": {
+      "upstream_inference_completions_cost": 0.006015,
+      "upstream_inference_cost": 0.006657,
+      "upstream_inference_prompt_cost": 0.000642
+    },
+    "is_byok": false,
+    "prompt_tokens": 214,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 615
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "I need to evaluate which method has more noise resistance to model calibration drift, anchoring, presentation order, and local inconsistency.\n\n**Ordinal Pairwise (A):**\n- Only asks \"which is better\" \u2014 binary choice\n- Aggregation via win counts is simple and robust\n- Anchoring is minimal since no numeric estimates are required\n- Presentation order can still affect which item \"feels\" better, but the binary nature limits the magnitude\n- Local inconsistency (intransitivity) can occur but is detectable and manageable\n- No calibration drift since there's no numeric scale to drift on\n- Robust because it doesn't rely on respondents maintaining consistent numeric scales\n\n**Cardinal Pairwise Ratio (B):**\n- Asks both direction AND magnitude (\"how many times more\")\n- Requires numeric ratio estimates, which are highly susceptible to anchoring (the first ratio given anchors subsequent ones)\n- Calibration drift is a real problem \u2014 respondents may shift their sense of what \"2x\" means over time\n- Presentation order affects both direction judgments AND ratio magnitudes\n- Fitting a latent score model amplifies local inconsistencies through the model fitting process\n- Ratio estimates are notoriously noisy and inconsistent across respondents and sessions\n- The additional complexity of ratio estimation introduces more noise sources\n\n**Comparison:**\nA (ordinal pairwise) is substantially more resistant to all four noise sources listed:\n- Calibration drift: A has none (no numeric scale); B has significant drift risk\n- Anchoring: A minimal; B high (ratio anchoring is well-documented)\n- Presentation order: A somewhat affected; B more affected (order affects both direction and magnitude)\n- Local inconsistency: A detectable via intransitivity; B propagates through latent model fitting\n\nA is clearly more noise-resistant. The gap is meaningful but not extreme \u2014 both methods use pairwise comparisons as their foundation, so they share some structural similarities. However, the additional ratio requirement in B introduces substantially more noise vulnerability. I'd estimate A is roughly 4-6x more resistant.\n\n```json\n{\"higher_id\":\"A\",\"ratio\":5.0,\"confidence\":0.82}\n```",
+        "reasoning": null,
+        "refusal": null,
+        "role": "assistant"
+      },
+      "native_finish_reason": "end_turn"
+    }
+  ],
+  "created": 1782849584,
+  "id": "gen-1782849584-uldhyR5YjH3YHKxnxkwX",
+  "model": "anthropic/claude-4.6-sonnet-20260217",
+  "object": "chat.completion",
+  "provider": "Anthropic",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 498,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.008109,
+    "cost_details": {
+      "upstream_inference_completions_cost": 0.00747,
+      "upstream_inference_cost": 0.008109,
+      "upstream_inference_prompt_cost": 0.000639
+    },
+    "is_byok": false,
+    "prompt_tokens": 213,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 711
+  }
+}

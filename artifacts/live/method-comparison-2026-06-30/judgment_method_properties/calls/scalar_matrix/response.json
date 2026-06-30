@@ -1,0 +1,46 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "{\"scores\": [{\"id\": \"single_scalar_rating\", \"attributes\": {\"noise_resistance\": {\"score\": 40, \"confidence\": 0.8}, \"information_per_call\": {\"score\": 90, \"confidence\": 0.9}, \"auditability\": {\"score\": 50, \"confidence\": 0.7}}}, {\"id\": \"whole_list_sort\", \"attributes\": {\"noise_resistance\": {\"score\": 60, \"confidence\": 0.85}, \"information_per_call\": {\"score\": 80, \"confidence\": 0.85}, \"auditability\": {\"score\": 40, \"confidence\": 0.6}}}, {\"id\": \"ordinal_pairwise\", \"attributes\": {\"noise_resistance\": {\"score\": 75, \"confidence\": 0.9}, \"information_per_call\": {\"score\": 50, \"confidence\": 0.8}, \"auditability\": {\"score\": 80, \"confidence\": 0.9}}}, {\"id\": \"cardinal_pairwise_ratio\", \"attributes\": {\"noise_resistance\": {\"score\": 85, \"confidence\": 0.9}, \"information_per_call\": {\"score\": 70, \"confidence\": 0.85}, \"auditability\": {\"score\": 75, \"confidence\": 0.85}}}, {\"id\": \"bandit_policy_cardinal\", \"attributes\": {\"noise_resistance\": {\"score\": 90, \"confidence\": 0.95}, \"information_per_call\": {\"score\": 75, \"confidence\": 0.9}, \"auditability\": {\"score\": 70, \"confidence\": 0.8}}}]}",
+        "reasoning": null,
+        "refusal": null,
+        "role": "assistant"
+      },
+      "native_finish_reason": "completed"
+    }
+  ],
+  "created": 1782849851,
+  "id": "gen-1782849851-r2KBmq1GiAwIR0KNOOrF",
+  "model": "openai/gpt-4.1-mini-2025-04-14",
+  "object": "chat.completion",
+  "provider": "Azure",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 349,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.000706,
+    "cost_details": {
+      "upstream_inference_completions_cost": 0.0005584,
+      "upstream_inference_cost": 0.000706,
+      "upstream_inference_prompt_cost": 0.0001476
+    },
+    "is_byok": false,
+    "prompt_tokens": 369,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 718
+  }
+}

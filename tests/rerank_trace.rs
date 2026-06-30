@@ -10,7 +10,10 @@ use cardinal_harness::rerank::{
     multi_rerank, MultiRerankAttributeSpec, MultiRerankEntity, MultiRerankRequest,
     MultiRerankTopKSpec, RerankExecution, RerankRunOptions,
 };
-use cardinal_harness::{Attribution, ComparisonTrace, PairwiseCache, TraceError, TraceSink};
+use cardinal_harness::{
+    Attribution, ComparisonEvent, ComparisonObserver, ComparisonTrace, ObserverError,
+    PairwiseCache, TraceError, TraceSink,
+};
 use tempfile::tempdir;
 
 #[derive(Default)]
@@ -20,13 +23,43 @@ struct VecTraceSink {
 
 impl VecTraceSink {
     fn take(&self) -> Vec<ComparisonTrace> {
-        std::mem::take(&mut self.events.lock().unwrap())
+        std::mem::take(
+            &mut self
+                .events
+                .lock()
+                .expect("trace sink events mutex poisoned"),
+        )
     }
 }
 
 impl TraceSink for VecTraceSink {
     fn record(&self, event: ComparisonTrace) -> Result<(), TraceError> {
-        self.events.lock().unwrap().push(event);
+        self.events
+            .lock()
+            .expect("trace sink events mutex poisoned")
+            .push(event);
+        Ok(())
+    }
+}
+
+#[derive(Default)]
+struct VecObserver {
+    events: Mutex<Vec<ComparisonEvent>>,
+}
+
+impl VecObserver {
+    fn take(&self) -> Vec<ComparisonEvent> {
+        std::mem::take(&mut self.events.lock().expect("observer events mutex poisoned"))
+    }
+}
+
+#[async_trait::async_trait]
+impl ComparisonObserver for VecObserver {
+    async fn on_comparison(&self, event: ComparisonEvent) -> Result<(), ObserverError> {
+        self.events
+            .lock()
+            .expect("observer events mutex poisoned")
+            .push(event);
         Ok(())
     }
 }
@@ -200,6 +233,98 @@ async fn rerank_records_trace_for_cached_comparison() {
     assert_eq!(
         event.attribute_prompt_hash,
         expected_key.attribute_prompt_hash
+    );
+}
+
+#[tokio::test]
+async fn seeded_swapped_trace_matches_presented_cache_key() {
+    let dir = tempdir().unwrap();
+    let db_path = dir.path().join("cache.sqlite");
+    let cache = SqlitePairwiseCache::new(&db_path).unwrap();
+
+    let model = "openai/gpt-5-mini";
+    let prompt_slug = "canonical_v2";
+    let template_hash = canonical_v2_template_hash();
+    let key_ba = PairwiseCacheKey::new(
+        model,
+        prompt_slug,
+        &template_hash,
+        "clarity",
+        "clarity of explanation",
+        "b",
+        "Entity B text",
+        "a",
+        "Entity A text",
+    );
+    let value_ba = CachedJudgement {
+        higher_ranked: Some("B".to_string()),
+        ratio: Some(2.0),
+        confidence: Some(0.9),
+        refused: false,
+        input_tokens: None,
+        output_tokens: None,
+        provider_cost_nanodollars: None,
+    };
+    cache.put(&key_ba, &value_ba).await.unwrap();
+
+    let mut observed_swapped_hit = false;
+    for seed in 0..128 {
+        let gateway = test_gateway();
+        let observer_sink = VecObserver::default();
+        let trace_sink = VecTraceSink::default();
+        let result = multi_rerank(
+            make_request(model),
+            RerankExecution::new(
+                std::sync::Arc::new(gateway),
+                Attribution::new("test::rerank_trace_swapped"),
+            )
+            .cache(&cache)
+            .run_options(RerankRunOptions {
+                rng_seed: Some(seed),
+                cache_only: true,
+            })
+            .trace(&trace_sink)
+            .observer(&observer_sink),
+        )
+        .await;
+
+        match result {
+            Ok(resp) => {
+                assert_eq!(resp.meta.comparisons_attempted, 1);
+                let events = trace_sink.take();
+                assert_eq!(events.len(), 1);
+                let event = &events[0];
+                assert!(event.cached);
+                assert!(event.swapped);
+                assert_eq!(event.entity_a_id, "b");
+                assert_eq!(event.entity_b_id, "a");
+                assert_eq!(event.entity_a_index, 1);
+                assert_eq!(event.entity_b_index, 0);
+                assert_eq!(event.higher_ranked.as_deref(), Some("B"));
+                assert_eq!(event.cache_key_hash, key_ba.key_hash);
+                let observer_events = observer_sink.take();
+                assert_eq!(observer_events.len(), 1);
+                let observer_event = &observer_events[0];
+                assert_eq!(observer_event.entity_a_id, event.entity_a_id);
+                assert_eq!(observer_event.entity_b_id, event.entity_b_id);
+                assert_eq!(observer_event.entity_a_index, event.entity_a_index);
+                assert_eq!(observer_event.entity_b_index, event.entity_b_index);
+                observed_swapped_hit = true;
+                break;
+            }
+            Err(err) => {
+                assert!(
+                    err.to_string().contains("cache_only")
+                        || err.to_string().contains("Cache miss"),
+                    "unexpected error for unswapped seed {seed}: {err}"
+                );
+            }
+        }
+    }
+
+    assert!(
+        observed_swapped_hit,
+        "expected at least one deterministic seed to exercise swapped presentation"
     );
 }
 
