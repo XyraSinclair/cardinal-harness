@@ -7,13 +7,30 @@ use std::sync::Arc;
 
 use cardinal_harness::cache::SqlitePairwiseCache;
 use cardinal_harness::gateway::{NoopUsageSink, ProviderGateway};
+use cardinal_harness::rerank::model_policy::ModelPolicy;
 use cardinal_harness::rerank::{
-    build_report, load_policy_from_path, render_report_markdown, validate_multi_rerank_request,
-    JsonlTraceSink, ModelPolicy, MultiRerankRequest, MultiRerankResponse, PolicyRegistry,
-    RerankReportOptions, RerankRunOptions, TraceSink,
+    build_report, expand_prompt_experiment_request, load_policy_from_path, render_report_markdown,
+    validate_multi_rerank_request, AttributeVariantSpec, JsonlTraceSink, MultiRerankRequest,
+    MultiRerankResponse, PolicyRegistry, PromptExperimentConfig, RerankReportOptions,
+    RerankRunOptions, TraceSink,
 };
 use cardinal_harness::Attribution;
-use clap::{Parser, Subcommand};
+use clap::{Parser, Subcommand, ValueEnum};
+
+#[derive(Debug, Clone, Copy, ValueEnum)]
+enum PairwiseModeArg {
+    Ratio,
+    Ordinal,
+}
+
+impl From<PairwiseModeArg> for cardinal_harness::rerank::evaluation::SyntheticPairwiseMode {
+    fn from(mode: PairwiseModeArg) -> Self {
+        match mode {
+            PairwiseModeArg::Ratio => Self::Ratio,
+            PairwiseModeArg::Ordinal => Self::Ordinal,
+        }
+    }
+}
 
 #[derive(Parser)]
 #[command(name = "cardinal", version, about = "Canonical pairwise ratio CLI")]
@@ -53,6 +70,8 @@ enum Commands {
         out: PathBuf,
         #[arg(long)]
         curve_csv: Option<PathBuf>,
+        #[arg(long, value_enum, default_value = "ratio")]
+        mode: PairwiseModeArg,
     },
     /// Run the synthetic Likert baseline evaluation suite
     EvalLikert {
@@ -77,6 +96,8 @@ enum Commands {
         levels: usize,
         #[arg(long, default_value_t = 1.0)]
         budget_multiplier: f64,
+        #[arg(long, value_enum, default_value = "ratio")]
+        mode: PairwiseModeArg,
     },
     /// Generate a report from a request + response JSON
     Report {
@@ -100,6 +121,19 @@ enum Commands {
         policy: Option<String>,
         #[arg(long)]
         cache_only: bool,
+    },
+    /// Expand one request across prompt templates and positive/negative attribute variants
+    ExperimentExpand {
+        #[arg(long)]
+        request: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long = "prompt-template")]
+        prompt_template_slugs: Vec<String>,
+        #[arg(long)]
+        include_negative: bool,
+        #[arg(long = "variant-json")]
+        variant_json: Vec<PathBuf>,
     },
     /// Validate a multi-rerank request JSON without touching the network or cache
     Validate {
@@ -187,9 +221,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             case,
             out,
             curve_csv,
+            mode,
         } => {
-            let results =
-                cardinal_harness::rerank::evaluation::run_synthetic_suite(case.as_deref())?;
+            let cfg =
+                cardinal_harness::rerank::evaluation::PairwiseEvalConfig { mode: mode.into() };
+            let results = cardinal_harness::rerank::evaluation::run_synthetic_suite_with_config(
+                case.as_deref(),
+                cfg,
+            )?;
             let mut file = File::create(out)?;
             for result in &results {
                 let line = serde_json::to_string(result)?;
@@ -240,14 +279,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             out,
             levels,
             budget_multiplier,
+            mode,
         } => {
-            let cfg = cardinal_harness::rerank::evaluation::LikertEvalConfig {
+            let pairwise_cfg =
+                cardinal_harness::rerank::evaluation::PairwiseEvalConfig { mode: mode.into() };
+            let likert_cfg = cardinal_harness::rerank::evaluation::LikertEvalConfig {
                 levels,
                 budget_multiplier,
             };
-            let summary = cardinal_harness::rerank::evaluation::run_evaluation_comparison_summary(
+            let summary = cardinal_harness::rerank::evaluation::run_evaluation_comparison_summary_with_config(
                 case.as_deref(),
-                cfg,
+                pairwise_cfg,
+                likert_cfg,
             )?;
             let mut file = File::create(out)?;
             serde_json::to_writer_pretty(&mut file, &summary)?;
@@ -283,6 +326,32 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let markdown = render_report_markdown(&report);
                 std::fs::write(out, markdown)?;
             }
+        }
+        Commands::ExperimentExpand {
+            request,
+            out,
+            prompt_template_slugs,
+            include_negative,
+            variant_json,
+        } => {
+            let req: MultiRerankRequest = read_json(&request)?;
+            let mut variants = Vec::new();
+            for path in variant_json {
+                let mut loaded: Vec<AttributeVariantSpec> = read_json(&path)?;
+                variants.append(&mut loaded);
+            }
+            let cfg = PromptExperimentConfig {
+                prompt_template_slugs,
+                include_negative,
+                variants,
+            };
+            let expanded = expand_prompt_experiment_request(&req, &cfg)?;
+            write_json(&out, &expanded)?;
+            println!(
+                "expanded request: {} attributes -> {} attributes",
+                req.attributes.len(),
+                expanded.attributes.len()
+            );
         }
         Commands::Validate { request } => {
             let req: MultiRerankRequest = read_json(&request)?;

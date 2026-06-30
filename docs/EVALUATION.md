@@ -18,6 +18,7 @@ cargo run --bin cardinal -- eval-likert \
   --curve-csv artifacts/eval/likert_curves.csv
 
 cargo run --bin cardinal -- eval-compare \
+  --mode ratio \
   --out artifacts/eval/comparison_summary.json
 ```
 
@@ -26,6 +27,7 @@ Checked-in outputs:
 - `artifacts/eval/synthetic_eval.jsonl`: raw cardinal pairwise synthetic results, one JSON object per case.
 - `artifacts/eval/likert_eval.jsonl`: raw Likert/scalar baseline results, one JSON object per case.
 - `artifacts/eval/comparison_summary.json`: compact cardinal-vs-Likert deltas and win/loss/tie counts.
+- Optional control: `cargo run --bin cardinal -- eval-compare --mode ordinal --out artifacts/eval/comparison_summary_ordinal.json` compares the same active-comparison loop using ordinal "which item is higher?" judgements instead of ratio magnitudes.
 - `artifacts/eval/synthetic_curves.csv`: cardinal trajectory receipt.
 - `artifacts/eval/likert_curves.csv`: Likert trajectory receipt.
 

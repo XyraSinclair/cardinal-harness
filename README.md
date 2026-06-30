@@ -1,10 +1,10 @@
 # cardinal-harness
 
-`cardinal-harness` is the canonical pairwise-ratio elicitation engine for OpenPriors.
+`cardinal-harness` is the canonical list-sorting and reranking engine for OpenPriors when a plain scalar score would lie about uncertainty.
 
 It does one job: turn noisy LLM pairwise ratio judgements into globally consistent cardinal scores with uncertainty, then spend the next comparison where it buys the most information.
 
-Use it when direct scores are unstable but pairwise comparisons are meaningful: research ideas, prompts, candidate plans, reviewer notes, or any shortlist where "how much better?" carries information. Do not use it for deterministic rankings, scalar metrics, or cases where the attribute itself is incoherent.
+Use it for serious list work where "how much better?" carries information: prompts, research ideas, candidate plans, reviewer notes, worktrees, backlog items, or any shortlist where the top cluster matters more than a cheap total order. Do not use it for deterministic rankings, scalar metrics, or cases where the attribute itself is incoherent.
 
 The trade is explicit: it costs more than one-shot scoring, saves comparisons versus exhaustive pairwise judging, and returns uncertainty plus receipts instead of only a sorted list.
 
@@ -115,6 +115,16 @@ The CLI `rerank` command reads a `MultiRerankRequest` JSON file. A copy-pasteabl
 cargo run --bin cardinal -- validate \
   --request examples/multi-rerank-request.json
 
+# Expand one request across supported prompt templates and attribute variants.
+cargo run --bin cardinal -- experiment-expand \
+  --request examples/multi-rerank-request.json \
+  --prompt-template canonical_v2 \
+  --prompt-template canonical_bucket_v1 \
+  --include-negative \
+  --variant-json examples/prompt-experiment-variants.json \
+  --out expanded-request.json
+
+
 export OPENROUTER_API_KEY=your_key_here
 
 # Rerank from JSON. The example includes both canonical_v2 and canonical_bucket_v1 attributes.
@@ -140,7 +150,10 @@ Other maintenance commands:
 # Synthetic evaluation receipts
 cargo run --bin cardinal -- eval --out artifacts/eval/synthetic_eval.jsonl --curve-csv artifacts/eval/synthetic_curves.csv
 cargo run --bin cardinal -- eval-likert --out artifacts/eval/likert_eval.jsonl --curve-csv artifacts/eval/likert_curves.csv
-cargo run --bin cardinal -- eval-compare --out artifacts/eval/comparison_summary.json
+
+# Compare the default pairwise-ratio simulator with an ordinal pairwise control.
+cargo run --bin cardinal -- eval-compare --mode ratio --out artifacts/eval/comparison_summary.json
+cargo run --bin cardinal -- eval-compare --mode ordinal --out artifacts/eval/comparison_summary_ordinal.json
 
 # Cache management
 cargo run --bin cardinal -- cache-export --out cache.jsonl

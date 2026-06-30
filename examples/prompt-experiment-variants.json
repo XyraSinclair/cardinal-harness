@@ -1,0 +1,16 @@
+[
+  {
+    "source_attribute_id": "clarity",
+    "id": "skim_resistance",
+    "prompt": "resistance to superficial skimming",
+    "polarity": "positive",
+    "prompt_template_slug": "canonical_bucket_v1"
+  },
+  {
+    "source_attribute_id": "evidence",
+    "id": "handwave_penalty",
+    "prompt": "hand-wavy evidence claims",
+    "polarity": "negative",
+    "prompt_template_slug": "canonical_v2"
+  }
+]

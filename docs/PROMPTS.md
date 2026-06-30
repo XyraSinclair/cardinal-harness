@@ -53,6 +53,7 @@ Refusal for either template:
 
 - Multi-attribute CLI request: [`../examples/multi-rerank-request.json`](../examples/multi-rerank-request.json)
 - Simple single-attribute request shape for library/API callers: [`../examples/simple-rerank-request.json`](../examples/simple-rerank-request.json)
+- Prompt/attribute variant specs for request expansion: [`../examples/prompt-experiment-variants.json`](../examples/prompt-experiment-variants.json)
 
 Run the multi-rerank example with:
 
@@ -65,8 +66,20 @@ cargo run --bin cardinal -- rerank \
   --report report.md
 ```
 
+Generate a local prompt-surface experiment request without touching the network:
+
+```bash
+cargo run --bin cardinal -- experiment-expand \
+  --request examples/multi-rerank-request.json \
+  --prompt-template canonical_v2 \
+  --prompt-template canonical_bucket_v1 \
+  --include-negative \
+  --variant-json examples/prompt-experiment-variants.json \
+  --out expanded-request.json
+```
+
 The current CLI accepts the multi-rerank request shape. The simple request shape is converted through the library API.
 
 ## Notes
 
-- Keep prompt experiments and archived comparisons in `openpriors-research`.
+- Keep large prompt experiments and archived comparisons in `openpriors-research`; keep small, reproducible request expansion examples here.

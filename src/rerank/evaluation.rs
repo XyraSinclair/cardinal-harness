@@ -30,6 +30,33 @@ pub enum EvaluationError {
     InvalidGate(#[from] crate::rerank::MultiRerankError),
 }
 
+/// Synthetic pairwise signal used by the cardinal evaluation harness.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SyntheticPairwiseMode {
+    /// Pairwise comparisons carry the true noisy ratio magnitude.
+    #[default]
+    Ratio,
+    /// Pairwise comparisons carry only direction plus a fixed small ratio.
+    Ordinal,
+}
+
+/// Configuration for the cardinal pairwise simulator.
+#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
+pub struct PairwiseEvalConfig {
+    pub mode: SyntheticPairwiseMode,
+}
+
+impl Default for PairwiseEvalConfig {
+    fn default() -> Self {
+        Self {
+            mode: SyntheticPairwiseMode::Ratio,
+        }
+    }
+}
+
+const ORDINAL_SYNTHETIC_RATIO: f64 = 2.1;
+
 fn parse_evaluation_gates<'a>(
     attributes: &'a [SyntheticAttribute],
     gates: &'a [MultiRerankGateSpec],
@@ -464,6 +491,7 @@ pub struct EvaluationMetrics {
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct EvaluationResult {
     pub case_name: String,
+    pub pairwise_mode: SyntheticPairwiseMode,
     pub metrics: EvaluationMetrics,
     pub error_trajectory: Vec<f64>,
 }
@@ -576,6 +604,7 @@ pub struct EvaluationComparisonCase {
 
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct EvaluationComparisonSummary {
+    pub pairwise_config: PairwiseEvalConfig,
     pub likert_config: LikertEvalConfig,
     pub metric_names: [&'static str; 5],
     pub aggregate_win_loss_tie: EvaluationWinLossTie,
@@ -773,6 +802,13 @@ pub fn synthetic_cases() -> Vec<SyntheticCase> {
 }
 
 pub fn run_synthetic_suite(filter: Option<&str>) -> Result<Vec<EvaluationResult>, EvaluationError> {
+    run_synthetic_suite_with_config(filter, PairwiseEvalConfig::default())
+}
+
+pub fn run_synthetic_suite_with_config(
+    filter: Option<&str>,
+    cfg: PairwiseEvalConfig,
+) -> Result<Vec<EvaluationResult>, EvaluationError> {
     let cases = synthetic_cases();
     let selected: Vec<SyntheticCase> = match filter {
         Some(name) => cases.into_iter().filter(|c| c.name == name).collect(),
@@ -781,11 +817,18 @@ pub fn run_synthetic_suite(filter: Option<&str>) -> Result<Vec<EvaluationResult>
 
     selected
         .into_iter()
-        .map(|case| run_synthetic_case(&case))
+        .map(|case| run_synthetic_case_with_config(&case, cfg))
         .collect()
 }
 
 pub fn run_synthetic_case(case: &SyntheticCase) -> Result<EvaluationResult, EvaluationError> {
+    run_synthetic_case_with_config(case, PairwiseEvalConfig::default())
+}
+
+pub fn run_synthetic_case_with_config(
+    case: &SyntheticCase,
+    cfg: PairwiseEvalConfig,
+) -> Result<EvaluationResult, EvaluationError> {
     let mut rng = StdRng::seed_from_u64(case.seed);
 
     let n_entities = case.attributes.first().map(|a| a.scores.len()).unwrap_or(0);
@@ -892,6 +935,7 @@ pub fn run_synthetic_case(case: &SyntheticCase) -> Result<EvaluationResult, Eval
                     j,
                     case.noise_sigma,
                     case.outlier_rate,
+                    cfg.mode,
                 );
                 if let PairwiseJudgement::Observation {
                     higher_ranked,
@@ -1027,6 +1071,7 @@ pub fn run_synthetic_case(case: &SyntheticCase) -> Result<EvaluationResult, Eval
                 task.j,
                 case.noise_sigma,
                 case.outlier_rate,
+                cfg.mode,
             );
 
             match judgement {
@@ -1155,6 +1200,7 @@ pub fn run_synthetic_case(case: &SyntheticCase) -> Result<EvaluationResult, Eval
 
     Ok(EvaluationResult {
         case_name: case.name.to_string(),
+        pairwise_mode: cfg.mode,
         metrics: EvaluationMetrics {
             kendall_tau,
             spearman_rho,
@@ -1377,7 +1423,15 @@ pub fn run_evaluation_comparison_summary(
     filter: Option<&str>,
     likert_cfg: LikertEvalConfig,
 ) -> Result<EvaluationComparisonSummary, EvaluationError> {
-    let cardinal_results = run_synthetic_suite(filter)?;
+    run_evaluation_comparison_summary_with_config(filter, PairwiseEvalConfig::default(), likert_cfg)
+}
+
+pub fn run_evaluation_comparison_summary_with_config(
+    filter: Option<&str>,
+    pairwise_cfg: PairwiseEvalConfig,
+    likert_cfg: LikertEvalConfig,
+) -> Result<EvaluationComparisonSummary, EvaluationError> {
+    let cardinal_results = run_synthetic_suite_with_config(filter, pairwise_cfg)?;
     let likert_results = run_likert_baseline_suite(filter, likert_cfg)?;
     let likert_by_case: HashMap<&str, &LikertEvaluationResult> = likert_results
         .iter()
@@ -1446,6 +1500,7 @@ pub fn run_evaluation_comparison_summary(
     }
 
     Ok(EvaluationComparisonSummary {
+        pairwise_config: pairwise_cfg,
         likert_config: likert_cfg,
         metric_names: [
             "topk_precision",
@@ -1651,6 +1706,7 @@ fn simulate_pairwise(
     j: usize,
     noise_sigma: f64,
     outlier_rate: f64,
+    mode: SyntheticPairwiseMode,
 ) -> PairwiseJudgement {
     if i >= truth_scores.len() || j >= truth_scores.len() {
         return PairwiseJudgement::Refused;
@@ -1696,6 +1752,9 @@ fn simulate_pairwise(
         confidence = 0.9;
     }
 
+    if mode == SyntheticPairwiseMode::Ordinal {
+        ratio = ORDINAL_SYNTHETIC_RATIO;
+    }
     ratio = ratio.clamp(1.0, 26.0);
 
     PairwiseJudgement::Observation {

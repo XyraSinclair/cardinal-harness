@@ -26,6 +26,7 @@ struct EvalMetrics {
 #[derive(Debug, serde::Deserialize)]
 struct EvalResult {
     case_name: String,
+    pairwise_mode: String,
     metrics: EvalMetrics,
     error_trajectory: Vec<f64>,
 }
@@ -73,13 +74,13 @@ fn cardinal_bin() -> PathBuf {
     );
 }
 
-fn run_cli_eval(case: &str) -> EvalResult {
+fn run_cli_eval_with_mode(case: &str, mode: &str) -> EvalResult {
     let dir = tempdir().unwrap();
     let out_path = dir.path().join("eval.jsonl");
 
     let bin = cardinal_bin();
     let status = Command::new(&bin)
-        .args(["eval", "--case", case])
+        .args(["eval", "--case", case, "--mode", mode])
         .arg("--out")
         .arg(&out_path)
         .status()
@@ -89,6 +90,10 @@ fn run_cli_eval(case: &str) -> EvalResult {
     let raw = std::fs::read_to_string(&out_path).unwrap();
     let first_line = raw.lines().next().unwrap();
     serde_json::from_str(first_line).unwrap()
+}
+
+fn run_cli_eval(case: &str) -> EvalResult {
+    run_cli_eval_with_mode(case, "ratio")
 }
 
 #[derive(Debug, serde::Deserialize)]
@@ -142,6 +147,8 @@ fn cli_eval_smoke_and_determinism() {
 
     assert_eq!(a.case_name, "clean_ordering_10");
     assert_eq!(b.case_name, "clean_ordering_10");
+    assert_eq!(a.pairwise_mode, "ratio");
+    assert_eq!(b.pairwise_mode, "ratio");
 
     // Smoke checks (quality).
     assert!(a.metrics.kendall_tau >= 0.99);
@@ -187,6 +194,17 @@ fn cli_eval_smoke_and_determinism() {
     for (x, y) in a.error_trajectory.iter().zip(b.error_trajectory.iter()) {
         assert!(approx_eq(*x, *y, 1e-12));
     }
+}
+
+#[test]
+fn cli_eval_accepts_ordinal_pairwise_mode() {
+    let result = run_cli_eval_with_mode("scale_compression_40", "ordinal");
+
+    assert_eq!(result.case_name, "scale_compression_40");
+    assert_eq!(result.pairwise_mode, "ordinal");
+    assert_eq!(result.metrics.comparisons_refused, 0);
+    assert!(result.metrics.comparisons_attempted > 0);
+    assert!(result.metrics.comparisons_used > 0);
 }
 
 #[test]
@@ -269,6 +287,79 @@ fn cli_validate_example_request_smoke() {
         "validate should not warn on the checked-in example request; stderr={}",
         String::from_utf8_lossy(&output.stderr)
     );
+}
+
+#[test]
+fn cli_experiment_expand_smoke() {
+    let dir = tempdir().unwrap();
+    let request_path =
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("examples/multi-rerank-request.json");
+    let variant_path = dir.path().join("variants.json");
+    let out_path = dir.path().join("expanded.json");
+    std::fs::write(
+        &variant_path,
+        serde_json::json!([
+            {
+                "source_attribute_id": "clarity",
+                "id": "skim_resistance",
+                "prompt": "resistance to superficial skimming",
+                "polarity": "positive",
+                "prompt_template_slug": "canonical_bucket_v1"
+            }
+        ])
+        .to_string(),
+    )
+    .unwrap();
+
+    let bin = cardinal_bin();
+    let output = Command::new(&bin)
+        .args(["experiment-expand", "--request"])
+        .arg(&request_path)
+        .arg("--out")
+        .arg(&out_path)
+        .args([
+            "--prompt-template",
+            "canonical_v2",
+            "--prompt-template",
+            "canonical_bucket_v1",
+            "--include-negative",
+            "--variant-json",
+        ])
+        .arg(&variant_path)
+        .output()
+        .unwrap_or_else(|err| {
+            panic!(
+                "failed to run cardinal experiment-expand at {}: {err}",
+                bin.display()
+            )
+        });
+
+    assert!(
+        output.status.success(),
+        "cardinal experiment-expand exited with {}; stderr={}",
+        output.status,
+        String::from_utf8_lossy(&output.stderr)
+    );
+    assert!(
+        String::from_utf8_lossy(&output.stdout).contains("2 attributes -> 9 attributes"),
+        "stdout did not summarize expansion: {}",
+        String::from_utf8_lossy(&output.stdout)
+    );
+    let expanded: serde_json::Value =
+        serde_json::from_str(&std::fs::read_to_string(&out_path).unwrap()).unwrap();
+    let attributes = expanded
+        .pointer("/attributes")
+        .and_then(|value| value.as_array())
+        .unwrap();
+    let ids: Vec<&str> = attributes
+        .iter()
+        .map(|attr| attr.pointer("/id").and_then(|id| id.as_str()).unwrap())
+        .collect();
+    assert_eq!(attributes.len(), 9);
+    assert!(ids.contains(&"clarity__pos__canonical_v2"));
+    assert!(ids.contains(&"clarity_negative__neg__canonical_bucket_v1"));
+    assert!(ids.contains(&"evidence__pos__canonical_bucket_v1"));
+    assert!(ids.contains(&"skim_resistance__pos__canonical_bucket_v1"));
 }
 
 #[test]

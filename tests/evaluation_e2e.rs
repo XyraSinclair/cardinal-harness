@@ -1,6 +1,8 @@
 use cardinal_harness::rerank::evaluation::{
-    run_evaluation_comparison_summary, run_likert_baseline_suite, run_synthetic_suite,
-    synthetic_cases, ComparisonOutcome, LikertEvalConfig,
+    run_evaluation_comparison_summary, run_evaluation_comparison_summary_with_config,
+    run_likert_baseline_suite, run_synthetic_suite, run_synthetic_suite_with_config,
+    synthetic_cases, ComparisonOutcome, LikertEvalConfig, PairwiseEvalConfig,
+    SyntheticPairwiseMode,
 };
 
 fn assert_prob(x: f64) {
@@ -96,6 +98,37 @@ fn scale_compression_case_exposes_likert_quantization_loss() {
 }
 
 #[test]
+fn ordinal_pairwise_mode_exposes_scale_loss_control() {
+    let ratio = run_synthetic_suite(Some("scale_compression_40"))
+        .expect("ratio cardinal synthetic suite should run");
+    let ordinal = run_synthetic_suite_with_config(
+        Some("scale_compression_40"),
+        PairwiseEvalConfig {
+            mode: SyntheticPairwiseMode::Ordinal,
+        },
+    )
+    .expect("ordinal cardinal synthetic suite should run");
+
+    assert_eq!(ratio.len(), 1);
+    assert_eq!(ordinal.len(), 1);
+    assert_eq!(ordinal[0].pairwise_mode, SyntheticPairwiseMode::Ordinal);
+
+    let ratio_precision = ratio[0].metrics.topk_precision;
+    let ordinal_precision = ordinal[0].metrics.topk_precision;
+    assert!(
+        ordinal_precision < ratio_precision,
+        "ordinal pairwise mode should expose lost ratio magnitude on the compressed frontier: ordinal {}, ratio {}",
+        ordinal_precision,
+        ratio_precision
+    );
+    assert!(
+        ordinal_precision <= 0.8,
+        "ordinal pairwise mode should remain a visible control, got precision {}",
+        ordinal_precision
+    );
+}
+
+#[test]
 fn comparison_summary_makes_cardinal_minus_likert_receipts_explicit() {
     let summary = run_evaluation_comparison_summary(None, LikertEvalConfig::default())
         .expect("comparison summary should run");
@@ -111,6 +144,7 @@ fn comparison_summary_makes_cardinal_minus_likert_receipts_explicit() {
         ]
     );
     assert_eq!(summary.cases.len(), synthetic_cases().len());
+    assert_eq!(summary.pairwise_config.mode, SyntheticPairwiseMode::Ratio);
 
     let mut observed_counts = (0usize, 0usize, 0usize);
     for case in &summary.cases {
@@ -168,4 +202,20 @@ fn comparison_summary_makes_cardinal_minus_likert_receipts_explicit() {
         observed_counts.1
     );
     assert_eq!(summary.aggregate_win_loss_tie.ties, observed_counts.2);
+}
+
+#[test]
+fn comparison_summary_accepts_ordinal_pairwise_config() {
+    let summary = run_evaluation_comparison_summary_with_config(
+        Some("scale_compression_40"),
+        PairwiseEvalConfig {
+            mode: SyntheticPairwiseMode::Ordinal,
+        },
+        LikertEvalConfig::default(),
+    )
+    .expect("comparison summary should run");
+
+    assert_eq!(summary.pairwise_config.mode, SyntheticPairwiseMode::Ordinal);
+    assert_eq!(summary.cases.len(), 1);
+    assert_eq!(summary.cases[0].case_name, "scale_compression_40");
 }

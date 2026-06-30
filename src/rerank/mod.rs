@@ -11,6 +11,7 @@
 
 pub mod comparison;
 pub mod evaluation;
+pub mod experiments;
 mod gates;
 pub mod hooks;
 pub mod model_policy;
@@ -28,11 +29,15 @@ pub use comparison::{
     compare_pair, ComparisonError, PairwiseComparisonAttribute, PairwiseComparisonEntity,
     PairwiseComparisonRequest, PairwiseComparisonSpec,
 };
+pub use experiments::{
+    expand_prompt_experiment_request, AttributePolarity, AttributeVariantSpec,
+    PromptExperimentConfig, PromptExperimentError,
+};
 pub use hooks::{
     ComparisonEvent, ComparisonObserver, ObserverError, WarmStartData, WarmStartError,
     WarmStartProvider,
 };
-pub use model_policy::{ModelLadderPolicy, ModelPolicy, ModelPolicyContext};
+pub use model_policy::ModelLadderPolicy;
 pub use multi::{
     apply_rerank_markup, estimate_max_rerank_charge, multi_rerank, validate_multi_rerank_request,
     MultiRerankError, RerankChargeEstimate, RerankExecution,
