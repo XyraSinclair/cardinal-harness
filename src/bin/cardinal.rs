@@ -8,6 +8,7 @@ use std::sync::Arc;
 use cardinal_harness::cache::SqlitePairwiseCache;
 use cardinal_harness::gateway::{NoopUsageSink, ProviderGateway};
 use cardinal_harness::rerank::model_policy::ModelPolicy;
+use cardinal_harness::rerank::report::validate_report_inputs;
 use cardinal_harness::rerank::{
     build_report, expand_prompt_experiment_request, load_policy_from_path, render_report_markdown,
     validate_multi_rerank_request, AttributeVariantSpec, JsonlTraceSink, MultiRerankRequest,
@@ -21,6 +22,13 @@ use clap::{Parser, Subcommand, ValueEnum};
 enum PairwiseModeArg {
     Ratio,
     Ordinal,
+}
+
+#[derive(Debug, Clone, Copy, ValueEnum)]
+enum ReportFormatArg {
+    Md,
+    Markdown,
+    Json,
 }
 
 impl From<PairwiseModeArg> for cardinal_harness::rerank::evaluation::SyntheticPairwiseMode {
@@ -81,9 +89,9 @@ enum Commands {
         out: PathBuf,
         #[arg(long)]
         curve_csv: Option<PathBuf>,
-        #[arg(long, default_value_t = 10)]
+        #[arg(long, default_value_t = 10, value_parser = parse_likert_levels)]
         levels: usize,
-        #[arg(long, default_value_t = 1.0)]
+        #[arg(long, default_value_t = 1.0, value_parser = parse_positive_finite_f64)]
         budget_multiplier: f64,
     },
     /// Compare cardinal pairwise evaluation against the Likert baseline
@@ -92,9 +100,9 @@ enum Commands {
         case: Option<String>,
         #[arg(long)]
         out: PathBuf,
-        #[arg(long, default_value_t = 10)]
+        #[arg(long, default_value_t = 10, value_parser = parse_likert_levels)]
         levels: usize,
-        #[arg(long, default_value_t = 1.0)]
+        #[arg(long, default_value_t = 1.0, value_parser = parse_positive_finite_f64)]
         budget_multiplier: f64,
         #[arg(long, value_enum, default_value = "ratio")]
         mode: PairwiseModeArg,
@@ -107,9 +115,9 @@ enum Commands {
         response: PathBuf,
         #[arg(long)]
         out: PathBuf,
-        #[arg(long, default_value = "md")]
-        format: String,
-        #[arg(long, default_value_t = 10)]
+        #[arg(long, value_enum, default_value = "md")]
+        format: ReportFormatArg,
+        #[arg(long, default_value_t = 10, value_parser = parse_report_top_n)]
         top_n: usize,
         #[arg(long)]
         include_infeasible: bool,
@@ -310,6 +318,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         } => {
             let req: MultiRerankRequest = read_json(&request)?;
             let resp: MultiRerankResponse = read_json(&response)?;
+            validate_multi_rerank_request(&req)?;
+            validate_report_inputs(&req, &resp)?;
             let opts = RerankReportOptions {
                 top_n,
                 include_infeasible,
@@ -319,12 +329,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 cache_only,
             };
             let report = build_report(&req, &resp, &opts);
-            if format == "json" {
-                let json = serde_json::to_string_pretty(&report)?;
-                std::fs::write(out, json)?;
-            } else {
-                let markdown = render_report_markdown(&report);
-                std::fs::write(out, markdown)?;
+            match format {
+                ReportFormatArg::Json => {
+                    let json = serde_json::to_string_pretty(&report)?;
+                    std::fs::write(out, json)?;
+                }
+                ReportFormatArg::Md | ReportFormatArg::Markdown => {
+                    let markdown = render_report_markdown(&report);
+                    std::fs::write(out, markdown)?;
+                }
             }
         }
         Commands::ExperimentExpand {
@@ -457,11 +470,48 @@ fn load_policy(
 fn read_json<T: serde::de::DeserializeOwned>(
     path: &PathBuf,
 ) -> Result<T, Box<dyn std::error::Error>> {
-    let raw = std::fs::read_to_string(path)?;
-    Ok(serde_json::from_str(&raw)?)
+    let raw = std::fs::read_to_string(path)
+        .map_err(|err| format!("failed to read JSON from {}: {err}", path.display()))?;
+    serde_json::from_str(&raw)
+        .map_err(|err| format!("failed to parse JSON in {}: {err}", path.display()).into())
 }
 
 fn write_json<T: serde::Serialize>(path: &PathBuf, value: &T) -> Result<(), io::Error> {
     let json = serde_json::to_string_pretty(value).map_err(io::Error::other)?;
     std::fs::write(path, json)
+}
+
+fn parse_likert_levels(raw: &str) -> Result<usize, String> {
+    let value = raw
+        .parse::<usize>()
+        .map_err(|err| format!("invalid integer '{raw}': {err}"))?;
+    if value >= 2 {
+        Ok(value)
+    } else {
+        Err(format!("value must be at least 2, got {raw}"))
+    }
+}
+
+fn parse_report_top_n(raw: &str) -> Result<usize, String> {
+    let value = raw
+        .parse::<usize>()
+        .map_err(|err| format!("invalid integer '{raw}': {err}"))?;
+    if value >= 1 {
+        Ok(value)
+    } else {
+        Err(format!("value must be at least 1, got {raw}"))
+    }
+}
+
+fn parse_positive_finite_f64(raw: &str) -> Result<f64, String> {
+    let value = raw
+        .parse::<f64>()
+        .map_err(|err| format!("invalid number '{raw}': {err}"))?;
+    if value.is_finite() && value > 0.0 {
+        Ok(value)
+    } else {
+        Err(format!(
+            "value must be a finite number greater than 0, got {raw}"
+        ))
+    }
 }

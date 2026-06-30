@@ -47,8 +47,21 @@ impl Default for PolicyRegistry {
             Arc::new(FixedPolicy::new("openai/gpt-5.4-mini")),
         );
         policies.insert(
+            "cost_aware_fast".to_string(),
+            Arc::new(FixedPolicy::new("deepseek/deepseek-v4-flash")),
+        );
+        policies.insert(
             "quality_only".to_string(),
             Arc::new(FixedPolicy::new("anthropic/claude-opus-4.6")),
+        );
+        policies.insert(
+            "frontier_ladder".to_string(),
+            Arc::new(ModelLadderPolicy {
+                high_model: "anthropic/claude-opus-4.6".to_string(),
+                mid_model: Some("google/gemini-3.1-pro-preview".to_string()),
+                low_model: "openai/gpt-5.4-mini".to_string(),
+                ..ModelLadderPolicy::default()
+            }),
         );
         Self { policies }
     }

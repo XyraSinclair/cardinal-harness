@@ -115,6 +115,7 @@ pub async fn rerank(
         provider_input_tokens: multi_resp.meta.provider_input_tokens,
         provider_output_tokens: multi_resp.meta.provider_output_tokens,
         provider_cost_nanodollars: multi_resp.meta.provider_cost_nanodollars,
+        provider_cost_is_estimate: multi_resp.meta.provider_cost_is_estimate,
         stop_reason: multi_resp.meta.stop_reason,
     };
 

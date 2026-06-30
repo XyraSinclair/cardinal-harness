@@ -521,6 +521,7 @@ pub async fn multi_rerank(
     let mut provider_input_tokens: u32 = 0;
     let mut provider_output_tokens: u32 = 0;
     let mut provider_cost_nanodollars: i64 = 0;
+    let mut provider_cost_is_estimate = false;
 
     let attr_id_to_index: HashMap<&str, usize> = req
         .attributes
@@ -825,6 +826,7 @@ pub async fn multi_rerank(
                                input_tokens: u32,
                                output_tokens: u32,
                                provider_cost_nanodollars: i64,
+                               provider_cost_is_estimate: bool,
                                error: Option<String>| {
                 let fields = trace_fields
                     .as_ref()
@@ -857,6 +859,7 @@ pub async fn multi_rerank(
                     input_tokens,
                     output_tokens,
                     provider_cost_nanodollars,
+                    provider_cost_is_estimate,
                     error,
                 }
             };
@@ -872,6 +875,7 @@ pub async fn multi_rerank(
                         provider_output_tokens.saturating_add(usage.output_tokens);
                     provider_cost_nanodollars =
                         provider_cost_nanodollars.saturating_add(usage.provider_cost_nanodollars);
+                    provider_cost_is_estimate |= usage.provider_cost_is_estimate;
                     comparisons_refused += 1;
                     refused_pairs.insert(task.key);
 
@@ -881,6 +885,7 @@ pub async fn multi_rerank(
                             usage.input_tokens,
                             usage.output_tokens,
                             usage.provider_cost_nanodollars,
+                            usage.provider_cost_is_estimate,
                             None,
                         );
                         event.refused = true;
@@ -927,6 +932,7 @@ pub async fn multi_rerank(
                         provider_output_tokens.saturating_add(usage.output_tokens);
                     provider_cost_nanodollars =
                         provider_cost_nanodollars.saturating_add(usage.provider_cost_nanodollars);
+                    provider_cost_is_estimate |= usage.provider_cost_is_estimate;
                     // When presentation was swapped, "A" in the LLM
                     // response actually refers to entity j, not i.
                     let effective = if task.swapped {
@@ -961,6 +967,7 @@ pub async fn multi_rerank(
                             usage.input_tokens,
                             usage.output_tokens,
                             usage.provider_cost_nanodollars,
+                            usage.provider_cost_is_estimate,
                             None,
                         );
                         event.higher_ranked = Some(match higher_ranked {
@@ -1008,7 +1015,7 @@ pub async fn multi_rerank(
                 }
                 Err(e) => {
                     if let Some(trace) = execution.trace {
-                        let event = build_trace(false, 0, 0, 0, Some(e.to_string()));
+                        let event = build_trace(false, 0, 0, 0, false, Some(e.to_string()));
                         trace.record(event)?;
                     }
                     if cache_only {
@@ -1213,6 +1220,7 @@ pub async fn multi_rerank(
         provider_input_tokens,
         provider_output_tokens,
         provider_cost_nanodollars,
+        provider_cost_is_estimate,
         stop_reason,
     };
 

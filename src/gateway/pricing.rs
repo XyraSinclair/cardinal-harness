@@ -94,8 +94,8 @@ const OPENAI_EMBED_3_SMALL: ModelPricing = ModelPricing::new("openai", 20, 0);
 const OPENAI_EMBED_3_LARGE_BATCH: ModelPricing = ModelPricing::new("openai", 65, 0);
 const OPENAI_EMBED_3_SMALL_BATCH: ModelPricing = ModelPricing::new("openai", 10, 0);
 
-// OpenRouter pricing — updated 2026-03-21.
-// Verify periodically against OpenRouter model pages.
+// OpenRouter pricing — updated 2026-06-29 from https://openrouter.ai/api/v1/models.
+// Verify periodically because provider model IDs and preview prices change.
 
 // Anthropic
 const CLAUDE_OPUS_4_6: ModelPricing = ModelPricing::new("openrouter", 5_000, 25_000);
@@ -116,13 +116,21 @@ const GPT_5_MINI: ModelPricing = ModelPricing::new("openrouter", 250, 2_000);
 
 // Google
 const GEMINI_3_1_PRO: ModelPricing = ModelPricing::new("openrouter", 2_000, 12_000);
-const GEMINI_3_PRO: ModelPricing = ModelPricing::new("openrouter", 2_000, 12_000);
 
 // Moonshot
-const KIMI_K2_0905: ModelPricing = ModelPricing::new("openrouter", 400, 2_000);
+const KIMI_K2_0905: ModelPricing = ModelPricing::new("openrouter", 600, 2_500);
+const KIMI_K2_THINKING: ModelPricing = ModelPricing::new("openrouter", 600, 2_500);
 
 // DeepSeek
-const DEEPSEEK_V3_2: ModelPricing = ModelPricing::new("openrouter", 260, 380);
+const DEEPSEEK_V4_PRO: ModelPricing = ModelPricing::new("openrouter", 435, 870);
+const DEEPSEEK_V4_FLASH: ModelPricing = ModelPricing::new("openrouter", 90, 180);
+const DEEPSEEK_V3_2: ModelPricing = ModelPricing::new("openrouter", 229, 343);
+
+// Qwen
+const QWEN_3_7_MAX: ModelPricing = ModelPricing::new("openrouter", 1_250, 3_750);
+
+// Z.ai
+const GLM_5_2: ModelPricing = ModelPricing::new("openrouter", 940, 3_000);
 
 static PRICING_MAP: OnceLock<HashMap<&'static str, ModelPricing>> = OnceLock::new();
 
@@ -154,13 +162,21 @@ fn init_pricing() -> HashMap<&'static str, ModelPricing> {
 
     // Google
     map.insert("google/gemini-3.1-pro-preview", GEMINI_3_1_PRO);
-    map.insert("google/gemini-3-pro-preview", GEMINI_3_PRO);
 
     // Moonshot
     map.insert("moonshotai/kimi-k2-0905", KIMI_K2_0905);
+    map.insert("moonshotai/kimi-k2-thinking", KIMI_K2_THINKING);
 
     // DeepSeek
     map.insert("deepseek/deepseek-v3.2", DEEPSEEK_V3_2);
+    map.insert("deepseek/deepseek-v4-pro", DEEPSEEK_V4_PRO);
+    map.insert("deepseek/deepseek-v4-flash", DEEPSEEK_V4_FLASH);
+
+    // Qwen
+    map.insert("qwen/qwen3.7-max", QWEN_3_7_MAX);
+
+    // Z.ai
+    map.insert("z-ai/glm-5.2", GLM_5_2);
 
     map
 }
@@ -385,6 +401,17 @@ mod tests {
             chat_cost("provider/not-in-pricing-table", 1_000, 1_000),
             status.cost_nanodollars()
         );
+    }
+
+    #[test]
+    fn test_current_frontier_model_pricing_entries() {
+        assert_eq!(chat_cost("qwen/qwen3.7-max", 1_000, 1_000), 5_000_000);
+        assert_eq!(chat_cost("z-ai/glm-5.2", 1_000, 1_000), 3_940_000);
+        assert_eq!(
+            chat_cost("deepseek/deepseek-v4-flash", 1_000, 1_000),
+            270_000
+        );
+        assert!(!chat_cost_status("moonshotai/kimi-k2-thinking", 1, 1).is_estimate());
     }
 
     // =========================================================================

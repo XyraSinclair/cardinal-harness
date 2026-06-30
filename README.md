@@ -1,12 +1,12 @@
 # cardinal-harness
 
-`cardinal-harness` is the canonical list-sorting and reranking engine for OpenPriors when a plain scalar score would lie about uncertainty.
+`cardinal-harness` is a pairwise-ratio reranking engine for cases where a plain scalar score would hide useful uncertainty.
 
-It does one job: turn noisy LLM pairwise ratio judgements into globally consistent cardinal scores with uncertainty, then spend the next comparison where it buys the most information.
+It does one job: turn noisy LLM pairwise ratio judgements into globally consistent cardinal scores with uncertainty, then spend the next comparison where it is expected to buy the most information.
 
-Use it for serious list work where "how much better?" carries information: prompts, research ideas, candidate plans, reviewer notes, worktrees, backlog items, or any shortlist where the top cluster matters more than a cheap total order. Do not use it for deterministic rankings, scalar metrics, or cases where the attribute itself is incoherent.
+Use it for list work where "how much better?" carries information: prompts, research ideas, candidate plans, reviewer notes, worktrees, backlog items, or any shortlist where the top cluster matters more than a cheap total order. Do not use it for deterministic rankings, scalar metrics, or cases where the attribute itself is incoherent.
 
-The trade is explicit: it costs more than one-shot scoring, saves comparisons versus exhaustive pairwise judging, and returns uncertainty plus receipts instead of only a sorted list.
+The trade is explicit: it costs more than one-shot scoring, saves comparisons versus exhaustive pairwise judging, and returns uncertainty plus receipts instead of only a sorted list. The checked-in synthetic receipts are mixed: they show a strong cardinal win on a scale-compression case, Likert/scalar wins on several ranking metrics, and no proof of universal cardinal superiority.
 
 ## Scope
 
@@ -20,6 +20,17 @@ This repo is intentionally narrow. It contains:
 - synthetic evaluation and reporting
 
 Research workflows, training/export code, agent orchestration, and other experimental layers belong in `openpriors-research`, not here.
+
+## Evidence status
+
+The public evidence is deliberately reproducible and deliberately narrow:
+
+- Offline synthetic evaluation and Likert/scalar comparison receipts live under `artifacts/eval/`.
+- The compact five-metric `comparison_summary.json` is mixed: 10 cardinal wins, 12 Likert wins, and 18 ties across the checked-in cases. The offline raw-receipt delta adds gate metrics and currently reports 10/12/20 across 42 comparable rows.
+- All current cardinal synthetic runs stop at `budget_exhausted`; the receipts do not prove early stopping or lower cost.
+- Equal call counts are not equal token cost. Pairwise prompts compare two items; scalar prompts rate one item.
+
+The next empirical proof target is a live, frozen benchmark suite with preserved request/response/trace/report/cache receipts, equalized token or dollar budgets, and scalar, ordinal-pairwise, and pairwise-ratio baselines on the same tasks.
 
 ## Core idea
 
@@ -134,6 +145,26 @@ cargo run --bin cardinal -- rerank \
   --trace trace.jsonl \
   --report report.md
 
+# Rerank with an explicit modern OpenRouter policy file.
+cargo run --bin cardinal -- rerank \
+  --request examples/multi-rerank-request.json \
+  --policy-config examples/model-policy-frontier-ladder.json \
+  --out output.json \
+  --trace trace.jsonl \
+  --report report.md
+
+# Or use a built-in policy name.
+cargo run --bin cardinal -- rerank \
+  --request examples/multi-rerank-request.json \
+  --policy frontier_ladder \
+  --out output.json
+
+# Other copy-paste policy recipes:
+#   examples/model-policy-quality-only.json       -> anthropic/claude-opus-4.6
+#   examples/model-policy-cost-aware-fast.json    -> deepseek/deepseek-v4-flash
+#   examples/model-policy-frontier-ladder.json    -> opus 4.6 -> gemini 3.1 pro preview -> gpt-5.4-mini
+
+
 # Generate a markdown or JSON report later from a saved request + response.
 cargo run --bin cardinal -- report \
   --request examples/multi-rerank-request.json \
@@ -147,12 +178,19 @@ cargo run --bin cardinal -- report \
 Other maintenance commands:
 
 ```bash
-# Synthetic evaluation receipts
+# Synthetic evaluation receipts, no API key required.
 cargo run --bin cardinal -- eval --out artifacts/eval/synthetic_eval.jsonl --curve-csv artifacts/eval/synthetic_curves.csv
 cargo run --bin cardinal -- eval-likert --out artifacts/eval/likert_eval.jsonl --curve-csv artifacts/eval/likert_curves.csv
 
-# Compare the default pairwise-ratio simulator with an ordinal pairwise control.
+# Compact built-in comparison summary, plus a scriptable CSV/text delta.
 cargo run --bin cardinal -- eval-compare --mode ratio --out artifacts/eval/comparison_summary.json
+python3 examples/offline_eval_delta.py \
+  --cardinal artifacts/eval/synthetic_eval.jsonl \
+  --likert artifacts/eval/likert_eval.jsonl \
+  --csv artifacts/eval/offline-workflow/cardinal_vs_likert_delta.csv \
+  --summary artifacts/eval/offline-workflow/cardinal_vs_likert_summary.txt
+
+# Optional control: active ordinal pairwise judgements without ratio magnitude.
 cargo run --bin cardinal -- eval-compare --mode ordinal --out artifacts/eval/comparison_summary_ordinal.json
 
 # Cache management

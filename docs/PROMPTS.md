@@ -54,6 +54,7 @@ Refusal for either template:
 - Multi-attribute CLI request: [`../examples/multi-rerank-request.json`](../examples/multi-rerank-request.json)
 - Simple single-attribute request shape for library/API callers: [`../examples/simple-rerank-request.json`](../examples/simple-rerank-request.json)
 - Prompt/attribute variant specs for request expansion: [`../examples/prompt-experiment-variants.json`](../examples/prompt-experiment-variants.json)
+- Model policy recipes: [`../examples/model-policy-quality-only.json`](../examples/model-policy-quality-only.json), [`../examples/model-policy-cost-aware-fast.json`](../examples/model-policy-cost-aware-fast.json), [`../examples/model-policy-frontier-ladder.json`](../examples/model-policy-frontier-ladder.json)
 
 Run the multi-rerank example with:
 
@@ -65,6 +66,39 @@ cargo run --bin cardinal -- rerank \
   --trace trace.jsonl \
   --report report.md
 ```
+
+Use an explicit current model policy when you want reproducible routing:
+
+```bash
+# Quality-only frontier run.
+cargo run --bin cardinal -- rerank \
+  --request examples/multi-rerank-request.json \
+  --policy-config examples/model-policy-quality-only.json \
+  --out output.json \
+  --trace trace.jsonl \
+  --report report.md
+
+# Cost-aware/fast run.
+cargo run --bin cardinal -- rerank \
+  --request examples/multi-rerank-request.json \
+  --policy-config examples/model-policy-cost-aware-fast.json \
+  --out output.json \
+  --trace trace.jsonl \
+  --report report.md
+
+# Frontier ladder: start with Opus 4.6, step through Gemini 3.1 Pro preview,
+# then use GPT-5.4 Mini for low-uncertainty near-tie checks.
+cargo run --bin cardinal -- rerank \
+  --request examples/multi-rerank-request.json \
+  --policy-config examples/model-policy-frontier-ladder.json \
+  --out output.json \
+  --trace trace.jsonl \
+  --report report.md
+```
+
+The checked-in policy files use live OpenRouter model IDs from the 2026-06 refresh: `anthropic/claude-opus-4.6`, `google/gemini-3.1-pro-preview`, `openai/gpt-5.4-mini`, and `deepseek/deepseek-v4-flash`.
+If a model is newer than the local pricing table, reports use OpenRouter's provider-reported upstream cost when available; otherwise they label the local fallback cost as an estimate instead of pretending it is exact.
+
 
 Generate a local prompt-surface experiment request without touching the network:
 

@@ -35,6 +35,7 @@ fn make_trace(comparison_index: usize) -> ComparisonTrace {
         input_tokens: 0,
         output_tokens: 0,
         provider_cost_nanodollars: 0,
+        provider_cost_is_estimate: false,
         error: None,
     }
 }

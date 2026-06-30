@@ -90,6 +90,16 @@ A run stops when one of the explicit stop reasons is reached:
 
 Only the first two reasons are convergence-like stops. Budget and latency stops require reading the reported top-k error before treating the result as settled.
 
+## Model routing and cost accounting
+
+The solver is model-agnostic: a rater can be a fixed model, a ladder policy, a cache hit, or a human-compatible implementation behind the same pairwise judgement contract. The CLI examples under `examples/model-policy-*.json` currently cover:
+
+- quality-only routing with `anthropic/claude-opus-4.6`,
+- cost-aware/fast routing with `deepseek/deepseek-v4-flash`,
+- a frontier ladder that starts on `anthropic/claude-opus-4.6`, falls back through `google/gemini-3.1-pro-preview`, and uses `openai/gpt-5.4-mini` once uncertainty is low enough.
+
+Pricing is separate from ranking. Reports distinguish exact local/provider cost from fallback cost estimates; an estimated cost is operational telemetry, not evidence that the provider actually charged that amount.
+
 ## Assumptions
 
 The model works best when:

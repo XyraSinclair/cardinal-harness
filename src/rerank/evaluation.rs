@@ -1215,7 +1215,7 @@ pub fn run_synthetic_case_with_config(
             comparisons_used,
             comparisons_refused,
             stop_reason,
-            latency_ms: start_time.elapsed().as_millis(),
+            latency_ms: 0,
             rank_quality,
         },
         error_trajectory,
@@ -1234,8 +1234,6 @@ pub fn run_likert_baseline_case(
     let mut rng = StdRng::seed_from_u64(case.seed ^ 0x9E37_79B9_7F4A_7C15);
     let n = case.attributes.first().map(|a| a.scores.len()).unwrap_or(0);
     let levels = cfg.levels.max(2);
-
-    let start_time = Instant::now();
 
     let n_attributes = case.attributes.len();
     let pairwise_budget = case
@@ -1395,7 +1393,7 @@ pub fn run_likert_baseline_case(
             ratings_attempted,
             ratings_used,
             ratings_refused,
-            latency_ms: start_time.elapsed().as_millis(),
+            latency_ms: 0,
         },
         error_trajectory,
     })
@@ -1754,6 +1752,7 @@ fn simulate_pairwise(
 
     if mode == SyntheticPairwiseMode::Ordinal {
         ratio = ORDINAL_SYNTHETIC_RATIO;
+        confidence = 0.9;
     }
     ratio = ratio.clamp(1.0, 26.0);
 
@@ -2206,6 +2205,44 @@ mod tests {
         assert!(
             tied_curl < 1.0,
             "one-sided predicted ties must not receive full concordance credit"
+        );
+    }
+
+    #[test]
+    fn rank_quality_catches_frontier_order_errors_when_topk_set_is_perfect() {
+        let truth = vec![100.0, 90.0, 80.0, 70.0, 60.0, 50.0];
+        // Same top-3 set as the truth, but the frontier itself is reversed.
+        // Plain top-k precision/recall would call this perfect; rank-quality
+        // metrics should still expose the ordering failure a maintainer cares
+        // about when a rerank is used as an ordered shortlist.
+        let pred_reversed_frontier = vec![80.0, 90.0, 100.0, 70.0, 60.0, 50.0];
+        let variances = vec![1.0; truth.len()];
+        let indices: Vec<usize> = (0..truth.len()).collect();
+
+        assert!((topk_precision(&pred_reversed_frontier, &truth, &indices, 3) - 1.0).abs() < 1e-6);
+        assert!((topk_recall(&pred_reversed_frontier, &truth, &indices, 3) - 1.0).abs() < 1e-6);
+
+        let metrics =
+            RankQualityMetrics::compute(&pred_reversed_frontier, &truth, &variances, &indices, 3);
+        assert!(
+            metrics.ndcg_at_k < 1.0,
+            "nDCG must penalize an internally reversed top-k frontier"
+        );
+        assert!(
+            metrics.curl_harmonic < 1.0,
+            "CURL must penalize pairwise reversals even with perfect top-k membership"
+        );
+        assert!(
+            metrics.weighted_rank_reversals > 0.0,
+            "weighted rank reversals should expose displacement of the true best item"
+        );
+        assert_eq!(
+            metrics.topk_discordance_count, 3,
+            "all three pairs inside the reversed top-3 frontier are discordant"
+        );
+        assert!(
+            metrics.bayesian_regret.abs() < 1e-6,
+            "same top-k membership has zero set-utility regret; this guard is specifically about order quality"
         );
     }
 

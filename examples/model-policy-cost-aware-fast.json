@@ -1,0 +1,7 @@
+{
+  "name": "cost_aware_fast_deepseek_v4_flash",
+  "policy": {
+    "type": "fixed",
+    "model": "deepseek/deepseek-v4-flash"
+  }
+}

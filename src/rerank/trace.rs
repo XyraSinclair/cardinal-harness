@@ -53,6 +53,8 @@ pub struct ComparisonTrace {
     pub input_tokens: u32,
     pub output_tokens: u32,
     pub provider_cost_nanodollars: i64,
+    #[serde(default)]
+    pub provider_cost_is_estimate: bool,
     pub error: Option<String>,
 }
 

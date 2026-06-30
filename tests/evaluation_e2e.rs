@@ -36,6 +36,30 @@ fn clean_ordering_case_is_perfect_topk() {
     assert!(metrics.topk_precision >= 0.99);
     assert!(metrics.topk_recall >= 0.99);
 
+    let rank_quality = metrics
+        .rank_quality
+        .as_ref()
+        .expect("clean synthetic case should emit rank-quality receipts");
+    assert!(
+        rank_quality.ndcg_at_k >= 0.99,
+        "perfect top-k should also have near-perfect nDCG, got {}",
+        rank_quality.ndcg_at_k
+    );
+    assert!(
+        rank_quality.curl_harmonic >= 0.99,
+        "perfect top-k should also have near-perfect weighted concordance, got {}",
+        rank_quality.curl_harmonic
+    );
+    assert!(
+        rank_quality.weighted_rank_reversals <= 1e-6,
+        "clean ordering should not hide frontier displacement behind top-k precision"
+    );
+    assert!(
+        rank_quality.bayesian_regret <= 1e-6,
+        "clean ordering should not lose top-k utility"
+    );
+    assert_eq!(rank_quality.topk_discordance_count, 0);
+
     assert_eq!(metrics.comparisons_refused, 0);
     assert!(metrics.comparisons_attempted > 0);
     assert!(metrics.comparisons_used > 0);

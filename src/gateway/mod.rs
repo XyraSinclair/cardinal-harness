@@ -117,6 +117,7 @@ impl<U: UsageSinkTrait> ProviderGateway<U> {
         .tokens(resp.input_tokens as i32, resp.output_tokens as i32)
         .cost(resp.cost_nanodollars)
         .upstream_cost(resp.upstream_cost_nanodollars)
+        .cost_is_estimate(resp.cost_is_estimate)
         .user(req.attribution.user_id)
         .api_key(req.attribution.api_key_id)
         .job(req.attribution.job_id)
@@ -146,6 +147,7 @@ impl ChatResponse {
             input_tokens: 0,
             output_tokens: 0,
             cost_nanodollars: 0,
+            cost_is_estimate: false,
             upstream_cost_nanodollars: None,
             latency: Duration::from_millis(0),
             finish_reason: FinishReason::Unknown("error".to_string()),

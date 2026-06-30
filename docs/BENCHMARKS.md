@@ -14,6 +14,8 @@ The default writes `artifacts/bench/scaling.jsonl` with `--max-n 250`. Use an ex
 cargo run --release --example bench_scaling -- --out artifacts/bench/scaling.jsonl --max-n 500
 ```
 
+For a public comparison, do not reuse the debug receipt below. Regenerate a release-profile JSONL on the target machine, keep the raw file, and publish the exact command and the first row's `build`, `limits`, and `measurement` fields next to any table derived from it.
+
 The harness includes candidate sizes up to the planner cap, so high values are intentionally expensive. The raw JSONL rows include `build`, `limits`, and `measurement` fields; read those before comparing numbers across machines or profiles.
 
 ## Current local receipt
@@ -28,14 +30,14 @@ Build/profile metadata from each raw row:
 
 | n | density | observations | candidates | solve ms | planner ms |
 |---:|---|---:|---:|---:|---:|
-| 10 | sparse_chain | 9 | 45 | 0.583 | 0.041 |
-| 10 | banded_3 | 24 | 45 | 0.333 | 0.038 |
-| 50 | sparse_chain | 49 | 1,225 | 8.848 | 0.979 |
-| 50 | banded_3 | 144 | 1,225 | 9.317 | 1.170 |
-| 100 | sparse_chain | 99 | 4,950 | 47.721 | 3.339 |
-| 100 | banded_3 | 294 | 4,950 | 48.282 | 3.875 |
-| 250 | sparse_chain | 249 | 31,125 | 678.102 | 25.407 |
-| 250 | banded_3 | 744 | 31,125 | 716.094 | 25.245 |
+| 10 | sparse_chain | 9 | 45 | 0.339 | 0.026 |
+| 10 | banded_3 | 24 | 45 | 0.217 | 0.026 |
+| 50 | sparse_chain | 49 | 1,225 | 5.531 | 0.765 |
+| 50 | banded_3 | 144 | 1,225 | 5.922 | 0.738 |
+| 100 | sparse_chain | 99 | 4,950 | 37.160 | 2.650 |
+| 100 | banded_3 | 294 | 4,950 | 38.447 | 2.707 |
+| 250 | sparse_chain | 249 | 31,125 | 517.830 | 18.958 |
+| 250 | banded_3 | 744 | 31,125 | 516.190 | 18.948 |
 
 Raw output: `artifacts/bench/scaling.jsonl`.
 
@@ -46,3 +48,11 @@ The dense solver is acceptable for small and medium active sets in this debug re
 Debug rows should not be used as release-performance estimates. For release measurements, regenerate the JSONL with `cargo run --release --example bench_scaling -- --max-n N`, keep the generated `build.profile`/`debug_assertions` fields with the table, and compare only runs with matching measurement scope.
 
 The planner candidate cap is visible once the full pair set exceeds `50,000`; at that point only the capped prefix of candidate pairs is scored. Treat benchmark rows as local receipts, not portable performance promises.
+
+## What this benchmark does not prove
+
+- It is not an end-to-end rerank benchmark: provider latency, tokenization, cache I/O, report rendering, and CLI startup are outside the timed scope.
+- It is not a state-of-the-art performance claim. It measures the current dense implementation so regressions and scaling limits are visible.
+- It does not prove production suitability above the planner cap. Past that cap, the benchmark is partly measuring capped candidate selection rather than the full pair frontier.
+
+The next performance proof target is a release-profile suite with repeated samples, warmup, fixed hardware metadata, sparse-solver comparisons once implemented, and separate timings for solve, planner, cache, provider, and report paths.

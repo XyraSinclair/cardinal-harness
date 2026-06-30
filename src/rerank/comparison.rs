@@ -96,6 +96,7 @@ pub struct ComparisonUsage {
     pub input_tokens: u32,
     pub output_tokens: u32,
     pub provider_cost_nanodollars: i64,
+    pub provider_cost_is_estimate: bool,
     pub cached: bool,
     pub prompt_text: Option<String>,
     pub question_text: Option<String>,
@@ -501,6 +502,7 @@ pub async fn compare_pair(
                         input_tokens: 0,
                         output_tokens: 0,
                         provider_cost_nanodollars: 0,
+                        provider_cost_is_estimate: false,
                         cached: true,
                         prompt_text: None,
                         question_text: None,
@@ -557,17 +559,20 @@ pub async fn compare_pair(
     let mut input_tokens_total = 0u32;
     let mut output_tokens_total = 0u32;
     let mut provider_cost_total = 0i64;
+    let mut provider_cost_is_estimate = false;
 
     for attempt_index in 0..max_live_attempts {
         let response = gateway.chat(chat_request.clone()).await?;
         input_tokens_total = input_tokens_total.saturating_add(response.input_tokens);
         output_tokens_total = output_tokens_total.saturating_add(response.output_tokens);
         provider_cost_total = provider_cost_total.saturating_add(response.cost_nanodollars);
+        provider_cost_is_estimate |= response.cost_is_estimate;
 
         let mut usage = ComparisonUsage {
             input_tokens: input_tokens_total,
             output_tokens: output_tokens_total,
             provider_cost_nanodollars: provider_cost_total,
+            provider_cost_is_estimate,
             cached: false,
             prompt_text: Some(prompt_text.clone()),
             question_text: Some(request.spec.attribute.prompt.to_string()),
@@ -757,6 +762,15 @@ fn model_supports_logprobs(model: &str) -> bool {
     if model_lower.starts_with("openai/gpt-5.4") {
         return false;
     }
+    // Gemini 3.1 Pro Preview is reasoning-mandatory on OpenRouter and does not
+    // advertise logprob/top_logprob support in live provider metadata. Treat
+    // current and future Gemini Pro reasoning previews conservatively until a
+    // non-reasoning endpoint explicitly exposes token logprobs.
+    if model_lower.starts_with("google/gemini-3.1-pro")
+        || model_lower.starts_with("google/gemini-3-pro")
+    {
+        return false;
+    }
 
     true
 }
@@ -837,6 +851,7 @@ mod tests {
             input_tokens: 10,
             output_tokens: 5,
             cost_nanodollars: 100,
+            cost_is_estimate: false,
             upstream_cost_nanodollars: None,
             latency: Duration::from_millis(1),
             finish_reason: FinishReason::Stop,
@@ -1243,7 +1258,7 @@ That's my assessment."#;
         assert!(model_supports_logprobs("openai/gpt-5.2-pro"));
         assert!(model_supports_logprobs("google/gemini-2.5-pro"));
         assert!(model_supports_logprobs("google/gemini-2.5-flash"));
-        assert!(model_supports_logprobs("google/gemini-3-pro-preview"));
+        assert!(!model_supports_logprobs("google/gemini-3.1-pro-preview"));
         assert!(model_supports_logprobs("moonshotai/kimi-k2-0905"));
         assert!(model_supports_logprobs("deepseek/deepseek-chat"));
         assert!(model_supports_logprobs("deepseek/deepseek-v3.2"));

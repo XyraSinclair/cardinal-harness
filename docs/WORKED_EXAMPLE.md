@@ -104,7 +104,7 @@ Do not read these snippets as evidence that `proposal_b` will win on a live prov
 
 ## 3. Offline comparison workflow, no API key required
 
-Before running a live provider, you can reproduce the synthetic comparison surface entirely offline. This workflow generates the cardinal pairwise synthetic receipt, generates the Likert/scalar baseline receipt, then writes a small delta report from the two JSONL files.
+Before running a live provider, reproduce the synthetic comparison surface entirely offline. This workflow generates the cardinal pairwise synthetic receipt, generates the Likert/scalar baseline receipt, then writes CSV and text deltas from the two JSONL files.
 
 ```bash
 mkdir -p artifacts/eval/offline-workflow
@@ -140,6 +140,8 @@ Inspect the summary first:
 ```bash
 cat artifacts/eval/offline-workflow/cardinal_vs_likert_summary.txt
 ```
+
+Then inspect the CSV for the specific metric rows. The summary is intentionally conservative: it reports both aggregate comparable metric rows and the top-k precision count, and it repeats that the comparison is synthetic.
 
 The generated files are synthetic receipts, not model outputs. They are useful for checking where pairwise-ratio inference beats the Likert baseline under the current deterministic simulator and where it loses. Do not cite them as proof that cardinal reranking is universally better than scalar ratings.
 
@@ -346,4 +348,4 @@ This harness is useful only when the attribute is meaningful and the receipts ar
 - provider pricing is treated as a proof of billing rather than a local estimate plus provider-reported usage where available;
 - illustrative snippets like the ones above are quoted as model outputs.
 
-The honest claim from a good run is narrow: for this request, under these prompts, with these model calls or cache hits, the fitted pairwise-ratio model selected this top-k set with this estimated uncertainty.
+The honest claim from a good run is narrow: for this request, under these prompts, with these model calls or cache hits, the fitted pairwise-ratio model selected this top-k set with this estimated uncertainty. The next stronger claim would require a frozen live benchmark with the same tasks run through scalar, ordinal-pairwise, and pairwise-ratio regimes under an equalized budget.

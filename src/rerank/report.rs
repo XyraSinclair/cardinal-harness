@@ -1,6 +1,6 @@
 //! Report generation for rerank runs.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use blake3;
 use serde::Serialize;
@@ -60,6 +60,7 @@ pub struct ReportSummary {
     pub provider_input_tokens: u32,
     pub provider_output_tokens: u32,
     pub provider_cost_nanodollars: i64,
+    pub provider_cost_is_estimate: bool,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -87,6 +88,67 @@ pub struct ReportStamp {
     pub rng_seed: Option<u64>,
     pub model_policy: Option<String>,
     pub cache_only: bool,
+}
+
+pub fn validate_report_inputs(
+    req: &MultiRerankRequest,
+    resp: &MultiRerankResponse,
+) -> Result<(), String> {
+    let request_entity_ids: HashSet<&str> = req
+        .entities
+        .iter()
+        .map(|entity| entity.id.as_str())
+        .collect();
+    let request_attribute_ids: HashSet<&str> = req
+        .attributes
+        .iter()
+        .map(|attribute| attribute.id.as_str())
+        .collect();
+    let mut response_entity_ids = HashSet::new();
+
+    for entity in &resp.entities {
+        if !request_entity_ids.contains(entity.id.as_str()) {
+            return Err(format!(
+                "response entity '{}' is not present in the request; refusing to generate a potentially stale report",
+                entity.id
+            ));
+        }
+        if !response_entity_ids.insert(entity.id.as_str()) {
+            return Err(format!(
+                "response contains duplicate entity result '{}'",
+                entity.id
+            ));
+        }
+
+        for attribute_id in entity.attribute_scores.keys() {
+            if !request_attribute_ids.contains(attribute_id.as_str()) {
+                return Err(format!(
+                    "response entity '{}' contains score for unknown attribute '{}'",
+                    entity.id, attribute_id
+                ));
+            }
+        }
+
+        for attribute in &req.attributes {
+            if !entity.attribute_scores.contains_key(&attribute.id) {
+                return Err(format!(
+                    "response entity '{}' is missing score for request attribute '{}'",
+                    entity.id, attribute.id
+                ));
+            }
+        }
+    }
+
+    for entity in &req.entities {
+        if !response_entity_ids.contains(entity.id.as_str()) {
+            return Err(format!(
+                "response is missing request entity '{}'; refusing to generate a partial report",
+                entity.id
+            ));
+        }
+    }
+
+    Ok(())
 }
 
 pub fn build_report(
@@ -148,6 +210,7 @@ impl ReportSummary {
             provider_input_tokens: meta.provider_input_tokens,
             provider_output_tokens: meta.provider_output_tokens,
             provider_cost_nanodollars: meta.provider_cost_nanodollars,
+            provider_cost_is_estimate: meta.provider_cost_is_estimate,
         }
     }
 }
@@ -221,8 +284,13 @@ pub fn render_report_markdown(report: &RerankReport) -> String {
             .provider_input_tokens
             .saturating_add(report.summary.provider_output_tokens)
     ));
+    let cost_label = if report.summary.provider_cost_is_estimate {
+        "Provider cost estimate"
+    } else {
+        "Provider cost"
+    };
     out.push_str(&format!(
-        "- Provider cost: {}\n",
+        "- {cost_label}: {}\n",
         format_nanodollars(report.summary.provider_cost_nanodollars)
     ));
     if let Some(seed) = report.run_stamp.rng_seed {
@@ -331,6 +399,12 @@ fn report_warnings(report: &RerankReport) -> Vec<String> {
     if provider_tokens > 0 && summary.provider_cost_nanodollars <= 0 {
         warnings.push(
             "Provider token usage is non-zero but provider cost is unavailable or zero; do not read this as a free run."
+                .to_string(),
+        );
+    }
+    if summary.provider_cost_is_estimate {
+        warnings.push(
+            "Provider cost is an estimate because at least one model lacked an exact local pricing entry and did not report upstream cost metadata."
                 .to_string(),
         );
     }

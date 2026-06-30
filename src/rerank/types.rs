@@ -131,6 +131,9 @@ pub struct RerankMeta {
     pub provider_output_tokens: u32,
     /// Provider cost (nanodollars) across all comparisons.
     pub provider_cost_nanodollars: i64,
+    /// True when at least one comparison used fallback pricing instead of exact known/provider cost.
+    #[serde(default)]
+    pub provider_cost_is_estimate: bool,
 
     /// Why the rerank loop stopped.
     pub stop_reason: RerankStopReason,
@@ -413,6 +416,9 @@ pub struct MultiRerankMeta {
     pub provider_output_tokens: u32,
     /// Provider cost (nanodollars) across all comparisons.
     pub provider_cost_nanodollars: i64,
+    /// True when at least one comparison used fallback pricing instead of exact known/provider cost.
+    #[serde(default)]
+    pub provider_cost_is_estimate: bool,
 
     /// Why the rerank loop stopped.
     pub stop_reason: RerankStopReason,

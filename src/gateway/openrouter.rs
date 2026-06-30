@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use super::error::{ErrorContext, ProviderError};
-use super::pricing::chat_cost;
+use super::pricing::chat_cost_status;
 use super::types::*;
 
 /// Maximum allowed response content length (1MB).
@@ -478,11 +478,13 @@ impl OpenRouterAdapter {
             .and_then(|details| details.cache_write_tokens);
 
         let latency = start.elapsed();
-        let cost = chat_cost(req.model.model_id(), input_tokens, output_tokens);
+        let cost_status = chat_cost_status(req.model.model_id(), input_tokens, output_tokens);
         let upstream_cost_nanodollars = usage
             .cost_details
             .and_then(|d| d.upstream_inference_cost)
             .map(|usd| ((usd * 1_000_000_000.0).round() as i64).max(0));
+        let cost = upstream_cost_nanodollars.unwrap_or_else(|| cost_status.cost_nanodollars());
+        let cost_is_estimate = upstream_cost_nanodollars.is_none() && cost_status.is_estimate();
 
         Ok(ChatResponse {
             content,
@@ -491,6 +493,7 @@ impl OpenRouterAdapter {
             input_tokens,
             output_tokens,
             cost_nanodollars: cost,
+            cost_is_estimate,
             upstream_cost_nanodollars,
             latency,
             finish_reason: FinishReason::from(finish_reason),

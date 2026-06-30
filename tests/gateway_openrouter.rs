@@ -59,10 +59,8 @@ async fn openrouter_parses_success_content_and_usage() {
     assert_eq!(resp.output_tokens, 20);
     assert_eq!(resp.cache_read_tokens, Some(4));
     assert_eq!(resp.cache_write_tokens, Some(6));
-    assert_eq!(
-        resp.cost_nanodollars,
-        cardinal_harness::gateway::chat_cost("openai/gpt-5-mini", 10, 20)
-    );
+    assert_eq!(resp.cost_nanodollars, 1_000);
+    assert!(!resp.cost_is_estimate);
     assert_eq!(resp.upstream_cost_nanodollars, Some(1_000));
 }
 

@@ -1,4 +1,7 @@
 {
+  "pairwise_config": {
+    "mode": "ratio"
+  },
   "likert_config": {
     "levels": 10,
     "budget_multiplier": 1.0

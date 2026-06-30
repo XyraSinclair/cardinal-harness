@@ -52,6 +52,8 @@ pub struct ProviderCallRecord {
     pub cost_nanodollars: i64,
     /// Provider-reported upstream inference cost in nanodollars, if available.
     pub upstream_cost_nanodollars: Option<i64>,
+    /// True when `cost_nanodollars` is a local fallback estimate, not exact/provider-reported.
+    pub cost_is_estimate: bool,
     /// User who made the request (if known).
     pub user_id: Option<Uuid>,
     /// API key used for the request (if known).
@@ -90,6 +92,7 @@ impl ProviderCallRecord {
             output_tokens: 0,
             cost_nanodollars: 0,
             upstream_cost_nanodollars: None,
+            cost_is_estimate: false,
             user_id: None,
             api_key_id: None,
             job_id: None,
@@ -116,6 +119,11 @@ impl ProviderCallRecord {
 
     pub fn upstream_cost(mut self, nanodollars: Option<i64>) -> Self {
         self.upstream_cost_nanodollars = nanodollars;
+        self
+    }
+
+    pub fn cost_is_estimate(mut self, is_estimate: bool) -> Self {
+        self.cost_is_estimate = is_estimate;
         self
     }
 
@@ -206,12 +214,13 @@ impl UsageSink for StderrUsageSink {
     async fn record(&self, record: ProviderCallRecord) {
         // Simple JSON output to stderr
         eprintln!(
-            r#"{{"provider":"{}","endpoint":"{}","model":"{}","tokens":{},"cost_nanos":{},"status":"{}","caller":"{}"}}"#,
+            r#"{{"provider":"{}","endpoint":"{}","model":"{}","tokens":{},"cost_nanos":{},"cost_is_estimate":{},"status":"{}","caller":"{}"}}"#,
             record.provider,
             record.endpoint,
             record.model,
             record.input_tokens + record.output_tokens,
             record.cost_nanodollars,
+            record.cost_is_estimate,
             record.status.as_str(),
             record.caller,
         );

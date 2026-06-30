@@ -794,7 +794,13 @@ pub struct ChatResponse {
     /// Output tokens generated.
     pub output_tokens: u32,
     /// Cost in nanodollars.
+    ///
+    /// If `cost_is_estimate` is true, this came from the local fallback estimate rather than
+    /// an exact pricing-table entry or provider-reported cost.
     pub cost_nanodollars: i64,
+    /// True when `cost_nanodollars` used fallback pricing because no exact local pricing entry
+    /// or provider-reported upstream cost was available.
+    pub cost_is_estimate: bool,
     /// Provider-reported upstream inference cost (nanodollars), if available.
     ///
     /// For OpenRouter this is derived from `usage.cost_details.upstream_inference_cost`.
