@@ -103,6 +103,8 @@ python3 examples/live_method_comparison.py \
 
 `summary.json` is the machine-readable aggregate. `summary.md` and `README.md` are generated views of the same data. `examples/live-method-suite.json` is the frozen suite input. Each case directory also preserves `case.json`, one JSON result per method, and per-call request/response/parsed/usage receipts under `calls/`.
 
+`tests/live_method_receipts.rs` is the local conformance guard for that pack. It checks the summary schema version, the pinned suite SHA-256, case and method JSON consistency, per-call request/response/parsed/usage completeness, aggregate usage totals, budget-normalized rows, and absence of checked-in provider keys or local absolute paths.
+
 ## Method
 
 The suite runs the same synthetic cases through two deterministic evaluators:

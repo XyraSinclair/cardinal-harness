@@ -6788,10 +6788,12 @@
     "temperature": 0.1
   },
   "reference_model": "anthropic/claude-sonnet-4.6",
+  "schema_version": "live_method_comparison_summary_v1",
   "suite": {
     "description": "Frozen public structured-judgment cases for live OpenRouter method comparisons. The suite is small enough to rerun, but intentionally spans project prioritization, method design, model routing, onboarding, benchmark rigor, and failure triage.",
     "name": "live_method_suite_v1",
-    "path": "examples/live-method-suite.json"
+    "path": "examples/live-method-suite.json",
+    "sha256": "2ad870ab5d8fab3fa0b5bc6c61ee20805872a88e83d18cbe034fc2c37d49d1ed"
   },
   "totals": {
     "calls": 552,

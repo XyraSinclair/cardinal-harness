@@ -4,8 +4,10 @@ This receipt is generated from real OpenRouter chat-completion calls.
 It compares structured judgment regimes on the same frozen attribute-weighted item lists.
 The reference is another live LLM regime, not human ground truth.
 
+Schema: `live_method_comparison_summary_v1`
 Suite: `live_method_suite_v1`
 Suite path: `examples/live-method-suite.json`
+Suite SHA-256: `2ad870ab5d8fab3fa0b5bc6c61ee20805872a88e83d18cbe034fc2c37d49d1ed`
 Candidate model: `openai/gpt-5.4-mini`
 Reference model: `anthropic/claude-sonnet-4.6`
 Cases: 6

@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 import itertools
+import hashlib
 import json
 import math
 import os
@@ -34,6 +35,7 @@ from typing import Any
 OPENROUTER_MODELS_URL = "https://openrouter.ai/api/v1/models?output_modalities=text"
 OPENROUTER_CHAT_URL = "https://openrouter.ai/api/v1/chat/completions"
 DEFAULT_SUITE_PATH = Path(__file__).with_name("live-method-suite.json")
+SUMMARY_SCHEMA_VERSION = "live_method_comparison_summary_v1"
 
 @dataclass(frozen=True)
 class Attribute:
@@ -237,6 +239,14 @@ class OpenRouterClient:
 def write_json(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def extract_content(response_body: dict[str, Any]) -> str:
@@ -710,8 +720,10 @@ def write_markdown(summary: dict[str, Any], path: Path) -> None:
         "It compares structured judgment regimes on the same frozen attribute-weighted item lists.",
         "The reference is another live LLM regime, not human ground truth.",
         "",
+        f"Schema: `{summary['schema_version']}`",
         f"Suite: `{summary['suite']['name']}`",
         f"Suite path: `{summary['suite']['path']}`",
+        f"Suite SHA-256: `{summary['suite']['sha256']}`",
         f"Candidate model: `{summary['candidate_model']}`",
         f"Reference model: `{summary['reference_model']}`",
         f"Cases: {summary['case_count']}",
@@ -872,10 +884,12 @@ def main() -> None:
     total_usage = aggregate_usage([result["usage"] for result in all_results])
     total_usage["calls"] = client.call_count
     summary = {
+        "schema_version": SUMMARY_SCHEMA_VERSION,
         "suite": {
             "name": suite_name,
             "description": suite_description,
             "path": portable_path(args.suite),
+            "sha256": file_sha256(args.suite),
         },
         "candidate_model": args.candidate_model,
         "reference_model": args.reference_model,
