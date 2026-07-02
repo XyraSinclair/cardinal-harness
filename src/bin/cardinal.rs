@@ -352,6 +352,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 worker.join()?;
             }
 
+            // A sort where every comparison failed or was refused is not a
+            // sort; refuse to emit uninformative output on stdout.
+            if sorted.meta.comparisons_attempted > 0 && sorted.meta.comparisons_used == 0 {
+                return Err(format!(
+                    "all {} comparison attempts failed ({} refused); output would be \
+                     uninformative. Re-run with --trace <path> to see per-comparison \
+                     errors (bad model slug and invalid API key are the usual causes).",
+                    sorted.meta.comparisons_attempted, sorted.meta.comparisons_refused,
+                )
+                .into());
+            }
+
             if reverse {
                 sorted.items.reverse();
             }

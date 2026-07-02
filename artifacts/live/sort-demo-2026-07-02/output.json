@@ -1,0 +1,93 @@
+{
+  "items": [
+    {
+      "id": "item-0001",
+      "text": "premature optimization is the root of all evil",
+      "rank": 1,
+      "latent_mean": 1.0815807089937253,
+      "latent_std": 0.7409661353130244,
+      "z_score": 2.7447626477970872,
+      "percentile": 0.9375
+    },
+    {
+      "id": "item-0000",
+      "text": "measure twice, cut once",
+      "rank": 2,
+      "latent_mean": 0.6087431781227068,
+      "latent_std": 0.7849452810859252,
+      "z_score": 0.8705605275229229,
+      "percentile": 0.8125
+    },
+    {
+      "id": "item-0005",
+      "text": "a chain is only as strong as its weakest link",
+      "rank": 3,
+      "latent_mean": 0.513736343545246,
+      "latent_std": 0.7719520951053066,
+      "z_score": 0.49397872261077014,
+      "percentile": 0.6875
+    },
+    {
+      "id": "item-0006",
+      "text": "don't put all your eggs in one basket",
+      "rank": 4,
+      "latent_mean": 0.4509705397027819,
+      "latent_std": 0.7684581839696712,
+      "z_score": 0.2451917821461236,
+      "percentile": 0.5625
+    },
+    {
+      "id": "item-0007",
+      "text": "practice makes perfect",
+      "rank": 5,
+      "latent_mean": 0.32725295811891486,
+      "latent_std": 0.7578590400702817,
+      "z_score": -0.2451917821461236,
+      "percentile": 0.4375
+    },
+    {
+      "id": "item-0003",
+      "text": "if it ain't broke, don't fix it",
+      "rank": 6,
+      "latent_mean": 0.2581611399078014,
+      "latent_std": 0.7849452810859252,
+      "z_score": -0.5190533598138852,
+      "percentile": 0.3125
+    },
+    {
+      "id": "item-0004",
+      "text": "too many cooks spoil the broth",
+      "rank": 7,
+      "latent_mean": 0.17973135320926092,
+      "latent_std": 0.7827542223475801,
+      "z_score": -0.8299281591393052,
+      "percentile": 0.1875
+    },
+    {
+      "id": "item-0002",
+      "text": "a bird in the hand is worth two in the bush",
+      "rank": 8,
+      "latent_mean": 0.0,
+      "latent_std": 0.7374035100098091,
+      "z_score": -1.542335405332351,
+      "percentile": 0.0625
+    }
+  ],
+  "meta": {
+    "topk_error": 6.086566664620581,
+    "tolerated_error": 0.1,
+    "comparisons_attempted": 32,
+    "comparisons_used": 32,
+    "comparisons_refused": 0,
+    "comparisons_cached": 1,
+    "comparison_budget": 32,
+    "latency_ms": 11714,
+    "model_used": "anthropic/claude-sonnet-4.6",
+    "rater_id_used": "anthropic/claude-sonnet-4.6",
+    "provider_input_tokens": 12480,
+    "provider_output_tokens": 837,
+    "provider_cost_nanodollars": 49995000,
+    "provider_cost_is_estimate": false,
+    "stop_reason": "budget_exhausted"
+  }
+}

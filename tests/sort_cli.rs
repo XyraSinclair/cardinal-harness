@@ -335,6 +335,35 @@ async fn cli_sort_empty_input_fails_cleanly() {
     assert!(stderr.contains("no items to sort"), "stderr: {stderr}");
 }
 
+#[tokio::test(flavor = "multi_thread")]
+async fn cli_sort_fails_loudly_when_every_comparison_errors() {
+    let server = MockServer::start().await;
+    Mock::given(method("POST"))
+        .and(path("/chat/completions"))
+        .respond_with(ResponseTemplate::new(500).set_body_string("boom"))
+        .mount(&server)
+        .await;
+    let args = [
+        "--by",
+        "shininess",
+        "--model",
+        "test/judge",
+        "--no-cache",
+        "--seed",
+        "7",
+        "--budget",
+        "2",
+    ];
+    let output = run_sort(&server.uri(), &args, "shiny GOLD ring\ndull TIN spoon\n");
+    assert!(!output.status.success());
+    assert!(
+        output.stdout.is_empty(),
+        "stdout must stay empty on an uninformative sort"
+    );
+    let stderr = String::from_utf8(output.stderr).unwrap();
+    assert!(stderr.contains("uninformative"), "stderr: {stderr}");
+}
+
 #[test]
 fn cli_sort_without_key_or_cache_only_fails_with_guidance() {
     let mut child = Command::new(cardinal_bin())
