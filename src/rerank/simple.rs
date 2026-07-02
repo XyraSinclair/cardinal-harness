@@ -66,6 +66,7 @@ pub fn to_multi_request(req: &RerankRequest) -> MultiRerankRequest {
         comparison_concurrency: req.comparison_concurrency,
         max_pair_repeats: req.max_pair_repeats,
         randomize_presentation_order: true,
+        counterbalance_pairs: req.counterbalance_pairs,
     }
 }
 
@@ -101,23 +102,30 @@ pub async fn rerank(
         })
         .collect();
 
-    let meta = RerankMeta {
-        topk_error: multi_resp.meta.global_topk_error,
-        tolerated_error: multi_resp.meta.tolerated_error,
-        comparisons_attempted: multi_resp.meta.comparisons_attempted,
-        comparisons_used: multi_resp.meta.comparisons_used,
-        comparisons_refused: multi_resp.meta.comparisons_refused,
-        comparisons_cached: multi_resp.meta.comparisons_cached,
-        comparison_budget: multi_resp.meta.comparison_budget,
-        latency_ms: multi_resp.meta.latency_ms,
-        model_used: multi_resp.meta.model_used,
-        rater_id_used: multi_resp.meta.rater_id_used,
-        provider_input_tokens: multi_resp.meta.provider_input_tokens,
-        provider_output_tokens: multi_resp.meta.provider_output_tokens,
-        provider_cost_nanodollars: multi_resp.meta.provider_cost_nanodollars,
-        provider_cost_is_estimate: multi_resp.meta.provider_cost_is_estimate,
-        stop_reason: multi_resp.meta.stop_reason,
-    };
+    let meta = meta_from_multi(multi_resp.meta);
 
     Ok(RerankResponse { results, meta })
+}
+
+/// Flatten multi-rerank run metadata into the single-attribute meta shape.
+pub(crate) fn meta_from_multi(meta: super::types::MultiRerankMeta) -> RerankMeta {
+    RerankMeta {
+        topk_error: meta.global_topk_error,
+        tolerated_error: meta.tolerated_error,
+        comparisons_attempted: meta.comparisons_attempted,
+        comparisons_used: meta.comparisons_used,
+        comparisons_refused: meta.comparisons_refused,
+        comparisons_cached: meta.comparisons_cached,
+        comparison_budget: meta.comparison_budget,
+        latency_ms: meta.latency_ms,
+        model_used: meta.model_used,
+        rater_id_used: meta.rater_id_used,
+        provider_input_tokens: meta.provider_input_tokens,
+        provider_output_tokens: meta.provider_output_tokens,
+        provider_cost_nanodollars: meta.provider_cost_nanodollars,
+        provider_cost_is_estimate: meta.provider_cost_is_estimate,
+        pairs_counterbalanced: meta.pairs_counterbalanced,
+        position_flips: meta.position_flips,
+        stop_reason: meta.stop_reason,
+    }
 }

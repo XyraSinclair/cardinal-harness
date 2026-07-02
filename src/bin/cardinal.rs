@@ -94,6 +94,19 @@ enum Commands {
         /// Worst first instead of best first
         #[arg(long)]
         reverse: bool,
+        /// Also judge the OPPOSITE of the criterion (`lack of <criterion>`),
+        /// fold it in with weight -1, and report cross-side consistency
+        #[arg(long)]
+        two_sided: bool,
+        /// Alternate phrasing of the criterion; judged as an extra attribute
+        /// and reported as a paraphrase-consistency probe (repeatable)
+        #[arg(long)]
+        also_by: Vec<String>,
+        /// Ask each planned pair in one random order only, instead of the
+        /// default both-orders counterbalancing (halves cost, loses the
+        /// position-bias receipt)
+        #[arg(long)]
+        no_counterbalance: bool,
         /// RNG seed for reproducible planning
         #[arg(long)]
         seed: Option<u64>,
@@ -262,6 +275,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             format,
             scores,
             reverse,
+            two_sided,
+            also_by,
+            no_counterbalance,
             seed,
             cache_only,
             no_cache,
@@ -342,6 +358,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 model,
                 comparison_budget: budget,
                 top_k,
+                counterbalance: !no_counterbalance,
+                two_sided,
+                also_by,
                 ..Default::default()
             };
             let mut sorted =
@@ -379,14 +398,47 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 } else {
                     ""
                 };
+                let flips = if meta.pairs_counterbalanced > 0 {
+                    format!(
+                        " · order flips: {}/{}",
+                        meta.position_flips, meta.pairs_counterbalanced
+                    )
+                } else {
+                    String::new()
+                };
                 eprintln!(
-                    "sorted {} items by \"{by}\" · {} comparisons ({} cached, {} refused) · {estimate}${cost_usd:.4} · stop: {}",
+                    "sorted {} items by \"{by}\" · {} comparisons ({} cached, {} refused) · {estimate}${cost_usd:.4}{flips} · stop: {}",
                     sorted.items.len(),
                     meta.comparisons_used,
                     meta.comparisons_cached,
                     meta.comparisons_refused,
                     serde_json::to_value(meta.stop_reason)?.as_str().unwrap_or("unknown"),
                 );
+                for probe in &sorted.probes {
+                    let kind = match probe.kind {
+                        cardinal_harness::rerank::SortProbeKind::Opposite => "opposite",
+                        cardinal_harness::rerank::SortProbeKind::Paraphrase => "paraphrase",
+                    };
+                    match probe.consistency {
+                        Some(c) => {
+                            let verdict = if c >= 0.7 {
+                                "consistent"
+                            } else if c >= 0.3 {
+                                "shaky"
+                            } else {
+                                "INCOHERENT for this judge"
+                            };
+                            eprintln!(
+                                "probe [{kind}] \"{}\": consistency {c:+.2} — {verdict}",
+                                probe.prompt
+                            );
+                        }
+                        None => eprintln!(
+                            "probe [{kind}] \"{}\": not enough shared scores to assess",
+                            probe.prompt
+                        ),
+                    }
+                }
             }
         }
         Commands::CacheExport { db, out } => {

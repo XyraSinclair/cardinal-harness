@@ -47,6 +47,9 @@ pub use options::RerankRunOptions;
 pub use policy_registry::{load_policy_from_path, PolicyConfig, PolicyRegistry, PolicySpec};
 pub use report::{build_report, render_report_markdown, RerankReport, RerankReportOptions};
 pub use simple::rerank;
-pub use sort::{sort_documents, sort_texts, SortError, SortOptions, SortedItem, SortedTexts};
+pub use sort::{
+    sort_documents, sort_texts, SortError, SortOptions, SortProbe, SortProbeKind, SortedItem,
+    SortedTexts,
+};
 pub use trace::{ComparisonTrace, JsonlTraceSink, TraceError, TraceSink, TraceWorker};
 pub use types::*;

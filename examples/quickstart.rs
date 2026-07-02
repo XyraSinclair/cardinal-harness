@@ -82,6 +82,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         comparison_concurrency: None, // use internal default parallelism
         max_pair_repeats: None,       // allow re-asking the same pair if needed
         randomize_presentation_order: true,
+        counterbalance_pairs: false,
     };
 
     // -- Run it --------------------------------------------------------------

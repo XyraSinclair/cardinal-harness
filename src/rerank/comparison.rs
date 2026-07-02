@@ -18,7 +18,8 @@ use crate::gateway::{
 use crate::text_chunking::count_tokens;
 
 use crate::prompts::{
-    prompt_by_slug, EntityRef, PromptInstance, PromptTemplate, DEFAULT_PROMPT, RATIO_LADDER,
+    prompt_by_slug, EntityRef, PromptInstance, PromptTemplate, DEFAULT_PROMPT,
+    ORDINAL_OBSERVATION_RATIO, RATIO_LADDER,
 };
 
 use super::types::{HigherRanked, PairwiseJudgement};
@@ -181,6 +182,7 @@ pub struct PairwiseComparisonRequest<'a> {
 /// Parse LLM response JSON into a PairwiseJudgement.
 pub fn parse_pairwise_response(
     raw: &str,
+    prompt_template_slug: &str,
     _output_logprobs: Option<&[TokenLogprob]>,
 ) -> Result<PairwiseJudgement, ComparisonError> {
     // Try to extract JSON from the response (may have surrounding text)
@@ -196,17 +198,28 @@ pub fn parse_pairwise_response(
     let higher = parsed
         .higher_ranked
         .ok_or_else(|| ComparisonError::Parse("missing 'higher_ranked'".into()))?;
-    let ratio = match parsed.ratio {
-        Some(ratio) => ratio,
-        None => {
+    let ratio = match prompt_template_slug {
+        // Ordinal judgements carry only direction plus confidence, so we map
+        // them onto a shared modest fixed ratio before passing them to the
+        // solver.
+        "ordinal_v1" => ORDINAL_OBSERVATION_RATIO,
+        "canonical_v2" => parsed
+            .ratio
+            .ok_or_else(|| ComparisonError::Parse("missing 'ratio'".into()))?,
+        "canonical_bucket_v1" => {
             let bucket = parsed
                 .ratio_bucket
-                .ok_or_else(|| ComparisonError::Parse("missing 'ratio'".into()))?;
+                .ok_or_else(|| ComparisonError::Parse("missing 'ratio_bucket'".into()))?;
             *RATIO_LADDER.get(bucket).ok_or_else(|| {
                 ComparisonError::Parse(format!(
                     "ratio_bucket out of allowed range [0,16]: {bucket}"
                 ))
             })?
+        }
+        other => {
+            return Err(ComparisonError::Parse(format!(
+                "unknown prompt template slug: {other}"
+            )))
         }
     };
 
@@ -581,7 +594,11 @@ pub async fn compare_pair(
             pairwise_logprob_posterior: None,
         };
 
-        match parse_pairwise_response(&response.content, response.output_logprobs.as_deref()) {
+        match parse_pairwise_response(
+            &response.content,
+            request.spec.prompt_template().slug,
+            response.output_logprobs.as_deref(),
+        ) {
             Ok(judgement) => {
                 if let PairwiseJudgement::Observation {
                     higher_ranked,
@@ -925,7 +942,7 @@ mod tests {
     #[test]
     fn test_parse_valid_json() {
         let raw = r#"{"higher_ranked": "A", "ratio": 1.3, "confidence": 0.74}"#;
-        let result = parse_pairwise_response(raw, None).unwrap();
+        let result = parse_pairwise_response(raw, "canonical_v2", None).unwrap();
         match result {
             PairwiseJudgement::Observation {
                 higher_ranked,
@@ -943,7 +960,7 @@ mod tests {
     #[test]
     fn test_parse_ratio_bucket_json() {
         let raw = r#"{"higher_ranked": "B", "ratio_bucket": 9, "confidence": 0.82}"#;
-        let result = parse_pairwise_response(raw, None).unwrap();
+        let result = parse_pairwise_response(raw, "canonical_bucket_v1", None).unwrap();
         match result {
             PairwiseJudgement::Observation {
                 higher_ranked,
@@ -961,7 +978,7 @@ mod tests {
     #[test]
     fn test_parse_refused() {
         let raw = r#"{"refused": true}"#;
-        let result = parse_pairwise_response(raw, None).unwrap();
+        let result = parse_pairwise_response(raw, "canonical_v2", None).unwrap();
         assert!(matches!(result, PairwiseJudgement::Refused));
     }
 
@@ -970,7 +987,7 @@ mod tests {
         let raw = r#"Here's my evaluation:
 {"higher_ranked": "B", "ratio": 2.5, "confidence": 0.9}
 That's my assessment."#;
-        let result = parse_pairwise_response(raw, None).unwrap();
+        let result = parse_pairwise_response(raw, "canonical_v2", None).unwrap();
         match result {
             PairwiseJudgement::Observation {
                 higher_ranked,
@@ -1006,9 +1023,61 @@ That's my assessment."#;
             },
         ];
 
-        let err = parse_pairwise_response(raw, Some(&logprobs)).unwrap_err();
+        let err = parse_pairwise_response(raw, "canonical_v2", Some(&logprobs)).unwrap_err();
         assert!(
             matches!(err, ComparisonError::Parse(message) if message.contains("missing 'confidence'"))
+        );
+    }
+
+    #[test]
+    fn test_parse_ordinal_json_a() {
+        let raw = r#"{"higher_ranked":"A","confidence":0.61}"#;
+        let result = parse_pairwise_response(raw, "ordinal_v1", None).unwrap();
+        match result {
+            PairwiseJudgement::Observation {
+                higher_ranked,
+                ratio,
+                confidence,
+            } => {
+                assert_eq!(higher_ranked, HigherRanked::A);
+                assert!((ratio - ORDINAL_OBSERVATION_RATIO).abs() < 0.001);
+                assert!((confidence - 0.61).abs() < 0.001);
+            }
+            _ => panic!("Expected Observation"),
+        }
+    }
+
+    #[test]
+    fn test_parse_ordinal_json_b() {
+        let raw = r#"{"higher_ranked":"B","confidence":0.22}"#;
+        let result = parse_pairwise_response(raw, "ordinal_v1", None).unwrap();
+        match result {
+            PairwiseJudgement::Observation {
+                higher_ranked,
+                ratio,
+                confidence,
+            } => {
+                assert_eq!(higher_ranked, HigherRanked::B);
+                assert!((ratio - ORDINAL_OBSERVATION_RATIO).abs() < 0.001);
+                assert!((confidence - 0.22).abs() < 0.001);
+            }
+            _ => panic!("Expected Observation"),
+        }
+    }
+
+    #[test]
+    fn test_parse_ordinal_refused() {
+        let raw = r#"{"refused":true}"#;
+        let result = parse_pairwise_response(raw, "ordinal_v1", None).unwrap();
+        assert!(matches!(result, PairwiseJudgement::Refused));
+    }
+
+    #[test]
+    fn test_parse_ordinal_rejects_malformed_response() {
+        let raw = r#"{"higher_ranked":"C","confidence":0.5}"#;
+        let err = parse_pairwise_response(raw, "ordinal_v1", None).unwrap_err();
+        assert!(
+            matches!(err, ComparisonError::Parse(message) if message.contains("invalid higher_ranked"))
         );
     }
 

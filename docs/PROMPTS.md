@@ -1,6 +1,6 @@
 # Prompt Contract
 
-`cardinal-harness` supports two prompt templates: `canonical_v2` and `canonical_bucket_v1`.
+`cardinal-harness` supports three prompt templates: `canonical_v2`, `canonical_bucket_v1`, and `ordinal_v1`.
 
 ## Slugs
 
@@ -8,6 +8,7 @@
 |------|--------------|----------|
 | `canonical_v2` | Decimal `ratio` on the canonical ladder range | General pairwise-ratio judgement. This is the default when no `prompt_template_slug` is set. |
 | `canonical_bucket_v1` | Integer `ratio_bucket` in `0..16` | Runs that need output-token logprobs mapped directly to the ratio ladder. The bucket index avoids reconstructing multi-token decimal probabilities. |
+| `ordinal_v1` | Direction only: `higher_ranked` plus `confidence` | Runs that want plain natural-language "which has more X?" judgements. This is cheaper and often more natural, but strictly less informative because magnitude is discarded. Good as a baseline or control. |
 
 Unknown slugs are rejected. Omit `prompt_template_slug` only when you want the default `canonical_v2`.
 
@@ -35,6 +36,14 @@ The ladder is approximately geometric in log-space, with extra density near 1.0 
 
 In bucket mode, `ratio_bucket` is the zero-based index into the ratio ladder above. For example, bucket `7` means ratio `2.1`.
 
+`ordinal_v1` successful judgement:
+
+```json
+{"higher_ranked":"A","confidence":0.74}
+```
+
+In ordinal mode, the live judgement records only direction and confidence. Internally it is converted into the same fixed modest ratio used by the synthetic ordinal evaluator so the solver receives a directional log-ratio observation without inventing a magnitude estimate.
+
 Refusal for either template:
 
 ```json
@@ -46,6 +55,7 @@ Refusal for either template:
 - `higher_ranked`: which side has more of the attribute
 - `ratio`: how much more, constrained to the canonical ladder range; used by `canonical_v2`
 - `ratio_bucket`: zero-based ratio ladder index; used by `canonical_bucket_v1`
+- `ordinal_v1`: no ratio field; magnitude is intentionally not elicited
 - `confidence`: self-reported confidence in `[0, 1]`
 - `refused`: explicit refusal channel for genuinely blocked cases
 
@@ -107,6 +117,7 @@ cargo run --bin cardinal -- experiment-expand \
   --request examples/multi-rerank-request.json \
   --prompt-template canonical_v2 \
   --prompt-template canonical_bucket_v1 \
+  --prompt-template ordinal_v1 \
   --include-negative \
   --variant-json examples/prompt-experiment-variants.json \
   --out expanded-request.json

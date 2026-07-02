@@ -68,6 +68,11 @@ pub struct RerankRequest {
     /// Each successful pairwise comparison increments repeats by 1.
     #[serde(default)]
     pub max_pair_repeats: Option<usize>,
+
+    /// Ask every planned pair in both presentation orders. See
+    /// [`MultiRerankRequest::counterbalance_pairs`].
+    #[serde(default)]
+    pub counterbalance_pairs: bool,
 }
 
 fn default_attribute_id() -> String {
@@ -134,6 +139,13 @@ pub struct RerankMeta {
     /// True when at least one comparison used fallback pricing instead of exact known/provider cost.
     #[serde(default)]
     pub provider_cost_is_estimate: bool,
+
+    /// Pairs judged in both presentation orders with a decisive direction.
+    #[serde(default)]
+    pub pairs_counterbalanced: usize,
+    /// Counterbalanced pairs whose two orders disagreed on direction.
+    #[serde(default)]
+    pub position_flips: usize,
 
     /// Why the rerank loop stopped.
     pub stop_reason: RerankStopReason,
@@ -340,8 +352,21 @@ pub struct MultiRerankRequest {
 
     /// Randomly swap which entity is presented as "A" vs "B" in each
     /// comparison to eliminate position bias.  Default: true.
+    ///
+    /// Ignored when `counterbalance_pairs` is set: counterbalancing asks both
+    /// orders deterministically, which subsumes randomization.
     #[serde(default = "default_randomize_presentation_order")]
     pub randomize_presentation_order: bool,
+
+    /// Ask every planned pair in BOTH presentation orders (A-then-B and
+    /// B-then-A), spending two comparisons per pair. This cancels position
+    /// bias per-pair instead of merely averaging it across the run, and
+    /// turns order disagreement into a measurable receipt
+    /// (`pairs_counterbalanced` / `position_flips` in the response meta).
+    /// Default: false (preserves existing request semantics; the `sort`
+    /// surface enables it by default).
+    #[serde(default)]
+    pub counterbalance_pairs: bool,
 }
 
 fn default_randomize_presentation_order() -> bool {
@@ -419,6 +444,15 @@ pub struct MultiRerankMeta {
     /// True when at least one comparison used fallback pricing instead of exact known/provider cost.
     #[serde(default)]
     pub provider_cost_is_estimate: bool,
+
+    /// Pairs judged in both presentation orders with a decisive (ratio > 1)
+    /// direction in each. Only populated when `counterbalance_pairs` was set.
+    #[serde(default)]
+    pub pairs_counterbalanced: usize,
+    /// Counterbalanced pairs whose two presentation orders disagreed on
+    /// direction — a direct, per-run measurement of position bias.
+    #[serde(default)]
+    pub position_flips: usize,
 
     /// Why the rerank loop stopped.
     pub stop_reason: RerankStopReason,

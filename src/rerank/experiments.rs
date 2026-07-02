@@ -334,6 +334,7 @@ mod tests {
             comparison_concurrency: Some(1),
             max_pair_repeats: Some(1),
             randomize_presentation_order: true,
+            counterbalance_pairs: false,
         }
     }
 
@@ -393,5 +394,38 @@ mod tests {
             expanded.attributes[0].prompt_template_slug.as_deref(),
             Some("canonical_bucket_v1")
         );
+    }
+
+    #[test]
+    fn expands_ordinal_template_slug() {
+        let cfg = PromptExperimentConfig {
+            prompt_template_slugs: vec!["ordinal_v1".to_string()],
+            include_negative: false,
+            variants: vec![],
+        };
+
+        let expanded = expand_prompt_experiment_request(&base_request(), &cfg).unwrap();
+
+        assert_eq!(expanded.attributes.len(), 1);
+        assert_eq!(expanded.attributes[0].id, "quality__pos__ordinal_v1");
+        assert_eq!(
+            expanded.attributes[0].prompt_template_slug.as_deref(),
+            Some("ordinal_v1")
+        );
+    }
+
+    #[test]
+    fn rejects_unknown_template_slug() {
+        let cfg = PromptExperimentConfig {
+            prompt_template_slugs: vec!["canonical_v9".to_string()],
+            include_negative: false,
+            variants: vec![],
+        };
+
+        let err = expand_prompt_experiment_request(&base_request(), &cfg).unwrap_err();
+        assert!(matches!(
+            err,
+            PromptExperimentError::UnknownPromptTemplate { slug } if slug == "canonical_v9"
+        ));
     }
 }

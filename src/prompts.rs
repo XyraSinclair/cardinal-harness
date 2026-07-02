@@ -153,9 +153,15 @@ pub const RATIO_LADDER: &[f64] = &[
     1.0, 1.05, 1.1, 1.2, 1.3, 1.5, 1.75, 2.1, 2.5, 3.1, 3.9, 5.1, 6.8, 9.2, 12.7, 18.0, 26.0,
 ];
 
-/// The canonical pairwise ratio elicitation prompt.
+/// Fixed ratio used when a judgement carries direction only.
 ///
-/// This is the only supported prompt template in this repository.
+/// Ordinal prompts tell the model to answer only which side is higher, not how
+/// much higher. The solver still consumes pairwise log-ratio observations, so
+/// we inject a modest fixed ratio rather than pretending the model expressed a
+/// magnitude estimate.
+pub const ORDINAL_OBSERVATION_RATIO: f64 = 2.1;
+
+/// The canonical pairwise ratio elicitation prompt.
 pub const PROMPT_V2: PromptTemplate = PromptTemplate {
     slug: "canonical_v2",
     system: r#"You are an expert subjective evaluator. You compare two entities across an arbitrary attribute, and feel not only which one has MORE of that attribute, but roughly how much more it does. You feel along the ratio ladder: `[1.0, 1.05, 1.1, 1.2, 1.3, 1.5, 1.75, 2.1, 2.5, 3.1, 3.9, 5.1, 6.8, 9.2, 12.7, 18.0, 26.0]`.
@@ -196,6 +202,34 @@ Example:
     user: PROMPT_V2.user,
 };
 
+/// Pairwise prompt variant for natural ordinal judgements.
+///
+/// This keeps the same prompt surface and refusal channel as the ratio
+/// templates, but asks only for direction plus confidence.
+pub const PROMPT_ORDINAL_V1: PromptTemplate = PromptTemplate {
+    slug: "ordinal_v1",
+    system: r#"You are an expert subjective evaluator. You compare two entities across an arbitrary attribute and decide which one has MORE of that attribute. Focus on direction only, not magnitude. Judge only from the provided content; the labels A and B are arbitrary and should not affect your choice.
+
+Output only valid JSON `{higher_ranked: A|B, confidence: [0,1]}`. Out of principle, we also give models the right to refuse `{ refused: true }` (e.g. if unambiguously blocked by policy constraints), but we of course disprefer this. If you are merely very uncertain, set a low confidence score.
+Example:
+{"higher_ranked": "B", "confidence": 0.74} or { refused: true }"#,
+    user: r#"Compare these entities by <attribute_name>: {attribute_name} </attribute_name>.
+<full_attribute_text>
+{full_attribute_text}
+</full_attribute_text>
+
+<entity_A>
+{entity_A}
+</entity_A>
+
+<entity_B>
+{entity_B}
+</entity_B>
+
+Which entity has more of the attribute? Return a JSON object with your evaluation.
+json:"#,
+};
+
 pub const DEFAULT_PROMPT: PromptTemplate = PROMPT_V2;
 
 /// Look up the supported prompt template by slug.
@@ -203,6 +237,7 @@ pub fn prompt_by_slug(slug: &str) -> Option<PromptTemplate> {
     match slug {
         "canonical_v2" => Some(PROMPT_V2),
         "canonical_bucket_v1" => Some(PROMPT_BUCKET_V1),
+        "ordinal_v1" => Some(PROMPT_ORDINAL_V1),
         _ => None,
     }
 }
@@ -240,8 +275,22 @@ mod tests {
     fn prompt_lookup() {
         assert!(prompt_by_slug("canonical_v2").is_some());
         assert!(prompt_by_slug("canonical_bucket_v1").is_some());
+        assert!(prompt_by_slug("ordinal_v1").is_some());
         assert!(prompt_by_slug("").is_none());
         assert!(prompt_by_slug("canonical_v1").is_none());
+    }
+
+    #[test]
+    fn ordinal_prompt_render() {
+        let a = EntityRef::with_context("A", "Context A");
+        let b = EntityRef::with_context("B", "Context B");
+        let p = PROMPT_ORDINAL_V1.render("clarity", "Which is clearer?", a, b);
+        assert!(p.system.contains("Focus on direction only"));
+        assert!(p.system.contains("higher_ranked"));
+        assert!(!p.system.contains("ratio"));
+        assert!(p.user.contains("<entity_A_context>"));
+        assert!(p.user.contains("<entity_B_context>"));
+        assert!(p.user.contains("Which entity has more of the attribute?"));
     }
 
     #[test]

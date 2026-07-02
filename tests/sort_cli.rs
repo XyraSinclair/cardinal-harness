@@ -390,3 +390,168 @@ fn cli_sort_without_key_or_cache_only_fails_with_guidance() {
     assert!(stderr.contains("OPENROUTER_API_KEY"), "stderr: {stderr}");
     assert!(stderr.contains("--cache-only"), "stderr: {stderr}");
 }
+
+/// A judge with pure position bias: always prefers whichever entity is
+/// presented as "A", regardless of content.
+#[derive(Clone, Copy)]
+struct AlwaysAJudge;
+
+impl Respond for AlwaysAJudge {
+    fn respond(&self, _request: &Request) -> ResponseTemplate {
+        ResponseTemplate::new(200).set_body_json(json!({
+            "choices": [{
+                "message": { "content": r#"{"higher_ranked":"A","ratio":2.5,"confidence":0.9}"# },
+                "finish_reason": "stop"
+            }],
+            "usage": { "prompt_tokens": 10, "completion_tokens": 10 }
+        }))
+    }
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn cli_sort_counterbalance_measures_pure_position_bias() {
+    let server = MockServer::start().await;
+    Mock::given(method("POST"))
+        .and(path("/chat/completions"))
+        .respond_with(AlwaysAJudge)
+        .mount(&server)
+        .await;
+    let mut args = COMMON_ARGS.to_vec();
+    args.extend_from_slice(&["--format", "json", "--quiet"]);
+    let output = run_sort(
+        &server.uri(),
+        &args,
+        "dull TIN spoon\nshiny GOLD ring\nold BRONZE coin\nbright SILVER fork\n",
+    );
+    assert!(
+        output.status.success(),
+        "stderr: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let parsed: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    let pairs = parsed["meta"]["pairs_counterbalanced"].as_u64().unwrap();
+    let flips = parsed["meta"]["position_flips"].as_u64().unwrap();
+    assert!(pairs > 0, "expected counterbalanced pairs, got 0");
+    // A judge that always answers "A" disagrees with itself on every
+    // counterbalanced pair: the receipt catches 100% position bias.
+    assert_eq!(
+        flips, pairs,
+        "pure position bias must flip every counterbalanced pair"
+    );
+}
+
+/// Polarity-aware metal judge: knows that "lack of shininess" inverts the
+/// direction, and understands the paraphrase "sheen".
+#[derive(Clone, Copy)]
+struct PolarityAwareJudge;
+
+impl Respond for PolarityAwareJudge {
+    fn respond(&self, request: &Request) -> ResponseTemplate {
+        let parsed: serde_json::Value = serde_json::from_slice(&request.body).unwrap_or_default();
+        let user_content = parsed
+            .get("messages")
+            .and_then(|m| m.as_array())
+            .and_then(|messages| {
+                messages
+                    .iter()
+                    .find(|m| m.get("role").and_then(|r| r.as_str()) == Some("user"))
+                    .and_then(|m| m.get("content").and_then(|c| c.as_str()))
+                    .map(str::to_string)
+            })
+            .unwrap_or_default();
+
+        let a_score = extract_between(&user_content, "<entity_A_context>", "</entity_A_context>")
+            .map(metal_score)
+            .unwrap_or(0);
+        let b_score = extract_between(&user_content, "<entity_B_context>", "</entity_B_context>")
+            .map(metal_score)
+            .unwrap_or(0);
+        let inverted = user_content.contains("lack of");
+
+        let a_effective = if inverted { -a_score } else { a_score };
+        let b_effective = if inverted { -b_score } else { b_score };
+        let (higher, ratio) = if a_effective >= b_effective {
+            (
+                "A",
+                if (a_effective - b_effective).abs() >= 2 {
+                    3.9
+                } else {
+                    1.5
+                },
+            )
+        } else {
+            (
+                "B",
+                if (b_effective - a_effective).abs() >= 2 {
+                    3.9
+                } else {
+                    1.5
+                },
+            )
+        };
+        let content = format!(r#"{{"higher_ranked":"{higher}","ratio":{ratio},"confidence":0.9}}"#);
+        ResponseTemplate::new(200).set_body_json(json!({
+            "choices": [{
+                "message": { "content": content },
+                "finish_reason": "stop"
+            }],
+            "usage": { "prompt_tokens": 10, "completion_tokens": 10 }
+        }))
+    }
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn cli_sort_two_sided_and_paraphrase_probes_report_consistency() {
+    let server = MockServer::start().await;
+    Mock::given(method("POST"))
+        .and(path("/chat/completions"))
+        .respond_with(PolarityAwareJudge)
+        .mount(&server)
+        .await;
+    let args = [
+        "--by",
+        "shininess",
+        "--model",
+        "test/judge",
+        "--no-cache",
+        "--seed",
+        "7",
+        "--budget",
+        "96",
+        "--two-sided",
+        "--also-by",
+        "sheen",
+        "--format",
+        "json",
+        "--quiet",
+    ];
+    let output = run_sort(
+        &server.uri(),
+        &args,
+        "dull TIN spoon\nshiny GOLD ring\nold BRONZE coin\nbright SILVER fork\n",
+    );
+    assert!(
+        output.status.success(),
+        "stderr: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let parsed: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    let items = parsed["items"].as_array().unwrap();
+    assert_eq!(items[0]["text"], "shiny GOLD ring");
+    assert_eq!(items[3]["text"], "dull TIN spoon");
+
+    let probes = parsed["probes"].as_array().unwrap();
+    assert_eq!(probes.len(), 2);
+    let opposite = probes.iter().find(|p| p["kind"] == "opposite").unwrap();
+    assert_eq!(opposite["prompt"], "lack of shininess");
+    assert!(
+        opposite["consistency"].as_f64().unwrap() > 0.5,
+        "polarity-aware judge should be cross-side consistent: {opposite}"
+    );
+    let paraphrase = probes.iter().find(|p| p["kind"] == "paraphrase").unwrap();
+    assert_eq!(paraphrase["prompt"], "sheen");
+    assert!(
+        paraphrase["consistency"].as_f64().unwrap() > 0.5,
+        "paraphrase probe should be consistent: {paraphrase}"
+    );
+}

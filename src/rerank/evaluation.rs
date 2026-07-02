@@ -9,6 +9,7 @@ use std::time::Instant;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 
+use crate::prompts::ORDINAL_OBSERVATION_RATIO;
 use crate::rating_engine::{
     AttributeParams, Config as EngineConfig, Observation, PlannerMode, RaterParams, RatingEngine,
 };
@@ -54,8 +55,6 @@ impl Default for PairwiseEvalConfig {
         }
     }
 }
-
-const ORDINAL_SYNTHETIC_RATIO: f64 = 2.1;
 
 fn parse_evaluation_gates<'a>(
     attributes: &'a [SyntheticAttribute],
@@ -1751,7 +1750,7 @@ fn simulate_pairwise(
     }
 
     if mode == SyntheticPairwiseMode::Ordinal {
-        ratio = ORDINAL_SYNTHETIC_RATIO;
+        ratio = ORDINAL_OBSERVATION_RATIO;
         confidence = 0.9;
     }
     ratio = ratio.clamp(1.0, 26.0);

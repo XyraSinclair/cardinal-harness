@@ -604,6 +604,13 @@ pub async fn multi_rerank(
 
     let mut refused_pairs: HashSet<(usize, usize, usize)> = HashSet::new();
     let mut models_used: HashSet<String> = HashSet::new();
+    // Counterbalancing receipts: first decisive direction observed per
+    // (attribute, pair) in each presentation order; a pair counts once.
+    let mut counterbalance_dirs: HashMap<(usize, usize, usize), [Option<HigherRanked>; 2]> =
+        HashMap::new();
+    let mut counterbalance_done: HashSet<(usize, usize, usize)> = HashSet::new();
+    let mut pairs_counterbalanced: usize = 0;
+    let mut position_flips: usize = 0;
     let mut presentation_rng = execution
         .run_options
         .rng_seed
@@ -640,6 +647,11 @@ pub async fn multi_rerank(
         }
 
         let batch_size = DEFAULT_BATCH_SIZE.min(remaining_budget);
+        if req.counterbalance_pairs && batch_size < 2 {
+            // A counterbalanced pair needs two calls; one slot of budget
+            // cannot start a pair.
+            break 'rerank RerankStopReason::BudgetExhausted;
+        }
         let proposal_request_size = (batch_size.saturating_mul(3)).max(batch_size);
         let proposals =
             manager.propose_batch(rater_id, proposal_request_size, PlannerMode::Hybrid)?;
@@ -678,22 +690,39 @@ pub async fn multi_rerank(
                 }
             }
 
-            let swapped = if req.randomize_presentation_order {
-                if let Some(rng) = presentation_rng.as_mut() {
-                    rng.gen_bool(0.5)
-                } else {
-                    rand::thread_rng().gen_bool(0.5)
+            if req.counterbalance_pairs {
+                // Both presentation orders, deterministically. Two calls per
+                // pair; presentation randomization is subsumed.
+                if tasks.len() + 2 > batch_size {
+                    break;
+                }
+                for swapped in [false, true] {
+                    tasks.push(CompareTask {
+                        key,
+                        attr_idx,
+                        i,
+                        j,
+                        swapped,
+                    });
                 }
             } else {
-                false
-            };
-            tasks.push(CompareTask {
-                key,
-                attr_idx,
-                i,
-                j,
-                swapped,
-            });
+                let swapped = if req.randomize_presentation_order {
+                    if let Some(rng) = presentation_rng.as_mut() {
+                        rng.gen_bool(0.5)
+                    } else {
+                        rand::thread_rng().gen_bool(0.5)
+                    }
+                } else {
+                    false
+                };
+                tasks.push(CompareTask {
+                    key,
+                    attr_idx,
+                    i,
+                    j,
+                    swapped,
+                });
+            }
 
             if tasks.len() >= batch_size {
                 break;
@@ -956,6 +985,20 @@ pub async fn multi_rerank(
                     } else {
                         higher_ranked
                     };
+                    if req.counterbalance_pairs
+                        && ratio > 1.0
+                        && !counterbalance_done.contains(&task.key)
+                    {
+                        let entry = counterbalance_dirs.entry(task.key).or_insert([None, None]);
+                        entry[task.swapped as usize] = Some(effective);
+                        if let [Some(unswapped_dir), Some(swapped_dir)] = *entry {
+                            pairs_counterbalanced += 1;
+                            if unswapped_dir != swapped_dir {
+                                position_flips += 1;
+                            }
+                            counterbalance_done.insert(task.key);
+                        }
+                    }
                     let (obs_i, obs_j) = match effective {
                         HigherRanked::A => (task.i, task.j),
                         HigherRanked::B => (task.j, task.i),
@@ -1234,6 +1277,8 @@ pub async fn multi_rerank(
         provider_output_tokens,
         provider_cost_nanodollars,
         provider_cost_is_estimate,
+        pairs_counterbalanced,
+        position_flips,
         stop_reason,
     };
 
@@ -1286,6 +1331,7 @@ mod tests {
             comparison_concurrency: None,
             max_pair_repeats: None,
             randomize_presentation_order: true,
+            counterbalance_pairs: false,
         }
     }
 

@@ -117,6 +117,7 @@ fn make_request(model: &str) -> MultiRerankRequest {
         comparison_concurrency: Some(1),
         max_pair_repeats: Some(1),
         randomize_presentation_order: true,
+        counterbalance_pairs: false,
     }
 }
 

@@ -508,6 +508,7 @@ fn cli_report_json_smoke() {
         comparison_concurrency: Some(1),
         max_pair_repeats: Some(1),
         randomize_presentation_order: true,
+        counterbalance_pairs: false,
     };
 
     let mut a_scores = HashMap::new();
@@ -571,6 +572,8 @@ fn cli_report_json_smoke() {
             provider_output_tokens: 45,
             provider_cost_nanodollars: 123_456_789,
             provider_cost_is_estimate: false,
+            pairs_counterbalanced: 0,
+            position_flips: 0,
             stop_reason: RerankStopReason::BudgetExhausted,
         },
     };
@@ -768,6 +771,7 @@ fn cli_report_rejects_stale_response_entities() {
         comparison_concurrency: Some(1),
         max_pair_repeats: Some(1),
         randomize_presentation_order: true,
+        counterbalance_pairs: false,
     };
 
     let mut scores = HashMap::new();
@@ -809,6 +813,8 @@ fn cli_report_rejects_stale_response_entities() {
             provider_output_tokens: 1,
             provider_cost_nanodollars: 1,
             provider_cost_is_estimate: false,
+            pairs_counterbalanced: 0,
+            position_flips: 0,
             stop_reason: RerankStopReason::ToleratedErrorMet,
         },
     };
