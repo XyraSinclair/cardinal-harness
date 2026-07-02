@@ -1,14 +1,14 @@
 [package]
 name = "cardinal-harness"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 license = "MIT"
-description = "The highest quality way to have LLMs put numbers on things — pairwise ratio judgments, robust statistics, uncertainty-aware stopping"
+description = "Sort and rank anything with LLMs: pairwise ratio judgements fitted into cardinal scores with uncertainty, active pair selection, and full cost receipts"
 readme = "README.md"
 repository = "https://github.com/XyraSinclair/cardinal-harness"
 homepage = "https://github.com/XyraSinclair/cardinal-harness"
 documentation = "https://docs.rs/cardinal-harness"
-keywords = ["llm", "reranking", "ranking", "pairwise", "cardinal"]
+keywords = ["llm", "ranking", "sorting", "pairwise", "reranking"]
 categories = ["algorithms", "science", "command-line-utilities"]
 include = [
     "/src/**",

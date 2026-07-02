@@ -7,7 +7,24 @@ Versioning once it reaches `1.0.0`.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-07-02
+
 ### Added
+- `cardinal sort`: sort newline-delimited items (or a JSON array) from a file
+  or stdin by a natural-language criterion, with `--scores`, `--reverse`,
+  `--format text|json|jsonl|csv`, `--top-k`, `--budget`, `--trace`,
+  `--cache-only` (keyless offline replay), and a one-line cost/stop receipt
+  on stderr. Refuses to print output when every comparison failed.
+- Library conveniences `sort_texts` / `sort_documents` (`rerank::sort`) over
+  the single-attribute rerank path, including a middle-boundary default for
+  whole-list sorts (a `top_k = n` degenerate case would stop before the first
+  comparison).
+- Tag-triggered release workflow building `cardinal` binaries for six targets
+  with sha256 checksums.
+- Tight crates.io packaging (explicit `include`, ~50 files), docs.rs metadata,
+  and `CITATION.cff`.
+- Live `cardinal sort` demo receipt pack under
+  `artifacts/live/sort-demo-2026-07-02/`.
 - Fixed CI checks under current stable toolchain (rustfmt/clippy/rustdoc).
 - Updated transitive dependency `bytes` to address RUSTSEC-2026-0007.
 - Added a Likert baseline synthetic eval runner (`cardinal eval-likert`) for comparisons.

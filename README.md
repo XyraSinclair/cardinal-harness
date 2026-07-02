@@ -1,40 +1,159 @@
 # cardinal-harness
 
-`cardinal-harness` is a pairwise-ratio reranking engine for cases where a plain scalar score would hide useful uncertainty.
+[![CI](https://github.com/XyraSinclair/cardinal-harness/actions/workflows/ci.yml/badge.svg)](https://github.com/XyraSinclair/cardinal-harness/actions/workflows/ci.yml)
+[![crates.io](https://img.shields.io/crates/v/cardinal-harness.svg)](https://crates.io/crates/cardinal-harness)
+[![docs.rs](https://img.shields.io/docsrs/cardinal-harness)](https://docs.rs/cardinal-harness)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-It does one job: turn noisy LLM pairwise ratio judgements into globally consistent cardinal scores with uncertainty, then spend the next comparison where it is expected to buy the most information.
+Sort lists with LLMs — and get numbers you can defend.
 
-Use it for list work where "how much better?" carries information: prompts, research ideas, candidate plans, reviewer notes, worktrees, backlog items, or any shortlist where the top cluster matters more than a cheap total order. Do not use it for deterministic rankings, scalar metrics, or cases where the attribute itself is incoherent.
+```console
+$ cardinal sort ideas.txt --by "expected impact on retention"
+```
 
-The trade is explicit: it costs more than one-shot scoring, saves comparisons versus exhaustive pairwise judging, and returns uncertainty plus receipts instead of only a sorted list. The checked-in receipts are deliberately mixed: the offline synthetic suite shows a strong cardinal win on a scale-compression case and Likert/scalar wins on several ranking metrics; the live OpenRouter method comparison shows agreement and disagreement against an LLM reference, not universal cardinal superiority.
+`cardinal-harness` turns noisy LLM pairwise **ratio** judgements ("how many
+times more of X does A have than B?") into globally consistent **cardinal
+scores with uncertainty**, spends each next comparison where it buys the most
+information about the order, and stops when the top-k is certain enough — or
+the budget runs out. Every run returns receipts: comparisons, tokens, dollar
+cost, stop reason, and an optional per-judgement trace.
+
+## Why not just ask the model to sort?
+
+Every obvious way to sort a list with an LLM breaks somewhere:
+
+| Approach | What breaks |
+|---|---|
+| "Rate each item 1–10" | Miscalibrated, anchor-dependent; scores cluster at 7–8; no error bars |
+| "Sort this list" in one prompt | Position bias, context limits, silently dropped or hallucinated items |
+| "Which is better, A or B?" over pairs | Ordinal only — throws away *how much* better; naive schedules cost O(n²) |
+| Elo / Bradley–Terry over wins | Better aggregation, but still magnitude-blind and usually passive about which pair to ask next |
+
+`cardinal-harness` treats each ratio answer as a noisy log-space measurement,
+fits latent scores over the whole comparison graph with a robust solver (IRLS,
+Huber loss), reads uncertainty off the posterior, and plans the next
+comparison by effective resistance on the graph. Default budget is 4·n
+comparisons — O(n), not O(n²).
+
+What you get that the alternatives don't, in one package:
+
+- **Cardinal magnitudes**, not just an order — "A is ~3× better" survives into the output.
+- **Uncertainty per item** and a top-k error estimate, honestly reported.
+- **Active pair selection** and principled stopping under an explicit budget.
+- **Receipts**: JSONL trace per judgement, token/cost accounting, SQLite cache, seeded reproducibility.
+
+## Quickstart
+
+```bash
+cargo install cardinal-harness
+export OPENROUTER_API_KEY=your_key_here   # any model on OpenRouter
+
+cardinal sort examples/sort-demo.txt --by "usefulness as advice for a software engineer" --scores
+```
+
+Real output (preserved, with full receipts, under
+[`artifacts/live/sort-demo-2026-07-02/`](artifacts/live/sort-demo-2026-07-02/)):
+
+```text
+1.082±0.741	premature optimization is the root of all evil
+0.609±0.785	measure twice, cut once
+0.514±0.772	a chain is only as strong as its weakest link
+0.451±0.768	don't put all your eggs in one basket
+0.327±0.758	practice makes perfect
+0.258±0.785	if it ain't broke, don't fix it
+0.180±0.783	too many cooks spoil the broth
+0.000±0.737	a bird in the hand is worth two in the bush
+
+sorted 8 items by "usefulness as advice for a software engineer" · 32 comparisons (1 cached, 0 refused) · $0.0500 · stop: budget_exhausted
+```
+
+Note what the receipt admits: at the default 4·n budget those posterior stds
+overlap. You get a well-motivated point estimate of the order, not a certified
+one — raise `--budget` or focus `--top-k` when you need certainty. The same
+run replays offline, keyless, for $0 via `--cache-only`.
+
+`sort` reads newline-delimited items or a JSON array (of strings or
+`{"id","text"}` objects) from a file or stdin, and writes plain lines (pipeable),
+`--format json|jsonl|csv`, `--scores`, `--reverse`, `--trace trace.jsonl`.
+A sort where every comparison fails refuses to print, loudly.
+
+## Library
+
+```rust,no_run
+use std::sync::Arc;
+use cardinal_harness::gateway::NoopUsageSink;
+use cardinal_harness::rerank::{sort_texts, RerankExecution, SortOptions};
+use cardinal_harness::{Attribution, ProviderGateway};
+
+# async fn demo() -> Result<(), Box<dyn std::error::Error>> {
+let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
+let execution = RerankExecution::new(Arc::new(gateway), Attribution::new("app::sort"));
+
+let sorted = sort_texts(
+    vec![
+        "First essay...".into(),
+        "Second essay...".into(),
+        "Third essay...".into(),
+    ],
+    "clarity of explanation",
+    execution,
+    SortOptions::default(),
+)
+.await?;
+
+for item in &sorted.items {
+    println!("{:>2}. {:.3} ± {:.3}  {}", item.rank, item.latent_mean, item.latent_std, item.text);
+}
+println!("cost: ${:.4}", sorted.meta.provider_cost_nanodollars as f64 / 1e9);
+# Ok(())
+# }
+```
+
+`sort_documents` is the same with caller-owned ids. For multiple weighted
+attributes, hard gates ("must be above the 25th percentile on safety"),
+top-k-focused stopping, model ladder policies, and caching, use the full
+`multi_rerank` API — see [docs/WORKED_EXAMPLE.md](docs/WORKED_EXAMPLE.md).
 
 ## Scope
 
 This repo is intentionally narrow. It contains:
 
-- canonical pairwise ratio prompts
-- the ratio ladder and JSON judgement contract
+- canonical pairwise ratio prompts (the ratio ladder and JSON judgement contract)
 - robust score fitting over pairwise observations
-- multi-attribute reranking, gating, and stopping
+- multi-attribute reranking, gating, and top-k stopping
 - OpenRouter gateway, pricing, usage, and SQLite cache support
 - synthetic evaluation and reporting
 
-Research workflows, training/export code, agent orchestration, and other experimental layers belong in `openpriors-research`, not here.
+Research workflows, training/export code, agent orchestration, and other
+experimental layers belong in `openpriors-research`, not here.
+
+Use it for list work where "how much better?" carries information: prompts,
+research ideas, candidate plans, reviewer notes, backlog items — any shortlist
+where the top cluster matters more than a cheap total order. Do not use it for
+deterministic rankings, scalar metrics, or attributes too incoherent to
+compare.
 
 ## Evidence status
 
-The public evidence is deliberately reproducible and deliberately narrow:
+The trade is explicit: this costs more than one-shot scoring, saves
+comparisons versus exhaustive pairwise judging, and returns uncertainty plus
+receipts instead of only a sorted list. The public evidence is deliberately
+reproducible and deliberately narrow — it does **not** show a universal win:
 
 - Offline synthetic evaluation and Likert/scalar comparison receipts live under `artifacts/eval/`.
-- Preserved real OpenRouter cardinal-policy receipts live under `artifacts/live/openrouter-benchmark-2026-06-30/`; they cover three policy runs, 459 fresh provider comparisons, 0 cache hits, 0 refusals, and $0.994335 provider-reported cost.
-- A live structured-judgment method comparison lives under `artifacts/live/method-comparison-2026-06-30-suite-v1/`; it compares scalar matrix, whole-list sort, ordinal pairwise, and cardinal pairwise-ratio regimes against a separate LLM reference across six frozen task families.
-- `tests/live_method_receipts.rs` guards the live method pack: schema version, frozen suite hash, per-call request/response/parsed/usage receipts, aggregate usage totals, budget-normalized rows, and absence of provider keys or local absolute paths.
-- The compact five-metric offline `comparison_summary.json` is mixed: 10 cardinal wins, 12 Likert wins, and 18 ties across the checked-in cases. The offline raw-receipt delta adds gate metrics and currently reports 10/12/20 across 42 comparable rows.
-- The live method comparison is also mixed: cardinal ties the best candidate regime on `public_artifact_work` and `benchmark_design_rigor`, stays close on `judgment_method_properties` and `public_release_risks`, and lags sharply on `model_policy_options` and `first_user_path`.
+- Preserved real OpenRouter cardinal-policy receipts live under `artifacts/live/openrouter-benchmark-2026-06-30/`: three policy runs, 459 fresh provider comparisons, 0 cache hits, 0 refusals, $0.994335 provider-reported cost.
+- A live structured-judgment method comparison lives under `artifacts/live/method-comparison-2026-06-30-suite-v1/`: scalar matrix vs whole-list sort vs ordinal pairwise vs cardinal pairwise-ratio, judged against a separate LLM reference across six frozen task families.
+- A live `sort` demo receipt lives under `artifacts/live/sort-demo-2026-07-02/`.
+- `tests/live_method_receipts.rs` guards the live method pack: schema version, frozen suite hash, per-call receipts, usage totals, and absence of provider keys or local paths.
+- The compact five-metric offline summary is mixed: 10 cardinal wins, 12 Likert wins, 18 ties. The raw-receipt delta reports 10/12/20 across 42 comparable rows.
+- The live method comparison is also mixed: cardinal ties the best regime on two task families, stays close on two, and lags sharply on two.
 - All current cardinal synthetic runs stop at `budget_exhausted`; the receipts do not prove early stopping or lower cost.
-- Equal call counts are not equal token cost. Pairwise prompts compare two items; scalar prompts rate one item.
+- Equal call counts are not equal token cost: pairwise prompts carry two items, scalar prompts one.
 
-The next empirical proof target is a larger frozen benchmark with repeated runs, equalized token or dollar budgets, more held-out task families, and human or high-budget external reference judgements.
+The next empirical proof target is a larger frozen benchmark with repeated
+runs, equalized token or dollar budgets, more held-out task families, and
+human or high-budget external reference judgements. Details in
+[docs/EVALUATION.md](docs/EVALUATION.md).
 
 ## Core idea
 
@@ -42,7 +161,13 @@ Instead of asking an LLM for unstable absolute scores, ask:
 
 > How many times more of attribute X does A have than B?
 
-Each answer becomes a noisy log-ratio observation. `cardinal-harness` fits latent scores that best explain the full comparison graph, tracks uncertainty, and stops once top-k is sufficiently certain.
+Each answer becomes a noisy log-ratio observation on a fixed ladder
+(1.0 … 26.0, geometric). Log-ratios compose additively, so the full comparison
+graph over-determines the latent scores; a robust solver (IRLS + Huber)
+downweights outlier judgements, the posterior gives per-item uncertainty, and
+the planner targets the pair whose observation most reduces uncertainty about
+the top-k boundary. Full rationale in [docs/ALGORITHM.md](docs/ALGORITHM.md)
+and the compact mathematical contract in [docs/MODEL.md](docs/MODEL.md).
 
 ## Prompt surfaces
 
@@ -53,170 +178,56 @@ Two prompt templates are supported:
 | `canonical_v2` | `{"higher_ranked":"A|B","ratio":1.0..26.0,"confidence":0.0..1.0}` | Default pairwise-ratio judgement. Use this unless you specifically need bucket-token logprobs. |
 | `canonical_bucket_v1` | `{"higher_ranked":"A|B","ratio_bucket":0..16,"confidence":0.0..1.0}` | Bucket-index variant for runs that need to map output logprobs onto the fixed ratio ladder. |
 
-Both templates use the same ratio ladder and the same refusal shape: `{"refused":true}`. Unknown `prompt_template_slug` values are rejected. Details live in [docs/PROMPTS.md](docs/PROMPTS.md).
-
-## Quickstart
-
-```bash
-export OPENROUTER_API_KEY=your_key_here
-cargo run --example quickstart
-```
-
-Library use:
-
-```rust,no_run
-use std::sync::Arc;
-use cardinal_harness::{Attribution, ProviderGateway, SqlitePairwiseCache};
-use cardinal_harness::gateway::NoopUsageSink;
-use cardinal_harness::rerank::{
-    ModelLadderPolicy, MultiRerankAttributeSpec, MultiRerankEntity, MultiRerankRequest,
-    MultiRerankTopKSpec, RerankRunOptions,
-};
-
-# async fn demo() -> Result<(), Box<dyn std::error::Error>> {
-let cache = SqlitePairwiseCache::new(SqlitePairwiseCache::default_path())?;
-let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
-
-let req = MultiRerankRequest {
-    entities: vec![
-        MultiRerankEntity { id: "a".into(), text: "First essay...".into() },
-        MultiRerankEntity { id: "b".into(), text: "Second essay...".into() },
-        MultiRerankEntity { id: "c".into(), text: "Third essay...".into() },
-    ],
-    attributes: vec![MultiRerankAttributeSpec {
-        id: "clarity".into(),
-        prompt: "clarity of explanation".into(),
-        prompt_template_slug: Some("canonical_v2".into()),
-        weight: 1.0,
-    }],
-    topk: MultiRerankTopKSpec {
-        k: 2,
-        ..serde_json::from_str("{}").unwrap()
-    },
-    gates: vec![],
-    comparison_budget: None,
-    latency_budget_ms: None,
-    model: None,
-    rater_id: None,
-    comparison_concurrency: None,
-    max_pair_repeats: None,
-    randomize_presentation_order: true,
-};
-
-let resp = cardinal_harness::rerank::multi_rerank(
-    req,
-    cardinal_harness::rerank::RerankExecution::new(
-        Arc::new(gateway),
-        Attribution::new("example::quickstart"),
-    )
-    .cache(&cache)
-    .model_policy(Arc::new(ModelLadderPolicy::default()))
-    .run_options(RerankRunOptions { rng_seed: None, cache_only: false }),
-).await?;
-
-for entity in &resp.entities {
-    println!("{} {:?}: {:.3} ± {:.3}", entity.id, entity.rank, entity.u_mean, entity.u_std);
-}
-# Ok(())
-# }
-```
+Both templates use the same ratio ladder and the same refusal shape:
+`{"refused":true}`. Unknown `prompt_template_slug` values are rejected.
+Details in [docs/PROMPTS.md](docs/PROMPTS.md).
 
 ## CLI
 
-The CLI `rerank` command reads a `MultiRerankRequest` JSON file. A copy-pasteable example lives at [`examples/multi-rerank-request.json`](examples/multi-rerank-request.json). Use `validate` first when you want schema and invariant checks without an API key, cache, or network call.
+Beyond `sort`, the CLI exposes the full request surface:
 
 ```bash
-# Validate request JSON locally before running a model.
-cargo run --bin cardinal -- validate \
-  --request examples/multi-rerank-request.json
+# Validate a multi-rerank request locally: no API key, cache, or network.
+cargo run --bin cardinal -- validate --request examples/multi-rerank-request.json
 
-# Expand one request across supported prompt templates and attribute variants.
+# Full multi-attribute rerank from JSON, with trace and markdown report.
+cargo run --bin cardinal -- rerank \
+  --request examples/multi-rerank-request.json \
+  --out output.json --trace trace.jsonl --report report.md
+
+# Model policies: built-in names or JSON files.
+cargo run --bin cardinal -- rerank \
+  --request examples/multi-rerank-request.json \
+  --policy frontier_ladder --out output.json
+#   examples/model-policy-quality-only.json    -> anthropic/claude-opus-4.6
+#   examples/model-policy-cost-aware-fast.json -> deepseek/deepseek-v4-flash
+#   examples/model-policy-frontier-ladder.json -> opus 4.6 -> gemini 3.1 pro preview -> gpt-5.4-mini
+
+# Expand one request across prompt templates and attribute variants.
 cargo run --bin cardinal -- experiment-expand \
   --request examples/multi-rerank-request.json \
-  --prompt-template canonical_v2 \
-  --prompt-template canonical_bucket_v1 \
-  --include-negative \
-  --variant-json examples/prompt-experiment-variants.json \
+  --prompt-template canonical_v2 --prompt-template canonical_bucket_v1 \
+  --include-negative --variant-json examples/prompt-experiment-variants.json \
   --out expanded-request.json
 
-
-export OPENROUTER_API_KEY=your_key_here
-
-# Rerank from JSON. The example includes both canonical_v2 and canonical_bucket_v1 attributes.
-cargo run --bin cardinal -- rerank \
-  --request examples/multi-rerank-request.json \
-  --out output.json \
-  --trace trace.jsonl \
-  --report report.md
-
-# Rerank with an explicit modern OpenRouter policy file.
-cargo run --bin cardinal -- rerank \
-  --request examples/multi-rerank-request.json \
-  --policy-config examples/model-policy-frontier-ladder.json \
-  --out output.json \
-  --trace trace.jsonl \
-  --report report.md
-
-# Or use a built-in policy name.
-cargo run --bin cardinal -- rerank \
-  --request examples/multi-rerank-request.json \
-  --policy frontier_ladder \
-  --out output.json
-
-# Other copy-paste policy recipes:
-#   examples/model-policy-quality-only.json       -> anthropic/claude-opus-4.6
-#   examples/model-policy-cost-aware-fast.json    -> deepseek/deepseek-v4-flash
-#   examples/model-policy-frontier-ladder.json    -> opus 4.6 -> gemini 3.1 pro preview -> gpt-5.4-mini
-
-
-# Generate a markdown or JSON report later from a saved request + response.
+# Generate a report later from a saved request + response.
 cargo run --bin cardinal -- report \
   --request examples/multi-rerank-request.json \
-  --response output.json \
-  --out report.md
+  --response output.json --out report.md
 
-# Simple single-attribute request shape for library/API callers.
-# See examples/simple-rerank-request.json; the current CLI accepts the multi-rerank shape above.
-```
-
-Other maintenance commands:
-
-```bash
-# Synthetic evaluation receipts, no API key required.
+# Offline synthetic evaluation receipts (no API key).
 cargo run --bin cardinal -- eval --out artifacts/eval/synthetic_eval.jsonl --curve-csv artifacts/eval/synthetic_curves.csv
 cargo run --bin cardinal -- eval-likert --out artifacts/eval/likert_eval.jsonl --curve-csv artifacts/eval/likert_curves.csv
-
-# Compact built-in comparison summary, plus a scriptable CSV/text delta.
 cargo run --bin cardinal -- eval-compare --mode ratio --out artifacts/eval/comparison_summary.json
-python3 examples/offline_eval_delta.py \
-  --cardinal artifacts/eval/synthetic_eval.jsonl \
-  --likert artifacts/eval/likert_eval.jsonl \
-  --csv artifacts/eval/offline-workflow/cardinal_vs_likert_delta.csv \
-  --summary artifacts/eval/offline-workflow/cardinal_vs_likert_summary.txt
 
-# Optional control: active ordinal pairwise judgements without ratio magnitude.
-cargo run --bin cardinal -- eval-compare --mode ordinal --out artifacts/eval/comparison_summary_ordinal.json
-
-# Real OpenRouter receipt pack; requires OPENROUTER_API_KEY and spends provider credits.
-python3 examples/live_openrouter_benchmark.py \
-  --out-dir artifacts/live/openrouter-benchmark-2026-06-30/quality_only \
-  --policy-config examples/model-policy-quality-only.json
-
-# Preserved receipts from the 2026-06-30 run cover quality-only, frontier-ladder,
-# and cost-aware-fast policies under artifacts/live/openrouter-benchmark-2026-06-30/.
-# Live structured-judgment method comparison; compares scalar matrix,
-# list sort, ordinal pairwise, and cardinal pairwise-ratio regimes against
-# a live pairwise-ratio reference. Requires OPENROUTER_API_KEY.
-python3 examples/live_method_comparison.py \
-  --out-dir artifacts/live/method-comparison-2026-06-30-suite-v1 \
-  --candidate-model openai/gpt-5.4-mini \
-  --reference-model anthropic/claude-sonnet-4.6 \
-  --max-usd 10
-
-# Cache management
+# Cache management.
 cargo run --bin cardinal -- cache-export --out cache.jsonl
 cargo run --bin cardinal -- cache-prune --max-age-days 30
 ```
+
+Live benchmark scripts (`examples/live_openrouter_benchmark.py`,
+`examples/live_method_comparison.py`) reproduce the checked-in receipt packs;
+both require `OPENROUTER_API_KEY` and spend provider credits.
 
 ## Architecture
 
@@ -225,21 +236,19 @@ cargo run --bin cardinal -- cache-prune --max-age-days 30
 | `rating_engine` | Robust IRLS solver and comparison planning |
 | `trait_search` | Multi-attribute utility composition, gating, top-k uncertainty |
 | `rerank` | Orchestration loop, comparison execution, stopping, traces, reports |
+| `rerank::sort` | List-in, list-out sorting convenience over the same engine |
 | `prompts` | Canonical pairwise ratio prompt and ratio ladder |
 | `cache` | SQLite-backed memoization for pairwise judgements |
 | `gateway` | OpenRouter client, pricing, usage, attribution |
 | `text_chunking` | Token-aware chunking helpers |
 
-
-Data flow:
-
 ```text
-request JSON
+list or request JSON
   -> rerank manager
   -> per-attribute rating engines
   -> active planner
   -> OpenRouter gateway + SQLite cache
-  -> trace JSONL + response JSON + markdown report
+  -> sorted output + trace JSONL + response JSON + markdown report
 ```
 
 ## Documentation
@@ -248,8 +257,9 @@ request JSON
 - [docs/MODEL.md](docs/MODEL.md): compact mathematical contract, assumptions, and failure modes
 - [docs/PROMPTS.md](docs/PROMPTS.md): supported prompt templates, output contracts, and JSON request examples
 - [docs/WORKED_EXAMPLE.md](docs/WORKED_EXAMPLE.md): concrete rerank walkthrough with request shape, gates, stop reasons, uncertainty, cache, and reproducibility receipts
-- [docs/EVALUATION.md](docs/EVALUATION.md): checked-in synthetic evaluation receipts, raw artifacts, and an honest cardinal-vs-Likert comparison
+- [docs/EVALUATION.md](docs/EVALUATION.md): checked-in synthetic evaluation receipts and an honest cardinal-vs-Likert comparison
 - [docs/BENCHMARKS.md](docs/BENCHMARKS.md): scaling harness and current dense-solver receipt
+- [docs/COMPARISON.md](docs/COMPARISON.md): how this relates to RankGPT-style listwise ranking, pairwise preference prompting, Bradley–Terry/Elo aggregation, and query-relevance rerankers
 
 ## License
 
