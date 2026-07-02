@@ -7,6 +7,28 @@ Versioning once it reaches `1.0.0`.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-07-02
+
+### Added
+- `cardinal judge`: single fully-transparent pairwise judgement (`--show-prompt`
+  prints the rendered system+user prompt; `--json` for structured output;
+  ratio, ordinal, and bucket templates).
+- `cardinal elaborate` and `sort --elaborate`: one LLM call expands a terse
+  criterion into a precise judging rubric (definition, what counts, what must
+  not be rewarded), printed and used verbatim as the attribute prompt.
+- `cardinal explain`: reverse-engineer an existing ranking — measure candidate
+  attributes (user-supplied and/or `--propose`d by an LLM) against a believed
+  order, report per-attribute Spearman and fitted non-negative weights
+  (`explain_ranking` / `propose_candidates` in the library).
+- Top-k exploration pruning: `prune_p_topk_below` on top-k specs (and
+  `--prune-below` on `sort`) stops spending forced-exploration comparisons on
+  items whose posterior chance of reaching the top-k is negligible;
+  `entities_pruned` receipt in response meta.
+- Live taste-tooling receipt pack under
+  `artifacts/live/taste-tools-demo-2026-07-02/` showing attribute recovery:
+  explain identifies the criterion that actually generated a ranking (ρ=+0.98,
+  weight 0.85) against three LLM-proposed decoys.
+
 ## [0.3.0] - 2026-07-02
 
 ### Added

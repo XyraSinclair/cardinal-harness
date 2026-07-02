@@ -1,0 +1,1 @@
+elaborated "usefulness as advice for a software engineer" via anthropic/claude-sonnet-4.6 · 209 in / 186 out tokens · $0.0034

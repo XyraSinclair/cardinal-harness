@@ -1,0 +1,5 @@
+proposed 3 candidate attributes ($0.0013):
+  - relevance to software engineering principles
+  - encourages proactive careful planning
+  - wisdom applicable to technical decision-making
+200 comparisons (36 cached, 0 refused) · $0.4464 · order flips: 11/82

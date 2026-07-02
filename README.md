@@ -114,6 +114,52 @@ swap, confirmed the criterion is two-sided coherent, and flagged that a
 reasonable-sounding paraphrase materially changes the ranking. None of this is
 visible in a single-prompt sort or a 1–10 rating pass.
 
+## Building taste: elaborate, judge, explain
+
+Good sorts start with good attribute prompts. Three commands help you get
+there, from most magic to most manual:
+
+- **`cardinal elaborate --by "impact"`** — one LLM call expands a terse
+  criterion into a precise judging rubric (definition, what counts as more,
+  what must not be rewarded), printed to stdout so it composes:
+  `cardinal sort list.txt --by "$(cardinal elaborate --by impact)"` — or use
+  `cardinal sort --elaborate` to do it inline. The rubric is always shown:
+  the magic stays inspectable and editable.
+- **`cardinal judge "<A>" "<B>" --by "<criterion>" --show-prompt`** — the
+  lowest-level primitive: one pairwise judgement, with the fully rendered
+  prompt on stderr and the parsed answer (direction, ratio, confidence,
+  cost) on stdout. This is how you develop taste for what a criterion
+  actually asks of the judge.
+- **`cardinal explain ranking.txt --candidate "clarity" --propose 3`** — the
+  inverse problem: you already HAVE a ranking you believe in. Explain
+  measures candidate attributes (yours, plus LLM-proposed ones) with the
+  normal pairwise machinery and reports which of them — alone and in fitted
+  non-negative combination — reconstruct your order.
+
+A real explain receipt (preserved under
+[`artifacts/live/taste-tools-demo-2026-07-02/`](artifacts/live/taste-tools-demo-2026-07-02/)),
+run against a ranking whose true generating attribute was known:
+
+```text
+attribute                                    | alone ρ | weight
+---------------------------------------------|---------|-------
+usefulness as advice for a software engineer |   +0.98 | 0.85
+relevance to software engineering principles |   +0.79 | 0.01
+encourages proactive careful planning        |   +0.21 | 0.00
+wisdom applicable to technical decision-maki |   +0.81 | 0.15
+
+weighted combination reconstructs your ranking at ρ = +0.98
+```
+
+The true attribute is recovered — top standalone correlation and dominant
+fitted weight — while three plausible decoys are down-weighted. (One run, one
+list; a demonstration of the mechanism, not a benchmark.)
+
+When only the top of a list matters, `--top-k K` focuses the planner on the
+K-boundary and `--prune-below <p>` additionally stops spending exploration
+comparisons on items whose posterior chance of reaching the top-K drops below
+`p` — the pruned count lands in the receipts as `entities_pruned`.
+
 ## Library
 
 ```rust,no_run
