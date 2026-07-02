@@ -54,6 +54,9 @@ Background sync automation, if any, should default to `git fetch`, not blind
 
 - `src/rating_engine.rs`: IRLS solver, planning, diagnostics
 - `src/rerank/`: orchestration loop, stopping logic, trace/report output
+- `src/rerank/sort.rs`: list-in/list-out sorting convenience (`sort_texts`,
+  `sort_documents`) over the single-attribute path; CLI `sort` verb lives in
+  `src/bin/cardinal.rs`
 - `src/rerank/comparison.rs`: pairwise LLM comparison logic
 - `src/prompts.rs`: prompt templates and ratio ladder
 - `src/gateway/`: OpenRouter adapter, pricing, usage, logprobs
