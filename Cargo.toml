@@ -10,10 +10,25 @@ homepage = "https://github.com/XyraSinclair/cardinal-harness"
 documentation = "https://docs.rs/cardinal-harness"
 keywords = ["llm", "reranking", "ranking", "pairwise", "cardinal"]
 categories = ["algorithms", "science", "command-line-utilities"]
+include = [
+    "/src/**",
+    "/examples/*.rs",
+    "/examples/*.json",
+    "/docs/**",
+    "/CHANGELOG.md",
+    "/CITATION.cff",
+    "/Cargo.lock",
+    "/Cargo.toml",
+    "/LICENSE",
+    "/README.md",
+]
 
 [features]
 default = ["sqlite-store"]
 sqlite-store = ["rusqlite", "fs2"]
+
+[package.metadata.docs.rs]
+all-features = true
 
 [dependencies]
 async-trait = "0.1"

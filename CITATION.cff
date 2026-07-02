@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use cardinal-harness in your research, please cite it as below."
+title: "cardinal-harness: pairwise-ratio LLM judgements fitted into cardinal scores with uncertainty"
+type: software
+authors:
+  - family-names: Sinclair
+    given-names: Xyra
+repository-code: "https://github.com/XyraSinclair/cardinal-harness"
+license: MIT
+keywords:
+  - llm-as-judge
+  - pairwise comparison
+  - ranking
+  - reranking
+  - uncertainty quantification
+abstract: >-
+  cardinal-harness elicits pairwise ratio judgements from LLMs
+  ("how many times more of attribute X does A have than B?"),
+  fits globally consistent cardinal latent scores with uncertainty
+  via robust IRLS over the comparison graph, actively selects the
+  most informative next comparison, and stops when the top-k
+  ranking is certain within a stated budget. It records full
+  cost, usage, and trace receipts for every run.
