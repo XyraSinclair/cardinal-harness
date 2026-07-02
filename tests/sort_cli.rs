@@ -555,3 +555,50 @@ async fn cli_sort_two_sided_and_paraphrase_probes_report_consistency() {
         "paraphrase probe should be consistent: {paraphrase}"
     );
 }
+
+#[tokio::test]
+async fn library_sort_accepts_prune_option_end_to_end() {
+    let server = start_judge().await;
+    let adapter =
+        OpenRouterAdapter::with_config("sk-test", server.uri(), Duration::from_secs(5), None, None)
+            .unwrap();
+    let gateway = Arc::new(ProviderGateway::with_config(
+        adapter,
+        Arc::new(NoopUsageSink),
+        GatewayConfig {
+            max_retries: 0,
+            retry_base_delay: Duration::from_millis(0),
+        },
+    ));
+    let execution = RerankExecution::new(gateway, Attribution::new("test::prune"));
+
+    let sorted = sort_texts(
+        vec![
+            "shiny GOLD ring".into(),
+            "bright SILVER fork".into(),
+            "old BRONZE coin".into(),
+            "dull TIN spoon".into(),
+        ],
+        "shininess",
+        execution,
+        SortOptions {
+            model: Some("test/judge".into()),
+            comparison_budget: Some(30),
+            top_k: Some(2),
+            prune_p_topk_below: Some(0.2),
+            counterbalance: false,
+            ..Default::default()
+        },
+    )
+    .await
+    .unwrap();
+
+    // Small lists blanket every pair in the first batch, so nothing needs
+    // pruning here (the deterministic pruning behavior is covered at the
+    // engine level in tests/trait_search_prune.rs). The option must still
+    // round-trip and the receipt field must be present.
+    assert_eq!(sorted.items[0].text, "shiny GOLD ring");
+    assert_eq!(sorted.items[1].text, "bright SILVER fork");
+    let json = serde_json::to_value(&sorted.meta).unwrap();
+    assert!(json.get("entities_pruned").is_some());
+}

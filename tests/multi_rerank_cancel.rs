@@ -54,6 +54,7 @@ async fn multi_rerank_honors_cancel_flag_before_any_comparisons() {
             stop_sigma_inflate: 1.25,
             stop_min_consecutive: 2,
             min_explore_degree: 2,
+            prune_p_topk_below: None,
         },
         gates: vec![],
         comparison_budget: Some(10),

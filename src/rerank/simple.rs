@@ -52,6 +52,7 @@ pub fn to_multi_request(req: &RerankRequest) -> MultiRerankRequest {
         stop_sigma_inflate: 1.25,
         stop_min_consecutive: 2,
         min_explore_degree: 2,
+        prune_p_topk_below: req.prune_p_topk_below,
     };
 
     MultiRerankRequest {
@@ -124,6 +125,7 @@ pub(crate) fn meta_from_multi(meta: super::types::MultiRerankMeta) -> RerankMeta
         provider_output_tokens: meta.provider_output_tokens,
         provider_cost_nanodollars: meta.provider_cost_nanodollars,
         provider_cost_is_estimate: meta.provider_cost_is_estimate,
+        entities_pruned: meta.entities_pruned,
         pairs_counterbalanced: meta.pairs_counterbalanced,
         position_flips: meta.position_flips,
         stop_reason: meta.stop_reason,

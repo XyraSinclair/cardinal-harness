@@ -853,6 +853,7 @@ pub fn run_synthetic_case_with_config(
         stop_sigma_inflate: case.topk.stop_sigma_inflate,
         stop_min_consecutive: case.topk.stop_min_consecutive,
         min_explore_degree: case.topk.min_explore_degree,
+        prune_p_topk_below: None,
     };
 
     let parsed_gates = parse_evaluation_gates(&case.attributes, &case.gates)?;
@@ -1582,6 +1583,7 @@ fn default_topk(k: usize) -> MultiRerankTopKSpec {
         stop_sigma_inflate: 1.25,
         stop_min_consecutive: 2,
         min_explore_degree: 2,
+        prune_p_topk_below: None,
     }
 }
 

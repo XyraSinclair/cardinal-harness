@@ -421,6 +421,7 @@ fn build_trait_search_config(req: &MultiRerankRequest) -> (TraitSearchConfig, To
         stop_sigma_inflate: req.topk.stop_sigma_inflate,
         stop_min_consecutive: req.topk.stop_min_consecutive,
         min_explore_degree: req.topk.min_explore_degree,
+        prune_p_topk_below: req.topk.prune_p_topk_below,
     };
     let gates = req
         .gates
@@ -1277,6 +1278,7 @@ pub async fn multi_rerank(
         provider_output_tokens,
         provider_cost_nanodollars,
         provider_cost_is_estimate,
+        entities_pruned: manager.explore_pruned_count(),
         pairs_counterbalanced,
         position_flips,
         stop_reason,
@@ -1322,6 +1324,7 @@ mod tests {
                 stop_sigma_inflate: 1.25,
                 stop_min_consecutive: 2,
                 min_explore_degree: 2,
+                prune_p_topk_below: None,
             },
             gates: Vec::new(),
             comparison_budget: Some(1),

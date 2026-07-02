@@ -10,8 +10,10 @@
 //! - Multi: Full trait search with gates and weights
 
 pub mod comparison;
+pub mod elaborate;
 pub mod evaluation;
 pub mod experiments;
+pub mod explain;
 mod gates;
 pub mod hooks;
 pub mod model_policy;
@@ -30,9 +32,14 @@ pub use comparison::{
     compare_pair, ComparisonError, PairwiseComparisonAttribute, PairwiseComparisonEntity,
     PairwiseComparisonRequest, PairwiseComparisonSpec,
 };
+pub use elaborate::{elaborate_criterion, ElaborateError, ElaboratedCriterion};
 pub use experiments::{
     expand_prompt_experiment_request, AttributePolarity, AttributeVariantSpec,
     PromptExperimentConfig, PromptExperimentError,
+};
+pub use explain::{
+    explain_ranking, propose_candidates, AttributeExplanation, ExplainError, ExplainOptions,
+    Explanation, ProposalUsage,
 };
 pub use hooks::{
     ComparisonEvent, ComparisonObserver, ObserverError, WarmStartData, WarmStartError,

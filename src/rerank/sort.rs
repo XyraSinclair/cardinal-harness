@@ -77,6 +77,10 @@ pub struct SortOptions {
     /// Alternate phrasings of the criterion, each judged as an additional
     /// weight-1 attribute and reported as a paraphrase-consistency probe.
     pub also_by: Vec<String>,
+    /// Prune hopeless items from forced exploration once their probability
+    /// of reaching the top-k falls below this threshold. Saves queries when
+    /// only the top of the list matters. Off by default.
+    pub prune_p_topk_below: Option<f64>,
 }
 
 impl Default for SortOptions {
@@ -91,6 +95,7 @@ impl Default for SortOptions {
             counterbalance: true,
             two_sided: false,
             also_by: Vec::new(),
+            prune_p_topk_below: None,
         }
     }
 }
@@ -238,6 +243,7 @@ pub async fn sort_documents(
                 provider_output_tokens: 0,
                 provider_cost_nanodollars: 0,
                 provider_cost_is_estimate: false,
+                entities_pruned: 0,
                 pairs_counterbalanced: 0,
                 position_flips: 0,
                 stop_reason: super::types::RerankStopReason::ToleratedErrorMet,
@@ -353,6 +359,7 @@ async fn sort_with_probes(
             stop_sigma_inflate: 1.25,
             stop_min_consecutive: 2,
             min_explore_degree: 2,
+            prune_p_topk_below: opts.prune_p_topk_below,
         },
         gates: Vec::new(),
         comparison_budget: opts.comparison_budget,
@@ -440,7 +447,7 @@ async fn sort_with_probes(
 
 /// Spearman rank correlation with average ranks for ties.
 /// Returns `None` for fewer than 3 points or zero variance.
-fn spearman(xs: &[f64], ys: &[f64]) -> Option<f64> {
+pub(crate) fn spearman(xs: &[f64], ys: &[f64]) -> Option<f64> {
     if xs.len() != ys.len() || xs.len() < 3 {
         return None;
     }
@@ -463,7 +470,7 @@ fn spearman(xs: &[f64], ys: &[f64]) -> Option<f64> {
     Some(cov / (vx.sqrt() * vy.sqrt()))
 }
 
-fn average_ranks(values: &[f64]) -> Vec<f64> {
+pub(crate) fn average_ranks(values: &[f64]) -> Vec<f64> {
     let mut order: Vec<usize> = (0..values.len()).collect();
     order.sort_by(|&a, &b| {
         values[a]
@@ -517,6 +524,7 @@ pub fn sort_request(
         comparison_concurrency: opts.comparison_concurrency,
         max_pair_repeats: opts.max_pair_repeats,
         counterbalance_pairs: opts.counterbalance,
+        prune_p_topk_below: opts.prune_p_topk_below,
     }
 }
 

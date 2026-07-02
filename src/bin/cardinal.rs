@@ -107,6 +107,15 @@ enum Commands {
         /// position-bias receipt)
         #[arg(long)]
         no_counterbalance: bool,
+        /// First expand the criterion into a precise judging rubric with one
+        /// LLM call, print it to stderr, then sort by the rubric
+        #[arg(long)]
+        elaborate: bool,
+        /// Stop spending exploration comparisons on items whose probability
+        /// of reaching the top-k drops below this (requires --top-k intent;
+        /// pruned count is reported in the run summary)
+        #[arg(long)]
+        prune_below: Option<f64>,
         /// RNG seed for reproducible planning
         #[arg(long)]
         seed: Option<u64>,
@@ -125,6 +134,84 @@ enum Commands {
         /// Suppress the run summary on stderr
         #[arg(long)]
         quiet: bool,
+    },
+    /// One pairwise judgement between two items, fully transparent
+    ///
+    /// The lowest-level primitive: see exactly what the judge is asked
+    /// (--show-prompt) and exactly what it answered. Items are literal text
+    /// or @path to read a file.
+    Judge {
+        /// First item (literal text, or @path)
+        item_a: String,
+        /// Second item (literal text, or @path)
+        item_b: String,
+        /// Criterion to judge by
+        #[arg(long)]
+        by: String,
+        /// Model slug (OpenRouter)
+        #[arg(long)]
+        model: Option<String>,
+        /// Prompt template slug
+        #[arg(long, default_value = "canonical_v2")]
+        template: String,
+        /// Print the fully rendered system + user prompt to stderr first
+        #[arg(long)]
+        show_prompt: bool,
+        /// Structured JSON output on stdout
+        #[arg(long)]
+        json: bool,
+        /// Do not read or write the pairwise cache
+        #[arg(long)]
+        no_cache: bool,
+        /// SQLite cache path (default: shared user cache)
+        #[arg(long)]
+        cache: Option<PathBuf>,
+    },
+    /// Expand a terse criterion into a precise judging rubric (one LLM call)
+    ///
+    /// Prints only the rubric to stdout, so it composes:
+    ///   cardinal sort list.txt --by "$(cardinal elaborate --by impact)"
+    Elaborate {
+        /// The terse criterion to expand
+        #[arg(long)]
+        by: String,
+        /// Model slug (OpenRouter)
+        #[arg(long)]
+        model: Option<String>,
+    },
+    /// Explain an existing ranking: which attributes reconstruct it?
+    ///
+    /// FILE (or stdin) holds items in YOUR believed order, best first.
+    /// Each --candidate attribute is measured with pairwise judgements and
+    /// scored on how well it — alone and in weighted combination —
+    /// reconstructs your order.
+    Explain {
+        /// Input file in believed order, best first; '-' or omitted reads stdin
+        file: Option<PathBuf>,
+        /// Candidate attribute (repeatable)
+        #[arg(long)]
+        candidate: Vec<String>,
+        /// Ask an LLM to propose this many additional candidate attributes
+        #[arg(long)]
+        propose: Option<usize>,
+        /// Model slug (OpenRouter)
+        #[arg(long)]
+        model: Option<String>,
+        /// Total comparison budget across all candidates
+        #[arg(long)]
+        budget: Option<usize>,
+        /// Structured JSON output on stdout
+        #[arg(long)]
+        format_json: bool,
+        /// Do not read or write the pairwise cache
+        #[arg(long)]
+        no_cache: bool,
+        /// SQLite cache path (default: shared user cache)
+        #[arg(long)]
+        cache: Option<PathBuf>,
+        /// RNG seed for reproducible planning
+        #[arg(long)]
+        seed: Option<u64>,
     },
     /// Export SQLite cache to JSONL
     CacheExport {
@@ -278,6 +365,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             two_sided,
             also_by,
             no_counterbalance,
+            elaborate,
+            prune_below,
             seed,
             cache_only,
             no_cache,
@@ -336,8 +425,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             };
             let trace_ref = trace_sink.as_ref().map(|sink| sink as &dyn TraceSink);
 
+            let gateway = Arc::new(gateway);
             let mut execution = cardinal_harness::rerank::RerankExecution::new(
-                Arc::new(gateway),
+                gateway.clone(),
                 Attribution::new("cardinal::sort"),
             )
             .run_options(RerankRunOptions {
@@ -355,16 +445,40 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
 
             let opts = cardinal_harness::rerank::SortOptions {
-                model,
+                model: model.clone(),
                 comparison_budget: budget,
                 top_k,
                 counterbalance: !no_counterbalance,
                 two_sided,
                 also_by,
+                prune_p_topk_below: prune_below,
                 ..Default::default()
             };
+            let criterion = if elaborate {
+                let rubric = cardinal_harness::rerank::elaborate_criterion(
+                    gateway.as_ref(),
+                    model.as_deref(),
+                    &by,
+                    Attribution::new("cardinal::sort::elaborate"),
+                )
+                .await?;
+                if !quiet {
+                    eprintln!(
+                        "elaborated criterion ({}, ${:.4}):
+{}
+",
+                        rubric.model_used,
+                        rubric.provider_cost_nanodollars as f64 / 1e9,
+                        rubric.elaborated
+                    );
+                }
+                rubric.elaborated
+            } else {
+                by.clone()
+            };
             let mut sorted =
-                cardinal_harness::rerank::sort_documents(documents, &by, execution, opts).await?;
+                cardinal_harness::rerank::sort_documents(documents, &criterion, execution, opts)
+                    .await?;
 
             drop(trace_sink);
             if let Some(worker) = trace_worker {
@@ -440,6 +554,268 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }
             }
+        }
+        Commands::Judge {
+            item_a,
+            item_b,
+            by,
+            model,
+            template,
+            show_prompt,
+            json,
+            no_cache,
+            cache,
+        } => {
+            let text_a = read_item_arg(&item_a)?;
+            let text_b = read_item_arg(&item_b)?;
+            let model = model
+                .as_deref()
+                .unwrap_or("openai/gpt-5.4-mini")
+                .to_string();
+
+            let spec = cardinal_harness::rerank::PairwiseComparisonSpec {
+                model: &model,
+                attribute: cardinal_harness::rerank::PairwiseComparisonAttribute {
+                    id: "judge",
+                    prompt: &by,
+                    prompt_template_slug: Some(&template),
+                },
+                entity_a: cardinal_harness::rerank::PairwiseComparisonEntity {
+                    id: "A",
+                    text: &text_a,
+                },
+                entity_b: cardinal_harness::rerank::PairwiseComparisonEntity {
+                    id: "B",
+                    text: &text_b,
+                },
+            };
+
+            if show_prompt {
+                let rendered = spec.prompt_instance();
+                eprintln!(
+                    "--- system ---
+{}
+--- user ---
+{}
+---",
+                    rendered.system, rendered.user
+                );
+            }
+
+            if std::env::var("OPENROUTER_API_KEY").is_err() {
+                return Err("OPENROUTER_API_KEY is not set. Create a key at                      https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
+                    .into());
+            }
+            let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
+            let cache_store = if no_cache {
+                None
+            } else {
+                let cache_path = cache.unwrap_or_else(SqlitePairwiseCache::default_path);
+                Some(SqlitePairwiseCache::new(cache_path)?)
+            };
+            let cache_ref = cache_store
+                .as_ref()
+                .map(|c| c as &dyn cardinal_harness::cache::PairwiseCache);
+
+            let (judgement, usage) = cardinal_harness::rerank::compare_pair(
+                &gateway,
+                cache_ref,
+                cardinal_harness::rerank::PairwiseComparisonRequest {
+                    spec,
+                    cache_only: false,
+                    attribution: Attribution::new("cardinal::judge"),
+                },
+            )
+            .await?;
+
+            let cost_usd = usage.provider_cost_nanodollars as f64 / 1e9;
+            match judgement {
+                cardinal_harness::rerank::PairwiseJudgement::Observation {
+                    higher_ranked,
+                    ratio,
+                    confidence,
+                } => {
+                    let winner = match higher_ranked {
+                        cardinal_harness::rerank::HigherRanked::A => "A",
+                        cardinal_harness::rerank::HigherRanked::B => "B",
+                    };
+                    if json {
+                        println!(
+                            "{}",
+                            serde_json::json!({
+                                "higher_ranked": winner,
+                                "ratio": ratio,
+                                "confidence": confidence,
+                                "refused": false,
+                                "model": model,
+                                "input_tokens": usage.input_tokens,
+                                "output_tokens": usage.output_tokens,
+                                "cost_nanodollars": usage.provider_cost_nanodollars,
+                                "cached": usage.cached,
+                            })
+                        );
+                    } else {
+                        let cached = if usage.cached { " · cached" } else { "" };
+                        println!(
+                            "{winner} wins · ratio {ratio} · confidence {confidence:.2} · ${cost_usd:.4}{cached}"
+                        );
+                    }
+                }
+                cardinal_harness::rerank::PairwiseJudgement::Refused => {
+                    if json {
+                        println!(
+                            "{}",
+                            serde_json::json!({
+                                "refused": true,
+                                "model": model,
+                                "cost_nanodollars": usage.provider_cost_nanodollars,
+                                "cached": usage.cached,
+                            })
+                        );
+                    } else {
+                        println!("REFUSED · ${cost_usd:.4}");
+                    }
+                }
+            }
+        }
+        Commands::Elaborate { by, model } => {
+            if std::env::var("OPENROUTER_API_KEY").is_err() {
+                return Err("OPENROUTER_API_KEY is not set. Create a key at                      https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
+                    .into());
+            }
+            let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
+            let rubric = cardinal_harness::rerank::elaborate_criterion(
+                &gateway,
+                model.as_deref(),
+                &by,
+                Attribution::new("cardinal::elaborate"),
+            )
+            .await?;
+            println!("{}", rubric.elaborated);
+            eprintln!(
+                "elaborated \"{}\" via {} · {} in / {} out tokens · ${:.4}",
+                rubric.original,
+                rubric.model_used,
+                rubric.input_tokens,
+                rubric.output_tokens,
+                rubric.provider_cost_nanodollars as f64 / 1e9,
+            );
+        }
+        Commands::Explain {
+            file,
+            candidate,
+            propose,
+            model,
+            budget,
+            format_json,
+            no_cache,
+            cache,
+            seed,
+        } => {
+            let raw = read_sort_input(file.as_deref())?;
+            let documents = parse_sort_items(&raw)?;
+            if documents.len() < 3 {
+                return Err(
+                    "explain requires at least 3 items (in your believed order, best first)".into(),
+                );
+            }
+            if std::env::var("OPENROUTER_API_KEY").is_err() {
+                return Err("OPENROUTER_API_KEY is not set. Create a key at                      https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
+                    .into());
+            }
+            let gateway = Arc::new(ProviderGateway::from_env(Arc::new(NoopUsageSink))?);
+
+            let mut candidates = candidate;
+            if let Some(count) = propose {
+                let (proposed, usage) = cardinal_harness::rerank::propose_candidates(
+                    gateway.as_ref(),
+                    model.as_deref().unwrap_or("openai/gpt-5.4-mini"),
+                    &documents,
+                    count,
+                    Attribution::new("cardinal::explain::propose"),
+                )
+                .await?;
+                eprintln!(
+                    "proposed {} candidate attributes (${:.4}):",
+                    proposed.len(),
+                    usage.cost_nanodollars as f64 / 1e9
+                );
+                for c in &proposed {
+                    eprintln!("  - {c}");
+                }
+                candidates.extend(proposed);
+            }
+            if candidates.is_empty() {
+                return Err(
+                    "no candidate attributes: pass --candidate \"<attribute>\" (repeatable) and/or --propose <n>"
+                        .into(),
+                );
+            }
+
+            let cache_store = if no_cache {
+                None
+            } else {
+                let cache_path = cache.unwrap_or_else(SqlitePairwiseCache::default_path);
+                Some(SqlitePairwiseCache::new(cache_path)?)
+            };
+            let mut execution = cardinal_harness::rerank::RerankExecution::new(
+                gateway.clone(),
+                Attribution::new("cardinal::explain"),
+            )
+            .run_options(RerankRunOptions {
+                rng_seed: seed,
+                cache_only: false,
+            });
+            if let Some(store) = cache_store.as_ref() {
+                execution = execution.cache(store);
+            }
+
+            let explanation = cardinal_harness::rerank::explain_ranking(
+                documents,
+                candidates,
+                execution,
+                cardinal_harness::rerank::ExplainOptions {
+                    model,
+                    comparison_budget: budget,
+                    ..Default::default()
+                },
+            )
+            .await?;
+
+            if format_json {
+                println!("{}", serde_json::to_string_pretty(&explanation)?);
+            } else {
+                println!("attribute                                    | alone ρ | weight");
+                println!("---------------------------------------------|---------|-------");
+                for attr in &explanation.attributes {
+                    let rho = attr
+                        .spearman_alone
+                        .map(|r| format!("{r:+.2}"))
+                        .unwrap_or_else(|| "  n/a".into());
+                    let prompt: String = attr.prompt.chars().take(44).collect();
+                    println!("{prompt:<45}| {rho:>7} | {:.2}", attr.fitted_weight);
+                }
+                match explanation.combined_spearman {
+                    Some(c) => println!(
+                        "
+weighted combination reconstructs your ranking at ρ = {c:+.2}"
+                    ),
+                    None => println!(
+                        "
+no combination of these attributes reconstructs your ranking"
+                    ),
+                }
+            }
+            let meta = &explanation.meta;
+            eprintln!(
+                "{} comparisons ({} cached, {} refused) · ${:.4} · order flips: {}/{}",
+                meta.comparisons_used,
+                meta.comparisons_cached,
+                meta.comparisons_refused,
+                meta.provider_cost_nanodollars as f64 / 1e9,
+                meta.position_flips,
+                meta.pairs_counterbalanced,
+            );
         }
         Commands::CacheExport { db, out } => {
             let path = db.unwrap_or_else(SqlitePairwiseCache::default_path);
@@ -701,6 +1077,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     Ok(())
+}
+
+/// Resolve a judge item argument: literal text, or `@path` file contents.
+fn read_item_arg(raw: &str) -> Result<String, Box<dyn std::error::Error>> {
+    if let Some(path) = raw.strip_prefix('@') {
+        std::fs::read_to_string(path).map_err(|err| format!("failed to read {path}: {err}").into())
+    } else {
+        Ok(raw.to_string())
+    }
 }
 
 /// Read raw sort input from a file or stdin (`-` or omitted).

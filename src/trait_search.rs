@@ -350,6 +350,14 @@ pub struct TopKConfig {
     pub stop_sigma_inflate: f64,
     pub stop_min_consecutive: usize,
     pub min_explore_degree: usize,
+    /// When set, stop spending forced-exploration comparisons on entities
+    /// that already have at least one observation, sit below the top-k
+    /// boundary, and whose probability of crossing it (`p_flip`) is under
+    /// this threshold. The exploitation planner is already band-focused;
+    /// this trims the exploration tail for entities the posterior says can
+    /// be let go of. Pruned entities keep their scores and can re-enter if
+    /// later evidence moves them back into the band.
+    pub prune_p_topk_below: Option<f64>,
 }
 
 impl TopKConfig {
@@ -363,6 +371,7 @@ impl TopKConfig {
             stop_sigma_inflate: 1.25,
             stop_min_consecutive: 2,
             min_explore_degree: 2,
+            prune_p_topk_below: None,
         }
     }
 }
@@ -452,6 +461,9 @@ pub struct TraitSearchManager {
     state_valid: bool,
     stop_streak: usize,
     has_degraded: bool,
+    /// Entities excluded from further forced exploration by the
+    /// `prune_p_topk_below` rule.
+    explore_pruned: HashSet<usize>,
 }
 
 impl TraitSearchManager {
@@ -513,6 +525,7 @@ impl TraitSearchManager {
             state_valid: false,
             stop_streak: 0,
             has_degraded: false,
+            explore_pruned: HashSet::new(),
         })
     }
 
@@ -834,7 +847,9 @@ impl TraitSearchManager {
         let min_explore = self.config.topk.min_explore_degree;
         if min_explore > 0 {
             let explore_budget = (batch_size / 4).max(1);
-            let explore_proposals = self.build_exploration_proposals(min_explore, explore_budget);
+            let (explore_proposals, pruned) =
+                self.build_exploration_proposals(min_explore, explore_budget);
+            self.explore_pruned.extend(pruned);
             if !explore_proposals.is_empty() {
                 let mut merged = Vec::with_capacity(batch_size);
                 let mut merged_seen: HashSet<(String, usize, usize)> = HashSet::new();
@@ -879,11 +894,11 @@ impl TraitSearchManager {
         &self,
         min_degree: usize,
         max_proposals: usize,
-    ) -> Vec<GlobalPlanProposal> {
+    ) -> (Vec<GlobalPlanProposal>, Vec<usize>) {
         let n = self.n;
         let n_attrs = self.config.attributes.len();
         if n_attrs == 0 {
-            return Vec::new();
+            return (Vec::new(), Vec::new());
         }
 
         // Compute total degree for each entity across all attribute engines.
@@ -905,20 +920,33 @@ impl TraitSearchManager {
         // Find entities needing exploration (total degree < min_degree * n_attrs)
         // Simplified: any entity with 0 total edges needs exploration most urgently
         let mut needy: Vec<usize> = Vec::new();
+        let mut pruned: Vec<usize> = Vec::new();
+        let k = self.config.topk.k;
         for (i, (&degree, entity)) in total_degree.iter().zip(self.entities.iter()).enumerate() {
             if entity.feasible && degree < min_degree {
+                if let Some(eps) = self.config.topk.prune_p_topk_below {
+                    // At least one observation, ranked below the boundary,
+                    // and effectively no chance of crossing it: let it go.
+                    if degree >= 1
+                        && entity.rank.is_some_and(|r| r > k)
+                        && 1.0 - entity.p_flip < eps
+                    {
+                        pruned.push(i);
+                        continue;
+                    }
+                }
                 needy.push(i);
             }
         }
 
         if needy.is_empty() {
-            return Vec::new();
+            return (Vec::new(), pruned);
         }
 
         // Pick the best-measured anchor: highest-ranked entity with most data
         let anchor = match self.sorted_indices.first().copied() {
             Some(idx) => idx,
-            None => return Vec::new(),
+            None => return (Vec::new(), pruned),
         };
 
         let mut proposals = Vec::new();
@@ -953,7 +981,13 @@ impl TraitSearchManager {
             }
         }
 
-        proposals
+        (proposals, pruned)
+    }
+
+    /// Entities excluded from further forced exploration by
+    /// [`TopKConfig::prune_p_topk_below`] at any point during this run.
+    pub fn explore_pruned_count(&self) -> usize {
+        self.explore_pruned.len()
     }
 
     pub fn ranked_indices(&self) -> Vec<usize> {

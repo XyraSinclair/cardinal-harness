@@ -73,6 +73,11 @@ pub struct RerankRequest {
     /// [`MultiRerankRequest::counterbalance_pairs`].
     #[serde(default)]
     pub counterbalance_pairs: bool,
+
+    /// Prune hopeless entities from forced exploration. See
+    /// [`MultiRerankTopKSpec::prune_p_topk_below`].
+    #[serde(default)]
+    pub prune_p_topk_below: Option<f64>,
 }
 
 fn default_attribute_id() -> String {
@@ -140,6 +145,9 @@ pub struct RerankMeta {
     #[serde(default)]
     pub provider_cost_is_estimate: bool,
 
+    /// Entities excluded from further forced exploration by top-k pruning.
+    #[serde(default)]
+    pub entities_pruned: usize,
     /// Pairs judged in both presentation orders with a decisive direction.
     #[serde(default)]
     pub pairs_counterbalanced: usize,
@@ -263,6 +271,16 @@ pub struct MultiRerankTopKSpec {
     /// Set to 0 to disable forced exploration.
     #[serde(default = "default_min_explore_degree")]
     pub min_explore_degree: usize,
+
+    /// When set, stop spending forced-exploration comparisons on entities
+    /// that already have at least one observation, sit below the top-k
+    /// boundary, and whose probability of crossing it is under this
+    /// threshold. Saves queries when only the top-k matters; pruned entities
+    /// keep their scores and can re-enter if evidence moves them back into
+    /// the band. Off by default. The count of pruned entities is reported in
+    /// `entities_pruned`.
+    #[serde(default)]
+    pub prune_p_topk_below: Option<f64>,
 }
 
 fn default_weight_exponent() -> f64 {
@@ -445,6 +463,11 @@ pub struct MultiRerankMeta {
     #[serde(default)]
     pub provider_cost_is_estimate: bool,
 
+    /// Entities excluded from further forced exploration because their
+    /// probability of reaching the top-k fell below
+    /// `topk.prune_p_topk_below`.
+    #[serde(default)]
+    pub entities_pruned: usize,
     /// Pairs judged in both presentation orders with a decisive (ratio > 1)
     /// direction in each. Only populated when `counterbalance_pairs` was set.
     #[serde(default)]

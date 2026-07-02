@@ -71,7 +71,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             // Defaults are good for most use cases — see docs/ALGORITHM.md
             // for what each parameter does and why.
-            ..serde_json::from_str("{}").unwrap()
+            ..serde_json::from_str(
+                "{,
+            prune_p_topk_below: None,
+        }",
+            )
+            .unwrap()
         },
 
         gates: vec![],                // no hard filters on any attribute
