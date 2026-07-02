@@ -47,8 +47,72 @@ struct Cli {
     command: Commands,
 }
 
+#[derive(Debug, Clone, Copy, ValueEnum)]
+enum SortFormatArg {
+    Text,
+    Json,
+    Jsonl,
+    Csv,
+}
+
 #[derive(Subcommand)]
 enum Commands {
+    /// Sort a list of items by a natural-language criterion
+    ///
+    /// Reads newline-delimited items (or a JSON array) from FILE or stdin and
+    /// prints them sorted best-first. Requires OPENROUTER_API_KEY unless
+    /// --cache-only is set and the cache already holds every judgement.
+    ///
+    /// Example: cardinal sort examples/sort-demo.txt --by "usefulness as advice"
+    Sort {
+        /// Input file; '-' or omitted reads stdin
+        file: Option<PathBuf>,
+        /// Criterion to sort by, e.g. "clarity of explanation"
+        #[arg(long)]
+        by: String,
+        /// Model slug (OpenRouter), e.g. anthropic/claude-sonnet-4.6
+        #[arg(long)]
+        model: Option<String>,
+        /// Built-in model policy name (see `cardinal policy list`)
+        #[arg(long)]
+        policy: Option<String>,
+        /// Model policy JSON file
+        #[arg(long)]
+        policy_config: Option<PathBuf>,
+        /// Maximum pairwise comparisons to spend
+        #[arg(long)]
+        budget: Option<usize>,
+        /// Certify only the top K items (default: whole list)
+        #[arg(long)]
+        top_k: Option<usize>,
+        /// Output format
+        #[arg(long, value_enum, default_value = "text")]
+        format: SortFormatArg,
+        /// In text mode, prefix each line with `mean±std<TAB>`
+        #[arg(long)]
+        scores: bool,
+        /// Worst first instead of best first
+        #[arg(long)]
+        reverse: bool,
+        /// RNG seed for reproducible planning
+        #[arg(long)]
+        seed: Option<u64>,
+        /// Serve judgements from cache only; error on any cache miss
+        #[arg(long)]
+        cache_only: bool,
+        /// Do not read or write the pairwise cache
+        #[arg(long)]
+        no_cache: bool,
+        /// SQLite cache path (default: shared user cache)
+        #[arg(long)]
+        cache: Option<PathBuf>,
+        /// Write a JSONL trace of every comparison
+        #[arg(long)]
+        trace: Option<PathBuf>,
+        /// Suppress the run summary on stderr
+        #[arg(long)]
+        quiet: bool,
+    },
     /// Export SQLite cache to JSONL
     CacheExport {
         #[arg(long)]
@@ -187,6 +251,132 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
 
     match cli.command {
+        Commands::Sort {
+            file,
+            by,
+            model,
+            policy,
+            policy_config,
+            budget,
+            top_k,
+            format,
+            scores,
+            reverse,
+            seed,
+            cache_only,
+            no_cache,
+            cache,
+            trace,
+            quiet,
+        } => {
+            if cache_only && no_cache {
+                return Err("--cache-only and --no-cache are mutually exclusive".into());
+            }
+            let raw = read_sort_input(file.as_deref())?;
+            let documents = parse_sort_items(&raw)?;
+            if documents.is_empty() {
+                return Err("no items to sort: input is empty".into());
+            }
+
+            let have_key = std::env::var("OPENROUTER_API_KEY").is_ok();
+            let gateway = if have_key {
+                ProviderGateway::from_env(Arc::new(NoopUsageSink))?
+            } else if cache_only {
+                // Keyless cache-only runs never reach the network; use an
+                // inert adapter so a fully cached sort works offline.
+                let adapter =
+                    cardinal_harness::gateway::openrouter::OpenRouterAdapter::with_config(
+                        "cache-only",
+                        "http://127.0.0.1:9",
+                        std::time::Duration::from_secs(1),
+                        None,
+                        None,
+                    )?;
+                ProviderGateway::with_config(
+                    adapter,
+                    Arc::new(NoopUsageSink),
+                    cardinal_harness::gateway::GatewayConfig::default(),
+                )
+            } else {
+                return Err("OPENROUTER_API_KEY is not set. Create a key at \
+                     https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`, \
+                     or use --cache-only to replay cached judgements."
+                    .into());
+            };
+
+            let cache_store = if no_cache {
+                None
+            } else {
+                let cache_path = cache.unwrap_or_else(SqlitePairwiseCache::default_path);
+                Some(SqlitePairwiseCache::new(cache_path)?)
+            };
+            let policy_obj = load_policy(policy, policy_config)?;
+
+            let (trace_sink, trace_worker) = if let Some(path) = trace {
+                let (sink, worker) = JsonlTraceSink::new(path)?;
+                (Some(sink), Some(worker))
+            } else {
+                (None, None)
+            };
+            let trace_ref = trace_sink.as_ref().map(|sink| sink as &dyn TraceSink);
+
+            let mut execution = cardinal_harness::rerank::RerankExecution::new(
+                Arc::new(gateway),
+                Attribution::new("cardinal::sort"),
+            )
+            .run_options(RerankRunOptions {
+                rng_seed: seed,
+                cache_only,
+            });
+            if let Some(store) = cache_store.as_ref() {
+                execution = execution.cache(store);
+            }
+            if let Some(policy) = policy_obj {
+                execution = execution.model_policy(policy);
+            }
+            if let Some(trace) = trace_ref {
+                execution = execution.trace(trace);
+            }
+
+            let opts = cardinal_harness::rerank::SortOptions {
+                model,
+                comparison_budget: budget,
+                top_k,
+                ..Default::default()
+            };
+            let mut sorted =
+                cardinal_harness::rerank::sort_documents(documents, &by, execution, opts).await?;
+
+            drop(trace_sink);
+            if let Some(worker) = trace_worker {
+                worker.join()?;
+            }
+
+            if reverse {
+                sorted.items.reverse();
+            }
+            let stdout = io::stdout();
+            let mut out = stdout.lock();
+            render_sorted(&mut out, &sorted, format, scores)?;
+
+            if !quiet {
+                let meta = &sorted.meta;
+                let cost_usd = meta.provider_cost_nanodollars as f64 / 1e9;
+                let estimate = if meta.provider_cost_is_estimate {
+                    "~"
+                } else {
+                    ""
+                };
+                eprintln!(
+                    "sorted {} items by \"{by}\" · {} comparisons ({} cached, {} refused) · {estimate}${cost_usd:.4} · stop: {}",
+                    sorted.items.len(),
+                    meta.comparisons_used,
+                    meta.comparisons_cached,
+                    meta.comparisons_refused,
+                    serde_json::to_value(meta.stop_reason)?.as_str().unwrap_or("unknown"),
+                );
+            }
+        }
         Commands::CacheExport { db, out } => {
             let path = db.unwrap_or_else(SqlitePairwiseCache::default_path);
             let cache = SqlitePairwiseCache::new(path)?;
@@ -447,6 +637,138 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     Ok(())
+}
+
+/// Read raw sort input from a file or stdin (`-` or omitted).
+fn read_sort_input(file: Option<&std::path::Path>) -> Result<String, Box<dyn std::error::Error>> {
+    match file {
+        Some(path) if path.as_os_str() != "-" => std::fs::read_to_string(path)
+            .map_err(|err| format!("failed to read {}: {err}", path.display()).into()),
+        _ => {
+            let mut raw = String::new();
+            io::Read::read_to_string(&mut io::stdin(), &mut raw)?;
+            Ok(raw)
+        }
+    }
+}
+
+/// Parse sort input: newline-delimited plain text, or a JSON array of strings
+/// or `{"id", "text"}` objects when the first non-whitespace byte is `[`.
+fn parse_sort_items(
+    raw: &str,
+) -> Result<Vec<cardinal_harness::rerank::RerankDocument>, Box<dyn std::error::Error>> {
+    use cardinal_harness::rerank::RerankDocument;
+
+    if raw.trim_start().starts_with('[') {
+        let value: serde_json::Value = serde_json::from_str(raw)
+            .map_err(|err| format!("input looks like JSON but failed to parse: {err}"))?;
+        let arr = value
+            .as_array()
+            .ok_or("JSON input must be an array of strings or {id, text} objects")?;
+        let mut documents = Vec::with_capacity(arr.len());
+        for (idx, elem) in arr.iter().enumerate() {
+            if let Some(text) = elem.as_str() {
+                documents.push(RerankDocument {
+                    id: format!("item-{idx:04}"),
+                    text: text.to_string(),
+                });
+            } else if let Some(obj) = elem.as_object() {
+                let text = obj
+                    .get("text")
+                    .and_then(|v| v.as_str())
+                    .ok_or_else(|| format!("JSON element {idx} needs a string \"text\" field"))?;
+                let id = obj
+                    .get("id")
+                    .and_then(|v| v.as_str())
+                    .map(str::to_string)
+                    .unwrap_or_else(|| format!("item-{idx:04}"));
+                documents.push(RerankDocument {
+                    id,
+                    text: text.to_string(),
+                });
+            } else {
+                return Err(format!(
+                    "JSON element {idx} must be a string or an object with a \"text\" field"
+                )
+                .into());
+            }
+        }
+        Ok(documents)
+    } else {
+        Ok(raw
+            .lines()
+            .map(|line| line.strip_suffix('\r').unwrap_or(line))
+            .filter(|line| !line.trim().is_empty())
+            .enumerate()
+            .map(|(idx, line)| RerankDocument {
+                id: format!("item-{idx:04}"),
+                text: line.to_string(),
+            })
+            .collect())
+    }
+}
+
+/// Render sorted output in the requested format.
+fn render_sorted(
+    out: &mut impl Write,
+    sorted: &cardinal_harness::rerank::SortedTexts,
+    format: SortFormatArg,
+    scores: bool,
+) -> Result<(), Box<dyn std::error::Error>> {
+    match format {
+        SortFormatArg::Text => {
+            for item in &sorted.items {
+                if scores {
+                    writeln!(
+                        out,
+                        "{:.3}\u{b1}{:.3}\t{}",
+                        item.latent_mean, item.latent_std, item.text
+                    )?;
+                } else {
+                    writeln!(out, "{}", item.text)?;
+                }
+            }
+        }
+        SortFormatArg::Json => {
+            serde_json::to_writer_pretty(&mut *out, sorted)?;
+            writeln!(out)?;
+        }
+        SortFormatArg::Jsonl => {
+            for item in &sorted.items {
+                serde_json::to_writer(&mut *out, item)?;
+                writeln!(out)?;
+            }
+        }
+        SortFormatArg::Csv => {
+            writeln!(
+                out,
+                "rank,id,latent_mean,latent_std,z_score,percentile,text"
+            )?;
+            for item in &sorted.items {
+                writeln!(
+                    out,
+                    "{},{},{:.6},{:.6},{:.6},{:.6},{}",
+                    item.rank,
+                    csv_field(&item.id),
+                    item.latent_mean,
+                    item.latent_std,
+                    item.z_score,
+                    item.percentile,
+                    csv_field(&item.text),
+                )?;
+            }
+        }
+    }
+    Ok(())
+}
+
+/// Quote a CSV field when it contains a comma, quote, or newline.
+fn csv_field(raw: &str) -> String {
+    if raw.contains([',', '"', '\n', '\r']) {
+        format!("\"{}\"", raw.replace('"', "\"\""))
+    } else {
+        raw.to_string()
+    }
 }
 
 fn load_policy(

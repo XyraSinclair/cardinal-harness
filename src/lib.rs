@@ -28,11 +28,11 @@ pub use cache::{PairwiseCache, PairwiseCacheKey};
 pub use discrete::{DiscreteDistribution, WeightedValue};
 pub use gateway::{Attribution, ChatGateway, ProviderGateway, UsageSink};
 pub use rerank::{
-    expand_prompt_experiment_request, multi_rerank, rerank, AttributePolarity,
-    AttributeVariantSpec, ComparisonError, ComparisonEvent, ComparisonObserver, ComparisonTrace,
-    JsonlTraceSink, MultiRerankError, ObserverError, PromptExperimentConfig, PromptExperimentError,
-    RerankExecution, TraceError, TraceSink, TraceWorker, WarmStartData, WarmStartError,
-    WarmStartProvider,
+    expand_prompt_experiment_request, multi_rerank, rerank, sort_documents, sort_texts,
+    AttributePolarity, AttributeVariantSpec, ComparisonError, ComparisonEvent, ComparisonObserver,
+    ComparisonTrace, JsonlTraceSink, MultiRerankError, ObserverError, PromptExperimentConfig,
+    PromptExperimentError, RerankExecution, SortError, SortOptions, SortedItem, SortedTexts,
+    TraceError, TraceSink, TraceWorker, WarmStartData, WarmStartError, WarmStartProvider,
 };
 
 #[cfg(doctest)]
