@@ -40,6 +40,8 @@ What you get that the alternatives don't, in one package:
 - **Cardinal magnitudes**, not just an order — "A is ~3× better" survives into the output.
 - **Uncertainty per item** and a top-k error estimate, honestly reported.
 - **Active pair selection** and principled stopping under an explicit budget.
+- **Counterbalancing by default**: every planned pair is asked in both presentation orders, and the disagreement rate is reported — position bias measured, not assumed away.
+- **Attribute health probes**: judge the opposite side of your criterion (`--two-sided`) and alternate phrasings (`--also-by`), get rank-consistency receipts that tell you whether the attribute even coheres for this judge.
 - **Receipts**: JSONL trace per judgement, token/cost accounting, SQLite cache, seeded reproducibility.
 
 ## Quickstart
@@ -76,6 +78,41 @@ run replays offline, keyless, for $0 via `--cache-only`.
 `{"id","text"}` objects) from a file or stdin, and writes plain lines (pipeable),
 `--format json|jsonl|csv`, `--scores`, `--reverse`, `--trace trace.jsonl`.
 A sort where every comparison fails refuses to print, loudly.
+
+## Healthy elicitation, by default
+
+Most LLM-annotation pathologies are invisible unless you deliberately measure
+them. `sort` measures them as part of the run:
+
+- **Both orders, every pair.** LLM judges favor whichever item is presented
+  first. Randomizing order (still available via `--no-counterbalance`) only
+  averages that bias; the default asks each planned pair in both orders,
+  cancels the bias per-pair, and reports the disagreement rate.
+- **The opposite side of the attribute.** `--two-sided` also judges
+  `lack of <criterion>` (weight −1) and reports whether the two sides mirror
+  each other. If they don't, your attribute doesn't mean anything stable to
+  this judge — better to learn that before trusting the annotation.
+- **Alternate phrasings.** `--also-by "<paraphrase>"` judges the criterion
+  under other wordings and reports cross-phrasing rank consistency.
+
+A real run (preserved under
+[`artifacts/live/healthy-sort-demo-2026-07-02/`](artifacts/live/healthy-sort-demo-2026-07-02/)):
+
+```console
+$ cardinal sort examples/sort-demo.txt \
+    --by "usefulness as advice for a software engineer" \
+    --two-sided --also-by "how much practical value it offers someone building software" \
+    --model anthropic/claude-sonnet-4.6 --budget 120
+
+sorted 8 items · 120 comparisons · $0.3441 · order flips: 11/51 · stop: budget_exhausted
+probe [opposite]   "lack of usefulness as advice...": consistency +0.81 — consistent
+probe [paraphrase] "how much practical value...":    consistency +0.35 — shaky
+```
+
+That run caught the judge reversing itself on **21.6% of pairs** under order
+swap, confirmed the criterion is two-sided coherent, and flagged that a
+reasonable-sounding paraphrase materially changes the ranking. None of this is
+visible in a single-prompt sort or a 1–10 rating pass.
 
 ## Library
 
@@ -177,6 +214,7 @@ Two prompt templates are supported:
 |------|--------------|----------|
 | `canonical_v2` | `{"higher_ranked":"A|B","ratio":1.0..26.0,"confidence":0.0..1.0}` | Default pairwise-ratio judgement. Use this unless you specifically need bucket-token logprobs. |
 | `canonical_bucket_v1` | `{"higher_ranked":"A|B","ratio_bucket":0..16,"confidence":0.0..1.0}` | Bucket-index variant for runs that need to map output logprobs onto the fixed ratio ladder. |
+| `ordinal_v1` | `{"higher_ranked":"A|B","confidence":0.0..1.0}` | Natural direction-only judgement; enters the solver as a fixed modest log-ratio. Strictly less informative than ratios — use as a baseline/control or when magnitude questions confuse the judge. |
 
 Both templates use the same ratio ladder and the same refusal shape:
 `{"refused":true}`. Unknown `prompt_template_slug` values are rejected.

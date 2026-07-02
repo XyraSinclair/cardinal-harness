@@ -98,12 +98,13 @@ we?" matters, the machinery is the point.
 
 | Pathology | Evidence | Design answer here | Status |
 |---|---|---|---|
-| Position bias | [Judging the Judges](https://arxiv.org/abs/2406.07791) | A/B presentation randomized per comparison | implemented, on by default |
+| Position bias | [Judging the Judges](https://arxiv.org/abs/2406.07791) | both presentation orders per pair (counterbalanced, default on the sort surface) with a measured flip-rate receipt; randomization still available | implemented; live receipt shows 21.6% flips on a real task |
 | Scalar miscalibration / clustering | [judgment-distribution work](https://arxiv.org/abs/2503.03064) | ratio elicitation avoids absolute scales entirely | by construction; receipts vs Likert are mixed |
 | Context limits | listwise sliding windows | two items per call, always | by construction |
 | O(n²) pairwise cost | PRP's own motivation | active planner, default 4·n budget, top-k focus | implemented; receipts do not yet prove early stopping |
 | Intransitivity | [non-transitivity](https://arxiv.org/abs/2502.14074), [LLM-RankFusion](https://arxiv.org/abs/2406.00231), [TrustJudge](https://arxiv.org/abs/2509.21117) | latent-score model fits *through* cycles; Huber loss discounts outliers | implemented |
 | Baseline / anchor dependence | fixed-baseline comparisons drift | full comparison graph, global fit, gauge pinning | implemented |
+| Attribute incoherence (phrasing- or polarity-sensitivity) | [TrustJudge](https://arxiv.org/abs/2509.21117)-style score/comparison inconsistency | `--two-sided` (opposite of the criterion, weight −1) and `--also-by` (paraphrases) probes with cross-attribute rank-consistency receipts | implemented; live receipt caught a shaky paraphrase (+0.35) |
 
 "Design answer" is not "proven win" — the honest state of the evidence lives
 in [EVALUATION.md](EVALUATION.md) and the checked-in receipt packs under

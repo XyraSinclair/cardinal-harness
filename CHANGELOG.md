@@ -7,6 +7,25 @@ Versioning once it reaches `1.0.0`.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-07-02
+
+### Added
+- Counterbalanced comparisons: `counterbalance_pairs` on rerank requests asks
+  every planned pair in both presentation orders, cancelling position bias
+  per-pair; `pairs_counterbalanced` / `position_flips` receipts in response
+  meta. Default ON for the `sort` surface (`--no-counterbalance` to opt out).
+- Attribute health probes on `sort`: `--two-sided` judges the opposite of the
+  criterion ("lack of X", weight −1) and `--also-by` judges paraphrases; both
+  report sign-adjusted Spearman rank-consistency receipts (`probes` in JSON
+  output, verdict lines on stderr).
+- Natural ordinal prompt template `ordinal_v1` (direction + confidence only),
+  entering the solver as a fixed modest log-ratio shared with the synthetic
+  ordinal mode (`ORDINAL_OBSERVATION_RATIO`).
+- Live healthy-elicitation receipt pack under
+  `artifacts/live/healthy-sort-demo-2026-07-02/`: a real Sonnet 4.6 run
+  measuring 11/51 order flips, +0.81 opposite-side consistency, and a +0.35
+  (shaky) paraphrase.
+
 ## [0.2.0] - 2026-07-02
 
 ### Added
