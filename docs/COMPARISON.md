@@ -27,7 +27,11 @@ repo makes — and note the honest caveat: our checked-in receipts show the bet
 paying off on some regimes and losing on others (see
 [EVALUATION.md](EVALUATION.md)). Ratio elicitation is strictly more
 informative *when the judge can actually provide it*; whether a given model
-can, for a given attribute, is an empirical question.
+can, for a given attribute, is an empirical question. Our own test battery
+pins a regime where the bet loses: under heavy noise and outlier pressure,
+direction-only ordinal judgements are more robust than ratio magnitudes
+(`tests/method_dominance.rs`). Magnitude is extra signal and extra attack
+surface; the honest position is to measure which one your judge provides.
 
 ## Prompting regimes
 

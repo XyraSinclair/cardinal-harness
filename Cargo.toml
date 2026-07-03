@@ -1,6 +1,6 @@
 [package]
 name = "cardinal-harness"
-version = "0.4.0"
+version = "0.5.0"
 edition = "2021"
 license = "MIT"
 description = "Sort and rank anything with LLMs: pairwise ratio judgements fitted into cardinal scores with uncertainty, active pair selection, and full cost receipts"

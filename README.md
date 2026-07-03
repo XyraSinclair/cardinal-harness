@@ -232,6 +232,7 @@ reproducible and deliberately narrow — it does **not** show a universal win:
 - The live method comparison is also mixed: cardinal ties the best regime on two task families, stays close on two, and lags sharply on two.
 - All current cardinal synthetic runs stop at `budget_exhausted`; the receipts do not prove early stopping or lower cost.
 - Equal call counts are not equal token cost: pairwise prompts carry two items, scalar prompts one.
+- An adversarial test battery (266 tests, [docs/TESTING.md](docs/TESTING.md)) pins the solver's mathematical claims — planted-truth recovery, Huber influence bounds, calibration coverage, pathological-judge behavior, method head-to-heads — and its honest negatives: ordinal beats ratio under heavy noise, and the budget-efficiency claim remains unproven.
 
 The next empirical proof target is a larger frozen benchmark with repeated
 runs, equalized token or dollar budgets, more held-out task families, and
@@ -343,6 +344,7 @@ list or request JSON
 - [docs/WORKED_EXAMPLE.md](docs/WORKED_EXAMPLE.md): concrete rerank walkthrough with request shape, gates, stop reasons, uncertainty, cache, and reproducibility receipts
 - [docs/EVALUATION.md](docs/EVALUATION.md): checked-in synthetic evaluation receipts and an honest cardinal-vs-Likert comparison
 - [docs/BENCHMARKS.md](docs/BENCHMARKS.md): scaling harness and current dense-solver receipt
+- [docs/TESTING.md](docs/TESTING.md): the adversarial test battery — what it attacks, the two solver bugs it found, and the honest negatives it pinned
 - [docs/COMPARISON.md](docs/COMPARISON.md): how this relates to RankGPT-style listwise ranking, pairwise preference prompting, Bradley–Terry/Elo aggregation, and query-relevance rerankers
 
 ## License

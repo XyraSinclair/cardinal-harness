@@ -7,6 +7,29 @@ Versioning once it reaches `1.0.0`.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-07-02
+
+### Added
+- Adversarial test battery: six new suites, 74 tests (266 total across 27
+  suites) attacking solver recovery (planted truth, Huber influence bounds,
+  gauge invariance, confidence weighting, ladder monotonicity), metamorphic
+  invariances of the sort path, uncertainty calibration coverage, a
+  pathological-judge taxonomy (position-biased, intransitive, compressed,
+  refusing, gaslighting, format-vandal), method head-to-heads vs Likert and
+  ordinal baselines, and planner/pruning/stopping efficiency. Authored and
+  adversarially reviewed by independent agents; see docs/TESTING.md.
+
+### Fixed
+- `solve_irls_huber`: MAD outlier-scale estimate collapsed when residuals
+  were tied up to floating-point noise (absolute 1e-18 zero-guard), clipping
+  every edge and crushing the fit by 3–4 orders of magnitude. Now falls back
+  to the max-abs scale when MAD is below 1e-8 of the max-abs residual.
+  Found by the battery's adversarial review; regression test pinned to the
+  hand-solved normal equations.
+- Synthetic evaluation gate-prewarm loop could overrun `comparison_budget`
+  before the main loop's budget check ever ran; prewarm now spends from and
+  stops at the same budget.
+
 ## [0.4.0] - 2026-07-02
 
 ### Added
