@@ -490,11 +490,10 @@ fn comparisons_attempted_never_exceeds_half_budget_for_non_prewarm_cases() {
 /// field) and the prewarm phase alone attempts 80 comparisons against a
 /// budget of 60 -- a 33% overrun -- before a single planned comparison runs.
 ///
-/// Do not "fix" this by special-casing the test: the fix belongs in the
-/// prewarm loop (it should count against, and stop at, `comparison_budget`
-/// like the main loop does). Left `#[ignore]`d as a precise regression target.
+/// Regression test: found by this suite and FIXED — the prewarm loop now
+/// checks `comparisons_attempted >= comparison_budget` before every prewarm
+/// comparison and stops when the budget is spent.
 #[test]
-#[ignore = "real bug: gate-prewarm loop in src/rerank/evaluation.rs ignores comparison_budget and can overrun it"]
 fn prewarm_ignores_comparison_budget_and_can_overrun_it() {
     let mut case = synthetic_cases()
         .into_iter()

@@ -921,8 +921,15 @@ pub fn run_synthetic_case_with_config(
     // Gates can self-starve if applied before any scores exist. Prewarm comparisons
     // give the solver enough signal so gating reflects actual structure.
     if case.prewarm_pairs_per_attr > 0 {
-        for (attr_idx, attr_truth) in case.attributes.iter().enumerate() {
+        'prewarm: for (attr_idx, attr_truth) in case.attributes.iter().enumerate() {
             for _ in 0..case.prewarm_pairs_per_attr {
+                // The prewarm phase spends from the same comparison budget as
+                // the main planning loop; it must never overrun it.
+                // (Regression: tests/method_dominance.rs::
+                // prewarm_ignores_comparison_budget_and_can_overrun_it)
+                if comparisons_attempted >= comparison_budget {
+                    break 'prewarm;
+                }
                 let i = rng.gen_range(0..n_entities);
                 let mut j = rng.gen_range(0..n_entities);
                 if i == j {

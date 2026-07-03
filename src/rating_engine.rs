@@ -694,8 +694,20 @@ fn solve_irls_huber(
         }
 
         let scale_mad = mad(&residuals);
-        let scale = if scale_mad <= cfg.tiny {
-            residuals.iter().map(|r| r.abs()).fold(0.0, f64::max)
+        let max_abs_residual = residuals.iter().map(|r| r.abs()).fold(0.0, f64::max);
+        // A MAD that is vanishingly small RELATIVE to the residual range is a
+        // degenerate scale estimate — it means most residuals are tied up to
+        // floating-point noise (e.g. duplicate anchor observations), not that
+        // every larger residual is an outlier. Treating such a MAD as a real
+        // scale sets delta = huber_k * (fp noise) and Huber-clips every edge,
+        // crushing the whole fit toward zero. Fall back to the max-abs scale
+        // exactly as for MAD == 0. (Regression:
+        // tests/property_solver.rs::huber_mad_scale_collapses_on_near_tied_residuals)
+        const MAD_RELATIVE_DEGENERACY_FLOOR: f64 = 1e-8;
+        let scale = if scale_mad <= cfg.tiny
+            || scale_mad <= MAD_RELATIVE_DEGENERACY_FLOOR * max_abs_residual
+        {
+            max_abs_residual
         } else {
             scale_mad
         };

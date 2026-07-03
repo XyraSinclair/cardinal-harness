@@ -800,17 +800,11 @@ fn ratio_ladder_cap_exceeds_midladder_gap() {
 /// get treated as "the outlier scale" and used to clip everything,
 /// including the conflicting edge.
 ///
-/// Ignored: this is a real solver bug (in `src/rating_engine.rs`,
-/// `solve_irls_huber`'s `scale_mad <= cfg.tiny` guard), not a test bug. Per
-/// review scope, src/ is not to be modified here; this test is left as a
-/// precise, reproducible regression marker for a future src fix (e.g.
-/// comparing `scale_mad` against a magnitude *relative to* the residuals'
-/// own scale, or against `f64::EPSILON` scaled by the largest residual,
-/// rather than the absolute `cfg.tiny = 1e-18`).
+/// Regression test: this bug was found by adversarial review of this suite
+/// and FIXED in `solve_irls_huber` with a relative degeneracy floor — a MAD
+/// below 1e-8 of the max-abs residual now falls back to the max-abs scale,
+/// exactly as for MAD == 0.
 #[test]
-#[ignore = "real solver bug: solve_irls_huber's MAD==0 guard (cfg.tiny=1e-18) is far too strict, \
-so floating-point noise in near-tied residuals gets treated as the Huber outlier scale, \
-crushing the whole fit even with huber_k=1e6; see doc comment for the mechanism"]
 fn huber_mad_scale_collapses_on_near_tied_residuals() {
     let mut cfg = Config::default();
     cfg.huber_k = 1.0e6; // "should" disable Huber per its own doc comment; does not.
