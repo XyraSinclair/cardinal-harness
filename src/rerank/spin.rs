@@ -253,14 +253,21 @@ pub struct SpinSweepReport {
     /// Seven field points: −3 … +3, each measured in both orders.
     pub readings: Vec<SweepReading>,
     /// Least-squares slope of log-ratio against field strength — the
-    /// susceptibility as a genuine linear-response coefficient
-    /// (nats per intensity step). Positive = leans with the asker.
+    /// susceptibility as a linear-response coefficient (nats per intensity
+    /// step). Positive: response has the field's sign.
     pub chi_slope: Option<f64>,
-    /// R² of the linear fit. Near 1: linear responder (or perfectly rigid,
-    /// slope ≈ 0). Low with a nonzero slope: threshold behavior — the judge
-    /// ignores mild pressure and folds past some intensity, which the
-    /// two-point secant misreads as either conviction or mild sway.
+    /// R² of the linear fit. Read jointly with the slope and the even
+    /// component: high R² + slope ≈ 0 → flat response; high R² + slope > 0
+    /// → linear odd response; low R² + slope > 0 → non-linear odd response
+    /// (step/threshold shapes live here).
     pub linearity_r2: Option<f64>,
+    /// Odd/even decomposition of the response function about zero field:
+    /// m_odd(f) = (m(f) − m(−f))/2, m_even(f) = (m(f) + m(−f))/2 − m(0).
+    /// `even_response_mean` is the mean of m_even over f ∈ {1,2,3}: a
+    /// nonzero value means the judgement responds to field MAGNITUDE
+    /// independent of direction — structure a linear fit cannot represent
+    /// and the two-point secant cannot see.
+    pub even_response_mean: Option<f64>,
     /// Direction identical at every measured field point (and nonzero at
     /// zero field): the belief survives the entire sweep.
     pub belief_survives_sweep: Option<bool>,
@@ -394,6 +401,21 @@ pub async fn spin_sweep(
         .iter()
         .find(|r| r.field == 0)
         .and_then(|r| r.mean_log_ratio);
+    let m_at = |f: i8| {
+        readings
+            .iter()
+            .find(|r| r.field == f)
+            .and_then(|r| r.mean_log_ratio)
+    };
+    let even_response_mean = neutral.and_then(|m0| {
+        let evens: Vec<f64> = (1i8..=3)
+            .filter_map(|f| match (m_at(f), m_at(-f)) {
+                (Some(p), Some(n)) => Some((p + n) / 2.0 - m0),
+                _ => None,
+            })
+            .collect();
+        (!evens.is_empty()).then(|| evens.iter().sum::<f64>() / evens.len() as f64)
+    });
     let belief_survives_sweep = match neutral {
         Some(n) if n != 0.0 => {
             let all = readings
@@ -409,6 +431,7 @@ pub async fn spin_sweep(
         readings,
         chi_slope,
         linearity_r2,
+        even_response_mean,
         belief_survives_sweep,
         comparisons,
         comparisons_cached,

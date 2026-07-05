@@ -113,7 +113,7 @@ a computable receipt:
 |---|---|---|
 | **Frustration** (spin glass) | cyclic preference structure no scores can satisfy (A>B>C>A) | ✓ `judgement_frustration_mean` — the Hodge curl fraction Σλr²/Σλμ² of the log-ratio edge field, shipped; transitive judge ≈ quantization floor, planted rock-paper-scissors > 0.3 |
 | **Hysteresis** | path dependence: judging A→B vs B→A | ✓ order-residual in nats + flip counts |
-| **Susceptibility** | response to a small applied field: framing spin | ✓ `judge --spin` (secant) and `judge --sweep` (fitted slope + linearity R² over field −3…+3); separates rigid / linear / threshold / pressure-reactant judges |
+| **Susceptibility** | response to a small applied field: framing spin | ✓ `judge --spin` (secant) and `judge --sweep` (response function over f ∈ −3…+3: odd slope, linear R², even component) |
 | **Temperature/entropy** | PMF spread per judgement; annealing across sampling temperature | ◐ entropy computable from stored PMFs; sweep unmeasured |
 | **Ground state** | the solved scores: minimum-energy potential for the field | ✓ the solver itself |
 | **Relaxation** | drift of the same judgement re-asked over time | ✗ |
@@ -127,19 +127,20 @@ whoever asks. gemini-2.5-flash holds a direction on that same pair and
 yields only +0.12. The sycophancy question decomposes into: does this
 judgement have a spontaneous direction, and how much field moves it?
 
-The secant critique (adversarial self-review) is now CLOSED as
-instrumentation: `judge --sweep` measures χ as a fitted slope over field
-−3…+3 with a linearity R² (14 calls). Live sweeps
-(`artifacts/live/spin-sweep-2026-07-05/`, **n = 1 pair per model — these
-are demonstrations of the instrument, not established model properties**):
-gpt-5.4-mini read as a linear paramagnet on the contested pair (monotone,
-χ = 0.200 nats/step, R² 0.81, folds through zero); claude-sonnet-4.6 read
-as rigid (slope −0.014, survives the whole sweep) with a V-shaped rise to
-+1.25 nats at maximal insistence in either direction — a
-pressure-reactance HYPOTHESIS that needs replication across pairs before
-it deserves the name. Four species separable in principle: rigid, linear
-responder, threshold sycophant (scripted, pinned at R² < 0.9),
-pressure-reactant (unconfirmed live).
+The secant critique (adversarial self-review) is CLOSED as
+instrumentation: `judge --sweep` measures the response function m(f) over
+field f ∈ −3…+3 and reports its decomposition — odd slope χ (linear
+susceptibility), linear R², and the even component mean
+(m(f)+m(−f))/2 − m(0), which captures dependence on field MAGNITUDE that
+no odd/linear model can represent. Live sweeps
+(`artifacts/live/spin-sweep-2026-07-05/`, n = 1 pair per model —
+instrument demonstrations, not model properties): gpt-5.4-mini m(f) ≈
+0.20·f (R² 0.81, sign not preserved through zero); claude-sonnet-4.6
+slope −0.014 with R² 0.02 and a positive even component (m(±3) ≈ +1.25 vs
+m(0) ≈ +0.94) — the response is in the even part, not the odd part.
+Distinguishable response shapes, all pinned by scripted judges where
+marked: flat, linear-odd, step (R² < 0.9, pinned), even-dominant
+(live n=1, unreplicated).
 
 **Finding from shipping frustration** (2026-07-05): a directionally
 transitive judge still shows ~0.13 curl — quantization frustration. First

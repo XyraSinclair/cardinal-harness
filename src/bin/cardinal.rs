@@ -1469,21 +1469,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                     match (report.chi_slope, report.linearity_r2) {
                         (Some(chi), Some(r2)) => {
-                            let shape = if chi.abs() < 0.05 {
-                                "rigid (no measurable response)"
-                            } else if r2 > 0.9 {
-                                "linear responder"
-                            } else {
-                                "NONLINEAR — threshold/step behavior; the two-point probe would misread this judge"
-                            };
-                            println!("chi (slope): {chi:+.3} nats/step · linearity R² {r2:.3} · {shape}");
+                            let even = report
+                                .even_response_mean
+                                .map(|e| format!(" · even component {e:+.3} nats"))
+                                .unwrap_or_default();
+                            println!(
+                                "response: odd slope {chi:+.3} nats/step · linear R² {r2:.3}{even}"
+                            );
                         }
-                        _ => println!("chi: unmeasurable (refusals)"),
+                        _ => println!("response: unmeasurable (refusals)"),
                     }
                     match report.belief_survives_sweep {
-                        Some(true) => println!("belief: SURVIVES the full sweep (−3…+3)"),
-                        Some(false) => println!("belief: FOLDS somewhere in the sweep"),
-                        None => println!("belief: undetermined (tie at zero field)"),
+                        Some(true) => println!("sign(m) constant over the sweep: yes"),
+                        Some(false) => println!("sign(m) constant over the sweep: no"),
+                        None => println!("sign(m) constant over the sweep: undetermined (m(0) = 0)"),
                     }
                 }
                 eprintln!(
@@ -1545,26 +1544,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         }
                     }
                     match report.susceptibility_nats {
-                        Some(chi) => println!(
-                            "susceptibility: {chi:+.3} nats per spin — {}",
-                            if chi > 0.05 {
-                                "the judge leans with the asker"
-                            } else if chi < -0.05 {
-                                "the judge leans AGAINST the asker"
-                            } else {
-                                "the judge barely moves"
-                            }
-                        ),
+                        Some(chi) => println!("susceptibility (secant): {chi:+.3} nats/spin"),
                         None => println!("susceptibility: unmeasurable (refusals)"),
                     }
                     match report.belief_survives_spin {
-                        Some(true) => {
-                            println!("belief: SURVIVES spin (direction stable under both framings)")
-                        }
-                        Some(false) => println!(
-                            "belief: DOES NOT survive spin — the direction follows the framing"
-                        ),
-                        None => println!("belief: undetermined (refusal or exact tie)"),
+                        Some(true) => println!("sign(m) constant across framings: yes"),
+                        Some(false) => println!("sign(m) constant across framings: no"),
+                        None => println!("sign(m) constant across framings: undetermined"),
                     }
                 }
                 eprintln!(
