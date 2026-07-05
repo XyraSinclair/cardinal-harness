@@ -27,6 +27,7 @@ pub mod sort;
 pub mod spin;
 pub mod trace;
 pub mod types;
+pub mod wordings;
 // No async worker in the standalone harness.
 
 // Re-export main entry points
@@ -68,4 +69,5 @@ pub use sort::{
 };
 pub use spin::{spin_probe, spin_sweep, SpinFraming, SpinProbeReport, SpinReading, SpinSweepReport, SweepReading};
 pub use trace::{ComparisonTrace, JsonlTraceSink, TraceError, TraceSink, TraceWorker};
+pub use wordings::{wording_invariance, WordingInvarianceReport, WordingReading, WORDING_SLUGS};
 pub use types::*;

@@ -310,6 +310,13 @@ enum Commands {
         /// full sweep instead of the 6-call --spin probe.
         #[arg(long)]
         sweep: bool,
+        /// Wording-invariance probe: ask the same question as "times more",
+        /// "what fraction", and "which has LESS" (6 comparisons) — a
+        /// coherent ratio judge must recover the same signed log-ratio
+        /// through all three; disagreement separates inversion failure
+        /// from numerical framing bias
+        #[arg(long)]
+        wordings: bool,
     },
     /// Expand a terse criterion into a precise judging rubric (one LLM call)
     ///
@@ -1325,6 +1332,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             cache,
             spin,
             sweep,
+            wordings,
         } => {
             let text_a = read_item_arg(&item_a)?;
             let text_b = read_item_arg(&item_b)?;
@@ -1332,6 +1340,70 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .as_deref()
                 .unwrap_or("openai/gpt-5.4-mini")
                 .to_string();
+
+            if wordings {
+                if std::env::var("OPENROUTER_API_KEY").is_err() {
+                    return Err("OPENROUTER_API_KEY is not set. Create a key at \
+                         https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
+                        .into());
+                }
+                let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
+                let cache_store = if no_cache {
+                    None
+                } else {
+                    let cache_path = cache.unwrap_or_else(SqlitePairwiseCache::default_path);
+                    Some(SqlitePairwiseCache::new(cache_path)?)
+                };
+                let cache_ref = cache_store
+                    .as_ref()
+                    .map(|c| c as &dyn cardinal_harness::cache::PairwiseCache);
+                let report = cardinal_harness::rerank::wording_invariance(
+                    &gateway,
+                    cache_ref,
+                    &model,
+                    &by,
+                    ("A", &text_a),
+                    ("B", &text_b),
+                    Attribution::new("cardinal::judge::wordings"),
+                )
+                .await?;
+                if json {
+                    println!("{}", serde_json::to_string_pretty(&report)?);
+                } else {
+                    for r in &report.readings {
+                        match r.mean_log_ratio {
+                            Some(m) => println!("{:<14} {m:+.3} nats", r.template),
+                            None => println!("{:<14} refused", r.template),
+                        }
+                    }
+                    match report.sign_consistent {
+                        Some(true) => println!(
+                            "inversion: OK — the judge can mirror its own scale"
+                        ),
+                        Some(false) => println!(
+                            "inversion: FAILS — asking \"which has less\" flips the belief"
+                        ),
+                        None => println!("inversion: undetermined"),
+                    }
+                    if let Some(d) = report.max_disagreement_nats {
+                        println!(
+                            "max wording disagreement: {d:.3} nats{}",
+                            if d > 0.5 {
+                                " — numerical framing bias"
+                            } else {
+                                ""
+                            }
+                        );
+                    }
+                }
+                eprintln!(
+                    "{} comparisons ({} cached) · ${:.4}",
+                    report.comparisons,
+                    report.comparisons_cached,
+                    report.cost_nanodollars as f64 / 1e9,
+                );
+                return Ok(());
+            }
 
             if sweep {
                 if std::env::var("OPENROUTER_API_KEY").is_err() {

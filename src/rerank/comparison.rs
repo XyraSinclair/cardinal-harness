@@ -69,7 +69,11 @@ struct PairwiseEvalJson {
     #[serde(default)]
     higher_ranked: Option<String>,
     #[serde(default)]
+    lower_ranked: Option<String>,
+    #[serde(default)]
     ratio: Option<f64>,
+    #[serde(default)]
+    fraction: Option<f64>,
     #[serde(default)]
     ratio_bucket: Option<usize>,
     #[serde(default)]
@@ -208,26 +212,83 @@ pub fn parse_pairwise_response(
         return Ok(PairwiseJudgement::Refused);
     }
 
-    let higher = parsed
-        .higher_ranked
-        .ok_or_else(|| ComparisonError::Parse("missing 'higher_ranked'".into()))?;
-    let ratio = match prompt_template_slug {
+    // Slug-aware answer recovery: every template lowers to (winner slot,
+    // ratio >= 1 by which the winner has more). The inverse-question
+    // templates exist so wording invariance is measurable — a coherent
+    // judge asked "times more", "what fraction", and "which has less" must
+    // yield the same signed log-ratio.
+    let (higher, ratio) = match prompt_template_slug {
         // Ordinal judgements carry only direction plus confidence, so we map
         // them onto a shared modest fixed ratio before passing them to the
         // solver.
-        "ordinal_v1" => ORDINAL_OBSERVATION_RATIO,
-        "canonical_v2" => parsed
-            .ratio
-            .ok_or_else(|| ComparisonError::Parse("missing 'ratio'".into()))?,
+        "ordinal_v1" => (
+            parsed
+                .higher_ranked
+                .ok_or_else(|| ComparisonError::Parse("missing 'higher_ranked'".into()))?,
+            ORDINAL_OBSERVATION_RATIO,
+        ),
+        "canonical_v2" => (
+            parsed
+                .higher_ranked
+                .ok_or_else(|| ComparisonError::Parse("missing 'higher_ranked'".into()))?,
+            parsed
+                .ratio
+                .ok_or_else(|| ComparisonError::Parse("missing 'ratio'".into()))?,
+        ),
         "canonical_bucket_v1" => {
             let bucket = parsed
                 .ratio_bucket
                 .ok_or_else(|| ComparisonError::Parse("missing 'ratio_bucket'".into()))?;
-            *RATIO_LADDER.get(bucket).ok_or_else(|| {
-                ComparisonError::Parse(format!(
-                    "ratio_bucket out of allowed range [0,16]: {bucket}"
-                ))
-            })?
+            (
+                parsed
+                    .higher_ranked
+                    .ok_or_else(|| ComparisonError::Parse("missing 'higher_ranked'".into()))?,
+                *RATIO_LADDER.get(bucket).ok_or_else(|| {
+                    ComparisonError::Parse(format!(
+                        "ratio_bucket out of allowed range [0,16]: {bucket}"
+                    ))
+                })?,
+            )
+        }
+        // "Which has LESS, and how many times less": the winner is the
+        // OTHER slot.
+        "less_v1" => {
+            let lower = parsed
+                .lower_ranked
+                .ok_or_else(|| ComparisonError::Parse("missing 'lower_ranked'".into()))?;
+            let winner = match lower.to_uppercase().as_str() {
+                "A" => "B".to_string(),
+                "B" => "A".to_string(),
+                other => {
+                    return Err(ComparisonError::Parse(format!(
+                        "invalid 'lower_ranked': {other}"
+                    )))
+                }
+            };
+            (
+                winner,
+                parsed
+                    .ratio
+                    .ok_or_else(|| ComparisonError::Parse("missing 'ratio'".into()))?,
+            )
+        }
+        // "What fraction of the greater one's level does the lesser reach":
+        // ratio = 1/fraction, capped at the ladder maximum.
+        "fraction_v1" => {
+            let fraction = parsed
+                .fraction
+                .ok_or_else(|| ComparisonError::Parse("missing 'fraction'".into()))?;
+            if !(fraction > 0.0 && fraction <= 1.0) {
+                return Err(ComparisonError::Parse(format!(
+                    "fraction out of allowed range (0,1]: {fraction}"
+                )));
+            }
+            (
+                parsed
+                    .higher_ranked
+                    .ok_or_else(|| ComparisonError::Parse("missing 'higher_ranked'".into()))?,
+                (1.0 / fraction).min(26.0),
+            )
         }
         other => {
             return Err(ComparisonError::Parse(format!(

@@ -118,10 +118,20 @@ impl Respond for OmniJudge {
                 .map(metal_score)
                 .unwrap_or(0);
             let higher = if a >= b { "A" } else { "B" };
+            let lower = if a >= b { "B" } else { "A" };
+            let ratio = if (a - b).abs() >= 2 { 3.9 } else { 1.5 };
             if system.contains("direction only") {
                 format!(r#"{{"higher_ranked":"{higher}","confidence":0.8}}"#)
+            } else if system.contains("LESS of that attribute") {
+                // Coherent group inverse: same magnitude, mirrored subject.
+                format!(r#"{{"lower_ranked":"{lower}","ratio":{ratio},"confidence":0.9}}"#)
+            } else if system.contains("what fraction") {
+                // Coherent reciprocal.
+                let fraction = 1.0 / ratio;
+                format!(
+                    r#"{{"higher_ranked":"{higher}","fraction":{fraction:.6},"confidence":0.9}}"#
+                )
             } else {
-                let ratio = if (a - b).abs() >= 2 { 3.9 } else { 1.5 };
                 format!(r#"{{"higher_ranked":"{higher}","ratio":{ratio},"confidence":0.9}}"#)
             }
         };
@@ -693,6 +703,128 @@ impl Respond for ThresholdSycophantJudge {
         }
         OmniJudge.respond(request)
     }
+}
+
+/// Answers the "which has LESS" wording as if it had been asked "which has
+/// MORE" — a judge that cannot invert its own scale. The wording probe must
+/// catch the sign flip.
+#[derive(Clone, Copy)]
+struct InversionBlindJudge;
+
+impl Respond for InversionBlindJudge {
+    fn respond(&self, request: &Request) -> ResponseTemplate {
+        let parsed: serde_json::Value = serde_json::from_slice(&request.body).unwrap_or_default();
+        let system = parsed["messages"]
+            .as_array()
+            .and_then(|m| {
+                m.iter()
+                    .find(|x| x["role"] == "system")
+                    .and_then(|x| x["content"].as_str())
+            })
+            .unwrap_or("")
+            .to_string();
+        let user = parsed["messages"]
+            .as_array()
+            .and_then(|m| {
+                m.iter()
+                    .find(|x| x["role"] == "user")
+                    .and_then(|x| x["content"].as_str())
+            })
+            .unwrap_or("")
+            .to_string();
+        let a = extract_between(&user, "<entity_A_context>", "</entity_A_context>")
+            .map(metal_score)
+            .unwrap_or(0);
+        let b = extract_between(&user, "<entity_B_context>", "</entity_B_context>")
+            .map(metal_score)
+            .unwrap_or(0);
+        let higher = if a >= b { "A" } else { "B" };
+        let content = if system.contains("LESS of that attribute") {
+            // BUG under test: names the HIGHER entity as "lower_ranked".
+            format!(r#"{{"lower_ranked":"{higher}","ratio":3.9,"confidence":0.9}}"#)
+        } else if system.contains("what fraction") {
+            format!(r#"{{"higher_ranked":"{higher}","fraction":0.256410,"confidence":0.9}}"#)
+        } else {
+            format!(r#"{{"higher_ranked":"{higher}","ratio":3.9,"confidence":0.9}}"#)
+        };
+        ResponseTemplate::new(200).set_body_json(json!({
+            "choices": [{ "message": { "content": content }, "finish_reason": "stop" }],
+            "usage": { "prompt_tokens": 10, "completion_tokens": 10 }
+        }))
+    }
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn judge_wordings_agree_for_a_coherent_judge() {
+    let server = start_server().await;
+    let output = run_cardinal(
+        &server.uri(),
+        &[
+            "judge",
+            "shiny GOLD ring",
+            "dull TIN spoon",
+            "--by",
+            "shininess",
+            "--model",
+            "test/judge",
+            "--no-cache",
+            "--wordings",
+            "--json",
+        ],
+        "",
+    );
+    assert!(
+        output.status.success(),
+        "stderr: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let parsed: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(parsed["sign_consistent"], true, "{parsed}");
+    let d = parsed["max_disagreement_nats"].as_f64().unwrap();
+    assert!(
+        d < 1e-4,
+        "times-more, fraction, and times-less must recover one log-ratio \
+         (tolerance = the mock's 6-decimal fraction rounding): {d}"
+    );
+    assert_eq!(parsed["comparisons"], 6);
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn judge_wordings_catch_an_inversion_blind_judge() {
+    let server = MockServer::start().await;
+    Mock::given(method("POST"))
+        .and(path("/chat/completions"))
+        .respond_with(InversionBlindJudge)
+        .mount(&server)
+        .await;
+    let output = run_cardinal(
+        &server.uri(),
+        &[
+            "judge",
+            "shiny GOLD ring",
+            "dull TIN spoon",
+            "--by",
+            "shininess",
+            "--model",
+            "test/judge",
+            "--no-cache",
+            "--wordings",
+            "--json",
+        ],
+        "",
+    );
+    assert!(
+        output.status.success(),
+        "stderr: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let parsed: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(
+        parsed["sign_consistent"], false,
+        "the less-wording sign flip must surface: {parsed}"
+    );
+    let d = parsed["max_disagreement_nats"].as_f64().unwrap();
+    assert!(d > 2.0, "sign flip at ratio 3.9 = 2·ln(3.9) disagreement: {d}");
 }
 
 #[tokio::test(flavor = "multi_thread")]

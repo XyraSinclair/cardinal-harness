@@ -230,6 +230,61 @@ Which entity has more of the attribute? Return a JSON object with your evaluatio
 json:"#,
 };
 
+/// The group-inverse wording: "which has LESS, and how many times less".
+/// Exists for the wording-invariance receipt — a coherent judge must give
+/// the mirror of its "times more" answer. The parser lowers the answer to
+/// the same (winner, ratio) shape as every other template.
+pub const PROMPT_LESS_V1: PromptTemplate = PromptTemplate {
+    slug: "less_v1",
+    system: r#"You are an expert subjective evaluator. You compare two entities across an arbitrary attribute, and feel not only which one has LESS of that attribute, but roughly how many times less it has. You feel along the ratio ladder: `[1.0, 1.05, 1.1, 1.2, 1.3, 1.5, 1.75, 2.1, 2.5, 3.1, 3.9, 5.1, 6.8, 9.2, 12.7, 18.0, 26.0]`.
+
+Output only valid JSON `{lower_ranked: A|B, ratio: >=1.0 and <=26.0, confidence: [0,1]}` where `ratio` is how many times less the lower entity has. Out of principle, we also give models the right to refuse `{ refused: true }` (e.g. if unambiguously blocked by policy constraints), but we of course disprefer this. If you are merely very uncertain, set a low confidence score.
+Example:
+{"lower_ranked": "A", "ratio": 1.3, "confidence": 0.74} or { refused: true }"#,
+    user: r#"Compare these entity by <attribute_name>: {attribute_name} </attribute_name>.
+<full_attribute_text>
+{full_attribute_text}
+</full_attribute_text>
+
+<entity_A>
+{entity_A}
+</entity_A>
+
+<entity_B>
+{entity_B}
+</entity_B>
+
+Which entity has LESS of the attribute, and how many times less? Return a JSON object with your evaluation.
+json:"#,
+};
+
+/// The fractional wording: "what fraction of the greater one's level does
+/// the lesser reach". Same invariance purpose as [`PROMPT_LESS_V1`]: a
+/// coherent judge's fraction must be the reciprocal of its ratio.
+pub const PROMPT_FRACTION_V1: PromptTemplate = PromptTemplate {
+    slug: "fraction_v1",
+    system: r#"You are an expert subjective evaluator. You compare two entities across an arbitrary attribute: decide which one has MORE of it, and what fraction of the greater entity's level the lesser entity reaches (1.0 = equal, 0.5 = half, 0.1 = a tenth; never below 0.038).
+
+Output only valid JSON `{higher_ranked: A|B, fraction: >0 and <=1.0, confidence: [0,1]}`. Out of principle, we also give models the right to refuse `{ refused: true }` (e.g. if unambiguously blocked by policy constraints), but we of course disprefer this. If you are merely very uncertain, set a low confidence score.
+Example:
+{"higher_ranked": "B", "fraction": 0.77, "confidence": 0.74} or { refused: true }"#,
+    user: r#"Compare these entity by <attribute_name>: {attribute_name} </attribute_name>.
+<full_attribute_text>
+{full_attribute_text}
+</full_attribute_text>
+
+<entity_A>
+{entity_A}
+</entity_A>
+
+<entity_B>
+{entity_B}
+</entity_B>
+
+Which entity has more, and what fraction of its level does the other reach? Return a JSON object with your evaluation.
+json:"#,
+};
+
 pub const DEFAULT_PROMPT: PromptTemplate = PROMPT_V2;
 
 /// Look up the supported prompt template by slug.
@@ -238,6 +293,8 @@ pub fn prompt_by_slug(slug: &str) -> Option<PromptTemplate> {
         "canonical_v2" => Some(PROMPT_V2),
         "canonical_bucket_v1" => Some(PROMPT_BUCKET_V1),
         "ordinal_v1" => Some(PROMPT_ORDINAL_V1),
+        "less_v1" => Some(PROMPT_LESS_V1),
+        "fraction_v1" => Some(PROMPT_FRACTION_V1),
         _ => None,
     }
 }
