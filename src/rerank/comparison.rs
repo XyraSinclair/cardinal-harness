@@ -153,16 +153,16 @@ impl PairwiseComparisonSpec<'_> {
     pub fn cache_key(self) -> PairwiseCacheKey {
         // The ratio-letter path renders via seriate; its cache identity is
         // the seriate template hash, not a cardinal template.
-        let (slug, template_hash) =
-            if self.attribute.prompt_template_slug == Some(RATIO_LETTER_SLUG) {
-                (
-                    RATIO_LETTER_SLUG,
-                    ratio_letter_template_fingerprint().to_string(),
-                )
-            } else {
-                let template = self.prompt_template();
-                (template.slug, template.template_hash())
-            };
+        let (slug, template_hash) = if let Some(slug) = self
+            .attribute
+            .prompt_template_slug
+            .filter(|slug| is_evidence_slug(slug))
+        {
+            (slug, seriate_template_fingerprint(slug).to_string())
+        } else {
+            let template = self.prompt_template();
+            (template.slug, template.template_hash())
+        };
         PairwiseCacheKey::from_parts(PairwiseCacheKeyParts {
             model: self.model,
             prompt_template: PairwiseCacheTemplate {
@@ -513,6 +513,18 @@ fn extract_json(raw: &str) -> &str {
 /// duplicates the prompt text, so the two cannot drift.
 pub const RATIO_LETTER_SLUG: &str = "ratio_letter_v1";
 
+/// Prompt-template slug for the seriate single-token ORDINAL instrument:
+/// a three-token alphabet (A / B / =) whose answer-position logprobs give
+/// a calibrated direction PMF. The cheapest evidence instrument; direction
+/// enters the solver at a fixed modest magnitude with PMF-carried
+/// uncertainty.
+pub const ORDINAL_LETTER_SLUG: &str = "ordinal_letter_v1";
+
+/// True when the slug routes through the seriate evidence path.
+pub fn is_evidence_slug(slug: &str) -> bool {
+    slug == RATIO_LETTER_SLUG || slug == ORDINAL_LETTER_SLUG
+}
+
 /// PMF-derived log-ratio moments for one judgement, in PRESENTED
 /// (A-over-B) coordinates. Carried alongside the point judgement so the
 /// solver can weight by measured variance instead of stated confidence.
@@ -532,17 +544,21 @@ pub struct EvidenceMoments {
 /// Stable template fingerprint for the ratio-letter path, derived from the
 /// seriate instrument's own content-addressed template hash (so a change to
 /// seriate's prompt text changes cardinal's cache identity automatically).
-fn ratio_letter_template_fingerprint() -> &'static str {
+fn seriate_template_fingerprint(slug: &str) -> &'static str {
     use std::sync::OnceLock;
-    static FINGERPRINT: OnceLock<String> = OnceLock::new();
-    FINGERPRINT.get_or_init(|| {
-        use seriate::instrument::Instrument as _;
-        let instrument = seriate::instrument::ratio_letter::RatioLetterInstrument;
+    static RATIO: OnceLock<String> = OnceLock::new();
+    static ORDINAL: OnceLock<String> = OnceLock::new();
+    fn compute(instrument: &dyn seriate::instrument::Instrument) -> String {
         let attribute = seriate::Attribute::new("fingerprint", "fingerprint");
         let a = seriate::Entity::new("A");
         let b = seriate::Entity::new("B");
         instrument.render(&attribute, &a, &b).template.0 .0.clone()
-    })
+    }
+    if slug == ORDINAL_LETTER_SLUG {
+        ORDINAL.get_or_init(|| compute(&seriate::instrument::ordinal::OrdinalInstrument))
+    } else {
+        RATIO.get_or_init(|| compute(&seriate::instrument::ratio_letter::RatioLetterInstrument))
+    }
 }
 
 // =============================================================================
@@ -555,8 +571,13 @@ pub async fn compare_pair(
     cache: Option<&dyn PairwiseCache>,
     request: PairwiseComparisonRequest<'_>,
 ) -> Result<(PairwiseJudgement, ComparisonUsage), ComparisonError> {
-    if request.spec.attribute.prompt_template_slug == Some(RATIO_LETTER_SLUG) {
-        return compare_pair_ratio_letter(gateway, cache, request).await;
+    if request
+        .spec
+        .attribute
+        .prompt_template_slug
+        .is_some_and(is_evidence_slug)
+    {
+        return compare_pair_seriate(gateway, cache, request).await;
     }
     let prompt_instance = request.spec.prompt_instance();
     let cache_key = cache.map(|_| request.spec.cache_key());
@@ -865,13 +886,11 @@ fn should_use_json_mode(model: &str) -> bool {
 /// surface (traces, counterbalance flip stats, cache) keeps working, while
 /// the PMF moments ride in `ComparisonUsage::evidence_moments` and enter the
 /// solver with measured variance.
-async fn compare_pair_ratio_letter(
+async fn compare_pair_seriate(
     gateway: &dyn ChatGateway,
     cache: Option<&dyn PairwiseCache>,
     request: PairwiseComparisonRequest<'_>,
 ) -> Result<(PairwiseJudgement, ComparisonUsage), ComparisonError> {
-    use seriate::instrument::Instrument as _;
-
     let cache_key = cache.map(|_| request.spec.cache_key());
     if let (Some(cache), Some(ref key)) = (cache, &cache_key) {
         match cache.get(key).await {
@@ -908,7 +927,12 @@ async fn compare_pair_ratio_letter(
         ));
     }
 
-    let instrument = seriate::instrument::ratio_letter::RatioLetterInstrument;
+    let instrument: Box<dyn seriate::instrument::Instrument> =
+        if request.spec.attribute.prompt_template_slug == Some(ORDINAL_LETTER_SLUG) {
+            Box::new(seriate::instrument::ordinal::OrdinalInstrument)
+        } else {
+            Box::new(seriate::instrument::ratio_letter::RatioLetterInstrument)
+        };
     let attribute =
         seriate::Attribute::new(request.spec.attribute.id, request.spec.attribute.prompt);
     let entity_a = seriate::Entity::new(request.spec.entity_a.text);

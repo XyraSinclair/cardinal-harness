@@ -254,6 +254,7 @@ pub async fn sort_documents(
                 evidence_judgements: 0,
                 logprob_mode_judgements: 0,
                 evidence_visible_mass_mean: None,
+                evidence_order_residual_mean_abs: None,
                 stop_reason: super::types::RerankStopReason::ToleratedErrorMet,
             },
             probes: Vec::new(),

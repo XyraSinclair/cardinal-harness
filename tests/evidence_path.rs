@@ -321,3 +321,140 @@ async fn cli_sort_with_letter_template_prints_evidence_receipts() {
         "stderr: {stderr}"
     );
 }
+
+/// Judge speaking the ordinal dialect: answers 'A', 'B', or '=' only.
+#[derive(Clone, Copy)]
+struct OrdinalJudge;
+
+impl Respond for OrdinalJudge {
+    fn respond(&self, request: &Request) -> ResponseTemplate {
+        let body: serde_json::Value = serde_json::from_slice(&request.body).unwrap_or_default();
+        let wants_logprobs = body
+            .get("logprobs")
+            .and_then(|v| v.as_bool())
+            .unwrap_or(false);
+        let user = body["messages"]
+            .as_array()
+            .and_then(|m| {
+                m.iter()
+                    .find(|x| x["role"] == "user")
+                    .and_then(|x| x["content"].as_str())
+            })
+            .unwrap_or("")
+            .to_string();
+        let a = extract_between(&user, "<entity_A>", "</entity_A>").unwrap_or("");
+        let b = extract_between(&user, "<entity_B>", "</entity_B>").unwrap_or("");
+        let d = stars(a) - stars(b);
+        let answer = if d > 0 {
+            "A"
+        } else if d < 0 {
+            "B"
+        } else {
+            "="
+        };
+        let mut response = json!({
+            "choices": [{
+                "message": { "content": answer },
+                "finish_reason": "stop"
+            }],
+            "usage": { "prompt_tokens": 40, "completion_tokens": 1 }
+        });
+        if wants_logprobs {
+            let other = if answer == "A" { "B" } else { "A" };
+            response["choices"][0]["logprobs"] = json!({
+                "content": [{
+                    "token": answer,
+                    "logprob": -0.105_360_5, // 0.9
+                    "top_logprobs": [
+                        { "token": answer, "logprob": -0.105_360_5 },
+                        { "token": other, "logprob": -2.995_732_3 }, // 0.05
+                    ]
+                }]
+            });
+        }
+        ResponseTemplate::new(200).set_body_json(response)
+    }
+}
+
+#[tokio::test]
+async fn ordinal_dialect_judge_full_pipeline_with_residual_receipt() {
+    let server = MockServer::start().await;
+    Mock::given(method("POST"))
+        .and(path("/chat/completions"))
+        .respond_with(OrdinalJudge)
+        .mount(&server)
+        .await;
+    let execution = RerankExecution::new(gateway_for(&server), Attribution::new("test::evidence"));
+    let mut opts = letter_opts();
+    opts.prompt_template_slug = Some("ordinal_letter_v1".into());
+    let sorted = sort_texts(items(), "brightness", execution, opts)
+        .await
+        .unwrap();
+    let texts: Vec<&str> = sorted.items.iter().map(|i| i.text.as_str()).collect();
+    assert_eq!(
+        texts,
+        vec!["alpha ****", "bravo ***", "charlie **", "delta *"],
+        "direction-only logprob evidence recovers the planted order"
+    );
+    assert_eq!(
+        sorted.meta.logprob_mode_judgements,
+        sorted.meta.evidence_judgements
+    );
+    // Content-driven judge: both presentation orders yield exactly
+    // reflected PMFs, so the order residual is ~0 nats.
+    let residual = sorted.meta.evidence_order_residual_mean_abs.unwrap();
+    assert!(residual < 1e-9, "unbiased judge residual: {residual}");
+}
+
+#[tokio::test]
+async fn position_biased_letter_judge_shows_nonzero_order_residual() {
+    /// Always answers 'D' (slot A wins) regardless of content.
+    #[derive(Clone, Copy)]
+    struct AlwaysSlotA;
+    impl Respond for AlwaysSlotA {
+        fn respond(&self, request: &Request) -> ResponseTemplate {
+            let body: serde_json::Value = serde_json::from_slice(&request.body).unwrap_or_default();
+            let wants_logprobs = body
+                .get("logprobs")
+                .and_then(|v| v.as_bool())
+                .unwrap_or(false);
+            let mut response = json!({
+                "choices": [{
+                    "message": { "content": "D" },
+                    "finish_reason": "stop"
+                }],
+                "usage": { "prompt_tokens": 40, "completion_tokens": 1 }
+            });
+            if wants_logprobs {
+                response["choices"][0]["logprobs"] = json!({
+                    "content": [{
+                        "token": "D",
+                        "logprob": -0.105_360_5,
+                        "top_logprobs": [
+                            { "token": "D", "logprob": -0.105_360_5 },
+                            { "token": "A", "logprob": -2.995_732_3 },
+                        ]
+                    }]
+                });
+            }
+            ResponseTemplate::new(200).set_body_json(response)
+        }
+    }
+    let server = MockServer::start().await;
+    Mock::given(method("POST"))
+        .and(path("/chat/completions"))
+        .respond_with(AlwaysSlotA)
+        .mount(&server)
+        .await;
+    let execution = RerankExecution::new(gateway_for(&server), Attribution::new("test::evidence"));
+    let sorted = sort_texts(items(), "brightness", execution, letter_opts())
+        .await
+        .unwrap();
+    // Pure position bias: presented means point the same way in both
+    // orders, so residuals are ~2x the per-order mean, far from zero.
+    let residual = sorted.meta.evidence_order_residual_mean_abs.unwrap();
+    assert!(
+        residual > 0.5,
+        "pure position bias must show a large order residual: {residual}"
+    );
+}

@@ -140,7 +140,19 @@ pub fn estimate_max_rerank_charge(req: &MultiRerankRequest) -> RerankChargeEstim
     }
 
     let model = req.model.as_deref().unwrap_or(DEFAULT_MODEL);
-    let output_tokens_per_comparison = PAIRWISE_MAX_OUTPUT_TOKENS_DEFAULT;
+    // Evidence-path templates answer with a single token; their call cap is
+    // 16 output tokens, not the JSON path's reasoning-sized ceiling.
+    let all_evidence = !req.attributes.is_empty()
+        && req.attributes.iter().all(|a| {
+            a.prompt_template_slug
+                .as_deref()
+                .is_some_and(crate::rerank::comparison::is_evidence_slug)
+        });
+    let output_tokens_per_comparison = if all_evidence {
+        16
+    } else {
+        PAIRWISE_MAX_OUTPUT_TOKENS_DEFAULT
+    };
 
     // Worst-case attribute prompt: choose the largest prompt by token count (bounded, cheap).
     let (attr_id, attr_prompt, attr_template_slug) = req
@@ -307,8 +319,7 @@ pub fn validate_multi_rerank_request(req: &MultiRerankRequest) -> Result<(), Mul
             )));
         }
         if let Some(slug) = a.prompt_template_slug.as_deref() {
-            if slug != crate::rerank::comparison::RATIO_LETTER_SLUG
-                && prompt_by_slug(slug).is_none()
+            if !crate::rerank::comparison::is_evidence_slug(slug) && prompt_by_slug(slug).is_none()
             {
                 return Err(MultiRerankError::InvalidRequest(format!(
                     "unknown prompt_template_slug: {slug}"
@@ -618,6 +629,13 @@ pub async fn multi_rerank(
     let mut evidence_judgements: usize = 0;
     let mut logprob_mode_judgements: usize = 0;
     let mut visible_mass_sum: f64 = 0.0;
+    // PMF-level counterbalance residuals: for a pair asked in both orders,
+    // an unbiased judge's presented-coordinate means sum to zero; the sum
+    // measures position bias in log-ratio units, per pair — strictly
+    // richer than binary direction flips.
+    let mut evidence_order_means: HashMap<(usize, usize, usize), [Option<f64>; 2]> = HashMap::new();
+    let mut evidence_order_residual_sum_abs: f64 = 0.0;
+    let mut evidence_order_residual_pairs: usize = 0;
     let mut presentation_rng = execution
         .run_options
         .rng_seed
@@ -1021,6 +1039,20 @@ pub async fn multi_rerank(
                             logprob_mode_judgements += 1;
                         }
                         visible_mass_sum += moments.visible_mass;
+                        if req.counterbalance_pairs {
+                            let entry =
+                                evidence_order_means.entry(task.key).or_insert([None, None]);
+                            let slot = task.swapped as usize;
+                            if entry[slot].is_none() {
+                                entry[slot] = Some(moments.log_ratio_mean);
+                                if let [Some(unswapped), Some(swapped)] = *entry {
+                                    // Both presented-coordinate means; an
+                                    // unbiased judge gives sum == 0.
+                                    evidence_order_residual_sum_abs += (unswapped + swapped).abs();
+                                    evidence_order_residual_pairs += 1;
+                                }
+                            }
+                        }
                         let mean_ij = if task.swapped {
                             -moments.log_ratio_mean
                         } else {
@@ -1320,6 +1352,11 @@ pub async fn multi_rerank(
         logprob_mode_judgements,
         evidence_visible_mass_mean: if evidence_judgements > 0 {
             Some(visible_mass_sum / evidence_judgements as f64)
+        } else {
+            None
+        },
+        evidence_order_residual_mean_abs: if evidence_order_residual_pairs > 0 {
+            Some(evidence_order_residual_sum_abs / evidence_order_residual_pairs as f64)
         } else {
             None
         },

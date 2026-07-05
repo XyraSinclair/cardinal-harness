@@ -139,6 +139,10 @@ enum Commands {
         /// Suppress the run summary on stderr
         #[arg(long)]
         quiet: bool,
+        /// Print the worst-case comparison count and dollar cost, then exit
+        /// without touching the network or cache
+        #[arg(long)]
+        estimate: bool,
     },
     /// One pairwise judgement between two items, fully transparent
     ///
@@ -379,6 +383,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             cache,
             trace,
             quiet,
+            estimate,
         } => {
             if cache_only && no_cache {
                 return Err("--cache-only and --no-cache are mutually exclusive".into());
@@ -387,6 +392,35 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let documents = parse_sort_items(&raw)?;
             if documents.is_empty() {
                 return Err("no items to sort: input is empty".into());
+            }
+
+            if estimate {
+                let opts = cardinal_harness::rerank::SortOptions {
+                    model: model.clone(),
+                    comparison_budget: budget,
+                    top_k,
+                    counterbalance: !no_counterbalance,
+                    two_sided,
+                    also_by: also_by.clone(),
+                    prune_p_topk_below: prune_below,
+                    prompt_template_slug: template.clone(),
+                    ..Default::default()
+                };
+                let simple =
+                    cardinal_harness::rerank::sort::sort_request(documents.clone(), &by, &opts);
+                let multi = cardinal_harness::rerank::simple::to_multi_request(&simple);
+                let charge = cardinal_harness::rerank::estimate_max_rerank_charge(&multi);
+                println!(
+                    "worst case: {} comparisons · ~{} input + {} output tokens each ·                      provider max ${:.4}",
+                    charge.comparison_budget,
+                    charge.input_tokens_per_comparison,
+                    charge.output_tokens_per_comparison,
+                    charge.provider_cost_max_nanodollars as f64 / 1e9,
+                );
+                eprintln!(
+                    "estimate only — no network, no cache; actual runs stop earlier on                      certified top-k or cache hits"
+                );
+                return Ok(());
             }
 
             let have_key = std::env::var("OPENROUTER_API_KEY").is_ok();
@@ -520,8 +554,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     ""
                 };
                 let evidence = if meta.evidence_judgements > 0 {
+                    let residual = meta
+                        .evidence_order_residual_mean_abs
+                        .map(|r| format!(", order-residual {r:.3} nats"))
+                        .unwrap_or_default();
                     format!(
-                        " · evidence: {}/{} logprob-mode, visible {:.2}",
+                        " · evidence: {}/{} logprob-mode, visible {:.2}{residual}",
                         meta.logprob_mode_judgements,
                         meta.evidence_judgements,
                         meta.evidence_visible_mass_mean.unwrap_or(0.0)

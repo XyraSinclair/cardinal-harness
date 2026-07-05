@@ -171,6 +171,11 @@ pub struct RerankMeta {
     /// evidence judgements.
     #[serde(default)]
     pub evidence_visible_mass_mean: Option<f64>,
+    /// Mean |sum of presented-coordinate log-ratio means| over pairs asked
+    /// in both orders: 0 for an unbiased judge; the magnitude of position
+    /// bias in log-ratio units.
+    #[serde(default)]
+    pub evidence_order_residual_mean_abs: Option<f64>,
 
     /// Why the rerank loop stopped.
     pub stop_reason: RerankStopReason,
@@ -505,6 +510,11 @@ pub struct MultiRerankMeta {
     /// evidence judgements.
     #[serde(default)]
     pub evidence_visible_mass_mean: Option<f64>,
+    /// Mean |sum of presented-coordinate log-ratio means| over pairs asked
+    /// in both orders: 0 for an unbiased judge; the magnitude of position
+    /// bias in log-ratio units.
+    #[serde(default)]
+    pub evidence_order_residual_mean_abs: Option<f64>,
 
     /// Why the rerank loop stopped.
     pub stop_reason: RerankStopReason,
