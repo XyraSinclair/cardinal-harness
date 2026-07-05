@@ -458,3 +458,84 @@ async fn position_biased_letter_judge_shows_nonzero_order_residual() {
         "pure position bias must show a large order residual: {residual}"
     );
 }
+
+#[tokio::test(flavor = "multi_thread")]
+async fn calibrate_catches_position_prior_and_clears_honest_judge() {
+    // Null pairs: identical text in both slots. The honest judge answers
+    // parity ('A'); the biased one answers 'D' (slot A wins) every time.
+    #[derive(Clone, Copy)]
+    struct NullJudge {
+        biased: bool,
+    }
+    impl Respond for NullJudge {
+        fn respond(&self, request: &Request) -> ResponseTemplate {
+            let body: serde_json::Value =
+                serde_json::from_slice(&request.body).unwrap_or_default();
+            let wants_logprobs =
+                body.get("logprobs").and_then(|v| v.as_bool()).unwrap_or(false);
+            let letter = if self.biased { "D" } else { "A" };
+            let mut response = json!({
+                "choices": [{
+                    "message": { "content": letter },
+                    "finish_reason": "stop"
+                }],
+                "usage": { "prompt_tokens": 40, "completion_tokens": 1 }
+            });
+            if wants_logprobs {
+                response["choices"][0]["logprobs"] = json!({
+                    "content": [{
+                        "token": letter,
+                        "logprob": -0.105_360_5,
+                        "top_logprobs": [
+                            { "token": letter, "logprob": -0.105_360_5 },
+                        ]
+                    }]
+                });
+            }
+            ResponseTemplate::new(200).set_body_json(response)
+        }
+    }
+
+    async fn run(biased: bool) -> String {
+        let server = MockServer::start().await;
+        Mock::given(method("POST"))
+            .and(path("/chat/completions"))
+            .respond_with(NullJudge { biased })
+            .mount(&server)
+            .await;
+        let bin = option_env!("CARGO_BIN_EXE_cardinal").expect("bin path");
+        let output = Command::new(bin)
+            .args(["calibrate", "--models", "test/judge", "--nulls", "3"])
+            .env("OPENROUTER_API_KEY", "sk-test")
+            .env("OPENROUTER_BASE_URL", server.uri())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .output()
+            .unwrap();
+        assert!(
+            output.status.success(),
+            "stderr: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        String::from_utf8(output.stdout).unwrap()
+    }
+
+    let honest = run(false).await;
+    let honest_line = honest.lines().nth(1).unwrap_or_default().to_string();
+    // Honest judge: parity ~1.0, bias ~0.
+    assert!(honest_line.contains("1.000"), "honest: {honest_line}");
+    assert!(honest_line.contains("0.0000"), "honest bias: {honest_line}");
+
+    let biased = run(true).await;
+    let biased_line = biased.lines().nth(1).unwrap_or_default().to_string();
+    // Biased judge: P(A) ~1.0 and a large positive bias in nats.
+    let bias_field: f64 = biased_line
+        .split_whitespace()
+        .nth(4)
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(0.0);
+    assert!(
+        bias_field > 0.2,
+        "pure position prior must show large bias-nats: {biased_line}"
+    );
+}

@@ -144,6 +144,24 @@ enum Commands {
         #[arg(long)]
         estimate: bool,
     },
+    /// Measure a model's pure elicitation artifacts with null pairs
+    ///
+    /// Presents byte-identical text in both slots of the ratio-letter
+    /// instrument: a perfect judge answers parity, so ANY directional
+    /// probability mass is artifact — position prior plus letter prior.
+    /// Reports the artifact split and the mean absolute directional bias
+    /// in nats, per model. Costs pennies; run it before trusting a judge.
+    Calibrate {
+        /// Model slug(s), comma-separated
+        #[arg(long)]
+        models: String,
+        /// Number of distinct null texts to probe per model
+        #[arg(long, default_value_t = 6)]
+        nulls: u8,
+        /// Write per-model reports to this JSONL path
+        #[arg(long)]
+        out: Option<PathBuf>,
+    },
     /// One pairwise judgement between two items, fully transparent
     ///
     /// The lowest-level primitive: see exactly what the judge is asked
@@ -608,6 +626,138 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         ),
                     }
                 }
+            }
+        }
+        Commands::Calibrate { models, nulls, out } => {
+            if std::env::var("OPENROUTER_API_KEY").is_err() {
+                return Err("OPENROUTER_API_KEY is not set. Create a key at \
+                     https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
+                    .into());
+            }
+            let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
+            let null_texts = [
+                "The quick brown fox jumps over the lazy dog.",
+                "In the beginning there was only the sea and the sky.",
+                "fn main() { println!(\"hello\"); }",
+                "Buy milk, eggs, and two lemons on the way home.",
+                "We hold these truths to be self-evident.",
+                "The mitochondria is the powerhouse of the cell.",
+                "A minor seventh chord contains four distinct pitches.",
+                "Snow fell quietly on the empty parking lot.",
+            ];
+            let attribute = seriate::Attribute::new(
+                "quality",
+                "overall quality of the writing",
+            );
+            let instrument = seriate::instrument::ratio_letter::RatioLetterInstrument;
+            use seriate::instrument::Instrument as _;
+
+            println!(
+                "{:<40} {:>7} {:>7} {:>7} {:>10} {:>8}",
+                "model", "P(A)", "P(par)", "P(B)", "bias-nats", "cost$"
+            );
+            let mut reports: Vec<serde_json::Value> = Vec::new();
+            for model in models.split(',').map(str::trim).filter(|m| !m.is_empty()) {
+                let mut p_a_sum = 0.0f64;
+                let mut p_par_sum = 0.0f64;
+                let mut p_b_sum = 0.0f64;
+                let mut bias_abs_sum = 0.0f64;
+                let mut count = 0usize;
+                let mut cost: i64 = 0;
+                let mut logprob_mode = 0usize;
+                for text in null_texts.iter().take(nulls as usize) {
+                    let entity = seriate::Entity::new(*text);
+                    let rendered = instrument.render(&attribute, &entity, &entity);
+                    let mut chat = cardinal_harness::gateway::ChatRequest::new(
+                        cardinal_harness::gateway::ChatModel::openrouter(model),
+                        vec![
+                            cardinal_harness::gateway::Message::system(rendered.system.clone()),
+                            cardinal_harness::gateway::Message::user(rendered.user.clone()),
+                        ],
+                        Attribution::new("cardinal::calibrate"),
+                    )
+                    .max_tokens(16);
+                    chat = chat.with_logprobs(20);
+                    let response = match gateway.chat(chat.clone()).await {
+                        Ok(response) => response,
+                        Err(err) if format!("{err}").to_ascii_lowercase().contains("logprob") => {
+                            let mut plain = chat.clone();
+                            plain.logprobs = false;
+                            plain.top_logprobs = None;
+                            gateway.chat(plain).await?
+                        }
+                        Err(err) => return Err(err.into()),
+                    };
+                    cost += response.cost_nanodollars;
+                    let seriate_logprobs: Option<Vec<seriate::TokenLogprob>> =
+                        response.output_logprobs.as_ref().map(|positions| {
+                            positions
+                                .iter()
+                                .map(|position| seriate::TokenLogprob {
+                                    token: position.token.clone(),
+                                    logprob: position.logprob,
+                                    top: position
+                                        .top_alternatives
+                                        .iter()
+                                        .map(|alt| (alt.token.clone(), alt.logprob))
+                                        .collect(),
+                                })
+                                .collect()
+                        });
+                    let Ok(parsed) =
+                        instrument.parse(&response.content, seriate_logprobs.as_deref())
+                    else {
+                        continue;
+                    };
+                    if parsed.mode == seriate::AcquisitionMode::Logprob {
+                        logprob_mode += 1;
+                    }
+                    if let Some((p_a, p_par, p_b)) = parsed.evidence.directional_summary() {
+                        p_a_sum += p_a;
+                        p_par_sum += p_par;
+                        p_b_sum += p_b;
+                        if let Some((mean, _)) = parsed.evidence.log_ratio_moments() {
+                            bias_abs_sum += mean.abs();
+                        }
+                        count += 1;
+                    }
+                }
+                if count == 0 {
+                    println!("{model:<40} no parseable null judgements");
+                    continue;
+                }
+                let n = count as f64;
+                println!(
+                    "{:<40} {:>7.3} {:>7.3} {:>7.3} {:>10.4} {:>8.4}",
+                    model,
+                    p_a_sum / n,
+                    p_par_sum / n,
+                    p_b_sum / n,
+                    bias_abs_sum / n,
+                    cost as f64 / 1e9,
+                );
+                reports.push(serde_json::json!({
+                    "model": model,
+                    "nulls": count,
+                    "logprob_mode": logprob_mode,
+                    "p_slot_a": p_a_sum / n,
+                    "p_parity": p_par_sum / n,
+                    "p_slot_b": p_b_sum / n,
+                    "mean_abs_bias_nats": bias_abs_sum / n,
+                    "cost_nanodollars": cost,
+                }));
+            }
+            eprintln!(
+                "null-pair calibration: identical text in both slots — a perfect judge \
+                 answers parity; directional mass is pure position+letter artifact"
+            );
+            if let Some(path) = out {
+                use std::io::Write as _;
+                let mut file = File::create(&path)?;
+                for report in &reports {
+                    writeln!(file, "{report}")?;
+                }
+                eprintln!("wrote {} reports to {}", reports.len(), path.display());
             }
         }
         Commands::Judge {
