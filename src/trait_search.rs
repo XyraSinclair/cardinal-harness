@@ -943,16 +943,45 @@ impl TraitSearchManager {
             return (Vec::new(), pruned);
         }
 
-        // Pick the best-measured anchor: highest-ranked entity with most data
-        let anchor = match self.sorted_indices.first().copied() {
-            Some(idx) => idx,
-            None => return (Vec::new(), pruned),
-        };
+        // Anchor DIVERSITY: pairing every under-observed entity against a
+        // single top anchor builds a hub-and-spoke comparison graph — the
+        // regret benchmark (tests/planner_regret.rs, issue #43) measured
+        // that geometry losing to uniform random pair selection, and the
+        // calibration battery independently flagged hub graphs as fragile
+        // under IRLS+Huber. Instead, rotate anchors across the ranked list
+        // (quantile stride), so exploration edges spread over the graph.
+        if self.sorted_indices.is_empty() {
+            return (Vec::new(), pruned);
+        }
+        let needy_set: std::collections::HashSet<usize> = needy.iter().copied().collect();
+        let anchor_pool: Vec<usize> = self
+            .sorted_indices
+            .iter()
+            .copied()
+            .filter(|idx| !needy_set.contains(idx))
+            .collect();
+        // When everything is needy (cold start), fall back to chaining the
+        // needy entities themselves: a path is still far better geometry
+        // than a star.
+        let fallback_chain = anchor_pool.is_empty();
 
         let mut proposals = Vec::new();
         let mut attr_cycle = self.config.attributes.iter().cycle();
 
-        for &entity_idx in &needy {
+        // Golden-ratio-ish stride spreads successive anchors across ranks.
+        let stride = (anchor_pool.len().max(1) * 5 / 8).max(1);
+        for (needy_pos, &entity_idx) in needy.iter().enumerate() {
+            let anchor = if fallback_chain {
+                // Chain: link to the next needy entity (wrapping), skipping
+                // self-pairs.
+                let next = needy[(needy_pos + 1) % needy.len()];
+                if next == entity_idx {
+                    continue;
+                }
+                next
+            } else {
+                anchor_pool[(needy_pos * stride) % anchor_pool.len()]
+            };
             if entity_idx == anchor {
                 continue;
             }

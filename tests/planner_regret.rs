@@ -176,17 +176,20 @@ fn random_cost(seed: u64, objective: Objective) -> usize {
     used.max(MAX_COMPARISONS)
 }
 
-/// HONEST NEGATIVE #1, measured and pinned: the active planner currently
-/// LOSES to uniform random pair selection even on its own objective —
-/// comparisons until the top-5 set is exactly right (n=20, noise ±0.6,
-/// 12 seeds): planner ≈134.7 vs random ≈86.7. At noise ±1.2 the gap
-/// widens (≈200.7 vs ≈136.7). Suspected mechanisms (issue #43): forced
-/// exploration builds a hub graph against a single top anchor (fragile
-/// geometry); cross-boundary candidates over-anchor to extreme items
-/// (acknowledged in trait_search's own comments); repeated critical-pair
-/// hammering under noise. The pin is two-sided: a fix that makes the
-/// planner actually WIN will trip the upper bound and force a re-pin —
-/// that is the desired failure.
+/// FIX-CYCLE HISTORY (issue #43), honestly kept:
+/// - 2026-07-04 pre-fix: planner LOST to random on first-hit top-5
+///   (≈134.7 vs ≈86.7) and global tau (≈51.3 vs ≈47.3); hub-anchor
+///   exploration geometry was the lead suspect.
+/// - 2026-07-04 anchor-diversity fix (quantile-rotating exploration
+///   anchors): global-tau FLIPPED to a planner win (≈43.3 vs ≈47.3,
+///   ratio 0.92); first-hit top-5 improved to ratio ≈1.36.
+/// - ALSO: first-hit-time of a flickering exact-set state is itself a
+///   biased metric favoring high-variance estimators — see the
+///   fixed-budget benchmark below for the artifact-free picture, where
+///   the planner WINS at scarce budgets (60), ties at 120, and slightly
+///   trails at 180.
+/// The pin is two-sided so both silent regressions and silent
+/// improvements surface.
 #[test]
 fn honest_negative_planner_loses_to_random_on_top_k_identification() {
     let seeds: Vec<u64> = (0..12).collect();
@@ -202,19 +205,19 @@ fn honest_negative_planner_loses_to_random_on_top_k_identification() {
         .sum::<usize>() as f64
         / seeds.len() as f64;
     let ratio = planner_mean / random_mean;
+    eprintln!(
+        "REGRET[top5-set]: planner {planner_mean:.1} vs random {random_mean:.1} (ratio {ratio:.2})"
+    );
     assert!(
         (1.05..=2.2).contains(&ratio),
         "planner/random top-5 ratio left the measured band: {ratio:.2}          (planner {planner_mean:.1}, random {random_mean:.1}) — below 1.05          means the planner now WINS: celebrate, fix issue #43's status, and          re-pin; above 2.2 means it got even worse"
     );
 }
 
-/// HONEST NEGATIVE, measured and pinned: on GLOBAL order recovery the
-/// boundary-focused planner is NOT better than uniform random pairs —
-/// boundary focus underserves the tail, while random spread is near-optimal
-/// for global tau. First measured 2026-07-04: planner ≈51.3 vs random
-/// ≈47.3 comparisons to tau 0.85 (n=20, 12 seeds). Whole-list sorts (which
-/// default to a middle boundary) inherit this; see issue #38. The pin is
-/// two-sided so silent regressions AND silent improvements both surface.
+/// Post anchor-fix: the planner now WINS global-tau first-hit (≈43.3 vs
+/// ≈47.3, ratio 0.92 — it lost pre-fix at 51.3). Two-sided pin so both
+/// regressions and further improvements surface. History in the doc
+/// comment above.
 #[test]
 fn global_tau_honest_negative_random_is_competitive() {
     let seeds: Vec<u64> = (0..12).collect();
@@ -230,6 +233,9 @@ fn global_tau_honest_negative_random_is_competitive() {
         .sum::<usize>() as f64
         / seeds.len() as f64;
     let ratio = planner_mean / random_mean;
+    eprintln!(
+        "REGRET[global-tau]: planner {planner_mean:.1} vs random {random_mean:.1} (ratio {ratio:.2})"
+    );
     assert!(
         (0.75..=1.45).contains(&ratio),
         "global-tau planner/random ratio drifted outside the measured band:          {ratio:.2} (planner {planner_mean:.1}, random {random_mean:.1}) —          if this IMPROVED below 0.75, celebrate and re-pin; if it degraded          above 1.45, the planner got worse at global order"
@@ -242,4 +248,104 @@ fn config_default_batch_is_deterministic_given_seeded_judge() {
     let b = planner_cost(3, Objective::GlobalTau);
     assert_eq!(a, b, "planner cost must be reproducible under fixed seeds");
     let _ = Config::default();
+}
+
+// =========================================================================
+// Fixed-budget accuracy: the artifact-free comparison.
+//
+// First-hit-time of a FLICKERING state (exact-set correctness) is biased
+// toward high-variance estimators — a policy whose scores jitter can cross
+// "correct" by luck. Fixed-budget accuracy asks the honest question: after
+// exactly B comparisons, how good is the answer?
+// =========================================================================
+
+fn run_policy_to_budget(seed: u64, planner: bool, budget: usize, k: usize) -> Vec<f64> {
+    let truth = planted_truth(seed);
+    let mut rng = StdRng::seed_from_u64(seed ^ 0x5eed);
+    let mut pair_rng = StdRng::seed_from_u64(seed ^ 0xa11);
+    let mut manager = manager(k);
+    let mut used = 0usize;
+    while used < budget {
+        manager.recompute_global_state().unwrap();
+        if planner {
+            let proposals = manager
+                .propose_batch("sim", 24, PlannerMode::Hybrid)
+                .unwrap();
+            if proposals.is_empty() {
+                break;
+            }
+            let mut seen = std::collections::HashSet::new();
+            let mut executed = 0usize;
+            for proposal in proposals {
+                let key = (proposal.i.min(proposal.j), proposal.i.max(proposal.j));
+                if !seen.insert(key) {
+                    continue;
+                }
+                let obs = judge(&mut rng, &truth, proposal.i, proposal.j);
+                manager.add_observation("q", obs).unwrap();
+                used += 1;
+                executed += 1;
+                if executed >= 8 || used >= budget {
+                    break;
+                }
+            }
+            if executed == 0 {
+                break;
+            }
+        } else {
+            for _ in 0..8 {
+                if used >= budget {
+                    break;
+                }
+                let i = pair_rng.gen_range(0..N);
+                let mut j = pair_rng.gen_range(0..N);
+                if i == j {
+                    j = (j + 1) % N;
+                }
+                let obs = judge(&mut rng, &truth, i, j);
+                manager.add_observation("q", obs).unwrap();
+                used += 1;
+            }
+        }
+    }
+    manager.recompute_global_state().unwrap();
+    manager.attribute_scores("q").unwrap().to_vec()
+}
+
+#[test]
+fn fixed_budget_accuracy_planner_vs_random() {
+    let seeds: Vec<u64> = (0..16).collect();
+    let k = 5usize;
+    for &budget in &[60usize, 120, 180] {
+        let mut planner_tau = 0.0;
+        let mut random_tau = 0.0;
+        let mut planner_top5 = 0usize;
+        let mut random_top5 = 0usize;
+        for &seed in &seeds {
+            let truth = planted_truth(seed);
+            let ps = run_policy_to_budget(seed, true, budget, k);
+            let rs = run_policy_to_budget(seed, false, budget, k);
+            planner_tau += kendall_tau(&truth, &ps);
+            random_tau += kendall_tau(&truth, &rs);
+            planner_top5 += (recovered_top_k(&ps, k) == true_top_k(&truth, k)) as usize;
+            random_top5 += (recovered_top_k(&rs, k) == true_top_k(&truth, k)) as usize;
+        }
+        let n = seeds.len() as f64;
+        eprintln!(
+            "REGRET[budget {budget}]: tau planner {:.3} vs random {:.3} · top5-rate planner {}/{} vs random {}/{}",
+            planner_tau / n,
+            random_tau / n,
+            planner_top5,
+            seeds.len(),
+            random_top5,
+            seeds.len(),
+        );
+        // Pin: at every measured budget the planner's mean tau must be at
+        // least random's minus a small tolerance (and the printed numbers
+        // are the receipt for the top-5 rates).
+        assert!(
+            planner_tau >= random_tau - 0.02 * n,
+            "planner tau fell below random at budget {budget}"
+        );
+    }
 }
