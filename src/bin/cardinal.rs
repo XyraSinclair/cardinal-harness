@@ -645,10 +645,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 "A minor seventh chord contains four distinct pitches.",
                 "Snow fell quietly on the empty parking lot.",
             ];
-            let attribute = seriate::Attribute::new(
-                "quality",
-                "overall quality of the writing",
-            );
+            let attribute = seriate::Attribute::new("quality", "overall quality of the writing");
             let instrument = seriate::instrument::ratio_letter::RatioLetterInstrument;
             use seriate::instrument::Instrument as _;
 

@@ -469,10 +469,11 @@ async fn calibrate_catches_position_prior_and_clears_honest_judge() {
     }
     impl Respond for NullJudge {
         fn respond(&self, request: &Request) -> ResponseTemplate {
-            let body: serde_json::Value =
-                serde_json::from_slice(&request.body).unwrap_or_default();
-            let wants_logprobs =
-                body.get("logprobs").and_then(|v| v.as_bool()).unwrap_or(false);
+            let body: serde_json::Value = serde_json::from_slice(&request.body).unwrap_or_default();
+            let wants_logprobs = body
+                .get("logprobs")
+                .and_then(|v| v.as_bool())
+                .unwrap_or(false);
             let letter = if self.biased { "D" } else { "A" };
             let mut response = json!({
                 "choices": [{

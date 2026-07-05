@@ -527,6 +527,21 @@ pub struct MultiRerankResponse {
     pub entities: Vec<MultiRerankEntityResult>,
     /// Metadata about the run.
     pub meta: MultiRerankMeta,
+    /// Multi-objective view: indices (into `entities`) of the Pareto front —
+    /// feasible entities not dominated on posterior means across ALL
+    /// attributes (with positive-weight orientation; negative-weight
+    /// attributes contribute inverted). Computed on means; treat membership
+    /// near ties with the per-attribute stds in mind. Empty when fewer than
+    /// two attributes.
+    #[serde(default)]
+    pub pareto_front: Vec<usize>,
+    /// Pearson correlation matrix between attribute latent-mean vectors
+    /// (attribute order matches the request). High off-diagonal values mean
+    /// the attributes are measuring nearly the same thing — a receipt for
+    /// deciding whether the extra attribute earns its comparison budget.
+    /// Empty when fewer than two attributes.
+    #[serde(default)]
+    pub attribute_correlations: Vec<Vec<f64>>,
 }
 
 // =============================================================================

@@ -7,6 +7,30 @@ Versioning once it reaches `1.0.0`.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-07-04
+
+### Added
+- `cardinal calibrate`: null-pair artifact measurement — identical text in
+  both slots; directional mass = pure position+letter prior. Live receipt:
+  four models measured clean (parity 1.000, bias 0.0000 nats) at the null
+  point.
+- Multi-objective receipts on every multi-attribute response: the Pareto
+  front (non-dominated on weight-oriented posterior means) and the
+  attribute correlation matrix (planted trade-off test pins a negative
+  off-diagonal). Cross-attribute information SHARING remains open (#44).
+- Fixed-budget planner accuracy benchmark alongside first-hit-time, after
+  catching the flicker artifact in exact-set first-hit metrics.
+
+### Changed
+- Exploration anchor diversity (issue #43): quantile-rotating anchors
+  (chain fallback) replace the hub-and-spoke single-anchor geometry.
+  Measured: global-tau regret flipped to a planner WIN (ratio 0.92);
+  scarce-budget accuracy now favors the planner (budget 60: tau 0.894 vs
+  0.871, top-5 12/16 vs 10/16).
+- The synthetic ratio-vs-ordinal suite relationship FLIPPED under the new
+  geometry (ordinal 0.726 vs ratio 0.648) — re-pinned with measurement
+  history preserved; live logprob-PMF receipts are unaffected.
+
 ## [0.7.0] - 2026-07-04
 
 ### Added

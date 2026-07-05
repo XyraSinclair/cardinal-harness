@@ -1363,10 +1363,110 @@ pub async fn multi_rerank(
         stop_reason,
     };
 
+    // Multi-objective receipts: Pareto front (non-dominated on per-attribute
+    // posterior means, weight-sign oriented) and the attribute correlation
+    // matrix (do the attributes measure different things?).
+    let (pareto_front, attribute_correlations) = multi_objective_receipts(&req, &entities_out);
+
     Ok(MultiRerankResponse {
         entities: entities_out,
         meta,
+        pareto_front,
+        attribute_correlations,
     })
+}
+
+/// Compute the Pareto front and attribute-correlation matrix over the
+/// finished entity results. Orientation: each attribute's latent means are
+/// multiplied by the sign of its weight, so "higher is better" holds
+/// uniformly (a negative-weight attribute like "lack of X" counts inverted).
+fn multi_objective_receipts(
+    req: &MultiRerankRequest,
+    entities: &[MultiRerankEntityResult],
+) -> (Vec<usize>, Vec<Vec<f64>>) {
+    let m = req.attributes.len();
+    if m < 2 {
+        return (Vec::new(), Vec::new());
+    }
+    // Oriented score matrix: rows = entities, cols = attributes.
+    let oriented: Vec<Option<Vec<f64>>> = entities
+        .iter()
+        .map(|entity| {
+            if !entity.feasible {
+                return None;
+            }
+            let mut row = Vec::with_capacity(m);
+            for attribute in &req.attributes {
+                let sign = if attribute.weight < 0.0 { -1.0 } else { 1.0 };
+                match entity.attribute_scores.get(&attribute.id) {
+                    Some(scores) => row.push(sign * scores.latent_mean),
+                    None => return None,
+                }
+            }
+            Some(row)
+        })
+        .collect();
+
+    // Pareto: entity i is dominated if some feasible j is >= on every
+    // oriented attribute and > on at least one.
+    let mut front = Vec::new();
+    for (i, row_i) in oriented.iter().enumerate() {
+        let Some(row_i) = row_i else { continue };
+        let dominated = oriented.iter().enumerate().any(|(j, row_j)| {
+            if i == j {
+                return false;
+            }
+            let Some(row_j) = row_j else { return false };
+            let mut strictly_better_somewhere = false;
+            for (a, b) in row_j.iter().zip(row_i.iter()) {
+                if a < b {
+                    return false;
+                }
+                if a > b {
+                    strictly_better_somewhere = true;
+                }
+            }
+            strictly_better_somewhere
+        });
+        if !dominated {
+            front.push(i);
+        }
+    }
+
+    // Correlation matrix over feasible entities' oriented columns.
+    let rows: Vec<&Vec<f64>> = oriented.iter().flatten().collect();
+    let mut correlations = vec![vec![0.0; m]; m];
+    if rows.len() >= 3 {
+        let n = rows.len() as f64;
+        let means: Vec<f64> = (0..m)
+            .map(|a| rows.iter().map(|r| r[a]).sum::<f64>() / n)
+            .collect();
+        for a in 0..m {
+            for b in 0..m {
+                let mut cov = 0.0;
+                let mut var_a = 0.0;
+                let mut var_b = 0.0;
+                for row in &rows {
+                    let da = row[a] - means[a];
+                    let db = row[b] - means[b];
+                    cov += da * db;
+                    var_a += da * da;
+                    var_b += db * db;
+                }
+                correlations[a][b] = if var_a > 1e-12 && var_b > 1e-12 {
+                    cov / (var_a.sqrt() * var_b.sqrt())
+                } else if a == b {
+                    1.0
+                } else {
+                    0.0
+                };
+            }
+        }
+    } else {
+        correlations = Vec::new();
+    }
+
+    (front, correlations)
 }
 
 #[cfg(test)]

@@ -536,6 +536,8 @@ fn cli_report_json_smoke() {
     );
 
     let resp = MultiRerankResponse {
+        pareto_front: Vec::new(),
+        attribute_correlations: Vec::new(),
         entities: vec![
             MultiRerankEntityResult {
                 id: "a".into(),
@@ -794,6 +796,8 @@ fn cli_report_rejects_stale_response_entities() {
     );
 
     let resp = MultiRerankResponse {
+        pareto_front: Vec::new(),
+        attribute_correlations: Vec::new(),
         entities: vec![MultiRerankEntityResult {
             id: "ghost".into(),
             rank: Some(1),
