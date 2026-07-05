@@ -411,14 +411,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let multi = cardinal_harness::rerank::simple::to_multi_request(&simple);
                 let charge = cardinal_harness::rerank::estimate_max_rerank_charge(&multi);
                 println!(
-                    "worst case: {} comparisons · ~{} input + {} output tokens each ·                      provider max ${:.4}",
+                    "worst case: {} comparisons · ~{} input + {} output tokens each · provider max ${:.4}",
                     charge.comparison_budget,
                     charge.input_tokens_per_comparison,
                     charge.output_tokens_per_comparison,
                     charge.provider_cost_max_nanodollars as f64 / 1e9,
                 );
                 eprintln!(
-                    "estimate only — no network, no cache; actual runs stop earlier on                      certified top-k or cache hits"
+                    "estimate only — no network, no cache; actual runs stop earlier on certified top-k or cache hits"
                 );
                 return Ok(());
             }
