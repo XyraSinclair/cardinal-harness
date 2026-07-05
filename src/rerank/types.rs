@@ -176,6 +176,12 @@ pub struct RerankMeta {
     /// bias in log-ratio units.
     #[serde(default)]
     pub evidence_order_residual_mean_abs: Option<f64>,
+    /// Mean curl fraction across attributes: the share of judgement energy
+    /// that is cyclically inconsistent (A>B>C>A structure) and cannot be
+    /// explained by ANY scores. 0 = transitive judge; the Hodge residual
+    /// of the log-ratio edge field.
+    #[serde(default)]
+    pub judgement_frustration_mean: Option<f64>,
 
     /// Why the rerank loop stopped.
     pub stop_reason: RerankStopReason,
@@ -515,6 +521,12 @@ pub struct MultiRerankMeta {
     /// bias in log-ratio units.
     #[serde(default)]
     pub evidence_order_residual_mean_abs: Option<f64>,
+    /// Mean curl fraction across attributes: the share of judgement energy
+    /// that is cyclically inconsistent (A>B>C>A structure) and cannot be
+    /// explained by ANY scores. 0 = transitive judge; the Hodge residual
+    /// of the log-ratio edge field.
+    #[serde(default)]
+    pub judgement_frustration_mean: Option<f64>,
 
     /// Why the rerank loop stopped.
     pub stop_reason: RerankStopReason,

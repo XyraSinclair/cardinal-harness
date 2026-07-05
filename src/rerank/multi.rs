@@ -1360,6 +1360,18 @@ pub async fn multi_rerank(
         } else {
             None
         },
+        judgement_frustration_mean: {
+            let values: Vec<f64> = req
+                .attributes
+                .iter()
+                .filter_map(|attribute| manager.attribute_frustration(&attribute.id))
+                .collect();
+            if values.is_empty() {
+                None
+            } else {
+                Some(values.iter().sum::<f64>() / values.len() as f64)
+            }
+        },
         stop_reason,
     };
 

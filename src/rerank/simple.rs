@@ -132,6 +132,7 @@ pub(crate) fn meta_from_multi(meta: super::types::MultiRerankMeta) -> RerankMeta
         logprob_mode_judgements: meta.logprob_mode_judgements,
         evidence_visible_mass_mean: meta.evidence_visible_mass_mean,
         evidence_order_residual_mean_abs: meta.evidence_order_residual_mean_abs,
+        judgement_frustration_mean: meta.judgement_frustration_mean,
         stop_reason: meta.stop_reason,
     }
 }

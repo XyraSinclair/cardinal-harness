@@ -94,6 +94,28 @@ is a fixed point of the transformations that shouldn't matter. The group:
 The stability axes we cover, we cover with receipts; the three ✗ rows are
 the cheapest untouched science in the repo.
 
+## 5½. The physics of a judge (receipts, not metaphors)
+
+Prior elicitation behaves like a physical system, and each analogy lands on
+a computable receipt:
+
+| Physics | Judgement meaning | Receipt |
+|---|---|---|
+| **Frustration** (spin glass) | cyclic preference structure no scores can satisfy (A>B>C>A) | ✓ `judgement_frustration_mean` — the Hodge curl fraction Σλr²/Σλμ² of the log-ratio edge field, shipped; transitive judge ≈ quantization floor, planted rock-paper-scissors > 0.3 |
+| **Hysteresis** | path dependence: judging A→B vs B→A | ✓ order-residual in nats + flip counts |
+| **Susceptibility** | response to a small applied field: framing spin | ✗ the pro-A/pro-B preamble probe; dJudgement/dFraming |
+| **Temperature/entropy** | PMF spread per judgement; annealing across sampling temperature | ◐ entropy computable from stored PMFs; sweep unmeasured |
+| **Ground state** | the solved scores: minimum-energy potential for the field | ✓ the solver itself |
+| **Relaxation** | drift of the same judgement re-asked over time | ✗ |
+
+**Finding from shipping frustration** (2026-07-05): a directionally
+transitive judge still shows ~0.13 curl — the ratio LADDER itself injects
+quantization frustration, because its rungs are not log-additive
+(ln r_a + ln r_b ≠ ln r_c for any rungs). This gives a design criterion no
+one told us: a log-arithmetic ladder (geometric with constant log step)
+would make quantization curl vanish and leave the receipt measuring ONLY
+structural cycles. Candidate future instrument revision, receipt-driven.
+
 ## 6. Parameters, honestly
 
 Current posture: temperature pinned 0.0 for evidence calls, 1.0 for

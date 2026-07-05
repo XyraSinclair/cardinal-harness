@@ -540,3 +540,96 @@ async fn calibrate_catches_position_prior_and_clears_honest_judge() {
         "pure position prior must show large bias-nats: {biased_line}"
     );
 }
+
+#[tokio::test]
+async fn frustration_receipt_zero_for_transitive_judge_high_for_cyclic() {
+    // Transitive star judge: curl fraction ~0.
+    let server = start_judge(LetterJudge {
+        reject_logprobs: false,
+        omit_logprobs: false,
+    })
+    .await;
+    let execution =
+        RerankExecution::new(gateway_for(&server), Attribution::new("test::frustration"));
+    let sorted = sort_texts(items(), "brightness", execution, letter_opts())
+        .await
+        .unwrap();
+    let frustration = sorted.meta.judgement_frustration_mean.unwrap();
+    // Not ~0, and honestly so: the star judge is transitive in DIRECTION
+    // but answers bucketed magnitudes (1.5 / 3.9), which are not
+    // log-additive — quantization alone injects real curl (~0.13 here).
+    // The receipt measuring that is a feature: magnitude inconsistency is
+    // inconsistency. The pin separates quantization-level curl from
+    // structural cycles (below).
+    assert!(
+        frustration < 0.2,
+        "directionally transitive judge: quantization-level curl only: {frustration}"
+    );
+
+    // Cyclic judge: prefers by (stars + 2) mod 4 — a planted rock-paper-
+    // scissors structure over the roster. The curl fraction must be large:
+    // no scores can explain a cycle.
+    #[derive(Clone, Copy)]
+    struct CyclicJudge;
+    impl Respond for CyclicJudge {
+        fn respond(&self, request: &Request) -> ResponseTemplate {
+            let body: serde_json::Value = serde_json::from_slice(&request.body).unwrap_or_default();
+            let user = body["messages"]
+                .as_array()
+                .and_then(|m| {
+                    m.iter()
+                        .find(|x| x["role"] == "user")
+                        .and_then(|x| x["content"].as_str())
+                })
+                .unwrap_or("")
+                .to_string();
+            let a = extract_between(&user, "<entity_A>", "</entity_A>").unwrap_or("");
+            let b = extract_between(&user, "<entity_B>", "</entity_B>").unwrap_or("");
+            // Rock-paper-scissors over star counts modulo the roster:
+            // x beats y iff x == y+1 (mod 4).
+            let sa = stars(a).rem_euclid(4);
+            let sb = stars(b).rem_euclid(4);
+            let a_wins = (sa - sb).rem_euclid(4) == 1;
+            let letter = if sa == sb {
+                'A'
+            } else if a_wins {
+                'H'
+            } else {
+                'h'
+            };
+            let mut response = json!({
+                "choices": [{
+                    "message": { "content": letter.to_string() },
+                    "finish_reason": "stop"
+                }],
+                "usage": { "prompt_tokens": 40, "completion_tokens": 1 }
+            });
+            response["choices"][0]["logprobs"] = json!({
+                "content": [{
+                    "token": letter.to_string(),
+                    "logprob": -0.105_360_5,
+                    "top_logprobs": [
+                        { "token": letter.to_string(), "logprob": -0.105_360_5 },
+                    ]
+                }]
+            });
+            ResponseTemplate::new(200).set_body_json(response)
+        }
+    }
+    let server = MockServer::start().await;
+    Mock::given(method("POST"))
+        .and(path("/chat/completions"))
+        .respond_with(CyclicJudge)
+        .mount(&server)
+        .await;
+    let execution =
+        RerankExecution::new(gateway_for(&server), Attribution::new("test::frustration"));
+    let sorted = sort_texts(items(), "brightness", execution, letter_opts())
+        .await
+        .unwrap();
+    let frustration = sorted.meta.judgement_frustration_mean.unwrap();
+    assert!(
+        frustration > 0.3,
+        "planted rock-paper-scissors must show high curl: {frustration}"
+    );
+}

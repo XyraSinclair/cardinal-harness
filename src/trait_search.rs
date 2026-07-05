@@ -461,6 +461,10 @@ pub struct TraitSearchManager {
     state_valid: bool,
     stop_streak: usize,
     has_degraded: bool,
+    /// Per-attribute curl fraction from the latest solve: the share of
+    /// judgement energy that is cyclically inconsistent (see
+    /// `rating_engine::compute_hcr`).
+    frustration: HashMap<String, f64>,
     /// Entities excluded from further forced exploration by the
     /// `prune_p_topk_below` rule.
     explore_pruned: HashSet<usize>,
@@ -526,6 +530,7 @@ impl TraitSearchManager {
             stop_streak: 0,
             has_degraded: false,
             explore_pruned: HashSet::new(),
+            frustration: HashMap::new(),
         })
     }
 
@@ -1019,6 +1024,12 @@ impl TraitSearchManager {
         self.explore_pruned.len()
     }
 
+    /// Curl fraction of one attribute's judgement field (0 = transitive,
+    /// toward 1 = cyclic/noisy). None before the first solve.
+    pub fn attribute_frustration(&self, attribute_id: &str) -> Option<f64> {
+        self.frustration.get(attribute_id).copied()
+    }
+
     pub fn ranked_indices(&self) -> Vec<usize> {
         self.sorted_indices.clone()
     }
@@ -1142,6 +1153,7 @@ impl TraitSearchManager {
             if summary.degraded {
                 self.has_degraded = true;
             }
+            self.frustration.insert(id.clone(), summary.hcr);
 
             if summary.scores.len() != n || summary.diag_cov.len() != n {
                 return Err(TraitSearchError::PosteriorLengthMismatch {

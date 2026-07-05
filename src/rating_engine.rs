@@ -813,6 +813,22 @@ fn solve_irls_huber(
 //  Diagnostics: HCR / PCR-lite
 // ---------------------------------------------------------------------
 
+/// Weighted residual energy fraction: Σλr² / Σλμ².
+///
+/// This has an exact physical reading. The judgements form a signed edge
+/// field (log-ratios) on the comparison graph; the least-squares solve is
+/// the Hodge/Helmholtz projection of that field onto gradients of a score
+/// potential. What the projection CANNOT absorb — the residual — is the
+/// field's curl + harmonic component: irreducible cyclic disagreement
+/// (A>B>C>A triads and their higher-order kin; "frustration" in the
+/// spin-glass sense). So this ratio is the fraction of judgement energy
+/// that is inconsistent BY STRUCTURE, no matter what scores anyone picks:
+/// 0 = perfectly transitive judge, 1 = pure noise/cycles. Weighted by the
+/// post-Huber λ, so already-downweighted outliers do not double-count.
+/// Note: repeat judgements of the SAME pair fuse into one edge before this
+/// is computed — intra-pair disagreement shows up in counterbalance
+/// receipts (order flips, order-residual nats), not here; this measures
+/// inter-pair (cyclic) incoherence specifically.
 fn compute_hcr(mu: &[f64], residuals: &[f64], lam_eff: &[f64], cfg: &Config) -> f64 {
     if mu.is_empty() || lam_eff.is_empty() {
         return 0.0;

@@ -618,6 +618,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 } else {
                     String::new()
                 };
+                let frustration = meta
+                    .judgement_frustration_mean
+                    .map(|f| format!(" · frustration {f:.3}"))
+                    .unwrap_or_default();
                 let flips = if meta.pairs_counterbalanced > 0 {
                     format!(
                         " · order flips: {}/{}",
@@ -627,7 +631,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     String::new()
                 };
                 eprintln!(
-                    "sorted {} items by \"{by}\" · {} comparisons ({} cached, {} refused) · {estimate}${cost_usd:.4}{flips}{evidence} · stop: {}",
+                    "sorted {} items by \"{by}\" · {} comparisons ({} cached, {} refused) · {estimate}${cost_usd:.4}{flips}{evidence}{frustration} · stop: {}",
                     sorted.items.len(),
                     meta.comparisons_used,
                     meta.comparisons_cached,
