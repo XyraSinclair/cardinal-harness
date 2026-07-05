@@ -7,6 +7,32 @@ Versioning once it reaches `1.0.0`.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-07-04
+
+### Added
+- `ordinal_letter_v1`: the seriate three-token direction instrument
+  (A / B / =) as a second evidence template — the cheapest logprob-native
+  path; direction PMFs enter the solver at fixed modest magnitude with
+  measured uncertainty.
+- Order-residual receipt: for pairs asked in both orders in evidence mode,
+  the mean |sum of presented-coordinate log-ratio means| — position bias in
+  nats, per run (`evidence_order_residual_mean_abs`; ~0 for an unbiased
+  judge, large under pure position bias; strictly richer than binary flip
+  counts).
+- `cardinal sort --estimate`: worst-case comparisons, per-call tokens, and
+  provider dollars before any network or cache touch — with per-template
+  honesty (single-letter evidence calls cap at 16 output tokens, ~100x
+  cheaper worst case than the JSON path).
+- Planner regret benchmark (`tests/planner_regret.rs`): comparisons-to-
+  answer for the active planner vs uniform random pair selection.
+
+### Findings (measured, pinned two-sided)
+- HONEST NEGATIVE: the current planner LOSES to uniform random pair
+  selection at n=20 under a noisy simulated judge — on top-5
+  identification (~134.7 vs ~86.7 comparisons) and global tau (~51.3 vs
+  ~47.3); the gap widens with noise. README claims tempered; fix cycle
+  tracked in #43 with the benchmark as the instrument.
+
 ## [0.6.0] - 2026-07-04
 
 ### Added

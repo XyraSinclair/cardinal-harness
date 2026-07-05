@@ -33,7 +33,12 @@ Every obvious way to sort a list with an LLM breaks somewhere:
 fits latent scores over the whole comparison graph with a robust solver (IRLS,
 Huber loss), reads uncertainty off the posterior, and plans the next
 comparison by effective resistance on the graph. Default budget is 4·n
-comparisons — O(n), not O(n²).
+comparisons — O(n), not O(n²). Honest caveat from our own regret benchmark
+(`tests/planner_regret.rs`): at n=20 under a noisy simulated judge, the
+current planner does NOT yet beat uniform random pair selection on
+comparisons-to-answer — measured, pinned two-sided, and tracked as the top
+optimization target (issue #43). The receipts culture applies to our own
+planner first.
 
 What you get that the alternatives don't, in one package:
 
