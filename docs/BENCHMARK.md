@@ -60,7 +60,15 @@ twice would double-credit a position-bias fix. The frustration axis is
 so refusing on the hardest pairs would launder cyclicity into apparent
 transitivity — curl only counts when ≥95% of core calls were answered.
 **`JUDGE SCORE` = signal-subscore × coherence.** Multiplicative on
-purpose: zero discrimination or zero consistency zeroes the headline.
+purpose: zero discrimination or zero consistency zeroes the headline. A
+**harmonic-mean coherence** is reported alongside — one dead axis tanks
+it, so pathologies cannot hide inside an average. At v1 corpus size (3
+clear spin pairs) a single unlucky pair zeroes an axis, so the harsher
+aggregate is a receipt, not yet the ranking; it becomes the headline
+candidate at v2 scale. The curl axis reports its denominator as **cycle
+rank** (|E| − |V| + components = 13 here), because curl is a graph
+statistic — a sparse graph cannot estimate frustration, and the
+denominator says so.
 
 ## Why it is hard to game
 

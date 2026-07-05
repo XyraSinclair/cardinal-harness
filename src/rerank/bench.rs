@@ -182,9 +182,13 @@ pub struct JudgeBenchReport {
     /// Mean |log-ratio| on identical-item pairs (nats). Subscore e^(−value).
     pub null_bias: DimensionStat,
 
-    /// Mean of available consistency subscores (order flip, residual,
-    /// frustration, spin survival, polarity, paraphrase, null).
+    /// Mean of available consistency subscores (reciprocity = merged order
+    /// flip + residual, frustration, spin survival, polarity, paraphrase,
+    /// null).
     pub coherence: Option<f64>,
+    /// Harmonic mean of the same subscores: one dead axis tanks it. The
+    /// game-resistant aggregate, reported alongside the arithmetic headline.
+    pub coherence_harmonic: Option<f64>,
     /// Headline: signal subscore × coherence. Zero signal or zero
     /// coherence zeroes it.
     pub judge_score: Option<f64>,
@@ -309,7 +313,7 @@ fn solve_scores(
     n: usize,
     observations: &[(usize, usize, f64)],
     rater: &str,
-) -> Option<(Vec<f64>, f64)> {
+) -> Option<(Vec<f64>, f64, usize)> {
     if observations.is_empty() {
         return None;
     }
@@ -323,7 +327,7 @@ fn solve_scores(
         .collect();
     engine.ingest(&obs);
     let summary = engine.solve();
-    Some((summary.scores, summary.hcr))
+    Some((summary.scores, summary.hcr, summary.cycle_dim))
 }
 
 /// Run the Judge Coherence Benchmark for one model.
@@ -443,9 +447,9 @@ pub async fn run_judge_bench(
     let flip_rate = (decisive_pairs > 0).then(|| flips as f64 / decisive_pairs as f64);
 
     let primary = solve_scores(CORPUS.len(), &fused_obs, &model);
-    let (primary_scores, hcr) = match &primary {
-        Some((scores, hcr)) => (scores.clone(), Some(*hcr)),
-        None => (Vec::new(), None),
+    let (primary_scores, hcr, cycle_dim) = match &primary {
+        Some((scores, hcr, cycle_dim)) => (scores.clone(), Some(*hcr), *cycle_dim),
+        None => (Vec::new(), None, 0),
     };
 
     // ---- Attribute blocks: polarity + paraphrase correlations ----
@@ -455,7 +459,7 @@ pub async fn run_judge_bench(
             .filter(|c| c.block == name)
             .filter_map(|c| c.log_ratio_toward_i.map(|m| (c.i, c.j, m)))
             .collect();
-        solve_scores(CORPUS.len(), &obs, &model).map(|(s, _)| s)
+        solve_scores(CORPUS.len(), &obs, &model).map(|(s, _, _)| s)
     };
     let polarity_rho = block_scores("opposite")
         .filter(|_| !primary_scores.is_empty())
@@ -537,10 +541,13 @@ pub async fn run_judge_bench(
         subscore: residual_mean.map(|r| (-r).exp()),
     };
     let hcr = hcr.filter(|h| h.is_finite());
+    // Curl is a graph statistic: its support is the number of independent
+    // cycles (|E| − |V| + components), NOT the edge count. A sparse graph
+    // cannot estimate frustration; the denominator says so.
     let frustration = DimensionStat {
         value: hcr,
         ci95: None,
-        n: fused_obs.len(),
+        n: cycle_dim,
         unit: "curl fraction",
         subscore: hcr.map(|h| (1.0 - h).clamp(0.0, 1.0)),
     };
@@ -609,6 +616,18 @@ pub async fn run_judge_bench(
     .collect();
     let coherence = (!consistency.is_empty())
         .then(|| consistency.iter().sum::<f64>() / consistency.len() as f64);
+    // Harmonic mean of the same axes: the game-resistant aggregate (one dead
+    // axis tanks it; pathologies cannot hide inside an average). Reported
+    // alongside the arithmetic headline — at v1 corpus size a single unlucky
+    // clear-pair zeroes an axis, so the harsher aggregate is a receipt, not
+    // yet the ranking.
+    let coherence_harmonic = (!consistency.is_empty()).then(|| {
+        if consistency.iter().any(|&s| s <= 0.0) {
+            0.0
+        } else {
+            consistency.len() as f64 / consistency.iter().map(|s| 1.0 / s).sum::<f64>()
+        }
+    });
     let judge_score = match (signal.subscore, coherence) {
         (Some(s), Some(c)) => Some(s * c),
         _ => None,
@@ -627,6 +646,7 @@ pub async fn run_judge_bench(
         paraphrase,
         null_bias,
         coherence,
+        coherence_harmonic,
         judge_score,
         primary_scores,
         refusals,
@@ -674,8 +694,9 @@ pub fn render_report(report: &JudgeBenchReport) -> String {
     out.push_str(&fmt_dim("null-bias", &report.null_bias));
     let _ = writeln!(
         out,
-        "  coherence {:.3} · JUDGE SCORE {:.3} · {} comparisons ({} cached) · {} refusals · ${:.4}",
+        "  coherence {:.3} (harmonic {:.3}) · JUDGE SCORE {:.3} · {} comparisons ({} cached) · {} refusals · ${:.4}",
         report.coherence.unwrap_or(f64::NAN),
+        report.coherence_harmonic.unwrap_or(f64::NAN),
         report.judge_score.unwrap_or(f64::NAN),
         report.comparisons,
         report.comparisons_cached,

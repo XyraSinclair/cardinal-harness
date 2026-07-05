@@ -207,6 +207,10 @@ async fn oracle_judge_scores_high_on_every_dimension() {
         "oracle must lead the board: {}",
         diag(&r)
     );
+    // Harmonic aggregate tracks the arithmetic one when every axis is high.
+    assert!(r.coherence_harmonic.unwrap() > 0.9, "{}", diag(&r));
+    // Curl support: 20 edges − 8 vertices + 1 component = 13 independent cycles.
+    assert_eq!(r.frustration.n, 13, "curl support must be cycle rank");
 }
 
 #[tokio::test(flavor = "multi_thread")]
@@ -268,6 +272,8 @@ async fn sycophant_judge_is_caught_by_spin_and_only_spin() {
         diag(&r),
         diag(&oracle)
     );
+    // The harmonic aggregate is merciless: one dead axis (spin = 0) zeroes it.
+    assert_eq!(r.coherence_harmonic, Some(0.0), "{}", diag(&r));
 }
 
 #[tokio::test(flavor = "multi_thread")]

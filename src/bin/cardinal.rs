@@ -1128,6 +1128,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             "judge_score": r.judge_score,
                             "signal_nats": r.signal.value,
                             "coherence": r.coherence,
+                            "coherence_harmonic": r.coherence_harmonic,
                             "order_flip_rate": r.order_flip.value,
                             "order_residual_nats": r.order_residual.value,
                             "frustration": r.frustration.value,

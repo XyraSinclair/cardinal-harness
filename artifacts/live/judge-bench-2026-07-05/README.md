@@ -57,3 +57,24 @@ cardinal bench --models "google/gemini-2.5-flash,anthropic/claude-sonnet-4.6,...
 
 (`bench-cache.sqlite` in this pack lets a rerun replay all 684 judgements
 without spend.)
+
+## Harmonic coherence (post-run receipt, same raw dims)
+
+The game-resistant aggregate (one dead axis tanks it), recomputed from the
+stored dimension values after the harmonic column shipped:
+
+| Model | harmonic coherence |
+|---|---|
+| anthropic/claude-sonnet-4.6 | 0.974 |
+| anthropic/claude-haiku-4.5 | 0.948 |
+| google/gemini-2.5-flash | 0.939 |
+| deepseek/deepseek-v4-flash | 0.925 |
+| openai/gpt-5.4-mini | 0.688 |
+| openai/gpt-5.4-nano | 0.000 |
+
+Under the harsher aggregate the board's top four barely move, but both
+OpenAI smalls collapse — mini to 0.69 (spin drags the harmonic down far
+harder than the mean) and nano to exactly 0.000 (spin survival 0/3 is a
+dead axis). The two aggregates agreeing on the top and disagreeing on the
+bottom is itself evidence the composite isn't an artifact of the averaging
+choice.
