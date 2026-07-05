@@ -41,7 +41,7 @@ use super::comparison::{
 };
 use super::sort::spearman;
 use super::spin::{spin_probe, SpinProbeReport};
-use super::types::{HigherRanked, PairwiseJudgement};
+use super::types::PairwiseJudgement;
 use crate::cache::PairwiseCache;
 use crate::gateway::{Attribution, ChatGateway};
 use crate::rating_engine::{AttributeParams, Config, Observation, RaterParams, RatingEngine};
@@ -319,25 +319,12 @@ async fn one_call(
         },
     )
     .await?;
-    let (log_ratio_toward_i, confidence) = match judgement {
-        PairwiseJudgement::Observation {
-            higher_ranked,
-            ratio,
-            confidence,
-        } => {
-            let toward_slot_a = match higher_ranked {
-                HigherRanked::A => 1.0,
-                HigherRanked::B => -1.0,
-            };
-            let toward_i = if i_in_slot_a {
-                toward_slot_a
-            } else {
-                -toward_slot_a
-            };
-            (Some(toward_i * ratio.max(1.0).ln()), Some(confidence))
-        }
-        PairwiseJudgement::Refused => (None, None),
+    let confidence = match &judgement {
+        PairwiseJudgement::Observation { confidence, .. } => Some(*confidence),
+        PairwiseJudgement::Refused => None,
     };
+    let log_ratio_toward_i =
+        super::types::signed_log_ratio_toward_first(&judgement, i_in_slot_a);
     Ok(CallOutcome {
         log_ratio_toward_i,
         confidence,

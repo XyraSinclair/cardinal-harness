@@ -89,7 +89,7 @@ is a fixed point of the transformations that shouldn't matter. The group:
 | **temperature** | ✗ never swept — one JSD data point (t=0 logprobs vs t=1 samples, 0.128 on gpt-5.4-mini) is a hint, not a map |
 | **reasoning effort / thinking params** | ✗ never swept; we only know reasoning models refuse logprobs |
 | **wording of the ratio question** (times-more ↔ fraction ↔ times-less: the group inverses on (ℝ₊,×)) | ✓ `judge --wordings` + live receipt: frontier models keep the SIGN (inversion works) but the fraction wording elicits +0.35…+0.92 nats larger magnitudes — human ratio-bias reproduced in machines; magnitudes are wording-calibrated, not absolute |
-| **nuisance edits** (whitespace, markdown, bullets, prestige halo) | ✓ bench axis 9 + live receipts: Anthropic near-blind (0.08–0.09 nats), prestige suffix moves gpt-5.4-mini 0.878 nats |
+| **nuisance edits** (whitespace, markdown, bullets, prestige halo) | ✓ bench axis 9 + live receipts (6 pairs × 4 edits, single run per model): Anthropic measured near-blind (0.08–0.09 nats), prestige suffix moved gpt-5.4-mini 0.878 nats — headline-sized effects, headline-unworthy denominators until replicated |
 | judge model | ◐ seriate probe compares models; no standing cross-model receipt in cardinal runs |
 | time (same judge, days apart) | ✗ |
 
@@ -127,17 +127,19 @@ whoever asks. gemini-2.5-flash holds a direction on that same pair and
 yields only +0.12. The sycophancy question decomposes into: does this
 judgement have a spontaneous direction, and how much field moves it?
 
-The secant critique (adversarial self-review) is now CLOSED: `judge
---sweep` measures χ as a fitted slope over field −3…+3 with a linearity
-R² (14 calls). Live sweeps (`artifacts/live/spin-sweep-2026-07-05/`):
-gpt-5.4-mini is a **linear paramagnet** on the contested pair — monotone
-response, χ = 0.200 nats/step, R² 0.81, folds through zero.
-claude-sonnet-4.6 is a **rigid domain that stiffens under pressure** —
-slope −0.014 (nothing), belief survives the whole sweep, and maximal
-insistence in EITHER direction pushes it to +1.25 nats, a V-shape the
-secant would have read as χ ≈ 0. Four species now separable: rigid,
-linear responder, threshold sycophant (scripted, pinned at R² < 0.9),
-pressure-reactant.
+The secant critique (adversarial self-review) is now CLOSED as
+instrumentation: `judge --sweep` measures χ as a fitted slope over field
+−3…+3 with a linearity R² (14 calls). Live sweeps
+(`artifacts/live/spin-sweep-2026-07-05/`, **n = 1 pair per model — these
+are demonstrations of the instrument, not established model properties**):
+gpt-5.4-mini read as a linear paramagnet on the contested pair (monotone,
+χ = 0.200 nats/step, R² 0.81, folds through zero); claude-sonnet-4.6 read
+as rigid (slope −0.014, survives the whole sweep) with a V-shaped rise to
++1.25 nats at maximal insistence in either direction — a
+pressure-reactance HYPOTHESIS that needs replication across pairs before
+it deserves the name. Four species separable in principle: rigid, linear
+responder, threshold sycophant (scripted, pinned at R² < 0.9),
+pressure-reactant (unconfirmed live).
 
 **Finding from shipping frustration** (2026-07-05): a directionally
 transitive judge still shows ~0.13 curl — quantization frustration. First

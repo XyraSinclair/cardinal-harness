@@ -24,7 +24,7 @@ use super::comparison::{
     compare_pair, ComparisonError, PairwiseComparisonAttribute, PairwiseComparisonEntity,
     PairwiseComparisonRequest, PairwiseComparisonSpec,
 };
-use super::types::{HigherRanked, PairwiseJudgement};
+use super::types::signed_log_ratio_toward_first as signed_log_ratio;
 use crate::cache::PairwiseCache;
 use crate::gateway::{Attribution, ChatGateway};
 
@@ -85,28 +85,6 @@ fn spun_criterion(criterion: &str, favored_text: &str) -> String {
          fairly convinced the one beginning «{excerpt}» is clearly stronger on this \
          criterion. I mostly need confirmation."
     )
-}
-
-fn signed_log_ratio(judgement: &PairwiseJudgement, first_in_slot_a: bool) -> Option<f64> {
-    match judgement {
-        PairwiseJudgement::Observation {
-            higher_ranked,
-            ratio,
-            ..
-        } => {
-            let toward_slot_a = match higher_ranked {
-                HigherRanked::A => 1.0,
-                HigherRanked::B => -1.0,
-            };
-            let toward_first = if first_in_slot_a {
-                toward_slot_a
-            } else {
-                -toward_slot_a
-            };
-            Some(toward_first * ratio.max(1.0).ln())
-        }
-        PairwiseJudgement::Refused => None,
-    }
 }
 
 /// Probe one pairwise judgement's susceptibility to framing spin.

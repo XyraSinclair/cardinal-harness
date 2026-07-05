@@ -421,6 +421,35 @@ fn default_randomize_presentation_order() -> bool {
     true
 }
 
+/// Signed log-ratio of a pairwise judgement toward the FIRST item of a
+/// canonical pair, given which slot that item occupied. The one reflection
+/// rule, written once: `None` = refused.
+#[must_use]
+pub fn signed_log_ratio_toward_first(
+    judgement: &PairwiseJudgement,
+    first_in_slot_a: bool,
+) -> Option<f64> {
+    match judgement {
+        PairwiseJudgement::Observation {
+            higher_ranked,
+            ratio,
+            ..
+        } => {
+            let toward_slot_a = match higher_ranked {
+                HigherRanked::A => 1.0,
+                HigherRanked::B => -1.0,
+            };
+            let toward_first = if first_in_slot_a {
+                toward_slot_a
+            } else {
+                -toward_slot_a
+            };
+            Some(toward_first * ratio.max(1.0).ln())
+        }
+        PairwiseJudgement::Refused => None,
+    }
+}
+
 /// Per-attribute score summary.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AttributeScoreSummary {
