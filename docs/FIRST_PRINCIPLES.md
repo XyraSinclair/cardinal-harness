@@ -206,8 +206,19 @@ eigenvector. `cardinal weigh` ships this (see §9): goal in, attribute
 weights out, consumable directly by multi-attribute rerank. `weigh
 --propose N` automates the decomposition too: the model proposes the
 considerations, the weighing measures them — AHP end to end from a single
-goal sentence. The full AHP hierarchy (goal → criteria → alternatives) is
-two chained applications of the same primitive.
+goal sentence.
+
+The network generalization also ships: `cardinal anp` builds the full
+ANP supermatrix — goal → criteria (weigh), criteria → criteria (measured
+inner dependence: pairwise contribution-to-each-other), criteria →
+alternatives (per-criterion multi-rerank), alternatives → criteria
+(feedback via softmaxed per-criterion z-scores, the gauge-free
+cross-criterion quantity) — and takes the Cesàro limit of the influence
+walk from the goal (windowed averaging; robust to the bipartite
+periodicity that plain powers cannot handle, unit-pinned against known
+stationary distributions). The receipt is the network correction:
+limiting minus direct criteria weights, in probability mass — how much
+the interdependence structure moves the answer away from the hierarchy.
 
 ## 8. The canonical-attribute loop (the "ultimate loop")
 

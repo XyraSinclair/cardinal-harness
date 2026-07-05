@@ -219,6 +219,50 @@ enum Commands {
         #[arg(long)]
         json: bool,
     },
+    /// Analytic Network Process: goal, criteria, alternatives — with feedback
+    ///
+    /// AHP generalized to a network. Every supermatrix edge is a solved
+    /// pairwise measurement: criteria weighed against the goal, criteria
+    /// weighed for their contribution to EACH OTHER (inner dependence),
+    /// alternatives measured per criterion, and alternatives feeding back
+    /// into criteria weights via their per-criterion z-scores. Priorities
+    /// are the Cesàro limit of the influence walk from the goal. The
+    /// headline receipt: limiting vs direct criteria weights — the network
+    /// correction in probability mass.
+    Anp {
+        /// Alternatives file; '-' or omitted reads stdin (one per line, or
+        /// JSON array of strings / {id, text})
+        input: Option<PathBuf>,
+        /// The goal
+        #[arg(long)]
+        goal: String,
+        /// Criterion as name=description (repeatable)
+        #[arg(long = "attribute")]
+        attributes: Vec<String>,
+        /// Ask the model to propose N criteria for the goal (merges with
+        /// --attribute)
+        #[arg(long)]
+        propose: Option<usize>,
+        /// Share of a criterion's influence flowing to other criteria
+        /// (inner dependence) vs alternatives, in [0,1)
+        #[arg(long, default_value_t = 0.4)]
+        alpha: f64,
+        /// Model slug (OpenRouter)
+        #[arg(long)]
+        model: Option<String>,
+        /// Comparison budget for the alternatives rerank
+        #[arg(long)]
+        budget: Option<usize>,
+        /// RNG seed
+        #[arg(long, default_value_t = 7)]
+        seed: u64,
+        /// SQLite cache path
+        #[arg(long)]
+        cache: Option<PathBuf>,
+        /// Emit the full report (supermatrix included) as JSON on stdout
+        #[arg(long)]
+        json: bool,
+    },
     /// Judge Coherence Benchmark: score models on judgement consistency
     ///
     /// No ground-truth labels: the benchmark measures internal consistency
@@ -1089,6 +1133,108 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 eprint!(" · frustration {f:.3}");
             }
             eprintln!();
+        }
+        Commands::Anp {
+            input,
+            goal,
+            attributes,
+            propose,
+            alpha,
+            model,
+            budget,
+            seed,
+            cache,
+            json,
+        } => {
+            let raw = read_sort_input(input.as_deref())?;
+            let alternatives = parse_sort_items(&raw)?;
+            if std::env::var("OPENROUTER_API_KEY").is_err() {
+                return Err("OPENROUTER_API_KEY is not set. Create a key at \
+                     https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
+                    .into());
+            }
+            let gateway = Arc::new(ProviderGateway::from_env(Arc::new(NoopUsageSink))?);
+
+            let mut criteria: Vec<(String, String)> = attributes
+                .iter()
+                .map(|raw| match raw.split_once('=') {
+                    Some((name, text)) => (name.trim().to_string(), text.trim().to_string()),
+                    None => (raw.trim().to_string(), raw.trim().to_string()),
+                })
+                .collect();
+            if let Some(count) = propose {
+                let (proposed, usage) = cardinal_harness::rerank::propose_for_goal(
+                    gateway.as_ref(),
+                    model.as_deref().unwrap_or("openai/gpt-5.4-mini"),
+                    &goal,
+                    count,
+                    Attribution::new("cardinal::anp::propose"),
+                )
+                .await?;
+                eprintln!(
+                    "proposed {} criteria (${:.4}):",
+                    proposed.len(),
+                    usage.cost_nanodollars as f64 / 1e9
+                );
+                for cand in &proposed {
+                    eprintln!("  - {cand}");
+                }
+                for cand in proposed {
+                    if !criteria
+                        .iter()
+                        .any(|(name, _)| name.eq_ignore_ascii_case(&cand))
+                    {
+                        criteria.push((cand.clone(), cand));
+                    }
+                }
+            }
+            let cache_path = cache.unwrap_or_else(SqlitePairwiseCache::default_path);
+            let cache_store = SqlitePairwiseCache::new(cache_path)?;
+            let report = cardinal_harness::rerank::anp(
+                gateway,
+                Some(&cache_store as &dyn cardinal_harness::cache::PairwiseCache),
+                &goal,
+                &criteria,
+                alternatives,
+                cardinal_harness::rerank::AnpOptions {
+                    model,
+                    alpha,
+                    comparison_budget: budget,
+                    seed,
+                },
+            )
+            .await?;
+
+            if json {
+                println!("{}", serde_json::to_string_pretty(&report)?);
+            } else {
+                println!("criteria (direct → limiting, Δ = network correction):");
+                for criterion in &report.criteria {
+                    println!(
+                        "  {:>6.3} → {:>6.3}  ({:+.3})  {}",
+                        criterion.direct_weight,
+                        criterion.limiting_weight,
+                        criterion.network_delta,
+                        criterion.name
+                    );
+                }
+                println!("alternatives by limiting priority:");
+                for alternative in &report.alternatives {
+                    println!(
+                        "  {:>6.3}  {}",
+                        alternative.limiting_priority, alternative.id
+                    );
+                }
+            }
+            eprintln!(
+                "anp: {} criteria x {} alternatives · alpha {alpha} · {} comparisons · ${:.4} · limit {} iterations ({})",
+                report.criteria.len(),
+                report.alternatives.len(),
+                report.comparisons_used,
+                report.cost_nanodollars as f64 / 1e9,
+                report.iterations,
+                if report.converged { "converged" } else { "NOT CONVERGED" },
+            );
         }
         Commands::Bench {
             models,

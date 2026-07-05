@@ -755,6 +755,95 @@ impl Respond for InversionBlindJudge {
 }
 
 #[tokio::test(flavor = "multi_thread")]
+async fn anp_produces_stochastic_limits_and_a_network_correction() {
+    // Full network on the metal scale: three criteria, four alternatives,
+    // every supermatrix edge measured through the mock judge. The checks
+    // are structural/mathematical: stochasticity, convergence, ordering.
+    let server = start_server().await;
+    let dir = std::env::temp_dir().join(format!("cardinal-anp-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let output = run_cardinal(
+        &server.uri(),
+        &[
+            "anp",
+            "--goal",
+            "maximum shine",
+            "--attribute",
+            "gold=shiny GOLD standard",
+            "--attribute",
+            "silver=bright SILVER middle",
+            "--attribute",
+            "tin=dull TIN afterthought",
+            "--model",
+            "test/judge",
+            "--budget",
+            "48",
+            "--cache",
+            dir.join("anp.sqlite").to_str().unwrap(),
+            "--json",
+        ],
+        "shiny GOLD ring\nold SILVER coin\nplain BRONZE cup\ndull TIN spoon\n",
+    );
+    assert!(
+        output.status.success(),
+        "stderr: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let parsed: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(parsed["converged"], true, "{parsed}");
+
+    // Column-stochasticity of every column with outflow (goal + criteria +
+    // alternatives).
+    let s = parsed["supermatrix"].as_array().unwrap();
+    let n = s.len();
+    for col in 0..n {
+        let sum: f64 = (0..n)
+            .map(|row| s[row].as_array().unwrap()[col].as_f64().unwrap())
+            .sum();
+        assert!(
+            (sum - 1.0).abs() < 1e-9 || sum.abs() < 1e-12,
+            "column {col} must be stochastic or empty: {sum}"
+        );
+    }
+
+    // Weights are distributions.
+    let criteria = parsed["criteria"].as_array().unwrap();
+    let direct: f64 = criteria.iter().map(|c| c["direct_weight"].as_f64().unwrap()).sum();
+    let limiting: f64 = criteria
+        .iter()
+        .map(|c| c["limiting_weight"].as_f64().unwrap())
+        .sum();
+    assert!((direct - 1.0).abs() < 1e-9, "direct sums to 1: {direct}");
+    assert!((limiting - 1.0).abs() < 1e-6, "limiting sums to 1: {limiting}");
+    let alts = parsed["alternatives"].as_array().unwrap();
+    let alt_sum: f64 = alts
+        .iter()
+        .map(|a| a["limiting_priority"].as_f64().unwrap())
+        .sum();
+    assert!((alt_sum - 1.0).abs() < 1e-6, "priorities sum to 1: {alt_sum}");
+
+    // Dominance ordering on the metal scale, in both clusters.
+    assert_eq!(criteria[0]["name"], "gold");
+    assert!(
+        criteria[0]["limiting_weight"].as_f64().unwrap()
+            > criteria[2]["limiting_weight"].as_f64().unwrap(),
+        "gold criterion must dominate tin in the limit: {parsed}"
+    );
+    assert_eq!(
+        alts[0]["id"], "item-0000",
+        "gold ring must lead the limiting priorities: {parsed}"
+    );
+    // The network correction is a measured quantity present per criterion.
+    for c in criteria {
+        assert!(
+            c["network_delta"].as_f64().is_some(),
+            "delta must be reported: {c}"
+        );
+    }
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[tokio::test(flavor = "multi_thread")]
 async fn judge_wordings_agree_for_a_coherent_judge() {
     let server = start_server().await;
     let output = run_cardinal(
