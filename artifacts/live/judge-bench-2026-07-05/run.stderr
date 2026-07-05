@@ -1,0 +1,72 @@
+benchmarking openai/gpt-5.4-mini ...
+model: openai/gpt-5.4-mini · template: canonical_v2
+  signal           +0.680 [+0.403, +0.956] nats (n=20)  → 0.493
+  order-flip       +0.200 [+0.081, +0.416] rate (n=20)  → 0.800
+  order-residual   +0.264 [+0.148, +0.380] nats (n=20)  → 0.768
+  frustration      +0.044 curl fraction (n=20)  → 0.956
+  spin-survival    +0.333 [+0.061, +0.792] rate (n=3)  → 0.333
+  susceptibility   +0.930 [+0.319, +1.542] nats/spin (n=5)
+  polarity         -0.690 spearman (n=8)  → 0.845
+  paraphrase       +0.643 spearman (n=8)  → 0.821
+  null-bias        +0.000 [+0.000, +0.000] nats (n=4)  → 1.000
+  coherence 0.790 · JUDGE SCORE 0.390 · 114 comparisons (0 cached) · 0 refusals · $0.0448
+benchmarking openai/gpt-5.4-nano ...
+model: openai/gpt-5.4-nano · template: canonical_v2
+  signal           +0.484 [+0.297, +0.672] nats (n=20)  → 0.384
+  order-flip       +0.400 [+0.219, +0.613] rate (n=20)  → 0.600
+  order-residual   +0.310 [+0.203, +0.418] nats (n=20)  → 0.733
+  frustration      +0.326 curl fraction (n=20)  → 0.674
+  spin-survival    +0.000 [+0.000, +0.562] rate (n=3)  → 0.000
+  susceptibility   +0.895 [+0.641, +1.149] nats/spin (n=5)
+  polarity         +0.381 spearman (n=8)  → 0.310
+  paraphrase       +0.333 spearman (n=8)  → 0.667
+  null-bias        +0.000 [+0.000, +0.000] nats (n=4)  → 1.000
+  coherence 0.553 · JUDGE SCORE 0.212 · 114 comparisons (0 cached) · 0 refusals · $0.0120
+benchmarking google/gemini-2.5-flash ...
+model: google/gemini-2.5-flash · template: canonical_v2
+  signal           +1.015 [+0.653, +1.377] nats (n=20)  → 0.637
+  order-flip       +0.150 [+0.052, +0.360] rate (n=20)  → 0.850
+  order-residual   +0.274 [+0.174, +0.374] nats (n=20)  → 0.760
+  frustration      +0.039 curl fraction (n=20)  → 0.961
+  spin-survival    +1.000 [+0.438, +1.000] rate (n=3)  → 1.000
+  susceptibility   +0.311 [+0.082, +0.539] nats/spin (n=5)
+  polarity         -0.810 spearman (n=8)  → 0.905
+  paraphrase       +1.000 spearman (n=8)  → 1.000
+  null-bias        +0.000 [+0.000, +0.000] nats (n=4)  → 1.000
+  coherence 0.945 · JUDGE SCORE 0.602 · 114 comparisons (0 cached) · 0 refusals · $0.0213
+benchmarking deepseek/deepseek-v4-flash ...
+model: deepseek/deepseek-v4-flash · template: canonical_v2
+  signal           +0.687 [+0.414, +0.960] nats (n=20)  → 0.497
+  order-flip       +0.200 [+0.081, +0.416] rate (n=20)  → 0.800
+  order-residual   +0.250 [+0.155, +0.345] nats (n=20)  → 0.779
+  frustration      +0.055 curl fraction (n=20)  → 0.945
+  spin-survival    +1.000 [+0.438, +1.000] rate (n=3)  → 1.000
+  susceptibility   +0.489 [+0.147, +0.832] nats/spin (n=5)
+  polarity         -0.762 spearman (n=8)  → 0.881
+  paraphrase       +0.952 spearman (n=8)  → 0.976
+  null-bias        +0.000 [+0.000, +0.000] nats (n=4)  → 1.000
+  coherence 0.932 · JUDGE SCORE 0.463 · 114 comparisons (0 cached) · 0 refusals · $0.0114
+benchmarking anthropic/claude-haiku-4.5 ...
+model: anthropic/claude-haiku-4.5 · template: canonical_v2
+  signal           +0.756 [+0.522, +0.990] nats (n=20)  → 0.530
+  order-flip       +0.100 [+0.028, +0.301] rate (n=20)  → 0.900
+  order-residual   +0.084 [+0.034, +0.135] nats (n=20)  → 0.919
+  frustration      +0.032 curl fraction (n=20)  → 0.968
+  spin-survival    +1.000 [+0.438, +1.000] rate (n=3)  → 1.000
+  susceptibility   +0.338 [+0.181, +0.495] nats/spin (n=5)
+  polarity         -0.810 spearman (n=8)  → 0.905
+  paraphrase       +0.833 spearman (n=8)  → 0.917
+  null-bias        +0.000 [+0.000, +0.000] nats (n=3)  → 1.000
+  coherence 0.950 · JUDGE SCORE 0.504 · 114 comparisons (0 cached) · 1 refusals · $0.1653
+benchmarking anthropic/claude-sonnet-4.6 ...
+model: anthropic/claude-sonnet-4.6 · template: canonical_v2
+  signal           +0.834 [+0.585, +1.083] nats (n=20)  → 0.566
+  order-flip       +0.000 [+0.000, +0.161] rate (n=20)  → 1.000
+  order-residual   +0.108 [+0.048, +0.168] nats (n=20)  → 0.898
+  frustration      +0.005 curl fraction (n=20)  → 0.995
+  spin-survival    +1.000 [+0.438, +1.000] rate (n=3)  → 1.000
+  susceptibility   +0.120 [-0.006, +0.246] nats/spin (n=5)
+  polarity         -0.881 spearman (n=8)  → 0.940
+  paraphrase       +0.929 spearman (n=8)  → 0.964
+  null-bias        +0.000 [+0.000, +0.000] nats (n=4)  → 1.000
+  coherence 0.975 · JUDGE SCORE 0.552 · 114 comparisons (0 cached) · 0 refusals · $0.2091
