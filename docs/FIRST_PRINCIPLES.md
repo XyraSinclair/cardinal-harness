@@ -125,14 +125,17 @@ whoever asks. gemini-2.5-flash holds a direction on that same pair and
 yields only +0.12. The sycophancy question decomposes into: does this
 judgement have a spontaneous direction, and how much field moves it?
 
-Honesty note (adversarial self-review, notes/ideation-2026-07-05/): the
-shipped χ is a **two-point secant at one field intensity**, not a measured
-slope — the neutral reading is reported but does not enter χ, which
-silently assumes the pro/con framings perturb symmetrically around the
-true zero-field point. A 3–5-intensity preamble ladder fitting log-ratio
-against field strength (slope + linearity residual) would distinguish a
-genuinely low-χ judge from a step-function sycophant that ignores mild
-pressure and folds completely past a threshold. Named, not yet built.
+The secant critique (adversarial self-review) is now CLOSED: `judge
+--sweep` measures χ as a fitted slope over field −3…+3 with a linearity
+R² (14 calls). Live sweeps (`artifacts/live/spin-sweep-2026-07-05/`):
+gpt-5.4-mini is a **linear paramagnet** on the contested pair — monotone
+response, χ = 0.200 nats/step, R² 0.81, folds through zero.
+claude-sonnet-4.6 is a **rigid domain that stiffens under pressure** —
+slope −0.014 (nothing), belief survives the whole sweep, and maximal
+insistence in EITHER direction pushes it to +1.25 nats, a V-shape the
+secant would have read as χ ≈ 0. Four species now separable: rigid,
+linear responder, threshold sycophant (scripted, pinned at R² < 0.9),
+pressure-reactant.
 
 **Finding from shipping frustration** (2026-07-05): a directionally
 transitive judge still shows ~0.13 curl — quantization frustration. First
