@@ -23,6 +23,7 @@ pub mod policy_registry;
 pub mod report;
 pub mod simple;
 pub mod sort;
+pub mod spin;
 pub mod trace;
 pub mod types;
 // No async worker in the standalone harness.
@@ -59,5 +60,6 @@ pub use sort::{
     sort_documents, sort_texts, SortError, SortOptions, SortProbe, SortProbeKind, SortedItem,
     SortedTexts,
 };
+pub use spin::{spin_probe, SpinFraming, SpinProbeReport, SpinReading};
 pub use trace::{ComparisonTrace, JsonlTraceSink, TraceError, TraceSink, TraceWorker};
 pub use types::*;

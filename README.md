@@ -156,7 +156,12 @@ there, from most magic to most manual:
   lowest-level primitive: one pairwise judgement, with the fully rendered
   prompt on stderr and the parsed answer (direction, ratio, confidence,
   cost) on stdout. This is how you develop taste for what a criterion
-  actually asks of the judge.
+  actually asks of the judge. Add **`--spin`** for the susceptibility
+  probe: the same pair judged under neutral, pro-first, and pro-second
+  requester framings (each in both presentation orders, 6 comparisons),
+  reporting how far the judgement moves when the asker leans — and whether
+  the belief survives the spin at all. A judgement only deserves the name
+  *belief* if it is a fixed point of framings that shouldn't matter.
 - **`cardinal explain ranking.txt --candidate "clarity" --propose 3`** — the
   inverse problem: you already HAVE a ranking you believe in. Explain
   measures candidate attributes (yours, plus LLM-proposed ones) with the

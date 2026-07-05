@@ -85,14 +85,14 @@ is a fixed point of the transformations that shouldn't matter. The group:
 | polarity (attribute ↔ its opposite) | ✓ `--two-sided`, consistency receipt |
 | paraphrase (same attribute, other words) | ✓ `--also-by`, consistency receipt |
 | null content (pure prior) | ✓ `cardinal calibrate` (4 models measured clean) |
-| **framing spin** (persuasive preamble pushing a side) | ✗ — the "if you spin it, they agree" probe: same pair judged under pro-A, pro-B, and neutral framings; belief = what survives. Buildable as a probe today |
+| **framing spin** (persuasive preamble pushing a side) | ✓ `cardinal judge --spin`: the same pair under neutral, pro-first, and pro-second requester framings × both orders; reports susceptibility χ in nats and whether the belief survives — "if you spin it, do they still agree" made a receipt |
 | **temperature** | ✗ never swept — one JSD data point (t=0 logprobs vs t=1 samples, 0.128 on gpt-5.4-mini) is a hint, not a map |
 | **reasoning effort / thinking params** | ✗ never swept; we only know reasoning models refuse logprobs |
 | judge model | ◐ seriate probe compares models; no standing cross-model receipt in cardinal runs |
 | time (same judge, days apart) | ✗ |
 
-The stability axes we cover, we cover with receipts; the three ✗ rows are
-the cheapest untouched science in the repo.
+The stability axes we cover, we cover with receipts; the remaining ✗ rows
+(parameter sweeps, time drift) are the cheapest untouched science in the repo.
 
 ## 5½. The physics of a judge (receipts, not metaphors)
 
@@ -103,7 +103,7 @@ a computable receipt:
 |---|---|---|
 | **Frustration** (spin glass) | cyclic preference structure no scores can satisfy (A>B>C>A) | ✓ `judgement_frustration_mean` — the Hodge curl fraction Σλr²/Σλμ² of the log-ratio edge field, shipped; transitive judge ≈ quantization floor, planted rock-paper-scissors > 0.3 |
 | **Hysteresis** | path dependence: judging A→B vs B→A | ✓ order-residual in nats + flip counts |
-| **Susceptibility** | response to a small applied field: framing spin | ✗ the pro-A/pro-B preamble probe; dJudgement/dFraming |
+| **Susceptibility** | response to a small applied field: framing spin | ✓ `judge --spin`: χ = (m₊ − m₋)/2 nats per unit spin, plus a survives/echoes verdict; a scripted sycophant judge is caught in tests, a framing-blind judge measures χ = 0 |
 | **Temperature/entropy** | PMF spread per judgement; annealing across sampling temperature | ◐ entropy computable from stored PMFs; sweep unmeasured |
 | **Ground state** | the solved scores: minimum-energy potential for the field | ✓ the solver itself |
 | **Relaxation** | drift of the same judgement re-asked over time | ✗ |

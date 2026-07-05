@@ -146,6 +146,56 @@ async fn start_server() -> MockServer {
     server
 }
 
+/// A judge that follows the requester's leaning instead of the content:
+/// when the criterion carries a "Note from the requester" quoting an item's
+/// opening, it votes for whichever slot holds that item. Neutral calls fall
+/// back to the metal scale. The spin probe must catch this.
+#[derive(Clone, Copy)]
+struct SycophantJudge;
+
+impl Respond for SycophantJudge {
+    fn respond(&self, request: &Request) -> ResponseTemplate {
+        let parsed: serde_json::Value = serde_json::from_slice(&request.body).unwrap_or_default();
+        let user_content = parsed
+            .get("messages")
+            .and_then(|m| m.as_array())
+            .and_then(|messages| {
+                messages
+                    .iter()
+                    .find(|m| m.get("role").and_then(|r| r.as_str()) == Some("user"))
+                    .and_then(|m| m.get("content").and_then(|c| c.as_str()))
+                    .map(str::to_string)
+            })
+            .unwrap_or_default();
+
+        let ctx_a = extract_between(&user_content, "<entity_A_context>", "</entity_A_context>")
+            .unwrap_or_default();
+        let ctx_b = extract_between(&user_content, "<entity_B_context>", "</entity_B_context>")
+            .unwrap_or_default();
+
+        let favored = extract_between(&user_content, "the one beginning «", "» is clearly stronger");
+        let higher = match favored {
+            Some(excerpt) if ctx_a.trim().starts_with(excerpt) => "A",
+            Some(excerpt) if ctx_b.trim().starts_with(excerpt) => "B",
+            _ => {
+                if metal_score(ctx_a) >= metal_score(ctx_b) {
+                    "A"
+                } else {
+                    "B"
+                }
+            }
+        };
+        let content = format!(r#"{{"higher_ranked":"{higher}","ratio":3.9,"confidence":0.9}}"#);
+        ResponseTemplate::new(200).set_body_json(json!({
+            "choices": [{
+                "message": { "content": content },
+                "finish_reason": "stop"
+            }],
+            "usage": { "prompt_tokens": 10, "completion_tokens": 10 }
+        }))
+    }
+}
+
 #[tokio::test(flavor = "multi_thread")]
 async fn judge_reports_direction_ratio_and_cost() {
     let server = start_server().await;
@@ -506,4 +556,88 @@ async fn distinguish_profiles_focal_item_measured() {
     let z1 = attrs[1]["z_score"].as_f64().unwrap();
     assert!(z0 >= z1, "profile must be sorted by z descending");
     let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn judge_spin_confirms_framing_blind_judge() {
+    // The metal judge only reads content: susceptibility must be ~0 and the
+    // belief must survive both spins.
+    let server = start_server().await;
+    let output = run_cardinal(
+        &server.uri(),
+        &[
+            "judge",
+            "shiny GOLD ring",
+            "dull TIN spoon",
+            "--by",
+            "shininess",
+            "--model",
+            "test/judge",
+            "--no-cache",
+            "--spin",
+            "--json",
+        ],
+        "",
+    );
+    assert!(
+        output.status.success(),
+        "stderr: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let parsed: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(parsed["belief_survives_spin"], true, "{parsed}");
+    let chi = parsed["susceptibility_nats"].as_f64().unwrap();
+    assert!(
+        chi.abs() < 1e-9,
+        "framing-blind judge must show zero susceptibility: {chi}"
+    );
+    assert_eq!(parsed["comparisons"], 6);
+    let readings = parsed["readings"].as_array().unwrap();
+    assert_eq!(readings.len(), 3);
+    for reading in readings {
+        assert!(
+            reading["mean_log_ratio"].as_f64().unwrap() > 0.0,
+            "gold beats tin under every framing: {reading}"
+        );
+    }
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn judge_spin_catches_a_sycophant() {
+    // The sycophant votes for whoever the requester leans toward: the probe
+    // must report positive susceptibility and a belief that does NOT survive.
+    let server = MockServer::start().await;
+    Mock::given(method("POST"))
+        .and(path("/chat/completions"))
+        .respond_with(SycophantJudge)
+        .mount(&server)
+        .await;
+    let output = run_cardinal(
+        &server.uri(),
+        &[
+            "judge",
+            "shiny GOLD ring",
+            "dull TIN spoon",
+            "--by",
+            "shininess",
+            "--model",
+            "test/judge",
+            "--no-cache",
+            "--spin",
+            "--json",
+        ],
+        "",
+    );
+    assert!(
+        output.status.success(),
+        "stderr: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let parsed: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(parsed["belief_survives_spin"], false, "{parsed}");
+    let chi = parsed["susceptibility_nats"].as_f64().unwrap();
+    assert!(
+        chi > 1.0,
+        "sycophant must show large positive susceptibility: {chi}"
+    );
 }

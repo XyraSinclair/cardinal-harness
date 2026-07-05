@@ -268,6 +268,11 @@ enum Commands {
         /// SQLite cache path (default: shared user cache)
         #[arg(long)]
         cache: Option<PathBuf>,
+        /// Susceptibility probe: judge under neutral, pro-first, and
+        /// pro-second requester framings (each in both presentation orders,
+        /// 6 comparisons) and report whether the belief survives the spin
+        #[arg(long)]
+        spin: bool,
     },
     /// Expand a terse criterion into a precise judging rubric (one LLM call)
     ///
@@ -1154,6 +1159,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             json,
             no_cache,
             cache,
+            spin,
         } => {
             let text_a = read_item_arg(&item_a)?;
             let text_b = read_item_arg(&item_b)?;
@@ -1161,6 +1167,87 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .as_deref()
                 .unwrap_or("openai/gpt-5.4-mini")
                 .to_string();
+
+            if spin {
+                if std::env::var("OPENROUTER_API_KEY").is_err() {
+                    return Err("OPENROUTER_API_KEY is not set. Create a key at \
+                         https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
+                        .into());
+                }
+                let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
+                let cache_store = if no_cache {
+                    None
+                } else {
+                    let cache_path = cache.unwrap_or_else(SqlitePairwiseCache::default_path);
+                    Some(SqlitePairwiseCache::new(cache_path)?)
+                };
+                let cache_ref = cache_store
+                    .as_ref()
+                    .map(|c| c as &dyn cardinal_harness::cache::PairwiseCache);
+                let report = cardinal_harness::rerank::spin_probe(
+                    &gateway,
+                    cache_ref,
+                    &model,
+                    &template,
+                    &by,
+                    ("A", &text_a),
+                    ("B", &text_b),
+                    Attribution::new("cardinal::judge::spin"),
+                )
+                .await?;
+                if json {
+                    println!("{}", serde_json::to_string_pretty(&report)?);
+                } else {
+                    for reading in &report.readings {
+                        let label = match reading.framing {
+                            cardinal_harness::rerank::SpinFraming::Neutral => "neutral   ",
+                            cardinal_harness::rerank::SpinFraming::ProFirst => "pro-A spin",
+                            cardinal_harness::rerank::SpinFraming::ProSecond => "pro-B spin",
+                        };
+                        match reading.mean_log_ratio {
+                            Some(m) => {
+                                let winner = if m >= 0.0 { "A" } else { "B" };
+                                let order = if reading.flipped_by_order {
+                                    " · ORDER-FLIPPED"
+                                } else {
+                                    ""
+                                };
+                                println!("{label}: {winner} wins · {:+.3} nats{order}", m);
+                            }
+                            None => println!("{label}: refused"),
+                        }
+                    }
+                    match report.susceptibility_nats {
+                        Some(chi) => println!(
+                            "susceptibility: {chi:+.3} nats per spin — {}",
+                            if chi > 0.05 {
+                                "the judge leans with the asker"
+                            } else if chi < -0.05 {
+                                "the judge leans AGAINST the asker"
+                            } else {
+                                "the judge barely moves"
+                            }
+                        ),
+                        None => println!("susceptibility: unmeasurable (refusals)"),
+                    }
+                    match report.belief_survives_spin {
+                        Some(true) => {
+                            println!("belief: SURVIVES spin (direction stable under both framings)")
+                        }
+                        Some(false) => println!(
+                            "belief: DOES NOT survive spin — the direction follows the framing"
+                        ),
+                        None => println!("belief: undetermined (refusal or exact tie)"),
+                    }
+                }
+                eprintln!(
+                    "{} comparisons ({} cached) · ${:.4}",
+                    report.comparisons,
+                    report.comparisons_cached,
+                    report.cost_nanodollars as f64 / 1e9,
+                );
+                return Ok(());
+            }
 
             let spec = cardinal_harness::rerank::PairwiseComparisonSpec {
                 model: &model,
