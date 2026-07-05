@@ -135,12 +135,16 @@ genuinely low-χ judge from a step-function sycophant that ignores mild
 pressure and folds completely past a threshold. Named, not yet built.
 
 **Finding from shipping frustration** (2026-07-05): a directionally
-transitive judge still shows ~0.13 curl — the ratio LADDER itself injects
-quantization frustration, because its rungs are not log-additive
-(ln r_a + ln r_b ≠ ln r_c for any rungs). This gives a design criterion no
-one told us: a log-arithmetic ladder (geometric with constant log step)
-would make quantization curl vanish and leave the receipt measuring ONLY
-structural cycles. Candidate future instrument revision, receipt-driven.
+transitive judge still shows ~0.13 curl — quantization frustration. First
+hypothesis blamed the ladder's non-constant log step; the controlled test
+(`tests/ladder_curl.rs`, same planted-transitive judge, full ladder)
+REFUTED the emphasis: repo ladder floor 0.00198 vs constant-log-step
+0.00155 — the uneven step is real but third-order. The ~0.13 floor comes
+from **rung usage coarseness**: a judge that expresses everything as two
+rungs (1.5-or-3.9) injects two orders of magnitude more curl than the
+ladder geometry does. Design consequence: to lower quantization curl,
+elicit finer *distinctions* (PMF instruments already do), not finer rungs.
+Corrected 2026-07-05, same day — receipts over vibes.
 
 ## 6. Parameters, honestly
 
