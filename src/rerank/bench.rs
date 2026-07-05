@@ -96,8 +96,33 @@ pub const SPIN_CONTESTED_PAIRS: [(usize, usize); 2] = [(0, 1), (3, 4)];
 /// Null texts: judged against themselves.
 pub const NULL_INDICES: [usize; 4] = [0, 3, 5, 7];
 
+/// Nuisance perturbations: semantically-null text edits a genuine judge
+/// must see through. Three format edits apply to BOTH entities; the halo
+/// suffix applies to entity j only (an asymmetric prestige cue). This is
+/// the axis that kills content-blind hash judges: any bytes-keyed shortcut
+/// changes its answer under a null edit (hash avalanche), while a reader
+/// does not.
+pub const PERTURBATIONS: [&str; 4] = ["whitespace", "markdown", "bullet", "halo"];
+
+/// Core pairs that get the perturbation battery (every 3rd pair: 6 of 20).
+#[must_use]
+pub fn perturb_pairs() -> Vec<(usize, usize)> {
+    core_pairs().into_iter().step_by(3).take(6).collect()
+}
+
+fn perturb_text(kind: &str, text: &str, is_target: bool) -> String {
+    match kind {
+        "whitespace" => format!("  {text}   "),
+        "markdown" => format!("**{text}**"),
+        "bullet" => format!("- {text}"),
+        // Halo applies only to the target entity (j).
+        "halo" if is_target => format!("{text} \u{2014} from a widely cited essay"),
+        _ => text.to_string(),
+    }
+}
+
 /// Total provider calls in one benchmark run.
-pub const CALLS_PER_RUN: usize = 20 * 2 + 20 + 20 + 4 + 5 * 6;
+pub const CALLS_PER_RUN: usize = 20 * 2 + 20 + 20 + 4 + 6 * 4 + 5 * 6;
 
 /// Options for [`run_judge_bench`].
 #[derive(Debug, Clone)]
@@ -181,6 +206,13 @@ pub struct JudgeBenchReport {
     pub paraphrase: DimensionStat,
     /// Mean |log-ratio| on identical-item pairs (nats). Subscore e^(−value).
     pub null_bias: DimensionStat,
+    /// Mean |drift| of the judgement under semantically-null text edits
+    /// (whitespace, markdown, bullet, prestige-halo), vs the same pair's
+    /// unperturbed same-order call. Nats. Subscore e^(−value). The axis
+    /// that kills content-blind hash shortcuts.
+    pub nuisance: DimensionStat,
+    /// Per-perturbation mean |drift| breakdown (kind, nats, n).
+    pub nuisance_breakdown: Vec<(String, f64, usize)>,
 
     /// Mean of available consistency subscores (reciprocity = merged order
     /// flip + residual, frustration, spin survival, polarity, paraphrase,
@@ -251,10 +283,15 @@ async fn one_call(
     attribute_prompt: &str,
     i: usize,
     j: usize,
+    texts: (&str, &str),
     i_in_slot_a: bool,
     attribution: &Attribution,
 ) -> Result<CallOutcome, ComparisonError> {
-    let (slot_a, slot_b) = if i_in_slot_a { (i, j) } else { (j, i) };
+    let (slot_a, slot_b, text_a, text_b) = if i_in_slot_a {
+        (i, j, texts.0, texts.1)
+    } else {
+        (j, i, texts.1, texts.0)
+    };
     let ids = ["e0", "e1", "e2", "e3", "e4", "e5", "e6", "e7"];
     let spec = PairwiseComparisonSpec {
         model,
@@ -265,11 +302,11 @@ async fn one_call(
         },
         entity_a: PairwiseComparisonEntity {
             id: ids[slot_a],
-            text: CORPUS[slot_a],
+            text: text_a,
         },
         entity_b: PairwiseComparisonEntity {
             id: ids[slot_b],
-            text: CORPUS[slot_b],
+            text: text_b,
         },
     };
     let (judgement, usage) = compare_pair(
@@ -341,29 +378,49 @@ pub async fn run_judge_bench(
     let template = opts.template.clone();
     let pairs = core_pairs();
 
-    // ---- Build the call plan: (block, attribute, i, j, i_in_slot_a) ----
-    let mut plan: Vec<(&'static str, &'static str, usize, usize, bool)> = Vec::new();
+    // ---- Build the call plan ----
+    type PlanEntry = (
+        &'static str,
+        &'static str,
+        usize,
+        usize,
+        bool,
+        Option<&'static str>,
+    );
+    let mut plan: Vec<PlanEntry> = Vec::new();
     for &(i, j) in &pairs {
-        plan.push(("core", PRIMARY_ATTRIBUTE, i, j, true));
-        plan.push(("core", PRIMARY_ATTRIBUTE, i, j, false));
+        plan.push(("core", PRIMARY_ATTRIBUTE, i, j, true, None));
+        plan.push(("core", PRIMARY_ATTRIBUTE, i, j, false, None));
     }
     for &(i, j) in &pairs {
-        plan.push(("opposite", OPPOSITE_ATTRIBUTE, i, j, true));
-        plan.push(("paraphrase", PARAPHRASE_ATTRIBUTE, i, j, true));
+        plan.push(("opposite", OPPOSITE_ATTRIBUTE, i, j, true, None));
+        plan.push(("paraphrase", PARAPHRASE_ATTRIBUTE, i, j, true, None));
     }
     for &i in &NULL_INDICES {
-        plan.push(("null", PRIMARY_ATTRIBUTE, i, i, true));
+        plan.push(("null", PRIMARY_ATTRIBUTE, i, i, true, None));
+    }
+    for &(i, j) in &perturb_pairs() {
+        for kind in PERTURBATIONS {
+            plan.push(("nuisance", PRIMARY_ATTRIBUTE, i, j, true, Some(kind)));
+        }
     }
 
     let concurrency = opts.concurrency.max(1);
     let results: Vec<(usize, Result<CallOutcome, ComparisonError>)> = stream::iter(
         plan.iter()
             .enumerate()
-            .map(|(idx, &(_, attr, i, j, fwd))| {
+            .map(|(idx, &(_, attr, i, j, fwd, perturb))| {
                 let attribution = &attribution;
                 let model = model.as_str();
                 let template = template.as_str();
                 async move {
+                    let (text_i, text_j) = match perturb {
+                        Some(kind) => (
+                            perturb_text(kind, CORPUS[i], false),
+                            perturb_text(kind, CORPUS[j], true),
+                        ),
+                        None => (CORPUS[i].to_string(), CORPUS[j].to_string()),
+                    };
                     let out = one_call(
                         gateway,
                         cache,
@@ -372,6 +429,7 @@ pub async fn run_judge_bench(
                         attr,
                         i,
                         j,
+                        (&text_i, &text_j),
                         fwd,
                         attribution,
                     )
@@ -401,10 +459,13 @@ pub async fn run_judge_bench(
     }
 
     let mut calls = Vec::with_capacity(plan.len());
-    for (idx, &(block, _, i, j, fwd)) in plan.iter().enumerate() {
+    for (idx, &(block, _, i, j, fwd, perturb)) in plan.iter().enumerate() {
         let out = outcomes[idx].as_ref().expect("all outcomes filled");
         calls.push(BenchCall {
-            block: block.to_string(),
+            block: match perturb {
+                Some(kind) => format!("nuisance:{kind}"),
+                None => block.to_string(),
+            },
             i,
             j,
             i_in_slot_a: fwd,
@@ -475,6 +536,34 @@ pub async fn run_judge_bench(
         .filter_map(|c| c.log_ratio_toward_i.map(f64::abs))
         .collect();
     let (null_mean, null_ci) = mean_ci95(&null_ms);
+
+    // ---- Nuisance block: drift vs the same pair's unperturbed call ----
+    let baseline_m = |i: usize, j: usize| -> Option<f64> {
+        calls
+            .iter()
+            .find(|c| c.block == "core" && c.i == i && c.j == j && c.i_in_slot_a)
+            .and_then(|c| c.log_ratio_toward_i)
+    };
+    let mut nuisance_drifts: Vec<f64> = Vec::new();
+    let mut breakdown: Vec<(String, f64, usize)> = Vec::new();
+    for kind in PERTURBATIONS {
+        let block = format!("nuisance:{kind}");
+        let drifts: Vec<f64> = calls
+            .iter()
+            .filter(|c| c.block == block)
+            .filter_map(|c| {
+                let base = baseline_m(c.i, c.j)?;
+                let m = c.log_ratio_toward_i?;
+                Some((m - base).abs())
+            })
+            .collect();
+        if !drifts.is_empty() {
+            let mean = drifts.iter().sum::<f64>() / drifts.len() as f64;
+            breakdown.push((kind.to_string(), mean, drifts.len()));
+        }
+        nuisance_drifts.extend(drifts);
+    }
+    let (nuisance_mean, nuisance_ci) = mean_ci95(&nuisance_drifts);
 
     // ---- Spin block ----
     let mut spin_reports = Vec::new();
@@ -586,6 +675,13 @@ pub async fn run_judge_bench(
         unit: "nats",
         subscore: null_mean.map(|b| (-b).exp()),
     };
+    let nuisance = DimensionStat {
+        value: nuisance_mean,
+        ci95: nuisance_ci,
+        n: nuisance_drifts.len(),
+        unit: "nats",
+        subscore: nuisance_mean.map(|d| (-d).exp()),
+    };
 
     // Order-flip and order-residual are measured from the SAME two calls per
     // pair — two views of one transformation. They enter the composite as a
@@ -610,6 +706,7 @@ pub async fn run_judge_bench(
         polarity.subscore,
         paraphrase.subscore,
         null_bias.subscore,
+        nuisance.subscore,
     ]
     .into_iter()
     .flatten()
@@ -645,6 +742,8 @@ pub async fn run_judge_bench(
         polarity,
         paraphrase,
         null_bias,
+        nuisance,
+        nuisance_breakdown: breakdown,
         coherence,
         coherence_harmonic,
         judge_score,
@@ -692,6 +791,10 @@ pub fn render_report(report: &JudgeBenchReport) -> String {
     out.push_str(&fmt_dim("polarity", &report.polarity));
     out.push_str(&fmt_dim("paraphrase", &report.paraphrase));
     out.push_str(&fmt_dim("null-bias", &report.null_bias));
+    out.push_str(&fmt_dim("nuisance", &report.nuisance));
+    for (kind, mean, n) in &report.nuisance_breakdown {
+        let _ = writeln!(out, "    nuisance:{kind:<12} {mean:+.3} nats (n={n})");
+    }
     let _ = writeln!(
         out,
         "  coherence {:.3} (harmonic {:.3}) · JUDGE SCORE {:.3} · {} comparisons ({} cached) · {} refusals · ${:.4}",

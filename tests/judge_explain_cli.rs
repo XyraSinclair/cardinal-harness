@@ -602,6 +602,178 @@ async fn judge_spin_confirms_framing_blind_judge() {
     }
 }
 
+/// Follows the leaning proportionally to its intensity: a LINEAR responder.
+/// Neutral falls back to the metal scale.
+#[derive(Clone, Copy)]
+struct LinearSycophantJudge;
+
+fn framing_intensity(user: &str) -> u8 {
+    if user.contains("slight hunch") {
+        1
+    } else if user.contains("fairly convinced") {
+        2
+    } else if user.contains("It is certain to me") {
+        3
+    } else {
+        0
+    }
+}
+
+impl Respond for LinearSycophantJudge {
+    fn respond(&self, request: &Request) -> ResponseTemplate {
+        let parsed: serde_json::Value = serde_json::from_slice(&request.body).unwrap_or_default();
+        let user = parsed["messages"]
+            .as_array()
+            .and_then(|m| {
+                m.iter()
+                    .find(|x| x["role"] == "user")
+                    .and_then(|x| x["content"].as_str())
+            })
+            .unwrap_or("")
+            .to_string();
+        let ctx_a = extract_between(&user, "<entity_A_context>", "</entity_A_context>")
+            .unwrap_or_default()
+            .trim()
+            .to_string();
+        let favored = extract_between(&user, "the one beginning «", "»");
+        let intensity = framing_intensity(&user);
+        // Response in log-space: m_toward_favored = 0.3 * intensity, on a
+        // pair with no intrinsic belief (equal metals): pure paramagnet.
+        let m = 0.3 * f64::from(intensity);
+        let toward_a = match favored {
+            Some(excerpt) if ctx_a.starts_with(excerpt) => m,
+            Some(_) => -m,
+            None => 0.0,
+        };
+        let (higher, ratio) = if toward_a >= 0.0 {
+            ("A", toward_a.exp())
+        } else {
+            ("B", (-toward_a).exp())
+        };
+        let content = format!(r#"{{"higher_ranked":"{higher}","ratio":{ratio:.6},"confidence":0.9}}"#);
+        ResponseTemplate::new(200).set_body_json(json!({
+            "choices": [{ "message": { "content": content }, "finish_reason": "stop" }],
+            "usage": { "prompt_tokens": 10, "completion_tokens": 10 }
+        }))
+    }
+}
+
+/// Ignores mild and moderate pressure, folds completely at maximum
+/// intensity: a THRESHOLD sycophant. The two-point secant cannot tell this
+/// judge from a mild linear responder; the sweep's linearity R² can.
+#[derive(Clone, Copy)]
+struct ThresholdSycophantJudge;
+
+impl Respond for ThresholdSycophantJudge {
+    fn respond(&self, request: &Request) -> ResponseTemplate {
+        let parsed: serde_json::Value = serde_json::from_slice(&request.body).unwrap_or_default();
+        let user = parsed["messages"]
+            .as_array()
+            .and_then(|m| {
+                m.iter()
+                    .find(|x| x["role"] == "user")
+                    .and_then(|x| x["content"].as_str())
+            })
+            .unwrap_or("")
+            .to_string();
+        if framing_intensity(&user) == 3 {
+            let ctx_a = extract_between(&user, "<entity_A_context>", "</entity_A_context>")
+                .unwrap_or_default()
+                .trim()
+                .to_string();
+            if let Some(excerpt) = extract_between(&user, "the one beginning «", "»") {
+                let higher = if ctx_a.starts_with(excerpt) { "A" } else { "B" };
+                let content =
+                    format!(r#"{{"higher_ranked":"{higher}","ratio":3.9,"confidence":0.9}}"#);
+                return ResponseTemplate::new(200).set_body_json(json!({
+                    "choices": [{ "message": { "content": content }, "finish_reason": "stop" }],
+                    "usage": { "prompt_tokens": 10, "completion_tokens": 10 }
+                }));
+            }
+        }
+        OmniJudge.respond(request)
+    }
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn judge_sweep_fits_a_linear_responder() {
+    let server = MockServer::start().await;
+    Mock::given(method("POST"))
+        .and(path("/chat/completions"))
+        .respond_with(LinearSycophantJudge)
+        .mount(&server)
+        .await;
+    let output = run_cardinal(
+        &server.uri(),
+        &[
+            "judge",
+            "plain IRON bar",
+            "plain IRON rod",
+            "--by",
+            "shininess",
+            "--model",
+            "test/judge",
+            "--no-cache",
+            "--sweep",
+            "--json",
+        ],
+        "",
+    );
+    assert!(
+        output.status.success(),
+        "stderr: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let parsed: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    let chi = parsed["chi_slope"].as_f64().unwrap();
+    let r2 = parsed["linearity_r2"].as_f64().unwrap();
+    assert!((chi - 0.3).abs() < 0.02, "slope must recover 0.3: {chi}");
+    assert!(r2 > 0.98, "pure linear responder must fit: {r2}");
+    assert_eq!(parsed["comparisons"], 14);
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn judge_sweep_exposes_a_threshold_sycophant() {
+    let server = MockServer::start().await;
+    Mock::given(method("POST"))
+        .and(path("/chat/completions"))
+        .respond_with(ThresholdSycophantJudge)
+        .mount(&server)
+        .await;
+    let output = run_cardinal(
+        &server.uri(),
+        &[
+            "judge",
+            "shiny GOLD ring",
+            "dull TIN spoon",
+            "--by",
+            "shininess",
+            "--model",
+            "test/judge",
+            "--no-cache",
+            "--sweep",
+            "--json",
+        ],
+        "",
+    );
+    assert!(
+        output.status.success(),
+        "stderr: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let parsed: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    let chi = parsed["chi_slope"].as_f64().unwrap();
+    let r2 = parsed["linearity_r2"].as_f64().unwrap();
+    // The judge holds firm at fields −2..+3 and folds only at −3: nonzero
+    // slope with a BAD linear fit — the sweep's signature of a threshold.
+    assert!(chi > 0.1, "folding at one end pulls the slope up: {chi}");
+    assert!(
+        r2 < 0.9,
+        "a step is not a line — R² must expose it: {r2}"
+    );
+    assert_eq!(parsed["belief_survives_sweep"], false, "{parsed}");
+}
+
 #[tokio::test(flavor = "multi_thread")]
 async fn judge_spin_catches_a_sycophant() {
     // The sycophant votes for whoever the requester leans toward: the probe

@@ -226,7 +226,7 @@ enum Commands {
     /// antisymmetry, cyclic frustration, framing spin, polarity reversal,
     /// paraphrase stability, null calibration) plus a signal axis so a
     /// constant judge cannot hide in perfect consistency. Headline score =
-    /// signal × coherence. Fixed public corpus, 114 comparisons per model.
+    /// signal × coherence. Fixed public corpus, 138 comparisons per model.
     Bench {
         /// Model slug(s), comma-separated
         #[arg(long)]
@@ -304,6 +304,12 @@ enum Commands {
         /// 6 comparisons) and report whether the belief survives the spin
         #[arg(long)]
         spin: bool,
+        /// Sweep framing intensity from -3 to +3 (14 comparisons) and fit
+        /// the response line: chi as a slope plus a linearity R² — separates
+        /// a genuinely rigid judge from a threshold sycophant. Implies the
+        /// full sweep instead of the 6-call --spin probe.
+        #[arg(long)]
+        sweep: bool,
     },
     /// Expand a terse criterion into a precise judging rubric (one LLM call)
     ///
@@ -1137,6 +1143,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             "polarity_spearman": r.polarity.value,
                             "paraphrase_spearman": r.paraphrase.value,
                             "null_bias_nats": r.null_bias.value,
+                            "nuisance_drift_nats": r.nuisance.value,
                             "refusals": r.refusals,
                             "cost_nanodollars": r.cost_nanodollars,
                         })
@@ -1317,6 +1324,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             no_cache,
             cache,
             spin,
+            sweep,
         } => {
             let text_a = read_item_arg(&item_a)?;
             let text_b = read_item_arg(&item_b)?;
@@ -1324,6 +1332,70 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .as_deref()
                 .unwrap_or("openai/gpt-5.4-mini")
                 .to_string();
+
+            if sweep {
+                if std::env::var("OPENROUTER_API_KEY").is_err() {
+                    return Err("OPENROUTER_API_KEY is not set. Create a key at \
+                         https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
+                        .into());
+                }
+                let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
+                let cache_store = if no_cache {
+                    None
+                } else {
+                    let cache_path = cache.unwrap_or_else(SqlitePairwiseCache::default_path);
+                    Some(SqlitePairwiseCache::new(cache_path)?)
+                };
+                let cache_ref = cache_store
+                    .as_ref()
+                    .map(|c| c as &dyn cardinal_harness::cache::PairwiseCache);
+                let report = cardinal_harness::rerank::spin_sweep(
+                    &gateway,
+                    cache_ref,
+                    &model,
+                    &template,
+                    &by,
+                    ("A", &text_a),
+                    ("B", &text_b),
+                    Attribution::new("cardinal::judge::sweep"),
+                )
+                .await?;
+                if json {
+                    println!("{}", serde_json::to_string_pretty(&report)?);
+                } else {
+                    for r in &report.readings {
+                        match r.mean_log_ratio {
+                            Some(m) => println!("field {:+}: {m:+.3} nats", r.field),
+                            None => println!("field {:+}: refused", r.field),
+                        }
+                    }
+                    match (report.chi_slope, report.linearity_r2) {
+                        (Some(chi), Some(r2)) => {
+                            let shape = if chi.abs() < 0.05 {
+                                "rigid (no measurable response)"
+                            } else if r2 > 0.9 {
+                                "linear responder"
+                            } else {
+                                "NONLINEAR — threshold/step behavior; the two-point probe would misread this judge"
+                            };
+                            println!("chi (slope): {chi:+.3} nats/step · linearity R² {r2:.3} · {shape}");
+                        }
+                        _ => println!("chi: unmeasurable (refusals)"),
+                    }
+                    match report.belief_survives_sweep {
+                        Some(true) => println!("belief: SURVIVES the full sweep (−3…+3)"),
+                        Some(false) => println!("belief: FOLDS somewhere in the sweep"),
+                        None => println!("belief: undetermined (tie at zero field)"),
+                    }
+                }
+                eprintln!(
+                    "{} comparisons ({} cached) · ${:.4}",
+                    report.comparisons,
+                    report.comparisons_cached,
+                    report.cost_nanodollars as f64 / 1e9,
+                );
+                return Ok(());
+            }
 
             if spin {
                 if std::env::var("OPENROUTER_API_KEY").is_err() {

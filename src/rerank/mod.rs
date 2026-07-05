@@ -66,6 +66,6 @@ pub use sort::{
     sort_documents, sort_texts, SortError, SortOptions, SortProbe, SortProbeKind, SortedItem,
     SortedTexts,
 };
-pub use spin::{spin_probe, SpinFraming, SpinProbeReport, SpinReading};
+pub use spin::{spin_probe, spin_sweep, SpinFraming, SpinProbeReport, SpinReading, SpinSweepReport, SweepReading};
 pub use trace::{ComparisonTrace, JsonlTraceSink, TraceError, TraceSink, TraceWorker};
 pub use types::*;

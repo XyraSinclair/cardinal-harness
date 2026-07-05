@@ -36,7 +36,7 @@ scores from an incoherent judge are noise about noise.
 
 ## Dimensions
 
-114 comparisons per model on a fixed public corpus (8 short texts, judged
+138 comparisons per model on a fixed public corpus (8 short texts, judged
 by "depth of insight about living well"), all through the ordinary
 counterbalanced pairwise machinery:
 
@@ -51,6 +51,7 @@ counterbalanced pairwise machinery:
 | 6 | **polarity** | Spearman ρ of scores vs the negated attribute | ρ | (1 − ρ)/2 |
 | 7 | **paraphrase** | Spearman ρ of scores vs a reworded attribute | ρ | (1 + ρ)/2 |
 | 8 | **null bias** | mean \|log-ratio\| on identical-item pairs | nats | e^(−x) |
+| 9 | **nuisance stability** | drift under semantically-null edits (whitespace, markdown, bullet, prestige-halo) vs the unperturbed call | nats | e^(−x) |
 
 **Composite**: `coherence` = mean of the consistency axes, where **order
 flip and order residual enter as ONE reciprocity axis** (their mean) —
@@ -78,14 +79,14 @@ another:
 | Exploit | Aces | Caught by |
 |---|---|---|
 | always answer "tie" | every consistency axis | signal = 0 → headline 0 |
-| deterministic content hash (order-invariant, decisive) | order, residual, null | polarity (hash can't know the negated attribute must reverse) and paraphrase (or that a rewording must not) |
+| deterministic content hash (order-invariant, decisive) | order, residual, null | **nuisance stability** (one whitespace byte scrambles the hash — the direct kill) plus polarity/paraphrase (a hash can't know the negated attribute must reverse) |
 | always prefer slot A | decisiveness | order flip = 100%, null bias = ln(ratio), fused signal = 0 |
 | locally-consistent cyclic preferences | order, residual | frustration (Hodge curl) |
 | agree with whoever's asking | signal + correlations | spin survival = 0, χ large |
 
-**These are not hypotheticals — they are the test suite.** Five scripted
-judges (oracle, constant, position-biased, sycophant, cyclic) run the full
-benchmark in-process (`tests/judge_bench.rs`); each pathology must land in
+**These are not hypotheticals — they are the test suite.** Six scripted
+judges (oracle, constant, position-biased, sycophant, cyclic, avalanche-hash)
+run the full benchmark in-process (`tests/judge_bench.rs`); each pathology must land in
 exactly the dimension that names it, and the oracle must lead the board.
 A benchmark that can't separate scripted pathologies has no business
 ranking labs.
@@ -114,7 +115,9 @@ neutralized in v1: consistency-without-signal (multiplicative composite),
 content-blind hashing (polarity/paraphrase cross-check), position bias
 (fused signal cancels + null pairs), local-consistency-with-global-cycles
 (curl), reciprocity double-counting (merged axis), refusal laundering
-(coverage gate). The attacks that remain OPEN and define v2:
+(coverage gate). The adversary's "cleanest kill" — nuisance-perturbation
+stability — shipped as axis 9 the same day. The attacks that remain OPEN
+and define v2:
 
 - **Template fingerprinting**: the spin preamble and paraphrase wordings
   are fixed strings; a lab could special-case them. Fix: procedurally

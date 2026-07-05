@@ -24,8 +24,21 @@ fn extract_between<'a>(s: &'a str, start: &str, end: &str) -> Option<&'a str> {
 /// ground truth — the benchmark itself never sees these.
 const DEPTHS: [f64; 8] = [4.0, 3.6, 3.2, 2.6, 1.8, 1.2, 0.6, 0.1];
 
+/// A reader sees through formatting: normalize the nuisance edits before
+/// looking up the item. (The hash judge below deliberately does NOT.)
+fn normalize(text: &str) -> String {
+    let t = text.trim();
+    let t = t.strip_prefix("**").and_then(|x| x.strip_suffix("**")).unwrap_or(t);
+    let t = t.strip_prefix("- ").unwrap_or(t);
+    let t = t
+        .strip_suffix(" \u{2014} from a widely cited essay")
+        .unwrap_or(t);
+    t.trim().to_string()
+}
+
 fn corpus_index(text: &str) -> Option<usize> {
-    CORPUS.iter().position(|&t| t == text.trim())
+    let norm = normalize(text);
+    CORPUS.iter().position(|&t| t == norm)
 }
 
 fn user_content(request: &Request) -> String {
@@ -157,6 +170,35 @@ impl Respond for CyclicJudge {
     }
 }
 
+/// Content-blind shortcut: direction by an avalanche hash of the raw slot
+/// texts. Deterministic, order-invariant (keyed on content, not slot),
+/// direction-transitive (a total order), decisive — it fools every axis a
+/// naive consistency benchmark would ship. It cannot survive nuisance
+/// edits: one whitespace byte scrambles the hash. (An earlier byte-SUM
+/// variant of this judge sailed through the symmetric format edits —
+/// additive keys don't avalanche; the test itself needed the attack to be
+/// competent.)
+#[derive(Clone, Copy)]
+struct HashJudge;
+
+impl Respond for HashJudge {
+    fn respond(&self, request: &Request) -> ResponseTemplate {
+        use std::hash::{DefaultHasher, Hash, Hasher};
+        let user = user_content(request);
+        let (a, b) = contexts(&user);
+        if a == b {
+            return answer("A", 1.0);
+        }
+        let key = |t: &str| {
+            let mut h = DefaultHasher::new();
+            t.hash(&mut h);
+            h.finish()
+        };
+        let higher = if key(&a) >= key(&b) { "A" } else { "B" };
+        answer(higher, 2.5)
+    }
+}
+
 async fn bench_with<R: Respond + 'static>(judge: R) -> JudgeBenchReport {
     let server = MockServer::start().await;
     Mock::given(method("POST"))
@@ -211,6 +253,38 @@ async fn oracle_judge_scores_high_on_every_dimension() {
     assert!(r.coherence_harmonic.unwrap() > 0.9, "{}", diag(&r));
     // Curl support: 20 edges − 8 vertices + 1 component = 13 independent cycles.
     assert_eq!(r.frustration.n, 13, "curl support must be cycle rank");
+    // A reader sees through null edits.
+    assert!(r.nuisance.value.unwrap() < 1e-9, "{}", diag(&r));
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn hash_judge_is_caught_by_nuisance_perturbation() {
+    let r = bench_with(HashJudge).await;
+    // The shortcut survives everything a naive consistency suite measures:
+    assert_eq!(r.order_flip.value, Some(0.0), "order-invariant: {}", diag(&r));
+    assert!(r.order_residual.value.unwrap() < 1e-9, "{}", diag(&r));
+    // Direction is a total order, but the CONSTANT ratio magnitude is not
+    // log-additive — flat-magnitude judging injects quantization curl
+    // (~0.15), the same rung-usage-coarseness mechanism pinned in
+    // tests/ladder_curl.rs. Honest bound, not a claim of zero.
+    assert!(r.frustration.value.unwrap() < 0.35, "{}", diag(&r));
+    assert!(r.null_bias.value.unwrap() < 1e-9, "{}", diag(&r));
+    // ...and dies on semantically-null edits (hash avalanche):
+    assert!(
+        r.nuisance.value.unwrap() > 0.3,
+        "null edits must move a bytes-keyed judge: {}",
+        diag(&r)
+    );
+    // Content-blindness also shows in the attribute axes: it cannot know
+    // the negated attribute must reverse.
+    assert!(r.polarity.value.unwrap() > 0.9, "{}", diag(&r));
+    let oracle = bench_with(OracleJudge).await;
+    assert!(
+        r.judge_score.unwrap() < oracle.judge_score.unwrap(),
+        "the shortcut must cost rank: {} vs {}",
+        diag(&r),
+        diag(&oracle)
+    );
 }
 
 #[tokio::test(flavor = "multi_thread")]
@@ -299,7 +373,7 @@ async fn cyclic_judge_is_caught_by_frustration_and_only_frustration() {
 
 fn diag(r: &JudgeBenchReport) -> String {
     format!(
-        "judge_score={:?} signal={:?} flip={:?} residual={:?} curl={:?} spin={:?} chi={:?} pol={:?} para={:?} null={:?}",
+        "judge_score={:?} signal={:?} flip={:?} residual={:?} curl={:?} spin={:?} chi={:?} pol={:?} para={:?} null={:?} nuisance={:?}",
         r.judge_score,
         r.signal.value,
         r.order_flip.value,
@@ -309,6 +383,7 @@ fn diag(r: &JudgeBenchReport) -> String {
         r.susceptibility.value,
         r.polarity.value,
         r.paraphrase.value,
-        r.null_bias.value
+        r.null_bias.value,
+        r.nuisance.value
     )
 }
