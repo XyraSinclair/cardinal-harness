@@ -48,3 +48,9 @@ the apostrophe-free framing wording (the v1 wording reached models as
 Reproduce: `cardinal bench --models ... --cache bench-cache.sqlite --out
 reports.jsonl` (cache in this pack replays all 828 judgements). Raw
 per-call receipts in `reports.jsonl`; console blocks in `run.stderr`.
+
+## Erratum (2026-07-05 test–retest)
+
+nano polarity (+0.38 here) flipped to −0.40 on an identical fresh run:
+read it as "polarity relation unstable/noise", not "ranks shallowness
+like depth". See `../judge-bench-retest-2026-07-05/`.

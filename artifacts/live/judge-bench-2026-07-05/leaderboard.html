@@ -164,7 +164,7 @@
           <span class="mid" style="height:20px" title="transitivity 0.67"></span><span class="bad" style="height:2px" title="spin 0.00"></span>
           <span class="bad" style="height:9px" title="polarity 0.31"></span><span class="mid" style="height:20px" title="paraphrase 0.67"></span>
           <span style="height:30px" title="null 1.00"></span></div></td>
-        <td class="fail-note">ranks "shallowness" like depth</td>
+        <td class="fail-note">polarity unstable: +0.38→−0.40 across runs</td>
         <td class="num">$0.012</td>
       </tr>
     </tbody>
@@ -179,12 +179,14 @@
   <h2>Three findings you can poke</h2>
   <div class="cards">
     <div class="card bad">
-      <h3>A halo, not a judgement</h3>
-      <p><span class="big bad">ρ = +0.38</span></p>
-      <p><strong>gpt-5.4-nano</strong> ranks the corpus the <em>same direction</em> under
-      "depth of insight" and under "shallowness: the absence of insight."
-      Negating the question should reverse the answer (every other model: ρ ≤ −0.69).
-      It scores <em>items</em>, not items-under-attributes.</p>
+      <h3>A polarity that won't hold still</h3>
+      <p><span class="big bad">ρ = +0.38 → −0.40</span></p>
+      <p><strong>gpt-5.4-nano</strong>, asked to rank by "shallowness: the absence of
+      insight," produced ρ = +0.38 against its own depth ranking in this run — and
+      <strong>−0.40 on an identical fresh retest</strong>. Every other model's polarity
+      reproduces within ±0.10 (all ≤ −0.69). The replicated finding: nano has no stable
+      polarity relation at all — its negated-attribute scores are noise. (Erratum: this
+      card originally read the single run as "ranks shallowness like depth.")</p>
       <div class="bar-row"><span class="bar-label">sonnet-4.6</span><div class="bar-track"><div class="bar-fill" style="width:88%"></div></div><span class="bar-val">−0.88</span></div>
       <div class="bar-row"><span class="bar-label">gemini-flash</span><div class="bar-track"><div class="bar-fill" style="width:81%"></div></div><span class="bar-val">−0.81</span></div>
       <div class="bar-row"><span class="bar-label">gpt-5.4-nano</span><div class="bar-track"><div class="bar-fill bad" style="width:38%"></div></div><span class="bar-val">+0.38</span></div>
@@ -287,6 +289,9 @@ cardinal bench \
   <footer>
     Judge Coherence Benchmark v1 · cardinal-harness · 2026-07-05 ·
     single-domain corpus, n=20 pairs/axis — treat sub-0.1 gaps as ties ·
-    every number recomputable from receipts
+    every number recomputable from receipts ·
+    test–retest run: mean |ΔJUDGE| = 0.022, top-3 rank order stable, haiku
+    bit-identical; nano polarity did not replicate and its card above was
+    corrected (receipts: judge-bench-retest-2026-07-05)
   </footer>
 </div>

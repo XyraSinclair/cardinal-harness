@@ -78,3 +78,11 @@ harder than the mean) and nano to exactly 0.000 (spin survival 0/3 is a
 dead axis). The two aggregates agreeing on the top and disagreeing on the
 bottom is itself evidence the composite isn't an artifact of the averaging
 choice.
+
+## Erratum (2026-07-05 test–retest)
+
+The finding "nano fails polarity in SIGN (+0.38)" did NOT replicate: a
+fresh identical run measured −0.40. The stable claim is that nano
+cannot produce a reproducible polarity relation at all (±0.4 swing at
+temperature 0, vs ≤0.10 for every other model). See
+`../judge-bench-retest-2026-07-05/`.

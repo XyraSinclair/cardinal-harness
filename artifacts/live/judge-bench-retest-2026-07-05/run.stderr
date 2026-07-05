@@ -1,0 +1,102 @@
+benchmarking openai/gpt-5.4-mini ...
+model: openai/gpt-5.4-mini · template: canonical_v2
+  signal           +0.844 [+0.496, +1.191] nats (n=20)  → 0.570
+  order-flip       +0.250 [+0.112, +0.469] rate (n=20)  → 0.750
+  order-residual   +0.299 [+0.157, +0.441] nats (n=20)  → 0.741
+  frustration      +0.034 curl fraction (n=13)  → 0.966
+  spin-survival    +0.667 [+0.208, +0.939] rate (n=3)  → 0.667
+  susceptibility   +0.531 [+0.085, +0.977] nats/spin (n=5)
+  polarity         -0.405 spearman (n=8)  → 0.702
+  paraphrase       +0.857 spearman (n=8)  → 0.929
+  null-bias        +0.000 [+0.000, +0.000] nats (n=4)  → 1.000
+  nuisance         +0.431 [+0.195, +0.668] nats (n=24)  → 0.650
+    nuisance:whitespace   +0.234 nats (n=6)
+    nuisance:markdown     +0.754 nats (n=6)
+    nuisance:bullet       +0.246 nats (n=6)
+    nuisance:halo         +0.492 nats (n=6)
+  coherence 0.808 (harmonic 0.785) · JUDGE SCORE 0.461 · 138 comparisons (0 cached) · 0 refusals · $0.0540
+benchmarking openai/gpt-5.4-nano ...
+model: openai/gpt-5.4-nano · template: canonical_v2
+  signal           +0.506 [+0.347, +0.664] nats (n=20)  → 0.397
+  order-flip       +0.350 [+0.181, +0.567] rate (n=20)  → 0.650
+  order-residual   +0.309 [+0.200, +0.418] nats (n=20)  → 0.734
+  frustration      +0.318 curl fraction (n=13)  → 0.682
+  spin-survival    +0.000 [+0.000, +0.562] rate (n=3)  → 0.000
+  susceptibility   +1.066 [+0.797, +1.334] nats/spin (n=5)
+  polarity         -0.405 spearman (n=8)  → 0.702
+  paraphrase       +0.476 spearman (n=8)  → 0.738
+  null-bias        +0.000 [+0.000, +0.000] nats (n=4)  → 1.000
+  nuisance         +0.548 [+0.377, +0.720] nats (n=24)  → 0.578
+    nuisance:whitespace   +0.386 nats (n=6)
+    nuisance:markdown     +0.647 nats (n=6)
+    nuisance:bullet       +0.567 nats (n=6)
+    nuisance:halo         +0.594 nats (n=6)
+  coherence 0.627 (harmonic 0.000) · JUDGE SCORE 0.249 · 138 comparisons (0 cached) · 0 refusals · $0.0145
+benchmarking google/gemini-2.5-flash ...
+model: google/gemini-2.5-flash · template: canonical_v2
+  signal           +1.038 [+0.686, +1.391] nats (n=20)  → 0.646
+  order-flip       +0.100 [+0.028, +0.301] rate (n=20)  → 0.900
+  order-residual   +0.242 [+0.146, +0.337] nats (n=20)  → 0.785
+  frustration      +0.054 curl fraction (n=13)  → 0.946
+  spin-survival    +1.000 [+0.438, +1.000] rate (n=3)  → 1.000
+  susceptibility   +0.222 [+0.053, +0.392] nats/spin (n=5)
+  polarity         -0.714 spearman (n=8)  → 0.857
+  paraphrase       +0.976 spearman (n=8)  → 0.988
+  null-bias        +0.000 [+0.000, +0.000] nats (n=4)  → 1.000
+  nuisance         +0.600 [+0.296, +0.904] nats (n=24)  → 0.549
+    nuisance:whitespace   +0.217 nats (n=6)
+    nuisance:markdown     +0.605 nats (n=6)
+    nuisance:bullet       +0.744 nats (n=6)
+    nuisance:halo         +0.834 nats (n=6)
+  coherence 0.883 (harmonic 0.849) · JUDGE SCORE 0.570 · 138 comparisons (0 cached) · 0 refusals · $0.0257
+benchmarking deepseek/deepseek-v4-flash ...
+model: deepseek/deepseek-v4-flash · template: canonical_v2
+  signal           +0.661 [+0.412, +0.910] nats (n=20)  → 0.484
+  order-flip       +0.200 [+0.081, +0.416] rate (n=20)  → 0.800
+  order-residual   +0.269 [+0.142, +0.395] nats (n=20)  → 0.764
+  frustration      +0.081 curl fraction (n=13)  → 0.919
+  spin-survival    +1.000 [+0.438, +1.000] rate (n=3)  → 1.000
+  susceptibility   +0.502 [+0.328, +0.676] nats/spin (n=5)
+  polarity         -0.762 spearman (n=8)  → 0.881
+  paraphrase       +0.952 spearman (n=8)  → 0.976
+  null-bias        +0.000 [+0.000, +0.000] nats (n=4)  → 1.000
+  nuisance         +0.511 [+0.264, +0.759] nats (n=24)  → 0.600
+    nuisance:whitespace   +0.565 nats (n=6)
+    nuisance:markdown     +0.779 nats (n=6)
+    nuisance:bullet       +0.516 nats (n=6)
+    nuisance:halo         +0.186 nats (n=6)
+  coherence 0.880 (harmonic 0.854) · JUDGE SCORE 0.425 · 138 comparisons (0 cached) · 0 refusals · $0.0160
+benchmarking anthropic/claude-haiku-4.5 ...
+model: anthropic/claude-haiku-4.5 · template: canonical_v2
+  signal           +0.756 [+0.522, +0.990] nats (n=20)  → 0.530
+  order-flip       +0.100 [+0.028, +0.301] rate (n=20)  → 0.900
+  order-residual   +0.084 [+0.034, +0.135] nats (n=20)  → 0.919
+  frustration      +0.032 curl fraction (n=13)  → 0.968
+  spin-survival    +1.000 [+0.438, +1.000] rate (n=3)  → 1.000
+  susceptibility   +0.320 [+0.134, +0.506] nats/spin (n=5)
+  polarity         -0.810 spearman (n=8)  → 0.905
+  paraphrase       +0.833 spearman (n=8)  → 0.917
+  null-bias        +0.000 [+0.000, +0.000] nats (n=3)  → 1.000
+  nuisance         +0.080 [-0.008, +0.168] nats (n=24)  → 0.923
+    nuisance:whitespace   +0.000 nats (n=6)
+    nuisance:markdown     +0.000 nats (n=6)
+    nuisance:bullet       +0.087 nats (n=6)
+    nuisance:halo         +0.232 nats (n=6)
+  coherence 0.946 (harmonic 0.944) · JUDGE SCORE 0.502 · 138 comparisons (0 cached) · 2 refusals · $0.1979
+benchmarking anthropic/claude-sonnet-4.6 ...
+model: anthropic/claude-sonnet-4.6 · template: canonical_v2
+  signal           +0.829 [+0.578, +1.079] nats (n=20)  → 0.563
+  order-flip       +0.000 [+0.000, +0.161] rate (n=20)  → 1.000
+  order-residual   +0.098 [+0.036, +0.160] nats (n=20)  → 0.906
+  frustration      +0.005 curl fraction (n=13)  → 0.995
+  spin-survival    +1.000 [+0.438, +1.000] rate (n=3)  → 1.000
+  susceptibility   +0.309 [+0.124, +0.495] nats/spin (n=5)
+  polarity         -0.929 spearman (n=8)  → 0.964
+  paraphrase       +0.905 spearman (n=8)  → 0.952
+  null-bias        +0.000 [+0.000, +0.000] nats (n=4)  → 1.000
+  nuisance         +0.080 [+0.032, +0.128] nats (n=24)  → 0.923
+    nuisance:whitespace   +0.013 nats (n=6)
+    nuisance:markdown     +0.140 nats (n=6)
+    nuisance:bullet       +0.086 nats (n=6)
+    nuisance:halo         +0.080 nats (n=6)
+  coherence 0.970 (harmonic 0.969) · JUDGE SCORE 0.546 · 138 comparisons (0 cached) · 0 refusals · $0.2579

@@ -1,0 +1,7 @@
+rank model                                JUDGE  signal coherence   flip   curl    spin   pol ρ   cost $
+1    google/gemini-2.5-flash              0.570   1.038     0.883  0.100  0.054   1.000  -0.714   0.0257
+2    anthropic/claude-sonnet-4.6          0.546   0.829     0.970  0.000  0.005   1.000  -0.929   0.2579
+3    anthropic/claude-haiku-4.5           0.502   0.756     0.946  0.100  0.032   1.000  -0.810   0.1979
+4    openai/gpt-5.4-mini                  0.461   0.844     0.808  0.250  0.034   0.667  -0.405   0.0540
+5    deepseek/deepseek-v4-flash           0.425   0.661     0.880  0.200  0.081   1.000  -0.762   0.0160
+6    openai/gpt-5.4-nano                  0.249   0.506     0.627  0.350  0.318   0.000  -0.405   0.0145
