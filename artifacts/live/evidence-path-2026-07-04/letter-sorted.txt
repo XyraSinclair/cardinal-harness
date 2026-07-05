@@ -1,0 +1,8 @@
+0.052±0.014	measure twice, cut once
+0.037±0.013	premature optimization is the root of all evil
+0.033±0.014	practice makes perfect
+0.031±0.014	if it ain't broke, don't fix it
+0.029±0.013	don't put all your eggs in one basket
+0.016±0.013	a bird in the hand is worth two in the bush
+0.014±0.013	a chain is only as strong as its weakest link
+0.000±0.013	too many cooks spoil the broth
