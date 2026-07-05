@@ -347,3 +347,53 @@ async fn explain_proposes_candidates_via_llm() {
     assert!(stderr.contains("proposed 2 candidate"), "stderr: {stderr}");
     assert!(stderr.contains("metallic lustre"), "stderr: {stderr}");
 }
+
+#[tokio::test(flavor = "multi_thread")]
+async fn weigh_produces_normalized_ahp_priority_vector() {
+    // The star judge sees attribute descriptions as entities; more '*'
+    // in the description = more important. Weights must come out ordered
+    // and sum to 1.
+    let server = start_server().await;
+    let dir = std::env::temp_dir().join(format!("cardinal-weigh-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let output = run_cardinal(
+        &server.uri(),
+        &[
+            "weigh",
+            "--goal",
+            "maximum shine",
+            "--attribute",
+            "gold=shiny GOLD standard",
+            "--attribute",
+            "tin=dull TIN afterthought",
+            "--attribute",
+            "silver=bright SILVER middle",
+            "--model",
+            "test/judge",
+            "--budget",
+            "24",
+            "--cache",
+            dir.join("weigh.sqlite").to_str().unwrap(),
+            "--json",
+        ],
+        "",
+    );
+    assert!(
+        output.status.success(),
+        "stderr: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let parsed: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    let weights = parsed["weights"].as_array().unwrap();
+    assert_eq!(weights.len(), 3);
+    let total: f64 = weights.iter().map(|w| w["weight"].as_f64().unwrap()).sum();
+    assert!((total - 1.0).abs() < 1e-9, "weights sum to 1: {total}");
+    // Ordered by the sort: gold > silver > tin, ratio-scale spread.
+    assert_eq!(weights[0]["attribute"], "gold");
+    assert_eq!(weights[2]["attribute"], "tin");
+    assert!(
+        weights[0]["weight"].as_f64().unwrap() > weights[2]["weight"].as_f64().unwrap() * 1.5,
+        "priority vector must be ratio-scale, not flat: {weights:?}"
+    );
+    let _ = std::fs::remove_dir_all(&dir);
+}

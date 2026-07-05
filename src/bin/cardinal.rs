@@ -144,6 +144,39 @@ enum Commands {
         #[arg(long)]
         estimate: bool,
     },
+    /// AHP: weigh attributes against a goal via pairwise comparisons
+    ///
+    /// Attributes are entities too: each is judged pairwise on "importance
+    /// for the goal", and the solver's log-latents are the log priority
+    /// vector — softmax gives normalized ratio-scale weights (the
+    /// least-squares analog of Saaty's eigenvector). Feed the weights back
+    /// into multi-attribute reranking.
+    Weigh {
+        /// The goal the attributes serve
+        #[arg(long)]
+        goal: String,
+        /// Attribute as name=description (repeatable, at least 2)
+        #[arg(long = "attribute")]
+        attributes: Vec<String>,
+        /// Model slug (OpenRouter)
+        #[arg(long)]
+        model: Option<String>,
+        /// Prompt template (canonical_v2, ratio_letter_v1, ...)
+        #[arg(long)]
+        template: Option<String>,
+        /// Maximum pairwise comparisons
+        #[arg(long)]
+        budget: Option<usize>,
+        /// RNG seed
+        #[arg(long, default_value_t = 7)]
+        seed: u64,
+        /// SQLite cache path
+        #[arg(long)]
+        cache: Option<PathBuf>,
+        /// Emit weights as JSON on stdout
+        #[arg(long)]
+        json: bool,
+    },
     /// Measure a model's pure elicitation artifacts with null pairs
     ///
     /// Presents byte-identical text in both slots of the ratio-letter
@@ -627,6 +660,120 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }
             }
+        }
+        Commands::Weigh {
+            goal,
+            attributes,
+            model,
+            template,
+            budget,
+            seed,
+            cache,
+            json,
+        } => {
+            if attributes.len() < 2 {
+                return Err("need at least 2 --attribute name=description entries".into());
+            }
+            if std::env::var("OPENROUTER_API_KEY").is_err() {
+                return Err("OPENROUTER_API_KEY is not set. Create a key at \
+                     https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
+                    .into());
+            }
+            let parsed: Vec<(String, String)> = attributes
+                .iter()
+                .map(|raw| match raw.split_once('=') {
+                    Some((name, text)) => (name.trim().to_string(), text.trim().to_string()),
+                    None => (raw.trim().to_string(), raw.trim().to_string()),
+                })
+                .collect();
+            let documents: Vec<cardinal_harness::rerank::RerankDocument> = parsed
+                .iter()
+                .map(|(name, text)| cardinal_harness::rerank::RerankDocument {
+                    id: name.clone(),
+                    text: format!("{name}: {text}"),
+                })
+                .collect();
+            let criterion = format!(
+                "importance for achieving this goal: {goal}. Judge how much more one \
+                 consideration matters than the other for that goal specifically — not in \
+                 general, not for other goals."
+            );
+
+            let gateway = Arc::new(ProviderGateway::from_env(Arc::new(NoopUsageSink))?);
+            let cache_path = cache.unwrap_or_else(SqlitePairwiseCache::default_path);
+            let cache_store = SqlitePairwiseCache::new(cache_path)?;
+            let execution = cardinal_harness::rerank::RerankExecution::new(
+                gateway,
+                Attribution::new("cardinal::weigh"),
+            )
+            .cache(&cache_store)
+            .run_options(RerankRunOptions {
+                rng_seed: Some(seed),
+                cache_only: false,
+            });
+            let opts = cardinal_harness::rerank::SortOptions {
+                model,
+                comparison_budget: budget,
+                prompt_template_slug: template,
+                ..Default::default()
+            };
+            let sorted =
+                cardinal_harness::rerank::sort_documents(documents, &criterion, execution, opts)
+                    .await?;
+
+            // Softmax of log-latents: normalized ratio-scale weights.
+            let max_latent = sorted
+                .items
+                .iter()
+                .map(|item| item.latent_mean)
+                .fold(f64::NEG_INFINITY, f64::max);
+            let unnormalized: Vec<f64> = sorted
+                .items
+                .iter()
+                .map(|item| (item.latent_mean - max_latent).exp())
+                .collect();
+            let z: f64 = unnormalized.iter().sum();
+
+            if json {
+                let weights: Vec<serde_json::Value> = sorted
+                    .items
+                    .iter()
+                    .zip(unnormalized.iter())
+                    .map(|(item, u)| {
+                        serde_json::json!({
+                            "attribute": item.id,
+                            "weight": u / z,
+                            "latent_mean": item.latent_mean,
+                            "latent_std": item.latent_std,
+                        })
+                    })
+                    .collect();
+                println!(
+                    "{}",
+                    serde_json::to_string_pretty(&serde_json::json!({
+                        "goal": goal,
+                        "weights": weights,
+                    }))?
+                );
+            } else {
+                for (item, u) in sorted.items.iter().zip(unnormalized.iter()) {
+                    println!(
+                        "{:>7.4}  {}  ({:+.3} ± {:.3})",
+                        u / z,
+                        item.id,
+                        item.latent_mean,
+                        item.latent_std
+                    );
+                }
+            }
+            let meta = &sorted.meta;
+            eprintln!(
+                "weighed {} attributes for goal \"{goal}\" · {} comparisons ({} cached) · ${:.4}",
+                sorted.items.len(),
+                meta.comparisons_used,
+                meta.comparisons_cached,
+                meta.provider_cost_nanodollars as f64 / 1e9,
+            );
         }
         Commands::Calibrate { models, nulls, out } => {
             if std::env::var("OPENROUTER_API_KEY").is_err() {

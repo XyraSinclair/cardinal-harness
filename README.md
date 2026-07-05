@@ -373,6 +373,7 @@ list or request JSON
 - [docs/BENCHMARKS.md](docs/BENCHMARKS.md): scaling harness and current dense-solver receipt
 - [docs/TESTING.md](docs/TESTING.md): the adversarial test battery — what it attacks, the two solver bugs it found, and the honest negatives it pinned
 - [docs/WHAT_WHY_HOW.md](docs/WHAT_WHY_HOW.md): the one-page shareable version — exactly what this is good for, why, and how, with receipts for every claim
+- [docs/FIRST_PRINCIPLES.md](docs/FIRST_PRINCIPLES.md): the type system of structured judgement — the instrument grid (arity × scale × output-form), the invariance group of a belief, efficiency theory, and the honest occupancy map of which cells this repo fills
 - [docs/COMPARISON.md](docs/COMPARISON.md): how this relates to RankGPT-style listwise ranking, pairwise preference prompting, Bradley–Terry/Elo aggregation, and query-relevance rerankers
 
 ## License
