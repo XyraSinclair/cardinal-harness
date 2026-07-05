@@ -88,6 +88,8 @@ is a fixed point of the transformations that shouldn't matter. The group:
 | **framing spin** (persuasive preamble pushing a side) | ✓ `cardinal judge --spin`: the same pair under neutral, pro-first, and pro-second requester framings × both orders; reports susceptibility χ in nats and whether the belief survives — "if you spin it, do they still agree" made a receipt |
 | **temperature** | ✗ never swept — one JSD data point (t=0 logprobs vs t=1 samples, 0.128 on gpt-5.4-mini) is a hint, not a map |
 | **reasoning effort / thinking params** | ✗ never swept; we only know reasoning models refuse logprobs |
+| **wording of the ratio question** (times-more ↔ fraction ↔ times-less: the group inverses on (ℝ₊,×)) | ✓ `judge --wordings` + live receipt: frontier models keep the SIGN (inversion works) but the fraction wording elicits +0.35…+0.92 nats larger magnitudes — human ratio-bias reproduced in machines; magnitudes are wording-calibrated, not absolute |
+| **nuisance edits** (whitespace, markdown, bullets, prestige halo) | ✓ bench axis 9 + live receipts: Anthropic near-blind (0.08–0.09 nats), prestige suffix moves gpt-5.4-mini 0.878 nats |
 | judge model | ◐ seriate probe compares models; no standing cross-model receipt in cardinal runs |
 | time (same judge, days apart) | ✗ |
 
@@ -96,11 +98,11 @@ The stability axes we cover, we cover with receipts; the remaining ✗ rows
 
 The invariance group is now also an INSTRUMENT: `cardinal bench` (the Judge
 Coherence Benchmark, docs/BENCHMARK.md) runs order swap, reciprocal
-antisymmetry, frustration, spin, polarity, paraphrase, and null calibration
-as a standardized 114-call battery per model, × a signal axis, → one
-leaderboard number labs can hill-climb without ground-truth labels. The
-benchmark validates itself against five scripted pathological judges in
-`tests/judge_bench.rs`.
+antisymmetry, frustration, spin, polarity, paraphrase, null calibration,
+and nuisance perturbation as a standardized 138-call battery per model,
+× a signal axis, → one leaderboard number labs can hill-climb without
+ground-truth labels. The benchmark validates itself against six scripted
+pathological judges in `tests/judge_bench.rs`.
 
 ## 5½. The physics of a judge (receipts, not metaphors)
 
@@ -111,7 +113,7 @@ a computable receipt:
 |---|---|---|
 | **Frustration** (spin glass) | cyclic preference structure no scores can satisfy (A>B>C>A) | ✓ `judgement_frustration_mean` — the Hodge curl fraction Σλr²/Σλμ² of the log-ratio edge field, shipped; transitive judge ≈ quantization floor, planted rock-paper-scissors > 0.3 |
 | **Hysteresis** | path dependence: judging A→B vs B→A | ✓ order-residual in nats + flip counts |
-| **Susceptibility** | response to a small applied field: framing spin | ✓ `judge --spin`: χ = (m₊ − m₋)/2 nats per unit spin, plus a survives/echoes verdict; a scripted sycophant judge is caught in tests, a framing-blind judge measures χ = 0 |
+| **Susceptibility** | response to a small applied field: framing spin | ✓ `judge --spin` (secant) and `judge --sweep` (fitted slope + linearity R² over field −3…+3); separates rigid / linear / threshold / pressure-reactant judges |
 | **Temperature/entropy** | PMF spread per judgement; annealing across sampling temperature | ◐ entropy computable from stored PMFs; sweep unmeasured |
 | **Ground state** | the solved scores: minimum-energy potential for the field | ✓ the solver itself |
 | **Relaxation** | drift of the same judgement re-asked over time | ✗ |

@@ -1,0 +1,24 @@
+{
+  "readings": [
+    {
+      "template": "canonical_v2",
+      "mean_log_ratio": 1.1314021114911006,
+      "refusals": 0
+    },
+    {
+      "template": "fraction_v1",
+      "mean_log_ratio": 1.641707173002886,
+      "refusals": 0
+    },
+    {
+      "template": "less_v1",
+      "mean_log_ratio": 1.2461893323133506,
+      "refusals": 0
+    }
+  ],
+  "max_disagreement_nats": 0.5103050615117855,
+  "sign_consistent": true,
+  "comparisons": 6,
+  "comparisons_cached": 0,
+  "cost_nanodollars": 9420000
+}
