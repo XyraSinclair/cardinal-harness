@@ -165,6 +165,9 @@ async fn rerank_records_trace_for_cached_comparison() {
         input_tokens: None,
         output_tokens: None,
         provider_cost_nanodollars: None,
+        log_ratio_mean: None,
+        log_ratio_var: None,
+        visible_mass: None,
     };
     let value_ba = CachedJudgement {
         higher_ranked: Some("B".to_string()),
@@ -174,6 +177,9 @@ async fn rerank_records_trace_for_cached_comparison() {
         input_tokens: None,
         output_tokens: None,
         provider_cost_nanodollars: None,
+        log_ratio_mean: None,
+        log_ratio_var: None,
+        visible_mass: None,
     };
 
     cache.put(&key_ab, &value_ab).await.unwrap();
@@ -266,6 +272,9 @@ async fn seeded_swapped_trace_matches_presented_cache_key() {
         input_tokens: None,
         output_tokens: None,
         provider_cost_nanodollars: None,
+        log_ratio_mean: None,
+        log_ratio_var: None,
+        visible_mass: None,
     };
     cache.put(&key_ba, &value_ba).await.unwrap();
 

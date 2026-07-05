@@ -154,6 +154,18 @@ pub struct RerankMeta {
     /// Counterbalanced pairs whose two orders disagreed on direction.
     #[serde(default)]
     pub position_flips: usize,
+    /// Judgements that carried PMF-derived evidence moments (ratio-letter
+    /// path) into the solver.
+    #[serde(default)]
+    pub evidence_judgements: usize,
+    /// Evidence judgements whose PMF came from answer-token logprobs
+    /// (the rest degraded to sampled mode, loudly).
+    #[serde(default)]
+    pub logprob_mode_judgements: usize,
+    /// Mean probability mass visible at the answer position across
+    /// evidence judgements.
+    #[serde(default)]
+    pub evidence_visible_mass_mean: Option<f64>,
 
     /// Why the rerank loop stopped.
     pub stop_reason: RerankStopReason,
@@ -476,6 +488,18 @@ pub struct MultiRerankMeta {
     /// direction — a direct, per-run measurement of position bias.
     #[serde(default)]
     pub position_flips: usize,
+    /// Judgements that carried PMF-derived evidence moments (ratio-letter
+    /// path) into the solver.
+    #[serde(default)]
+    pub evidence_judgements: usize,
+    /// Evidence judgements whose PMF came from answer-token logprobs
+    /// (the rest degraded to sampled mode, loudly).
+    #[serde(default)]
+    pub logprob_mode_judgements: usize,
+    /// Mean probability mass visible at the answer position across
+    /// evidence judgements.
+    #[serde(default)]
+    pub evidence_visible_mass_mean: Option<f64>,
 
     /// Why the rerank loop stopped.
     pub stop_reason: RerankStopReason,

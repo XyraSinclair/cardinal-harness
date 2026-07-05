@@ -128,6 +128,9 @@ pub(crate) fn meta_from_multi(meta: super::types::MultiRerankMeta) -> RerankMeta
         entities_pruned: meta.entities_pruned,
         pairs_counterbalanced: meta.pairs_counterbalanced,
         position_flips: meta.position_flips,
+        evidence_judgements: meta.evidence_judgements,
+        logprob_mode_judgements: meta.logprob_mode_judgements,
+        evidence_visible_mass_mean: meta.evidence_visible_mass_mean,
         stop_reason: meta.stop_reason,
     }
 }

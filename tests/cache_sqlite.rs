@@ -13,6 +13,12 @@ struct ExportRow {
     input_tokens: Option<u32>,
     output_tokens: Option<u32>,
     provider_cost_nanodollars: Option<i64>,
+    #[allow(dead_code)]
+    log_ratio_mean: Option<f64>,
+    #[allow(dead_code)]
+    log_ratio_var: Option<f64>,
+    #[allow(dead_code)]
+    visible_mass: Option<f64>,
 }
 
 #[tokio::test]
@@ -41,6 +47,9 @@ async fn sqlite_cache_put_get_and_export_increments_hit_count() {
         input_tokens: Some(10),
         output_tokens: Some(5),
         provider_cost_nanodollars: Some(123),
+        log_ratio_mean: None,
+        log_ratio_var: None,
+        visible_mass: None,
     };
 
     cache.put(&key, &value).await.unwrap();
@@ -116,6 +125,9 @@ async fn sqlite_cache_prune_max_rows_keeps_most_recent() {
         input_tokens: None,
         output_tokens: None,
         provider_cost_nanodollars: None,
+        log_ratio_mean: None,
+        log_ratio_var: None,
+        visible_mass: None,
     };
 
     cache.put(&old_key, &value).await.unwrap();

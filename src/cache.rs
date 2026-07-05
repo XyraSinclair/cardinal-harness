@@ -133,6 +133,13 @@ pub struct CachedJudgement {
     pub input_tokens: Option<u32>,
     pub output_tokens: Option<u32>,
     pub provider_cost_nanodollars: Option<i64>,
+    /// PMF-derived signed log-ratio mean (presented A-over-B coordinates);
+    /// present only for evidence-mode judgements.
+    pub log_ratio_mean: Option<f64>,
+    /// PMF-derived log-ratio variance.
+    pub log_ratio_var: Option<f64>,
+    /// Probability mass visible at the answer position.
+    pub visible_mass: Option<f64>,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -198,6 +205,10 @@ impl SqlitePairwiseCache {
              );",
         )?;
         ensure_column(&conn, "template_hash", "TEXT NOT NULL DEFAULT ''")?;
+        // Evidence-moment columns (PMF-derived judgements, seriate path).
+        ensure_column(&conn, "log_ratio_mean", "REAL")?;
+        ensure_column(&conn, "log_ratio_var", "REAL")?;
+        ensure_column(&conn, "visible_mass", "REAL")?;
 
         Ok(Self {
             path,
@@ -254,7 +265,7 @@ impl PairwiseCache for SqlitePairwiseCache {
             conn.with_conn(|conn| {
                 let mut stmt = conn.prepare(
                     "SELECT higher_ranked, ratio, confidence, refused, input_tokens, output_tokens,\
-                            provider_cost_nanodollars \
+                            provider_cost_nanodollars, log_ratio_mean, log_ratio_var, visible_mass \
                      FROM pairwise_cache WHERE key_hash = ?1",
                 )?;
                 let mut rows = stmt.query(params![key_hash])?;
@@ -267,6 +278,9 @@ impl PairwiseCache for SqlitePairwiseCache {
                         input_tokens: row.get::<_, Option<i64>>(4)?.map(|v| v as u32),
                         output_tokens: row.get::<_, Option<i64>>(5)?.map(|v| v as u32),
                         provider_cost_nanodollars: row.get::<_, Option<i64>>(6)?,
+                        log_ratio_mean: row.get::<_, Option<f64>>(7)?,
+                        log_ratio_var: row.get::<_, Option<f64>>(8)?,
+                        visible_mass: row.get::<_, Option<f64>>(9)?,
                     };
                     conn.execute(
                         "UPDATE pairwise_cache \
@@ -297,8 +311,8 @@ impl PairwiseCache for SqlitePairwiseCache {
                         entity_a_id, entity_b_id, entity_a_hash, entity_b_hash,\
                         higher_ranked, ratio, confidence, refused,\
                         input_tokens, output_tokens, provider_cost_nanodollars,\
-                        created_at, updated_at\
-                     ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19)\
+                        created_at, updated_at, log_ratio_mean, log_ratio_var, visible_mass\
+                     ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19, ?20, ?21, ?22)\
                      ON CONFLICT(key_hash) DO UPDATE SET \
                         higher_ranked = excluded.higher_ranked,\
                         ratio = excluded.ratio,\
@@ -307,7 +321,10 @@ impl PairwiseCache for SqlitePairwiseCache {
                         input_tokens = excluded.input_tokens,\
                         output_tokens = excluded.output_tokens,\
                         provider_cost_nanodollars = excluded.provider_cost_nanodollars,\
-                        updated_at = excluded.updated_at",
+                        updated_at = excluded.updated_at,\
+                        log_ratio_mean = excluded.log_ratio_mean,\
+                        log_ratio_var = excluded.log_ratio_var,\
+                        visible_mass = excluded.visible_mass",
                     params![
                         key.key_hash,
                         key.model,
@@ -328,6 +345,9 @@ impl PairwiseCache for SqlitePairwiseCache {
                         value.provider_cost_nanodollars,
                         now,
                         now,
+                        value.log_ratio_mean,
+                        value.log_ratio_var,
+                        value.visible_mass,
                     ],
                 )?;
                 Ok(())

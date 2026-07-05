@@ -103,6 +103,9 @@ pub struct ComparisonUsage {
     pub question_text: Option<String>,
     pub raw_output: Option<String>,
     pub output_logprobs: Option<Vec<TokenLogprob>>,
+    /// PMF-derived log-ratio moments (ratio-letter path); the solver
+    /// consumes these as explicit-precision observations when present.
+    pub evidence_moments: Option<EvidenceMoments>,
     pub pairwise_logprob_posterior: Option<PairwiseLogprobPosterior>,
 }
 
@@ -148,12 +151,22 @@ impl PairwiseComparisonSpec<'_> {
 
     #[must_use]
     pub fn cache_key(self) -> PairwiseCacheKey {
-        let template = self.prompt_template();
-        let template_hash = template.template_hash();
+        // The ratio-letter path renders via seriate; its cache identity is
+        // the seriate template hash, not a cardinal template.
+        let (slug, template_hash) =
+            if self.attribute.prompt_template_slug == Some(RATIO_LETTER_SLUG) {
+                (
+                    RATIO_LETTER_SLUG,
+                    ratio_letter_template_fingerprint().to_string(),
+                )
+            } else {
+                let template = self.prompt_template();
+                (template.slug, template.template_hash())
+            };
         PairwiseCacheKey::from_parts(PairwiseCacheKeyParts {
             model: self.model,
             prompt_template: PairwiseCacheTemplate {
-                slug: template.slug,
+                slug,
                 template_hash: &template_hash,
             },
             attribute: PairwiseCacheAttribute {
@@ -494,6 +507,44 @@ fn extract_json(raw: &str) -> &str {
 
     trimmed
 }
+/// Prompt-template slug for the seriate single-token ratio-letter
+/// instrument: one completion position's top-k logprobs ARE the judgement
+/// PMF. Rendering and parsing are delegated to `seriate` — cardinal never
+/// duplicates the prompt text, so the two cannot drift.
+pub const RATIO_LETTER_SLUG: &str = "ratio_letter_v1";
+
+/// PMF-derived log-ratio moments for one judgement, in PRESENTED
+/// (A-over-B) coordinates. Carried alongside the point judgement so the
+/// solver can weight by measured variance instead of stated confidence.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct EvidenceMoments {
+    /// Expected signed log-ratio (positive: presented slot A has more).
+    pub log_ratio_mean: f64,
+    /// Variance of the signed log-ratio under the judgement PMF.
+    pub log_ratio_var: f64,
+    /// Probability mass visible at the answer position.
+    pub visible_mass: f64,
+    /// True when the PMF came from logprobs; false when from a sampled
+    /// point (loud degradation).
+    pub logprob_mode: bool,
+}
+
+/// Stable template fingerprint for the ratio-letter path, derived from the
+/// seriate instrument's own content-addressed template hash (so a change to
+/// seriate's prompt text changes cardinal's cache identity automatically).
+fn ratio_letter_template_fingerprint() -> &'static str {
+    use std::sync::OnceLock;
+    static FINGERPRINT: OnceLock<String> = OnceLock::new();
+    FINGERPRINT.get_or_init(|| {
+        use seriate::instrument::Instrument as _;
+        let instrument = seriate::instrument::ratio_letter::RatioLetterInstrument;
+        let attribute = seriate::Attribute::new("fingerprint", "fingerprint");
+        let a = seriate::Entity::new("A");
+        let b = seriate::Entity::new("B");
+        instrument.render(&attribute, &a, &b).template.0 .0.clone()
+    })
+}
+
 // =============================================================================
 // LLM comparison
 // =============================================================================
@@ -504,6 +555,9 @@ pub async fn compare_pair(
     cache: Option<&dyn PairwiseCache>,
     request: PairwiseComparisonRequest<'_>,
 ) -> Result<(PairwiseJudgement, ComparisonUsage), ComparisonError> {
+    if request.spec.attribute.prompt_template_slug == Some(RATIO_LETTER_SLUG) {
+        return compare_pair_ratio_letter(gateway, cache, request).await;
+    }
     let prompt_instance = request.spec.prompt_instance();
     let cache_key = cache.map(|_| request.spec.cache_key());
 
@@ -522,6 +576,7 @@ pub async fn compare_pair(
                         raw_output: None,
                         output_logprobs: None,
                         pairwise_logprob_posterior: None,
+                        evidence_moments: evidence_moments_from_cached(&hit),
                     };
                     return Ok((judgement, usage));
                 }
@@ -592,6 +647,7 @@ pub async fn compare_pair(
             raw_output: Some(response.content.clone()),
             output_logprobs: None,
             pairwise_logprob_posterior: None,
+            evidence_moments: None,
         };
 
         match parse_pairwise_response(
@@ -803,6 +859,193 @@ fn should_use_json_mode(model: &str) -> bool {
     model.starts_with("openai/") || !model.contains('/')
 }
 
+/// The seriate ratio-letter path: one single-token call whose answer-position
+/// top-k logprobs are parsed into a judgement PMF. The point judgement
+/// (direction, ratio, confidence) is DERIVED from the PMF so every existing
+/// surface (traces, counterbalance flip stats, cache) keeps working, while
+/// the PMF moments ride in `ComparisonUsage::evidence_moments` and enter the
+/// solver with measured variance.
+async fn compare_pair_ratio_letter(
+    gateway: &dyn ChatGateway,
+    cache: Option<&dyn PairwiseCache>,
+    request: PairwiseComparisonRequest<'_>,
+) -> Result<(PairwiseJudgement, ComparisonUsage), ComparisonError> {
+    use seriate::instrument::Instrument as _;
+
+    let cache_key = cache.map(|_| request.spec.cache_key());
+    if let (Some(cache), Some(ref key)) = (cache, &cache_key) {
+        match cache.get(key).await {
+            Ok(Some(hit)) => {
+                if let Some(judgement) = cached_to_judgement(&hit) {
+                    let usage = ComparisonUsage {
+                        input_tokens: 0,
+                        output_tokens: 0,
+                        provider_cost_nanodollars: 0,
+                        provider_cost_is_estimate: false,
+                        cached: true,
+                        prompt_text: None,
+                        question_text: None,
+                        raw_output: None,
+                        output_logprobs: None,
+                        pairwise_logprob_posterior: None,
+                        evidence_moments: evidence_moments_from_cached(&hit),
+                    };
+                    return Ok((judgement, usage));
+                }
+            }
+            Ok(None) => {}
+            Err(err) => {
+                if request.cache_only {
+                    return Err(ComparisonError::Cache(err));
+                }
+                warn!(error = %err, "Cache read failed; falling back to live comparison");
+            }
+        }
+    }
+    if request.cache_only {
+        return Err(ComparisonError::CacheMiss(
+            "cache_only is enabled and no cached judgement was found".to_string(),
+        ));
+    }
+
+    let instrument = seriate::instrument::ratio_letter::RatioLetterInstrument;
+    let attribute =
+        seriate::Attribute::new(request.spec.attribute.id, request.spec.attribute.prompt);
+    let entity_a = seriate::Entity::new(request.spec.entity_a.text);
+    let entity_b = seriate::Entity::new(request.spec.entity_b.text);
+    let rendered = instrument.render(&attribute, &entity_a, &entity_b);
+
+    let messages = vec![
+        crate::gateway::Message::system(rendered.system.clone()),
+        crate::gateway::Message::user(rendered.user.clone()),
+    ];
+    let base_request = ChatRequest::new(
+        ChatModel::openrouter(request.spec.model),
+        messages,
+        request.attribution.clone(),
+    )
+    // Single-letter answer; 16 is the observed provider floor (OpenAI
+    // responses path rejects smaller — logprob reality map, 2026-07-04).
+    .max_tokens(16);
+
+    let mut input_tokens_total = 0u32;
+    let mut output_tokens_total = 0u32;
+    let mut provider_cost_total = 0i64;
+    let mut provider_cost_is_estimate = false;
+
+    // Attempt 1: with logprobs. If the provider rejects the PARAMETER
+    // (reasoning-class models 400 on it), degrade loudly to a sampled call.
+    let with_logprobs = base_request.clone().with_logprobs(20);
+    let response = match gateway.chat(with_logprobs).await {
+        Ok(response) => response,
+        Err(err) if format!("{err}").to_ascii_lowercase().contains("logprob") => {
+            warn!(model = request.spec.model, error = %err,
+                "provider rejects logprobs; degrading to sampled mode");
+            gateway.chat(base_request.clone()).await?
+        }
+        Err(err) => return Err(err.into()),
+    };
+    input_tokens_total = input_tokens_total.saturating_add(response.input_tokens);
+    output_tokens_total = output_tokens_total.saturating_add(response.output_tokens);
+    provider_cost_total = provider_cost_total.saturating_add(response.cost_nanodollars);
+    provider_cost_is_estimate |= response.cost_is_estimate;
+
+    // Adapt cardinal logprob positions to seriate's shape.
+    let seriate_logprobs: Option<Vec<seriate::TokenLogprob>> =
+        response.output_logprobs.as_ref().map(|positions| {
+            positions
+                .iter()
+                .map(|position| seriate::TokenLogprob {
+                    token: position.token.clone(),
+                    logprob: position.logprob,
+                    top: position
+                        .top_alternatives
+                        .iter()
+                        .map(|alt| (alt.token.clone(), alt.logprob))
+                        .collect(),
+                })
+                .collect()
+        });
+
+    let prompt_text = format!("{}\n---\n{}", rendered.system, rendered.user);
+    let mut usage = ComparisonUsage {
+        input_tokens: input_tokens_total,
+        output_tokens: output_tokens_total,
+        provider_cost_nanodollars: provider_cost_total,
+        provider_cost_is_estimate,
+        cached: false,
+        prompt_text: Some(prompt_text),
+        question_text: Some(request.spec.attribute.prompt.to_string()),
+        raw_output: Some(response.content.clone()),
+        output_logprobs: fallback_stored_logprobs(response.output_logprobs.as_deref()),
+        pairwise_logprob_posterior: None,
+        evidence_moments: None,
+    };
+
+    let parsed = match instrument.parse(&response.content, seriate_logprobs.as_deref()) {
+        Ok(parsed) => parsed,
+        Err(err) => {
+            warn!(error = %err, "ratio-letter parse failed; treating as refusal");
+            let judgement = PairwiseJudgement::Refused;
+            if let (Some(cache), Some(ref key)) = (cache, &cache_key) {
+                let entry = judgement_to_cached(&judgement, &usage);
+                let _ = cache.put(key, &entry).await;
+            }
+            return Ok((judgement, usage));
+        }
+    };
+
+    if parsed.health.refused {
+        let judgement = PairwiseJudgement::Refused;
+        if let (Some(cache), Some(ref key)) = (cache, &cache_key) {
+            let entry = judgement_to_cached(&judgement, &usage);
+            let _ = cache.put(key, &entry).await;
+        }
+        return Ok((judgement, usage));
+    }
+
+    let Some((mean, var)) = parsed.evidence.log_ratio_moments() else {
+        warn!("ratio-letter evidence has no informative mass; treating as refusal");
+        let judgement = PairwiseJudgement::Refused;
+        if let (Some(cache), Some(ref key)) = (cache, &cache_key) {
+            let entry = judgement_to_cached(&judgement, &usage);
+            let _ = cache.put(key, &entry).await;
+        }
+        return Ok((judgement, usage));
+    };
+
+    usage.evidence_moments = Some(EvidenceMoments {
+        log_ratio_mean: mean,
+        log_ratio_var: var,
+        visible_mass: parsed.health.visible_mass,
+        logprob_mode: parsed.mode == seriate::AcquisitionMode::Logprob,
+    });
+
+    // Point summary DERIVED from the PMF, for every point-shaped surface.
+    let (p_a, _parity, p_b) = parsed
+        .evidence
+        .directional_summary()
+        .unwrap_or((0.5, 0.0, 0.5));
+    let higher_ranked = if mean >= 0.0 {
+        HigherRanked::A
+    } else {
+        HigherRanked::B
+    };
+    let confidence = if mean >= 0.0 { p_a } else { p_b }.clamp(0.0, 1.0);
+    let ratio = mean.abs().exp().clamp(1.0, 26.0);
+    let judgement = PairwiseJudgement::Observation {
+        higher_ranked,
+        ratio,
+        confidence,
+    };
+
+    if let (Some(cache), Some(ref key)) = (cache, &cache_key) {
+        let entry = judgement_to_cached(&judgement, &usage);
+        let _ = cache.put(key, &entry).await;
+    }
+    Ok((judgement, usage))
+}
+
 fn judgement_to_cached(judgement: &PairwiseJudgement, usage: &ComparisonUsage) -> CachedJudgement {
     match judgement {
         PairwiseJudgement::Refused => CachedJudgement {
@@ -813,6 +1056,9 @@ fn judgement_to_cached(judgement: &PairwiseJudgement, usage: &ComparisonUsage) -
             input_tokens: Some(usage.input_tokens),
             output_tokens: Some(usage.output_tokens),
             provider_cost_nanodollars: Some(usage.provider_cost_nanodollars),
+            log_ratio_mean: None,
+            log_ratio_var: None,
+            visible_mass: None,
         },
         PairwiseJudgement::Observation {
             higher_ranked,
@@ -829,8 +1075,23 @@ fn judgement_to_cached(judgement: &PairwiseJudgement, usage: &ComparisonUsage) -
             input_tokens: Some(usage.input_tokens),
             output_tokens: Some(usage.output_tokens),
             provider_cost_nanodollars: Some(usage.provider_cost_nanodollars),
+            log_ratio_mean: usage.evidence_moments.map(|m| m.log_ratio_mean),
+            log_ratio_var: usage.evidence_moments.map(|m| m.log_ratio_var),
+            visible_mass: usage.evidence_moments.map(|m| m.visible_mass),
         },
     }
+}
+
+/// Reconstruct evidence moments from a cache hit (evidence-mode rows only).
+fn evidence_moments_from_cached(hit: &CachedJudgement) -> Option<EvidenceMoments> {
+    Some(EvidenceMoments {
+        log_ratio_mean: hit.log_ratio_mean?,
+        log_ratio_var: hit.log_ratio_var?,
+        visible_mass: hit.visible_mass?,
+        // Cached moments came from a logprob-mode call; sampled-mode
+        // judgements carry no moments.
+        logprob_mode: true,
+    })
 }
 
 #[cfg(test)]

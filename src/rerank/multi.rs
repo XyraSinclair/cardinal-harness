@@ -307,7 +307,9 @@ pub fn validate_multi_rerank_request(req: &MultiRerankRequest) -> Result<(), Mul
             )));
         }
         if let Some(slug) = a.prompt_template_slug.as_deref() {
-            if prompt_by_slug(slug).is_none() {
+            if slug != crate::rerank::comparison::RATIO_LETTER_SLUG
+                && prompt_by_slug(slug).is_none()
+            {
                 return Err(MultiRerankError::InvalidRequest(format!(
                     "unknown prompt_template_slug: {slug}"
                 )));
@@ -612,6 +614,10 @@ pub async fn multi_rerank(
     let mut counterbalance_done: HashSet<(usize, usize, usize)> = HashSet::new();
     let mut pairs_counterbalanced: usize = 0;
     let mut position_flips: usize = 0;
+    // Evidence-mode receipts (ratio-letter path).
+    let mut evidence_judgements: usize = 0;
+    let mut logprob_mode_judgements: usize = 0;
+    let mut visible_mass_sum: f64 = 0.0;
     let mut presentation_rng = execution
         .run_options
         .rng_seed
@@ -1004,7 +1010,36 @@ pub async fn multi_rerank(
                         HigherRanked::A => (task.i, task.j),
                         HigherRanked::B => (task.j, task.i),
                     };
-                    let obs = Observation::new(obs_i, obs_j, ratio, confidence, rater_id, 1.0);
+                    // PMF-derived moments (ratio-letter path): the solver
+                    // gets the measured mean and variance directly, with
+                    // stated confidence out of the loop. Moments arrive in
+                    // PRESENTED coordinates; a swapped presentation flips
+                    // the sign (reflection is exact for the letter algebra).
+                    let obs = if let Some(moments) = usage.evidence_moments {
+                        evidence_judgements += 1;
+                        if moments.logprob_mode {
+                            logprob_mode_judgements += 1;
+                        }
+                        visible_mass_sum += moments.visible_mass;
+                        let mean_ij = if task.swapped {
+                            -moments.log_ratio_mean
+                        } else {
+                            moments.log_ratio_mean
+                        };
+                        // Variance floor: a delta-certain PMF must not claim
+                        // infinite precision against the rest of the graph.
+                        const EVIDENCE_VAR_FLOOR: f64 = 1e-3;
+                        Observation::from_log_ratio_moments(
+                            task.i,
+                            task.j,
+                            mean_ij,
+                            moments.log_ratio_var.max(EVIDENCE_VAR_FLOOR),
+                            rater_id,
+                            1.0,
+                        )
+                    } else {
+                        Observation::new(obs_i, obs_j, ratio, confidence, rater_id, 1.0)
+                    };
                     if let Err(e) = manager.add_observation(attr_id, obs) {
                         tracing::warn!(
                             attribute_id = %attr_id,
@@ -1281,6 +1316,13 @@ pub async fn multi_rerank(
         entities_pruned: manager.explore_pruned_count(),
         pairs_counterbalanced,
         position_flips,
+        evidence_judgements,
+        logprob_mode_judgements,
+        evidence_visible_mass_mean: if evidence_judgements > 0 {
+            Some(visible_mass_sum / evidence_judgements as f64)
+        } else {
+            None
+        },
         stop_reason,
     };
 

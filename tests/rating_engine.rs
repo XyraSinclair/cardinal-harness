@@ -124,8 +124,7 @@ fn explicit_precision_dominates_stated_confidence_in_conflict() {
     // fused edge; with symmetric stated confidences instead, the claims
     // cancel to a near-tie. This pins the precision channel as a real,
     // separate weighting path — not a relabeled g(c).
-    let mut engine =
-        RatingEngine::new(2, AttributeParams::default(), sim_raters(), None).unwrap();
+    let mut engine = RatingEngine::new(2, AttributeParams::default(), sim_raters(), None).unwrap();
     engine.ingest(&[
         Observation::new(0, 1, 4.0, 0.5, "sim", 1.0),
         Observation::from_log_ratio_moments(0, 1, 0.25f64.ln(), 0.001, "sim", 1.0),
@@ -152,19 +151,20 @@ fn explicit_precision_dominates_stated_confidence_in_conflict() {
 #[test]
 fn moments_constructor_sign_semantics() {
     // Negative mean log-ratio: j has more; the solve must respect it.
-    let mut engine =
-        RatingEngine::new(2, AttributeParams::default(), sim_raters(), None).unwrap();
+    let mut engine = RatingEngine::new(2, AttributeParams::default(), sim_raters(), None).unwrap();
     engine.ingest(&[Observation::from_log_ratio_moments(
         0, 1, -1.0, 0.05, "sim", 1.0,
     )]);
     let scores = engine.solve().scores;
-    assert!(scores[1] > scores[0], "negative mean means j wins: {scores:?}");
+    assert!(
+        scores[1] > scores[0],
+        "negative mean means j wins: {scores:?}"
+    );
 }
 
 #[test]
 fn degenerate_precision_is_skipped_not_poisonous() {
-    let mut engine =
-        RatingEngine::new(2, AttributeParams::default(), sim_raters(), None).unwrap();
+    let mut engine = RatingEngine::new(2, AttributeParams::default(), sim_raters(), None).unwrap();
     let mut bad = Observation::from_log_ratio_moments(0, 1, 1.0, 0.05, "sim", 1.0);
     bad.precision = Some(f64::NAN);
     engine.ingest(&[bad]);
