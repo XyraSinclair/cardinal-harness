@@ -7,6 +7,29 @@ Versioning once it reaches `1.0.0`.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-07-04
+
+### Added
+- The seriate evidence path (`--template ratio_letter_v1`): single-token
+  ratio-letter elicitation whose answer-position top-k logprobs form the
+  judgement PMF; rendering/parsing delegated to the `seriate` crate (no
+  prompt duplication, cache identity derived from seriate's content-
+  addressed template hash).
+- Explicit-precision observations: `Observation::from_log_ratio_moments`
+  feeds PMF mean/variance into the IRLS solver directly, replacing the
+  `g(c)` stated-confidence mapping for evidence-mode judgements.
+- Evidence health receipts in response meta and the sort summary line:
+  `evidence_judgements`, `logprob_mode_judgements`,
+  `evidence_visible_mass_mean`.
+- Loud degradation: providers that reject the logprobs parameter
+  (reasoning-class models) or silently omit logprobs fall back to sampled
+  mode, visibly in the receipts.
+- Cache schema: nullable `log_ratio_mean` / `log_ratio_var` /
+  `visible_mass` columns; evidence moments survive cache replay.
+- Live receipt: at equal budget and cost on gpt-5.4-mini the PMF path
+  yields ~3x the top-to-bottom separation per dollar (4.0 sigma vs 1.4
+  sigma); instruments agree at Spearman 0.74 — documented honestly.
+
 ## [0.5.0] - 2026-07-02
 
 ### Added

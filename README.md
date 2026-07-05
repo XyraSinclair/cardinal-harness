@@ -79,6 +79,26 @@ run replays offline, keyless, for $0 via `--cache-only`.
 `--format json|jsonl|csv`, `--scores`, `--reverse`, `--trace trace.jsonl`.
 A sort where every comparison fails refuses to print, loudly.
 
+## The evidence path: logprobs as judgements
+
+With `--template ratio_letter_v1`, each comparison asks for ONE letter from
+a 52-token alphabet (case = which item, letter = magnitude on the ladder,
+`A` = parity, `!` = refuse) — so a single completion position's top-k
+logprobs are the model's **full judgement PMF**. The solver then weights
+each observation by its **measured variance** instead of a stated
+confidence. Rendering, parsing, and mass accounting are delegated to
+[seriate](https://github.com/XyraSinclair/seriate); where a provider hides
+or rejects logprobs, the path degrades loudly to sampled mode and the run
+summary says so (`evidence: 63/63 logprob-mode, visible 0.99`).
+
+Live head-to-head at equal budget and cost on gpt-5.4-mini
+([receipts](artifacts/live/evidence-path-2026-07-04/)): top-to-bottom
+separation **≈4.0σ vs ≈1.4σ** for the canonical JSON path — roughly 3× the
+resolving power per dollar, because each call consumes the model's prior
+instead of one sample from it. Caveats in the receipt pack, including that
+the two instruments induce correlated but not identical orderings
+(Spearman 0.74) — different elicitations tap different priors.
+
 ## Healthy elicitation, by default
 
 Most LLM-annotation pathologies are invisible unless you deliberately measure
