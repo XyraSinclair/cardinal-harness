@@ -93,7 +93,7 @@ async fn pareto_front_and_correlations_reflect_a_planted_trade_off() {
 
     // Trade-off roster: high-star/low-moon, balanced, low-star/high-moon,
     // and one strictly dominated straggler.
-    let entities = vec![
+    let entities = [
         ("s", "*****"),   // stars champion
         ("m", "ooooo"),   // moons champion
         ("b", "*** ooo"), // balanced — on the front

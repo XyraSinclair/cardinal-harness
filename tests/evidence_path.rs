@@ -504,7 +504,7 @@ async fn calibrate_catches_position_prior_and_clears_honest_judge() {
             .respond_with(NullJudge { biased })
             .mount(&server)
             .await;
-        let bin = option_env!("CARGO_BIN_EXE_cardinal").expect("bin path");
+        let bin = env!("CARGO_BIN_EXE_cardinal");
         let output = Command::new(bin)
             .args(["calibrate", "--models", "test/judge", "--nulls", "3"])
             .env("OPENROUTER_API_KEY", "sk-test")

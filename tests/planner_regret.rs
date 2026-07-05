@@ -188,6 +188,7 @@ fn random_cost(seed: u64, objective: Objective) -> usize {
 ///   fixed-budget benchmark below for the artifact-free picture, where
 ///   the planner WINS at scarce budgets (60), ties at 120, and slightly
 ///   trails at 180.
+///
 /// The pin is two-sided so both silent regressions and silent
 /// improvements surface.
 #[test]
