@@ -155,9 +155,13 @@ enum Commands {
         /// The goal the attributes serve
         #[arg(long)]
         goal: String,
-        /// Attribute as name=description (repeatable, at least 2)
+        /// Attribute as name=description (repeatable; at least 2 unless --propose)
         #[arg(long = "attribute")]
         attributes: Vec<String>,
+        /// Automated AHP: ask the model to propose N considerations for the
+        /// goal, then weigh them (merges with any --attribute entries)
+        #[arg(long)]
+        propose: Option<usize>,
         /// Model slug (OpenRouter)
         #[arg(long)]
         model: Option<String>,
@@ -174,6 +178,44 @@ enum Commands {
         #[arg(long)]
         cache: Option<PathBuf>,
         /// Emit weights as JSON on stdout
+        #[arg(long)]
+        json: bool,
+    },
+    /// Find the attributes under which one item stands out from its peers
+    ///
+    /// The propagation primitive: given a set and a focal item, propose (or
+    /// supply) candidate attributes, MEASURE all of them over the whole set
+    /// with the counterbalanced pairwise machinery, and report where the
+    /// focal item actually lands per attribute — percentile and z-score,
+    /// best direction first. Proposals are hypotheses; the profile is the
+    /// receipt.
+    Distinguish {
+        /// Input file; '-' or omitted reads stdin (one item per line, or a
+        /// JSON array of strings / {id, text} objects)
+        input: Option<PathBuf>,
+        /// The focal item: 1-based line number, item id, or exact text
+        #[arg(long)]
+        focus: String,
+        /// Candidate attribute to measure (repeatable)
+        #[arg(long = "by")]
+        by: Vec<String>,
+        /// Ask the model to propose N distinguishing attributes for the
+        /// focal item (default 5 when no --by is given)
+        #[arg(long)]
+        propose: Option<usize>,
+        /// Model slug (OpenRouter)
+        #[arg(long)]
+        model: Option<String>,
+        /// Maximum pairwise comparisons across all attributes
+        #[arg(long)]
+        budget: Option<usize>,
+        /// RNG seed
+        #[arg(long, default_value_t = 7)]
+        seed: u64,
+        /// SQLite cache path
+        #[arg(long)]
+        cache: Option<PathBuf>,
+        /// Emit the full profile as JSON on stdout
         #[arg(long)]
         json: bool,
     },
@@ -668,6 +710,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Commands::Weigh {
             goal,
             attributes,
+            propose,
             model,
             template,
             budget,
@@ -675,26 +718,63 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             cache,
             json,
         } => {
-            if attributes.len() < 2 {
-                return Err("need at least 2 --attribute name=description entries".into());
+            if attributes.len() + propose.unwrap_or(0) < 2 {
+                return Err("need at least 2 attributes: --attribute name=description \
+                     entries and/or --propose <n>"
+                    .into());
             }
             if std::env::var("OPENROUTER_API_KEY").is_err() {
                 return Err("OPENROUTER_API_KEY is not set. Create a key at \
                      https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
                     .into());
             }
-            let parsed: Vec<(String, String)> = attributes
+            let gateway = Arc::new(ProviderGateway::from_env(Arc::new(NoopUsageSink))?);
+
+            let mut parsed: Vec<(String, String)> = attributes
                 .iter()
                 .map(|raw| match raw.split_once('=') {
                     Some((name, text)) => (name.trim().to_string(), text.trim().to_string()),
                     None => (raw.trim().to_string(), raw.trim().to_string()),
                 })
                 .collect();
+            if let Some(count) = propose {
+                let (proposed, usage) = cardinal_harness::rerank::propose_for_goal(
+                    gateway.as_ref(),
+                    model.as_deref().unwrap_or("openai/gpt-5.4-mini"),
+                    &goal,
+                    count,
+                    Attribution::new("cardinal::weigh::propose"),
+                )
+                .await?;
+                eprintln!(
+                    "proposed {} considerations for the goal (${:.4}):",
+                    proposed.len(),
+                    usage.cost_nanodollars as f64 / 1e9
+                );
+                for c in &proposed {
+                    eprintln!("  - {c}");
+                }
+                for c in proposed {
+                    let dup = parsed
+                        .iter()
+                        .any(|(name, text)| name.eq_ignore_ascii_case(&c) || text == &c);
+                    if !dup {
+                        parsed.push((c.clone(), c));
+                    }
+                }
+            }
+            if parsed.len() < 2 {
+                return Err("fewer than 2 distinct attributes after proposal".into());
+            }
             let documents: Vec<cardinal_harness::rerank::RerankDocument> = parsed
                 .iter()
                 .map(|(name, text)| cardinal_harness::rerank::RerankDocument {
                     id: name.clone(),
-                    text: format!("{name}: {text}"),
+                    text: if name == text {
+                        name.clone()
+                    } else {
+                        format!("{name}: {text}")
+                    },
                 })
                 .collect();
             let criterion = format!(
@@ -702,8 +782,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                  consideration matters than the other for that goal specifically — not in \
                  general, not for other goals."
             );
-
-            let gateway = Arc::new(ProviderGateway::from_env(Arc::new(NoopUsageSink))?);
             let cache_path = cache.unwrap_or_else(SqlitePairwiseCache::default_path);
             let cache_store = SqlitePairwiseCache::new(cache_path)?;
             let execution = cardinal_harness::rerank::RerankExecution::new(
@@ -778,6 +856,164 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 meta.comparisons_cached,
                 meta.provider_cost_nanodollars as f64 / 1e9,
             );
+        }
+        Commands::Distinguish {
+            input,
+            focus,
+            by,
+            propose,
+            model,
+            budget,
+            seed,
+            cache,
+            json,
+        } => {
+            let raw = read_sort_input(input.as_deref())?;
+            let documents = parse_sort_items(&raw)?;
+            if documents.len() < 3 {
+                return Err("distinguish requires at least 3 items (the focal item \
+                     and at least 2 peers)"
+                    .into());
+            }
+            if std::env::var("OPENROUTER_API_KEY").is_err() {
+                return Err("OPENROUTER_API_KEY is not set. Create a key at \
+                     https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
+                    .into());
+            }
+
+            // Resolve the focal item: 1-based line number, id, or exact text.
+            let focal_id = if let Ok(index) = focus.parse::<usize>() {
+                if index == 0 || index > documents.len() {
+                    return Err(format!(
+                        "--focus {index} out of range (1..={})",
+                        documents.len()
+                    )
+                    .into());
+                }
+                documents[index - 1].id.clone()
+            } else if let Some(doc) = documents.iter().find(|d| d.id == focus) {
+                doc.id.clone()
+            } else if let Some(doc) = documents.iter().find(|d| d.text == focus) {
+                doc.id.clone()
+            } else {
+                return Err(format!(
+                    "--focus \"{focus}\" matched no item (use a 1-based line \
+                     number, an item id, or the exact item text)"
+                )
+                .into());
+            };
+
+            let gateway = Arc::new(ProviderGateway::from_env(Arc::new(NoopUsageSink))?);
+
+            let mut candidates = by;
+            let propose_count = propose.unwrap_or(if candidates.is_empty() { 5 } else { 0 });
+            if propose_count > 0 {
+                let (proposed, usage) = cardinal_harness::rerank::propose_distinguishing(
+                    gateway.as_ref(),
+                    model.as_deref().unwrap_or("openai/gpt-5.4-mini"),
+                    &documents,
+                    &focal_id,
+                    propose_count,
+                    Attribution::new("cardinal::distinguish::propose"),
+                )
+                .await?;
+                eprintln!(
+                    "proposed {} distinguishing attributes (${:.4}):",
+                    proposed.len(),
+                    usage.cost_nanodollars as f64 / 1e9
+                );
+                for c in &proposed {
+                    eprintln!("  - {c}");
+                }
+                for c in proposed {
+                    if !candidates.iter().any(|have| have.eq_ignore_ascii_case(&c)) {
+                        candidates.push(c);
+                    }
+                }
+            }
+            if candidates.is_empty() {
+                return Err(
+                    "no candidate attributes: pass --by \"<attribute>\" (repeatable) \
+                     and/or --propose <n>"
+                        .into(),
+                );
+            }
+
+            let cache_path = cache.unwrap_or_else(SqlitePairwiseCache::default_path);
+            let cache_store = SqlitePairwiseCache::new(cache_path)?;
+            let execution = cardinal_harness::rerank::RerankExecution::new(
+                gateway,
+                Attribution::new("cardinal::distinguish"),
+            )
+            .cache(&cache_store)
+            .run_options(RerankRunOptions {
+                rng_seed: Some(seed),
+                cache_only: false,
+            });
+            let opts = cardinal_harness::rerank::ExplainOptions {
+                model,
+                comparison_budget: budget,
+                ..Default::default()
+            };
+            let focal_text = documents
+                .iter()
+                .find(|d| d.id == focal_id)
+                .map(|d| d.text.clone())
+                .unwrap_or_default();
+            let profile = cardinal_harness::rerank::differentiation_profile(
+                documents,
+                &focal_id,
+                candidates,
+                execution,
+                opts,
+            )
+            .await?;
+
+            if json {
+                println!("{}", serde_json::to_string_pretty(&profile)?);
+            } else {
+                let shown: String = focal_text.chars().take(72).collect();
+                println!("focal: {focal_id}  {shown}");
+                for attr in &profile.attributes {
+                    println!(
+                        "p{:<4.0} z{:+.2}  {}  ({:+.3} ± {:.3})",
+                        attr.percentile * 100.0,
+                        attr.z_score,
+                        attr.prompt,
+                        attr.latent_mean,
+                        attr.latent_std
+                    );
+                }
+                if let Some(best) = profile.attributes.first() {
+                    if best.percentile >= 0.7 {
+                        println!(
+                            "propagate under: \"{}\" — focal at p{:.0}, z {:+.2}",
+                            best.prompt,
+                            best.percentile * 100.0,
+                            best.z_score
+                        );
+                    } else {
+                        println!(
+                            "no measured standout: best attribute \"{}\" only places \
+                             the focal item at p{:.0}",
+                            best.prompt,
+                            best.percentile * 100.0
+                        );
+                    }
+                }
+            }
+            let meta = &profile.meta;
+            eprint!(
+                "profiled {} attributes · {} comparisons ({} cached) · ${:.4}",
+                profile.attributes.len(),
+                meta.comparisons_used,
+                meta.comparisons_cached,
+                meta.provider_cost_nanodollars as f64 / 1e9,
+            );
+            if let Some(f) = meta.judgement_frustration_mean {
+                eprint!(" · frustration {f:.3}");
+            }
+            eprintln!();
         }
         Commands::Calibrate { models, nulls, out } => {
             if std::env::var("OPENROUTER_API_KEY").is_err() {

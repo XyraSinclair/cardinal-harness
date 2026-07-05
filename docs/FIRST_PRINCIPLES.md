@@ -136,9 +136,11 @@ descriptions, judged under a meta-attribute ("importance for G"). The
 solver's log-latents ARE the log priority vector; softmax of latents gives
 normalized ratio-scale weights — the least-squares analog of Saaty's
 eigenvector. `cardinal weigh` ships this (see §9): goal in, attribute
-weights out, consumable directly by multi-attribute rerank. The full AHP
-hierarchy (goal → criteria → alternatives) is two chained applications of
-the same primitive.
+weights out, consumable directly by multi-attribute rerank. `weigh
+--propose N` automates the decomposition too: the model proposes the
+considerations, the weighing measures them — AHP end to end from a single
+goal sentence. The full AHP hierarchy (goal → criteria → alternatives) is
+two chained applications of the same primitive.
 
 ## 8. The canonical-attribute loop (the "ultimate loop")
 
@@ -159,6 +161,15 @@ span a multi-objective space. All pieces exist; the loop is composition:
 Status: steps 1–3 shipped with receipts; 4–5 are orchestration, not new
 math. This loop is the road from "sort my list" to "map my space" — and
 custom feeds are exactly a mapped space plus a standing AHP weighting.
+
+The focal-item inverse of this loop ships as `cardinal distinguish`
+(`differentiation_profile` in the library): given a set and one item,
+propose the attributes under which the item plausibly stands out, then
+MEASURE all of them over the whole set and report the item's percentile
+and z-score per attribute, best direction first. That is the propagation
+question made judgeable — "under which attribute does this deserve to
+travel far?" — answered by the counterbalanced pairwise machinery, never
+by the proposer's say-so.
 
 ## 9. The judgement ledger, counted (2026-07-05)
 

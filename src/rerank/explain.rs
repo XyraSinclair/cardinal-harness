@@ -250,8 +250,6 @@ pub async fn propose_candidates(
     how_many: usize,
     attribution: Attribution,
 ) -> Result<(Vec<String>, ProposalUsage), ExplainError> {
-    use crate::gateway::{ChatModel, ChatRequest, Message};
-
     let list = documents
         .iter()
         .enumerate()
@@ -268,6 +266,82 @@ pub async fn propose_candidates(
         "This list is ranked best-first. Propose exactly {how_many} candidate \
          attributes that might explain the ordering.\n\n<ranked_list>\n{list}\n</ranked_list>\n\njson:"
     );
+    propose_via_chat(gateway, model, system, user, attribution).await
+}
+
+/// Ask an LLM to decompose a goal into judgeable considerations — the
+/// automated front half of AHP. Returns short criterion strings ready to be
+/// weighed pairwise for importance (`cardinal weigh --propose`). Proposals
+/// are hypotheses; the weighing measures them.
+pub async fn propose_for_goal(
+    gateway: &dyn ChatGateway,
+    model: &str,
+    goal: &str,
+    how_many: usize,
+    attribution: Attribution,
+) -> Result<(Vec<String>, ProposalUsage), ExplainError> {
+    let system = "You decompose goals into judgeable considerations. Given a \
+        goal, propose the distinct considerations that most plausibly determine \
+        success at it. Each consideration must be a short, judgeable criterion \
+        phrase (2-8 words) usable in the question 'which of these two matters \
+        more for the goal?'. Considerations must be genuinely different from \
+        each other, not paraphrases, and must span the goal — include the \
+        unglamorous ones. Output only a JSON array of strings.";
+    let user = format!(
+        "Goal: {goal}\n\nPropose exactly {how_many} considerations that \
+         determine success at this goal.\n\njson:"
+    );
+    propose_via_chat(gateway, model, system, user, attribution).await
+}
+
+/// Ask an LLM to propose attributes on which one focal item stands out from
+/// its peers — candidate directions along which the item is worth
+/// propagating. Proposals are hypotheses; [`differentiation_profile`]
+/// measures them.
+pub async fn propose_distinguishing(
+    gateway: &dyn ChatGateway,
+    model: &str,
+    documents: &[RerankDocument],
+    focal_id: &str,
+    how_many: usize,
+    attribution: Attribution,
+) -> Result<(Vec<String>, ProposalUsage), ExplainError> {
+    let focal = documents
+        .iter()
+        .find(|d| d.id == focal_id)
+        .ok_or_else(|| ExplainError::ProposalParse(format!("no document with id {focal_id}")))?;
+    let peers = documents
+        .iter()
+        .filter(|d| d.id != focal_id)
+        .enumerate()
+        .map(|(i, d)| format!("{}. {}", i + 1, d.text))
+        .collect::<Vec<_>>()
+        .join("\n");
+    let system = "You distinguish one item from its peers. Given a focal item \
+        and a peer set, propose the distinct attributes on which the focal item \
+        most plausibly stands out — attributes under which judging the whole \
+        set would place the focal item at an extreme. Each attribute must be a \
+        short, judgeable criterion phrase (2-8 words) usable in the question \
+        'which of these two items has more of X?'. Attributes must be genuinely \
+        different from each other, not paraphrases. Output only a JSON array \
+        of strings.";
+    let user = format!(
+        "<focal_item>\n{}\n</focal_item>\n\n<peer_items>\n{peers}\n</peer_items>\n\n\
+         Propose exactly {how_many} attributes on which the focal item stands \
+         out from its peers.\n\njson:",
+        focal.text
+    );
+    propose_via_chat(gateway, model, system, user, attribution).await
+}
+
+async fn propose_via_chat(
+    gateway: &dyn ChatGateway,
+    model: &str,
+    system: &str,
+    user: String,
+    attribution: Attribution,
+) -> Result<(Vec<String>, ProposalUsage), ExplainError> {
+    use crate::gateway::{ChatModel, ChatRequest, Message};
 
     let response = gateway
         .chat(ChatRequest {
@@ -297,6 +371,148 @@ pub async fn propose_candidates(
         cost_nanodollars: response.cost_nanodollars,
     };
     Ok((parsed, usage))
+}
+
+/// One attribute's measured differentiation receipt for a focal item.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AttributeDifferentiation {
+    /// Attribute id used in traces and cache keys (`distinguish_<n>`).
+    pub attribute_id: String,
+    /// The attribute prompt that was measured.
+    pub prompt: String,
+    /// Focal item's percentile among the set on this attribute (0..1).
+    pub percentile: f64,
+    /// Focal item's robust z-score on this attribute.
+    pub z_score: f64,
+    /// Focal item's posterior latent mean.
+    pub latent_mean: f64,
+    /// Focal item's posterior latent std.
+    pub latent_std: f64,
+}
+
+/// Result of [`differentiation_profile`]: where does the focal item actually
+/// land, per candidate attribute, measured — not asserted.
+#[derive(Debug, Serialize)]
+pub struct DifferentiationProfile {
+    /// The focal entity id.
+    pub focal_id: String,
+    /// Per-attribute receipts, sorted by focal z-score descending: the top
+    /// entries are the measured directions along which the item stands out.
+    pub attributes: Vec<AttributeDifferentiation>,
+    /// Run metadata (comparisons, tokens, cost, counterbalancing flips,
+    /// frustration).
+    pub meta: RerankMeta,
+}
+
+/// Measure candidate attributes over the whole entity set and profile one
+/// focal item: its percentile and z-score per attribute, best direction
+/// first. The propagation primitive — "under which judgeable attribute does
+/// this item deserve to travel far?" — with the answer measured by the same
+/// counterbalanced pairwise machinery as everything else, never taken from
+/// the proposer's say-so.
+pub async fn differentiation_profile(
+    documents: Vec<RerankDocument>,
+    focal_id: &str,
+    candidates: Vec<String>,
+    execution: RerankExecution<'_>,
+    opts: ExplainOptions,
+) -> Result<DifferentiationProfile, ExplainError> {
+    let n = documents.len();
+    if n < 3 {
+        return Err(ExplainError::TooFewItems(n));
+    }
+    if candidates.is_empty() {
+        return Err(ExplainError::NoCandidates);
+    }
+    if !documents.iter().any(|d| d.id == focal_id) {
+        return Err(ExplainError::ProposalParse(format!(
+            "no document with id {focal_id}"
+        )));
+    }
+
+    let attributes: Vec<MultiRerankAttributeSpec> = candidates
+        .iter()
+        .enumerate()
+        .map(|(idx, prompt)| MultiRerankAttributeSpec {
+            id: format!("distinguish_{idx}"),
+            prompt: prompt.clone(),
+            prompt_template_slug: None,
+            weight: 1.0,
+        })
+        .collect();
+
+    let request = MultiRerankRequest {
+        entities: documents
+            .iter()
+            .map(|doc| MultiRerankEntity {
+                id: doc.id.clone(),
+                text: doc.text.clone(),
+            })
+            .collect(),
+        attributes,
+        topk: MultiRerankTopKSpec {
+            // Whole-set resolution matters (percentiles, not one boundary);
+            // target the middle like whole-list sorts do.
+            k: n.div_ceil(2),
+            weight_exponent: 1.0,
+            tolerated_error: 0.1,
+            band_size: 5,
+            effective_resistance_max_active: 64,
+            stop_sigma_inflate: 1.25,
+            stop_min_consecutive: 2,
+            min_explore_degree: 2,
+            prune_p_topk_below: None,
+        },
+        gates: Vec::new(),
+        comparison_budget: opts.comparison_budget,
+        latency_budget_ms: None,
+        model: opts.model.clone(),
+        rater_id: None,
+        comparison_concurrency: opts.comparison_concurrency,
+        max_pair_repeats: None,
+        randomize_presentation_order: true,
+        counterbalance_pairs: opts.counterbalance,
+    };
+
+    let response = multi_rerank(request, execution).await?;
+
+    let focal = response
+        .entities
+        .iter()
+        .find(|entity| entity.id == focal_id)
+        .ok_or_else(|| {
+            ExplainError::ProposalParse(format!("focal id {focal_id} missing from result"))
+        })?;
+
+    let mut profile: Vec<AttributeDifferentiation> = candidates
+        .iter()
+        .enumerate()
+        .filter_map(|(idx, prompt)| {
+            let attribute_id = format!("distinguish_{idx}");
+            focal
+                .attribute_scores
+                .get(&attribute_id)
+                .map(|score| AttributeDifferentiation {
+                    attribute_id,
+                    prompt: prompt.clone(),
+                    percentile: score.percentile,
+                    z_score: score.z_score,
+                    latent_mean: score.latent_mean,
+                    latent_std: score.latent_std,
+                })
+        })
+        .collect();
+    profile.sort_by(|a, b| {
+        b.z_score
+            .partial_cmp(&a.z_score)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
+
+    Ok(DifferentiationProfile {
+        focal_id: focal_id.to_string(),
+        attributes: profile,
+        meta: simple::meta_from_multi(response.meta),
+    })
 }
 
 /// Projected gradient descent for `min ||Xw - y||²  s.t.  w >= 0`,

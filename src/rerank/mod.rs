@@ -38,8 +38,9 @@ pub use experiments::{
     PromptExperimentConfig, PromptExperimentError,
 };
 pub use explain::{
-    explain_ranking, propose_candidates, AttributeExplanation, ExplainError, ExplainOptions,
-    Explanation, ProposalUsage,
+    differentiation_profile, explain_ranking, propose_candidates, propose_distinguishing,
+    propose_for_goal, AttributeDifferentiation, AttributeExplanation, DifferentiationProfile,
+    ExplainError, ExplainOptions, Explanation, ProposalUsage,
 };
 pub use hooks::{
     ComparisonEvent, ComparisonObserver, ObserverError, WarmStartData, WarmStartError,

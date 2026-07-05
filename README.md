@@ -162,6 +162,19 @@ there, from most magic to most manual:
   measures candidate attributes (yours, plus LLM-proposed ones) with the
   normal pairwise machinery and reports which of them — alone and in fitted
   non-negative combination — reconstruct your order.
+- **`cardinal weigh --goal "ship v1 fast" --propose 6`** — automated AHP:
+  the model decomposes the goal into judgeable considerations (or you pass
+  `--attribute name=description` yourself), each pair is judged on
+  importance *for that goal*, and the solver's softmaxed log-latents come
+  out as a normalized ratio-scale priority vector — weights ready to feed
+  back into multi-attribute reranking.
+- **`cardinal distinguish list.txt --focus 12`** — the propagation
+  primitive: given a set and one focal item, propose (or pass `--by`)
+  candidate attributes, measure ALL of them over the whole set, and report
+  where the focal item actually lands per attribute — percentile and
+  z-score, best direction first. The proposal is a hypothesis; the measured
+  profile is the receipt. This is how you find the attribute under which a
+  differentiated item deserves to travel.
 
 A real explain receipt (preserved under
 [`artifacts/live/taste-tools-demo-2026-07-02/`](artifacts/live/taste-tools-demo-2026-07-02/)),

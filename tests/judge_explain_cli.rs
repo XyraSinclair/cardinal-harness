@@ -102,6 +102,13 @@ impl Respond for OmniJudge {
         } else if system.contains("analyze rankings") {
             // Candidate proposal.
             r#"["shininess", "metallic lustre"]"#.to_string()
+        } else if system.contains("decompose goals") {
+            // Goal decomposition for automated AHP; the metal words make the
+            // downstream pairwise importance judgements deterministic.
+            r#"["shiny GOLD standard", "bright SILVER middle"]"#.to_string()
+        } else if system.contains("distinguish one item") {
+            // Distinguishing-attribute proposal.
+            r#"["shininess", "metallic lustre"]"#.to_string()
         } else {
             // Pairwise judgement (ratio or ordinal template).
             let a = extract_between(&user_content, "<entity_A_context>", "</entity_A_context>")
@@ -395,5 +402,108 @@ async fn weigh_produces_normalized_ahp_priority_vector() {
         weights[0]["weight"].as_f64().unwrap() > weights[2]["weight"].as_f64().unwrap() * 1.5,
         "priority vector must be ratio-scale, not flat: {weights:?}"
     );
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn weigh_propose_runs_automated_ahp() {
+    // No --attribute at all: the model decomposes the goal into
+    // considerations, which are then weighed pairwise like any others.
+    let server = start_server().await;
+    let dir = std::env::temp_dir().join(format!("cardinal-weigh-ahp-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let output = run_cardinal(
+        &server.uri(),
+        &[
+            "weigh",
+            "--goal",
+            "maximum shine",
+            "--propose",
+            "2",
+            "--model",
+            "test/judge",
+            "--budget",
+            "24",
+            "--cache",
+            dir.join("weigh-ahp.sqlite").to_str().unwrap(),
+            "--json",
+        ],
+        "",
+    );
+    assert!(
+        output.status.success(),
+        "stderr: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let stderr = String::from_utf8(output.stderr).unwrap();
+    assert!(
+        stderr.contains("proposed 2 considerations"),
+        "stderr: {stderr}"
+    );
+    let parsed: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    let weights = parsed["weights"].as_array().unwrap();
+    assert_eq!(weights.len(), 2);
+    let total: f64 = weights.iter().map(|w| w["weight"].as_f64().unwrap()).sum();
+    assert!((total - 1.0).abs() < 1e-9, "weights sum to 1: {total}");
+    // The mock judge ranks GOLD above SILVER for shine.
+    assert!(
+        weights[0]["attribute"].as_str().unwrap().contains("GOLD"),
+        "gold-flavored consideration should dominate: {weights:?}"
+    );
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn distinguish_profiles_focal_item_measured() {
+    // The propagation primitive: propose attributes for the focal item, then
+    // MEASURE where it lands on each — the profile is the receipt, not the
+    // proposer's say-so. Focal item is the shiniest metal, so it must come
+    // out at the top percentile of both proposed attributes.
+    let server = start_server().await;
+    let dir = std::env::temp_dir().join(format!("cardinal-distinguish-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let output = run_cardinal(
+        &server.uri(),
+        &[
+            "distinguish",
+            "--focus",
+            "1",
+            "--model",
+            "test/judge",
+            "--budget",
+            "64",
+            "--cache",
+            dir.join("distinguish.sqlite").to_str().unwrap(),
+            "--json",
+        ],
+        "shiny GOLD ring\ndull TIN spoon\nplain BRONZE cup\nold SILVER coin\n",
+    );
+    assert!(
+        output.status.success(),
+        "stderr: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let stderr = String::from_utf8(output.stderr).unwrap();
+    assert!(
+        stderr.contains("proposed 2 distinguishing attributes"),
+        "stderr: {stderr}"
+    );
+    let parsed: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(parsed["focal_id"], "item-0000");
+    let attrs = parsed["attributes"].as_array().unwrap();
+    assert_eq!(attrs.len(), 2);
+    for attr in attrs {
+        let pct = attr["percentile"].as_f64().unwrap();
+        let z = attr["z_score"].as_f64().unwrap();
+        assert!(
+            pct >= 0.7,
+            "gold ring must measure near the top: percentile {pct} in {attr}"
+        );
+        assert!(z > 0.0, "positive standout required: z {z}");
+    }
+    // Sorted best-direction-first.
+    let z0 = attrs[0]["z_score"].as_f64().unwrap();
+    let z1 = attrs[1]["z_score"].as_f64().unwrap();
+    assert!(z0 >= z1, "profile must be sorted by z descending");
     let _ = std::fs::remove_dir_all(&dir);
 }
