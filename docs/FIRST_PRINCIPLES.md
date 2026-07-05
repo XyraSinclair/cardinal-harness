@@ -151,6 +151,35 @@ ladder geometry does. Design consequence: to lower quantization curl,
 elicit finer *distinctions* (PMF instruments already do), not finer rungs.
 Corrected 2026-07-05, same day — receipts over vibes.
 
+## 5¾. Respecting the group: from probes to estimator
+
+The invariance table above is diagnostic — it measures violations. The
+paradigm is respected one level deeper when the violations feed back into
+how beliefs are COMPUTED, the way experimental physics treats symmetry:
+
+1. **Systematics are modeled, not just flagged.** Wordings are instrument
+   channels with unknown gains; `gain_calibration::solve_with_template_gains`
+   fits per-template gains jointly with the scores (bilinear alternation,
+   reference channel pinned — the same gauge move as the additive score
+   constant). Live receipt (`artifacts/live/wording-gains-2026-07-05/`):
+   gains are per-model constants (sonnet fraction 1.43×, mini fraction
+   0.56×), sonnet's less-channel is calibrated to 1.009, and the residual
+   payoff column honestly reports where the linear gain model itself runs
+   out (gemini: 3% — its wording disagreement is not a pure gain).
+   Guarantees: no phantom gains on uniform data; a sign-incoherent channel
+   collapses rather than calibrates.
+2. **Estimators are group-averaged by construction.** Counterbalancing
+   already averages the order orbit; the order residual is now measured on
+   EVERY instrument (point answers included, not only PMF means), so each
+   run carries its own violation magnitude in nats.
+3. **Uncertainty is quoted experimentalist-style**: `cardinal sort` prints
+   an error budget — `stat ± (posterior)` · `syst order (nats/pair)` ·
+   `syst cyclic (% of energy)` — statistical and systematic components
+   side by side in their native units, never silently pooled. A belief
+   whose systematic terms dwarf its statistical term is not better
+   measured by more sampling; it is telling you which transformation to
+   fix.
+
 ## 6. Parameters, honestly
 
 Current posture: temperature pinned 0.0 for evidence calls, 1.0 for

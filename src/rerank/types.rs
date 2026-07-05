@@ -171,9 +171,11 @@ pub struct RerankMeta {
     /// evidence judgements.
     #[serde(default)]
     pub evidence_visible_mass_mean: Option<f64>,
-    /// Mean |sum of presented-coordinate log-ratio means| over pairs asked
-    /// in both orders: 0 for an unbiased judge; the magnitude of position
-    /// bias in log-ratio units.
+    /// Mean |sum of presented-coordinate log-ratios| over pairs asked in
+    /// both orders — ANY instrument (PMF means or point answers): 0 for an
+    /// unbiased judge; the magnitude of position bias in nats. This is the
+    /// order-axis SYSTEMATIC uncertainty of the run, to be read alongside
+    /// the statistical posterior stds.
     #[serde(default)]
     pub evidence_order_residual_mean_abs: Option<f64>,
     /// Mean curl fraction across attributes: the share of judgement energy
@@ -516,9 +518,11 @@ pub struct MultiRerankMeta {
     /// evidence judgements.
     #[serde(default)]
     pub evidence_visible_mass_mean: Option<f64>,
-    /// Mean |sum of presented-coordinate log-ratio means| over pairs asked
-    /// in both orders: 0 for an unbiased judge; the magnitude of position
-    /// bias in log-ratio units.
+    /// Mean |sum of presented-coordinate log-ratios| over pairs asked in
+    /// both orders — ANY instrument (PMF means or point answers): 0 for an
+    /// unbiased judge; the magnitude of position bias in nats. This is the
+    /// order-axis SYSTEMATIC uncertainty of the run, to be read alongside
+    /// the statistical posterior stds.
     #[serde(default)]
     pub evidence_order_residual_mean_abs: Option<f64>,
     /// Mean curl fraction across attributes: the share of judgement energy

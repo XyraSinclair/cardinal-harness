@@ -729,6 +729,32 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     meta.comparisons_refused,
                     serde_json::to_value(meta.stop_reason)?.as_str().unwrap_or("unknown"),
                 );
+                // Error budget, experimentalist-style: statistical and
+                // systematic components side by side, each in its native
+                // unit — never silently pooled.
+                {
+                    let stat = if sorted.items.is_empty() {
+                        None
+                    } else {
+                        Some(
+                            sorted.items.iter().map(|i| i.latent_std).sum::<f64>()
+                                / sorted.items.len() as f64,
+                        )
+                    };
+                    let mut parts: Vec<String> = Vec::new();
+                    if let Some(stat) = stat {
+                        parts.push(format!("stat ±{stat:.3} (posterior, mean)"));
+                    }
+                    if let Some(residual) = meta.evidence_order_residual_mean_abs {
+                        parts.push(format!("syst order {residual:.3} nats/pair"));
+                    }
+                    if let Some(hcr) = meta.judgement_frustration_mean {
+                        parts.push(format!("syst cyclic {:.1}% of energy", hcr * 100.0));
+                    }
+                    if parts.len() > 1 {
+                        eprintln!("error budget: {}", parts.join(" · "));
+                    }
+                }
                 for probe in &sorted.probes {
                     let kind = match probe.kind {
                         cardinal_harness::rerank::SortProbeKind::Opposite => "opposite",

@@ -1070,6 +1070,28 @@ pub async fn multi_rerank(
                             1.0,
                         )
                     } else {
+                        // Point-path order residual: same receipt as the
+                        // PMF path, from the presented-coordinate signed
+                        // log-ratio. An unbiased judge's two orders sum to
+                        // zero; the residual is position bias in nats.
+                        if req.counterbalance_pairs {
+                            let toward_presented_a = match effective {
+                                HigherRanked::A => 1.0,
+                                HigherRanked::B => -1.0,
+                            } * if task.swapped { -1.0 } else { 1.0 };
+                            let presented_m = toward_presented_a * ratio.max(1.0).ln();
+                            let entry =
+                                evidence_order_means.entry(task.key).or_insert([None, None]);
+                            let slot = task.swapped as usize;
+                            if entry[slot].is_none() {
+                                entry[slot] = Some(presented_m);
+                                if let [Some(unswapped), Some(swapped)] = *entry {
+                                    evidence_order_residual_sum_abs +=
+                                        (unswapped + swapped).abs();
+                                    evidence_order_residual_pairs += 1;
+                                }
+                            }
+                        }
                         Observation::new(obs_i, obs_j, ratio, confidence, rater_id, 1.0)
                     };
                     if let Err(e) = manager.add_observation(attr_id, obs) {
