@@ -107,6 +107,11 @@ enum Commands {
         /// position-bias receipt)
         #[arg(long)]
         no_counterbalance: bool,
+        /// Prompt template: canonical_v2 (default), canonical_bucket_v1, or
+        /// ratio_letter_v1 (single-token PMF evidence via answer logprobs;
+        /// degrades loudly to sampled mode where providers hide them)
+        #[arg(long)]
+        template: Option<String>,
         /// First expand the criterion into a precise judging rubric with one
         /// LLM call, print it to stderr, then sort by the rubric
         #[arg(long)]
@@ -365,6 +370,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             two_sided,
             also_by,
             no_counterbalance,
+            template,
             elaborate,
             prune_below,
             seed,
@@ -452,6 +458,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 two_sided,
                 also_by,
                 prune_p_topk_below: prune_below,
+                prompt_template_slug: template,
                 ..Default::default()
             };
             let criterion = if elaborate {
@@ -512,6 +519,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 } else {
                     ""
                 };
+                let evidence = if meta.evidence_judgements > 0 {
+                    format!(
+                        " · evidence: {}/{} logprob-mode, visible {:.2}",
+                        meta.logprob_mode_judgements,
+                        meta.evidence_judgements,
+                        meta.evidence_visible_mass_mean.unwrap_or(0.0)
+                    )
+                } else {
+                    String::new()
+                };
                 let flips = if meta.pairs_counterbalanced > 0 {
                     format!(
                         " · order flips: {}/{}",
@@ -521,7 +538,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     String::new()
                 };
                 eprintln!(
-                    "sorted {} items by \"{by}\" · {} comparisons ({} cached, {} refused) · {estimate}${cost_usd:.4}{flips} · stop: {}",
+                    "sorted {} items by \"{by}\" · {} comparisons ({} cached, {} refused) · {estimate}${cost_usd:.4}{flips}{evidence} · stop: {}",
                     sorted.items.len(),
                     meta.comparisons_used,
                     meta.comparisons_cached,

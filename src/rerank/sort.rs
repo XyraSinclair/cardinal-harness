@@ -81,6 +81,10 @@ pub struct SortOptions {
     /// of reaching the top-k falls below this threshold. Saves queries when
     /// only the top of the list matters. Off by default.
     pub prune_p_topk_below: Option<f64>,
+    /// Prompt template slug: `canonical_v2` (default), `canonical_bucket_v1`,
+    /// or `ratio_letter_v1` — the seriate single-token evidence path, where
+    /// answer-token logprobs enter the solver as measured variance.
+    pub prompt_template_slug: Option<String>,
 }
 
 impl Default for SortOptions {
@@ -96,6 +100,7 @@ impl Default for SortOptions {
             two_sided: false,
             also_by: Vec::new(),
             prune_p_topk_below: None,
+            prompt_template_slug: None,
         }
     }
 }
@@ -316,7 +321,7 @@ async fn sort_with_probes(
     let mut attributes = vec![MultiRerankAttributeSpec {
         id: SORT_ATTRIBUTE_ID.to_string(),
         prompt: criterion.to_string(),
-        prompt_template_slug: None,
+        prompt_template_slug: opts.prompt_template_slug.clone(),
         weight: 1.0,
     }];
     let mut probe_specs: Vec<(String, String, SortProbeKind)> = Vec::new();
@@ -528,6 +533,7 @@ pub fn sort_request(
         max_pair_repeats: opts.max_pair_repeats,
         counterbalance_pairs: opts.counterbalance,
         prune_p_topk_below: opts.prune_p_topk_below,
+        prompt_template_slug: opts.prompt_template_slug.clone(),
     }
 }
 

@@ -78,6 +78,11 @@ pub struct RerankRequest {
     /// [`MultiRerankTopKSpec::prune_p_topk_below`].
     #[serde(default)]
     pub prune_p_topk_below: Option<f64>,
+
+    /// Prompt template slug for the single attribute (e.g. `canonical_v2`,
+    /// `ratio_letter_v1` for the PMF evidence path).
+    #[serde(default)]
+    pub prompt_template_slug: Option<String>,
 }
 
 fn default_attribute_id() -> String {

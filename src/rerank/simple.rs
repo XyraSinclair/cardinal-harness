@@ -36,7 +36,7 @@ pub fn to_multi_request(req: &RerankRequest) -> MultiRerankRequest {
     let attributes = vec![MultiRerankAttributeSpec {
         id: req.attribute_id.clone(),
         prompt: attribute_prompt,
-        prompt_template_slug: None,
+        prompt_template_slug: req.prompt_template_slug.clone(),
         weight: 1.0,
     }];
 
