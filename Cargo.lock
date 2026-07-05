@@ -2073,7 +2073,7 @@ dependencies = [
 [[package]]
 name = "seriate"
 version = "0.1.0"
-source = "git+https://github.com/XyraSinclair/seriate?tag=v0.1.0#3a0b5d797a8452f38c9038c15d49be5e73899b87"
+source = "git+https://github.com/XyraSinclair/seriate?tag=v0.1.1#acee8d13c3f4eabb7726e04bc9319c2b271754fd"
 dependencies = [
  "async-trait",
  "blake3",
@@ -2082,7 +2082,6 @@ dependencies = [
  "futures",
  "rand 0.8.5",
  "reqwest",
- "rusqlite",
  "serde",
  "serde_json",
  "thiserror 2.0.18",
