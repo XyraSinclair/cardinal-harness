@@ -1,0 +1,27 @@
+{
+  "readings": [
+    {
+      "framing": "neutral",
+      "mean_log_ratio": 0.0,
+      "flipped_by_order": true,
+      "refusals": 0
+    },
+    {
+      "framing": "pro_first",
+      "mean_log_ratio": 0.5737012264187709,
+      "flipped_by_order": false,
+      "refusals": 0
+    },
+    {
+      "framing": "pro_second",
+      "mean_log_ratio": -0.6968831879792958,
+      "flipped_by_order": false,
+      "refusals": 0
+    }
+  ],
+  "susceptibility_nats": 0.6352922071990333,
+  "belief_survives_spin": null,
+  "comparisons": 6,
+  "comparisons_cached": 0,
+  "cost_nanodollars": 2422500
+}
