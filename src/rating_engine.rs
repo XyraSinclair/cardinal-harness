@@ -187,6 +187,14 @@ pub struct Observation {
     pub confidence: f64,
     pub rater_id: String,
     pub reps: f64,
+    /// Explicit information weight (1/variance in log-ratio space) for this
+    /// observation. When set, it REPLACES the confidence mapping `g(c)` in
+    /// the precision computation — this is the channel by which PMF-derived
+    /// evidence (e.g. answer-token logprob distributions, via seriate)
+    /// enters the solver with its measured variance instead of a stated
+    /// self-assessment. Rater reliability (beta) and attribute temperature
+    /// still scale it; they are orthogonal to per-judgement precision.
+    pub precision: Option<f64>,
 }
 
 impl Observation {
@@ -205,6 +213,31 @@ impl Observation {
             confidence,
             rater_id: rater_id.into(),
             reps,
+            precision: None,
+        }
+    }
+
+    /// Build an observation from log-ratio moments (mean, variance), as
+    /// produced by a judgement PMF. `log_ratio_mean` is signed relative to
+    /// `(i, j)`: positive means `i` has more of the attribute. `variance`
+    /// is floored by the caller; precision = 1/variance.
+    pub fn from_log_ratio_moments(
+        i: usize,
+        j: usize,
+        log_ratio_mean: f64,
+        variance: f64,
+        rater_id: impl Into<String>,
+        reps: f64,
+    ) -> Self {
+        Self {
+            i,
+            j,
+            ratio: log_ratio_mean.exp(),
+            // Unused when precision is set; kept sane for display paths.
+            confidence: 1.0,
+            rater_id: rater_id.into(),
+            reps,
+            precision: Some(1.0 / variance.max(f64::MIN_POSITIVE)),
         }
     }
 }
@@ -1342,7 +1375,14 @@ impl RatingEngine {
             let c = ob.confidence.clamp(0.0, 1.0);
             let reps = ob.reps.clamp(0.0, MAX_REPS);
 
-            let lam = (beta_r * g_of_c(c, &self.cfg) * reps) / t;
+            // Same precision channel as add_observations: explicit
+            // PMF-derived precision replaces the confidence map.
+            let per_judgement_weight = match ob.precision {
+                Some(p) if p.is_finite() && p > 0.0 => p,
+                Some(_) => continue,
+                None => g_of_c(c, &self.cfg),
+            };
+            let lam = (beta_r * per_judgement_weight * reps) / t;
             if !lam.is_finite() || lam <= 0.0 {
                 continue;
             }
@@ -1424,7 +1464,15 @@ impl RatingEngine {
             };
             let c = ob.confidence.clamp(0.0, 1.0);
             let reps = ob.reps.clamp(0.0, MAX_REPS);
-            let lam_new = (beta_r * g_of_c(c, &self.cfg) * reps) / t;
+            // Explicit PMF-derived precision replaces the confidence map;
+            // stated confidence is a self-assessment, measured variance is
+            // a measurement.
+            let per_judgement_weight = match ob.precision {
+                Some(p) if p.is_finite() && p > 0.0 => p,
+                Some(_) => continue,
+                None => g_of_c(c, &self.cfg),
+            };
+            let lam_new = (beta_r * per_judgement_weight * reps) / t;
             if !lam_new.is_finite() || lam_new <= 0.0 {
                 continue;
             }

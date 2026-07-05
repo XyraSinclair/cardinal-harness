@@ -273,6 +273,7 @@ dependencies = [
  "rusqlite",
  "serde",
  "serde_json",
+ "seriate",
  "statrs",
  "tempfile",
  "thiserror 2.0.18",
@@ -2067,6 +2068,26 @@ dependencies = [
  "serde",
  "serde_core",
  "zmij",
+]
+
+[[package]]
+name = "seriate"
+version = "0.1.0"
+source = "git+https://github.com/XyraSinclair/seriate?tag=v0.1.0#3a0b5d797a8452f38c9038c15d49be5e73899b87"
+dependencies = [
+ "async-trait",
+ "blake3",
+ "chrono",
+ "clap",
+ "futures",
+ "rand 0.8.5",
+ "reqwest",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "tokio",
+ "tracing",
 ]
 
 [[package]]
