@@ -52,10 +52,15 @@ counterbalanced pairwise machinery:
 | 7 | **paraphrase** | Spearman ρ of scores vs a reworded attribute | ρ | (1 + ρ)/2 |
 | 8 | **null bias** | mean \|log-ratio\| on identical-item pairs | nats | e^(−x) |
 
-**Composite**: `coherence` = mean of available consistency subscores
-(1,2,3,4,6,7,8); **`JUDGE SCORE` = signal-subscore × coherence.**
-Multiplicative on purpose: zero discrimination or zero consistency zeroes
-the headline.
+**Composite**: `coherence` = mean of the consistency axes, where **order
+flip and order residual enter as ONE reciprocity axis** (their mean) —
+they are measured from the same two calls per pair, and counting them
+twice would double-credit a position-bias fix. The frustration axis is
+**coverage-gated**: refused judgements vanish from the comparison graph,
+so refusing on the hardest pairs would launder cyclicity into apparent
+transitivity — curl only counts when ≥95% of core calls were answered.
+**`JUDGE SCORE` = signal-subscore × coherence.** Multiplicative on
+purpose: zero discrimination or zero consistency zeroes the headline.
 
 ## Why it is hard to game
 
@@ -92,6 +97,35 @@ Every rate carries its denominator and a 95% interval (Wilson for rates,
 difference". Raw per-call receipts ship in the JSONL output
 (`--out reports.jsonl`) so any number in the table can be recomputed from
 the judgements themselves.
+
+## Adversarial review (what a lab gaming this would try)
+
+A full red-team of this design lives in
+`notes/ideation-2026-07-05/benchmark-adversary.md`. The attacks already
+neutralized in v1: consistency-without-signal (multiplicative composite),
+content-blind hashing (polarity/paraphrase cross-check), position bias
+(fused signal cancels + null pairs), local-consistency-with-global-cycles
+(curl), reciprocity double-counting (merged axis), refusal laundering
+(coverage gate). The attacks that remain OPEN and define v2:
+
+- **Template fingerprinting**: the spin preamble and paraphrase wordings
+  are fixed strings; a lab could special-case them. Fix: procedurally
+  rotated wording banks with a held-out subset.
+- **Max-ratio signal inflation**: a judge whose direction tracks content
+  but whose magnitude is always pinned at the ceiling scores full signal.
+  Fix: a magnitude-calibration anchor subset (pairs with objectively
+  verifiable ratios — lengths, counts).
+- **Identical-null floor effect**: byte-equal null pairs are free to pass
+  (our own receipts show four frontier models at exactly 0.000). Fix:
+  near-identical pairs (independent rewordings that should tie) plus
+  should-NOT-tie lookalikes.
+- **Syntactic polarity**: "shallowness: the absence of..." can be passed
+  by flipping on the negation marker. Fix: true antonym attributes and
+  scoped negation.
+- **Scale**: 20 pairs bounds the order-flip CI at ~±10pt; a leaderboard
+  labs would stake reputation on needs ~500 pairs/axis across 8–10
+  stratified domains (clear vs contested strata reported separately) and
+  test–retest reliability published for the composite itself.
 
 ## Scope and honest caveats
 

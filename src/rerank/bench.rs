@@ -580,10 +580,25 @@ pub async fn run_judge_bench(
         subscore: null_mean.map(|b| (-b).exp()),
     };
 
+    // Order-flip and order-residual are measured from the SAME two calls per
+    // pair — two views of one transformation. They enter the composite as a
+    // single reciprocity axis (their mean) so position-bias fixes are not
+    // double-credited. Both raw stats stay reported.
+    let reciprocity = match (order_flip.subscore, order_residual.subscore) {
+        (Some(a), Some(b)) => Some((a + b) / 2.0),
+        (a, b) => a.or(b),
+    };
+    // Coverage gate: refusing on hard pairs shrinks the curl numerator
+    // (refused edges vanish from the graph), so a refusal-heavy run must not
+    // be credited with transitivity. Curl only counts when ≥95% of core
+    // calls produced judgements.
+    let core_coverage = 1.0 - refusals as f64 / plan.len().max(1) as f64;
+    let frustration_gated = (core_coverage >= 0.95)
+        .then_some(frustration.subscore)
+        .flatten();
     let consistency: Vec<f64> = [
-        order_flip.subscore,
-        order_residual.subscore,
-        frustration.subscore,
+        reciprocity,
+        frustration_gated,
         spin_survival.subscore,
         polarity.subscore,
         paraphrase.subscore,

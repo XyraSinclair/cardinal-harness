@@ -125,6 +125,15 @@ whoever asks. gemini-2.5-flash holds a direction on that same pair and
 yields only +0.12. The sycophancy question decomposes into: does this
 judgement have a spontaneous direction, and how much field moves it?
 
+Honesty note (adversarial self-review, notes/ideation-2026-07-05/): the
+shipped χ is a **two-point secant at one field intensity**, not a measured
+slope — the neutral reading is reported but does not enter χ, which
+silently assumes the pro/con framings perturb symmetrically around the
+true zero-field point. A 3–5-intensity preamble ladder fitting log-ratio
+against field strength (slope + linearity residual) would distinguish a
+genuinely low-χ judge from a step-function sycophant that ignores mild
+pressure and folds completely past a threshold. Named, not yet built.
+
 **Finding from shipping frustration** (2026-07-05): a directionally
 transitive judge still shows ~0.13 curl — the ratio LADDER itself injects
 quantization frustration, because its rungs are not log-additive
