@@ -94,6 +94,14 @@ is a fixed point of the transformations that shouldn't matter. The group:
 The stability axes we cover, we cover with receipts; the remaining ✗ rows
 (parameter sweeps, time drift) are the cheapest untouched science in the repo.
 
+The invariance group is now also an INSTRUMENT: `cardinal bench` (the Judge
+Coherence Benchmark, docs/BENCHMARK.md) runs order swap, reciprocal
+antisymmetry, frustration, spin, polarity, paraphrase, and null calibration
+as a standardized 114-call battery per model, × a signal axis, → one
+leaderboard number labs can hill-climb without ground-truth labels. The
+benchmark validates itself against five scripted pathological judges in
+`tests/judge_bench.rs`.
+
 ## 5½. The physics of a judge (receipts, not metaphors)
 
 Prior elicitation behaves like a physical system, and each analogy lands on

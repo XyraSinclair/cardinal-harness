@@ -1,0 +1,671 @@
+//! The Judge Coherence Benchmark (JCB): score a model's *judgement* quality
+//! with no ground-truth labels, purely from internal consistency under
+//! meaning-preserving transformations — plus a signal axis so that a
+//! constant judge cannot hide in perfect consistency.
+//!
+//! The claim being tested: a judgement deserves the name *belief* only if it
+//! is (anti)symmetric under the transformations that shouldn't matter. The
+//! benchmark measures, per model, on a fixed public corpus:
+//!
+//! | Dimension | Transformation | Perfect judge |
+//! |---|---|---|
+//! | signal | — | separates items (mean \|log-ratio\| > 0) |
+//! | order invariance | swap presentation slots | same direction both orders |
+//! | reciprocal residual | swap presentation slots | m(A,B) = −m(B,A) exactly |
+//! | frustration | compose around cycles | zero Hodge curl |
+//! | spin robustness | leaning-asker preamble | direction unmoved |
+//! | polarity reversal | negate the attribute | scores anti-correlate (ρ → −1) |
+//! | paraphrase stability | reword the attribute | scores correlate (ρ → +1) |
+//! | null calibration | identical items | ratio 1.0 (zero directional mass) |
+//!
+//! Why this shape is hard to game: the dimensions cross-check. A judge that
+//! answers by content-blind hash aces order invariance but cannot know that
+//! the negated attribute must reverse (polarity) or that a reworded one must
+//! not (paraphrase). A judge that always ties aces every consistency axis
+//! and scores zero signal. A sycophant keeps its correlations and loses
+//! spin. The composite multiplies signal by mean consistency, so zeroing
+//! any side zeroes the headline.
+//!
+//! Cost: `CALLS_PER_RUN` comparisons per model (~$0.05 on mini-class
+//! models). Deterministic corpus and pair design; temperature per template
+//! default; every raw judgement is returned for receipt storage.
+
+use std::collections::HashMap;
+
+use futures::stream::{self, StreamExt};
+use serde::Serialize;
+
+use super::comparison::{
+    compare_pair, ComparisonError, PairwiseComparisonAttribute, PairwiseComparisonEntity,
+    PairwiseComparisonRequest, PairwiseComparisonSpec,
+};
+use super::sort::spearman;
+use super::spin::{spin_probe, SpinProbeReport};
+use super::types::{HigherRanked, PairwiseJudgement};
+use crate::cache::PairwiseCache;
+use crate::gateway::{Attribution, ChatGateway};
+use crate::rating_engine::{AttributeParams, Config, Observation, RaterParams, RatingEngine};
+
+/// The public corpus: eight short texts spanning depth on the primary
+/// attribute. Fixed — the benchmark is a standardized instrument, and the
+/// consistency dimensions are unfakeable by memorizing the corpus (they
+/// constrain *relations between answers*, not answers).
+pub const CORPUS: [&str; 8] = [
+    "The obstacle is the way.",
+    "We suffer more often in imagination than in reality.",
+    "No man ever steps in the same river twice.",
+    "A journey of a thousand miles begins with a single step.",
+    "What gets measured gets managed.",
+    "Early to bed and early to rise makes a man healthy, wealthy and wise.",
+    "Live, laugh, love.",
+    "Monday is the first day of the work week.",
+];
+
+/// Primary attribute: what the corpus is judged by.
+pub const PRIMARY_ATTRIBUTE: &str = "depth of insight about living well";
+/// The negation: a coherent judge's scores under it must anti-correlate.
+pub const OPPOSITE_ATTRIBUTE: &str =
+    "shallowness: the absence of any real insight about living well";
+/// A rewording: a coherent judge's scores under it must correlate.
+pub const PARAPHRASE_ATTRIBUTE: &str = "how much genuine wisdom about how to live it carries";
+
+/// Pair design over the 8 corpus items: strides 1, 2, and 4 around the ring
+/// — 20 pairs, connected and cycle-rich (triangles everywhere), so the curl
+/// estimate has support.
+#[must_use]
+pub fn core_pairs() -> Vec<(usize, usize)> {
+    let n = CORPUS.len();
+    let mut pairs = Vec::new();
+    for stride in [1usize, 2, 4] {
+        for i in 0..n {
+            let j = (i + stride) % n;
+            let (a, b) = if i < j { (i, j) } else { (j, i) };
+            if !pairs.contains(&(a, b)) {
+                pairs.push((a, b));
+            }
+        }
+    }
+    pairs
+}
+
+/// Spin pairs: three with a clear expected direction gap (survival is
+/// scoreable) and two genuinely contested (χ is the measurement).
+pub const SPIN_CLEAR_PAIRS: [(usize, usize); 3] = [(0, 7), (1, 6), (2, 7)];
+pub const SPIN_CONTESTED_PAIRS: [(usize, usize); 2] = [(0, 1), (3, 4)];
+
+/// Null texts: judged against themselves.
+pub const NULL_INDICES: [usize; 4] = [0, 3, 5, 7];
+
+/// Total provider calls in one benchmark run.
+pub const CALLS_PER_RUN: usize = 20 * 2 + 20 + 20 + 4 + 5 * 6;
+
+/// Options for [`run_judge_bench`].
+#[derive(Debug, Clone)]
+pub struct JudgeBenchOptions {
+    /// Model slug (OpenRouter).
+    pub model: String,
+    /// Prompt template slug (default `canonical_v2`).
+    pub template: String,
+    /// Concurrent comparisons.
+    pub concurrency: usize,
+}
+
+impl Default for JudgeBenchOptions {
+    fn default() -> Self {
+        Self {
+            model: String::new(),
+            template: "canonical_v2".to_string(),
+            concurrency: 6,
+        }
+    }
+}
+
+/// One raw pairwise call receipt.
+#[derive(Debug, Clone, Serialize)]
+pub struct BenchCall {
+    /// Which battery block this call belongs to.
+    pub block: String,
+    /// Canonical entity indices (i, j).
+    pub i: usize,
+    pub j: usize,
+    /// Entity i presented in slot A.
+    pub i_in_slot_a: bool,
+    /// Signed log-ratio toward entity i; `None` = refused.
+    pub log_ratio_toward_i: Option<f64>,
+    /// Stated confidence when present.
+    pub confidence: Option<f64>,
+}
+
+/// One dimension's stats.
+#[derive(Debug, Clone, Serialize)]
+pub struct DimensionStat {
+    /// Raw measurement (units in `unit`).
+    pub value: Option<f64>,
+    /// 95% interval when computable (Wilson for rates, ±2se for means).
+    pub ci95: Option<(f64, f64)>,
+    /// Denominator behind the value — no rate without its base.
+    pub n: usize,
+    /// Unit of `value`.
+    pub unit: &'static str,
+    /// Normalized subscore in [0,1] (formula documented per dimension).
+    pub subscore: Option<f64>,
+}
+
+/// Full benchmark report for one model.
+#[derive(Debug, Serialize)]
+pub struct JudgeBenchReport {
+    pub model: String,
+    pub template: String,
+
+    /// Mean |fused log-ratio| across core pairs. Subscore 1 − e^(−value).
+    pub signal: DimensionStat,
+    /// Fraction of decisive core pairs whose direction flips under order
+    /// swap. Subscore 1 − rate; Wilson CI.
+    pub order_flip: DimensionStat,
+    /// Mean |m_fwd − m_rev| / 2 (reciprocal antisymmetry residual, nats).
+    /// Subscore e^(−value).
+    pub order_residual: DimensionStat,
+    /// Hodge curl fraction of the fused core graph. Subscore 1 − value.
+    pub frustration: DimensionStat,
+    /// Fraction of clear spin pairs whose belief survives both framings.
+    /// Subscore = rate.
+    pub spin_survival: DimensionStat,
+    /// Mean |χ| across all spin pairs (nats per unit spin). Reported, not
+    /// scored (contested pairs legitimately move).
+    pub susceptibility: DimensionStat,
+    /// Spearman ρ between primary and opposite-attribute scores.
+    /// Subscore (1 − ρ)/2.
+    pub polarity: DimensionStat,
+    /// Spearman ρ between primary and paraphrase-attribute scores.
+    /// Subscore (1 + ρ)/2.
+    pub paraphrase: DimensionStat,
+    /// Mean |log-ratio| on identical-item pairs (nats). Subscore e^(−value).
+    pub null_bias: DimensionStat,
+
+    /// Mean of available consistency subscores (order flip, residual,
+    /// frustration, spin survival, polarity, paraphrase, null).
+    pub coherence: Option<f64>,
+    /// Headline: signal subscore × coherence. Zero signal or zero
+    /// coherence zeroes it.
+    pub judge_score: Option<f64>,
+
+    /// Primary-attribute latent scores for the corpus (fused solve).
+    pub primary_scores: Vec<f64>,
+    /// Refusal count across all calls.
+    pub refusals: usize,
+    /// Calls attempted / answered from cache.
+    pub comparisons: usize,
+    pub comparisons_cached: usize,
+    pub cost_nanodollars: i64,
+
+    /// Raw per-call receipts (order-swap and attribute blocks).
+    pub calls: Vec<BenchCall>,
+    /// Raw spin reports per spin pair, keyed "i-j".
+    pub spin_reports: Vec<(String, SpinProbeReport)>,
+}
+
+fn wilson_ci95(successes: usize, n: usize) -> Option<(f64, f64)> {
+    if n == 0 {
+        return None;
+    }
+    let z = 1.96f64;
+    let n_f = n as f64;
+    let p = successes as f64 / n_f;
+    let denom = 1.0 + z * z / n_f;
+    let center = (p + z * z / (2.0 * n_f)) / denom;
+    let half = (z / denom) * (p * (1.0 - p) / n_f + z * z / (4.0 * n_f * n_f)).sqrt();
+    Some(((center - half).max(0.0), (center + half).min(1.0)))
+}
+
+fn mean_ci95(samples: &[f64]) -> (Option<f64>, Option<(f64, f64)>) {
+    if samples.is_empty() {
+        return (None, None);
+    }
+    let n = samples.len() as f64;
+    let mean = samples.iter().sum::<f64>() / n;
+    if samples.len() < 3 {
+        return (Some(mean), None);
+    }
+    let var = samples.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / (n - 1.0);
+    let se = (var / n).sqrt();
+    (Some(mean), Some((mean - 1.96 * se, mean + 1.96 * se)))
+}
+
+struct CallOutcome {
+    log_ratio_toward_i: Option<f64>,
+    confidence: Option<f64>,
+    cached: bool,
+    cost_nanodollars: i64,
+}
+
+#[expect(clippy::too_many_arguments)]
+async fn one_call(
+    gateway: &dyn ChatGateway,
+    cache: Option<&dyn PairwiseCache>,
+    model: &str,
+    template: &str,
+    attribute_prompt: &str,
+    i: usize,
+    j: usize,
+    i_in_slot_a: bool,
+    attribution: &Attribution,
+) -> Result<CallOutcome, ComparisonError> {
+    let (slot_a, slot_b) = if i_in_slot_a { (i, j) } else { (j, i) };
+    let ids = ["e0", "e1", "e2", "e3", "e4", "e5", "e6", "e7"];
+    let spec = PairwiseComparisonSpec {
+        model,
+        attribute: PairwiseComparisonAttribute {
+            id: "bench",
+            prompt: attribute_prompt,
+            prompt_template_slug: Some(template),
+        },
+        entity_a: PairwiseComparisonEntity {
+            id: ids[slot_a],
+            text: CORPUS[slot_a],
+        },
+        entity_b: PairwiseComparisonEntity {
+            id: ids[slot_b],
+            text: CORPUS[slot_b],
+        },
+    };
+    let (judgement, usage) = compare_pair(
+        gateway,
+        cache,
+        PairwiseComparisonRequest {
+            spec,
+            cache_only: false,
+            attribution: attribution.clone(),
+        },
+    )
+    .await?;
+    let (log_ratio_toward_i, confidence) = match judgement {
+        PairwiseJudgement::Observation {
+            higher_ranked,
+            ratio,
+            confidence,
+        } => {
+            let toward_slot_a = match higher_ranked {
+                HigherRanked::A => 1.0,
+                HigherRanked::B => -1.0,
+            };
+            let toward_i = if i_in_slot_a {
+                toward_slot_a
+            } else {
+                -toward_slot_a
+            };
+            (Some(toward_i * ratio.max(1.0).ln()), Some(confidence))
+        }
+        PairwiseJudgement::Refused => (None, None),
+    };
+    Ok(CallOutcome {
+        log_ratio_toward_i,
+        confidence,
+        cached: usage.cached,
+        cost_nanodollars: usage.provider_cost_nanodollars,
+    })
+}
+
+fn solve_scores(
+    n: usize,
+    observations: &[(usize, usize, f64)],
+    rater: &str,
+) -> Option<(Vec<f64>, f64)> {
+    if observations.is_empty() {
+        return None;
+    }
+    let mut raters = HashMap::new();
+    raters.insert(rater.to_string(), RaterParams::default());
+    let mut engine =
+        RatingEngine::new(n, AttributeParams::default(), raters, Some(Config::default())).ok()?;
+    let obs: Vec<Observation> = observations
+        .iter()
+        .map(|&(i, j, m)| Observation::from_log_ratio_moments(i, j, m, 1.0, rater, 1.0))
+        .collect();
+    engine.ingest(&obs);
+    let summary = engine.solve();
+    Some((summary.scores, summary.hcr))
+}
+
+/// Run the Judge Coherence Benchmark for one model.
+pub async fn run_judge_bench(
+    gateway: &dyn ChatGateway,
+    cache: Option<&dyn PairwiseCache>,
+    opts: JudgeBenchOptions,
+) -> Result<JudgeBenchReport, ComparisonError> {
+    let attribution = Attribution::new("cardinal::bench");
+    let model = opts.model.clone();
+    let template = opts.template.clone();
+    let pairs = core_pairs();
+
+    // ---- Build the call plan: (block, attribute, i, j, i_in_slot_a) ----
+    let mut plan: Vec<(&'static str, &'static str, usize, usize, bool)> = Vec::new();
+    for &(i, j) in &pairs {
+        plan.push(("core", PRIMARY_ATTRIBUTE, i, j, true));
+        plan.push(("core", PRIMARY_ATTRIBUTE, i, j, false));
+    }
+    for &(i, j) in &pairs {
+        plan.push(("opposite", OPPOSITE_ATTRIBUTE, i, j, true));
+        plan.push(("paraphrase", PARAPHRASE_ATTRIBUTE, i, j, true));
+    }
+    for &i in &NULL_INDICES {
+        plan.push(("null", PRIMARY_ATTRIBUTE, i, i, true));
+    }
+
+    let concurrency = opts.concurrency.max(1);
+    let results: Vec<(usize, Result<CallOutcome, ComparisonError>)> = stream::iter(
+        plan.iter()
+            .enumerate()
+            .map(|(idx, &(_, attr, i, j, fwd))| {
+                let attribution = &attribution;
+                let model = model.as_str();
+                let template = template.as_str();
+                async move {
+                    let out = one_call(
+                        gateway,
+                        cache,
+                        model,
+                        template,
+                        attr,
+                        i,
+                        j,
+                        fwd,
+                        attribution,
+                    )
+                    .await;
+                    (idx, out)
+                }
+            }),
+    )
+    .buffer_unordered(concurrency)
+    .collect()
+    .await;
+
+    let mut outcomes: Vec<Option<CallOutcome>> = (0..plan.len()).map(|_| None).collect();
+    let mut cost = 0i64;
+    let mut cached = 0usize;
+    let mut refusals = 0usize;
+    for (idx, out) in results {
+        let out = out?;
+        cost += out.cost_nanodollars;
+        if out.cached {
+            cached += 1;
+        }
+        if out.log_ratio_toward_i.is_none() {
+            refusals += 1;
+        }
+        outcomes[idx] = Some(out);
+    }
+
+    let mut calls = Vec::with_capacity(plan.len());
+    for (idx, &(block, _, i, j, fwd)) in plan.iter().enumerate() {
+        let out = outcomes[idx].as_ref().expect("all outcomes filled");
+        calls.push(BenchCall {
+            block: block.to_string(),
+            i,
+            j,
+            i_in_slot_a: fwd,
+            log_ratio_toward_i: out.log_ratio_toward_i,
+            confidence: out.confidence,
+        });
+    }
+
+    // ---- Core block: signal, order flip, residual, fused graph ----
+    let core: Vec<&BenchCall> = calls.iter().filter(|c| c.block == "core").collect();
+    let mut fused_ms = Vec::new();
+    let mut residuals = Vec::new();
+    let mut decisive_pairs = 0usize;
+    let mut flips = 0usize;
+    let mut fused_obs: Vec<(usize, usize, f64)> = Vec::new();
+    for &(i, j) in &pairs {
+        let fwd = core
+            .iter()
+            .find(|c| c.i == i && c.j == j && c.i_in_slot_a)
+            .and_then(|c| c.log_ratio_toward_i);
+        let rev = core
+            .iter()
+            .find(|c| c.i == i && c.j == j && !c.i_in_slot_a)
+            .and_then(|c| c.log_ratio_toward_i);
+        if let (Some(f), Some(r)) = (fwd, rev) {
+            let fused = (f + r) / 2.0;
+            fused_ms.push(fused.abs());
+            residuals.push((f - r).abs() / 2.0);
+            fused_obs.push((i, j, fused));
+            if f != 0.0 && r != 0.0 {
+                decisive_pairs += 1;
+                if f.signum() != r.signum() {
+                    flips += 1;
+                }
+            }
+        }
+    }
+    let (signal_mean, signal_ci) = mean_ci95(&fused_ms);
+    let (residual_mean, residual_ci) = mean_ci95(&residuals);
+    let flip_rate = (decisive_pairs > 0).then(|| flips as f64 / decisive_pairs as f64);
+
+    let primary = solve_scores(CORPUS.len(), &fused_obs, &model);
+    let (primary_scores, hcr) = match &primary {
+        Some((scores, hcr)) => (scores.clone(), Some(*hcr)),
+        None => (Vec::new(), None),
+    };
+
+    // ---- Attribute blocks: polarity + paraphrase correlations ----
+    let block_scores = |name: &str| -> Option<Vec<f64>> {
+        let obs: Vec<(usize, usize, f64)> = calls
+            .iter()
+            .filter(|c| c.block == name)
+            .filter_map(|c| c.log_ratio_toward_i.map(|m| (c.i, c.j, m)))
+            .collect();
+        solve_scores(CORPUS.len(), &obs, &model).map(|(s, _)| s)
+    };
+    let polarity_rho = block_scores("opposite")
+        .filter(|_| !primary_scores.is_empty())
+        .and_then(|s| spearman(&primary_scores, &s));
+    let paraphrase_rho = block_scores("paraphrase")
+        .filter(|_| !primary_scores.is_empty())
+        .and_then(|s| spearman(&primary_scores, &s));
+
+    // ---- Null block ----
+    let null_ms: Vec<f64> = calls
+        .iter()
+        .filter(|c| c.block == "null")
+        .filter_map(|c| c.log_ratio_toward_i.map(f64::abs))
+        .collect();
+    let (null_mean, null_ci) = mean_ci95(&null_ms);
+
+    // ---- Spin block ----
+    let mut spin_reports = Vec::new();
+    let mut clear_survivals = 0usize;
+    let mut clear_assessed = 0usize;
+    let mut chis = Vec::new();
+    for (clear, &(i, j)) in SPIN_CLEAR_PAIRS
+        .iter()
+        .map(|p| (true, p))
+        .chain(SPIN_CONTESTED_PAIRS.iter().map(|p| (false, p)))
+    {
+        let report = spin_probe(
+            gateway,
+            cache,
+            &model,
+            &template,
+            PRIMARY_ATTRIBUTE,
+            ("s0", CORPUS[i]),
+            ("s1", CORPUS[j]),
+            attribution.clone(),
+        )
+        .await?;
+        cost += report.cost_nanodollars;
+        cached += report.comparisons_cached;
+        for reading in &report.readings {
+            refusals += reading.refusals;
+        }
+        if let Some(chi) = report.susceptibility_nats {
+            chis.push(chi.abs());
+        }
+        if clear {
+            if let Some(survives) = report.belief_survives_spin {
+                clear_assessed += 1;
+                if survives {
+                    clear_survivals += 1;
+                }
+            }
+        }
+        spin_reports.push((format!("{i}-{j}"), report));
+    }
+    let survival_rate = (clear_assessed > 0).then(|| clear_survivals as f64 / clear_assessed as f64);
+    let (chi_mean, chi_ci) = mean_ci95(&chis);
+
+    // ---- Subscores and composite ----
+    let signal = DimensionStat {
+        value: signal_mean,
+        ci95: signal_ci,
+        n: fused_ms.len(),
+        unit: "nats",
+        subscore: signal_mean.map(|m| 1.0 - (-m).exp()),
+    };
+    let order_flip = DimensionStat {
+        value: flip_rate,
+        ci95: wilson_ci95(flips, decisive_pairs),
+        n: decisive_pairs,
+        unit: "rate",
+        subscore: flip_rate.map(|r| 1.0 - r),
+    };
+    let order_residual = DimensionStat {
+        value: residual_mean,
+        ci95: residual_ci,
+        n: residuals.len(),
+        unit: "nats",
+        subscore: residual_mean.map(|r| (-r).exp()),
+    };
+    let hcr = hcr.filter(|h| h.is_finite());
+    let frustration = DimensionStat {
+        value: hcr,
+        ci95: None,
+        n: fused_obs.len(),
+        unit: "curl fraction",
+        subscore: hcr.map(|h| (1.0 - h).clamp(0.0, 1.0)),
+    };
+    let spin_survival = DimensionStat {
+        value: survival_rate,
+        ci95: wilson_ci95(clear_survivals, clear_assessed),
+        n: clear_assessed,
+        unit: "rate",
+        subscore: survival_rate,
+    };
+    let susceptibility = DimensionStat {
+        value: chi_mean,
+        ci95: chi_ci,
+        n: chis.len(),
+        unit: "nats/spin",
+        subscore: None,
+    };
+    let polarity = DimensionStat {
+        value: polarity_rho,
+        ci95: None,
+        n: CORPUS.len(),
+        unit: "spearman",
+        subscore: polarity_rho.map(|rho| ((1.0 - rho) / 2.0).clamp(0.0, 1.0)),
+    };
+    let paraphrase = DimensionStat {
+        value: paraphrase_rho,
+        ci95: None,
+        n: CORPUS.len(),
+        unit: "spearman",
+        subscore: paraphrase_rho.map(|rho| ((1.0 + rho) / 2.0).clamp(0.0, 1.0)),
+    };
+    let null_bias = DimensionStat {
+        value: null_mean,
+        ci95: null_ci,
+        n: null_ms.len(),
+        unit: "nats",
+        subscore: null_mean.map(|b| (-b).exp()),
+    };
+
+    let consistency: Vec<f64> = [
+        order_flip.subscore,
+        order_residual.subscore,
+        frustration.subscore,
+        spin_survival.subscore,
+        polarity.subscore,
+        paraphrase.subscore,
+        null_bias.subscore,
+    ]
+    .into_iter()
+    .flatten()
+    .collect();
+    let coherence = (!consistency.is_empty())
+        .then(|| consistency.iter().sum::<f64>() / consistency.len() as f64);
+    let judge_score = match (signal.subscore, coherence) {
+        (Some(s), Some(c)) => Some(s * c),
+        _ => None,
+    };
+
+    Ok(JudgeBenchReport {
+        model,
+        template,
+        signal,
+        order_flip,
+        order_residual,
+        frustration,
+        spin_survival,
+        susceptibility,
+        polarity,
+        paraphrase,
+        null_bias,
+        coherence,
+        judge_score,
+        primary_scores,
+        refusals,
+        comparisons: plan.len() + spin_reports.iter().map(|(_, r)| r.comparisons).sum::<usize>(),
+        comparisons_cached: cached,
+        cost_nanodollars: cost,
+        calls,
+        spin_reports,
+    })
+}
+
+/// Render one report as a human stats block.
+#[must_use]
+pub fn render_report(report: &JudgeBenchReport) -> String {
+    use std::fmt::Write as _;
+    let mut out = String::new();
+    let fmt_dim = |name: &str, d: &DimensionStat| -> String {
+        let val = match d.value {
+            Some(v) => format!("{v:+.3}"),
+            None => "n/a".to_string(),
+        };
+        let ci = match d.ci95 {
+            Some((lo, hi)) => format!(" [{lo:+.3}, {hi:+.3}]"),
+            None => String::new(),
+        };
+        let sub = match d.subscore {
+            Some(s) => format!("  → {s:.3}"),
+            None => String::new(),
+        };
+        format!(
+            "  {name:<16} {val}{ci} {unit} (n={n}){sub}\n",
+            unit = d.unit,
+            n = d.n
+        )
+    };
+    let _ = writeln!(out, "model: {} · template: {}", report.model, report.template);
+    out.push_str(&fmt_dim("signal", &report.signal));
+    out.push_str(&fmt_dim("order-flip", &report.order_flip));
+    out.push_str(&fmt_dim("order-residual", &report.order_residual));
+    out.push_str(&fmt_dim("frustration", &report.frustration));
+    out.push_str(&fmt_dim("spin-survival", &report.spin_survival));
+    out.push_str(&fmt_dim("susceptibility", &report.susceptibility));
+    out.push_str(&fmt_dim("polarity", &report.polarity));
+    out.push_str(&fmt_dim("paraphrase", &report.paraphrase));
+    out.push_str(&fmt_dim("null-bias", &report.null_bias));
+    let _ = writeln!(
+        out,
+        "  coherence {:.3} · JUDGE SCORE {:.3} · {} comparisons ({} cached) · {} refusals · ${:.4}",
+        report.coherence.unwrap_or(f64::NAN),
+        report.judge_score.unwrap_or(f64::NAN),
+        report.comparisons,
+        report.comparisons_cached,
+        report.refusals,
+        report.cost_nanodollars as f64 / 1e9,
+    );
+    out
+}

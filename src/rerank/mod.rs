@@ -9,6 +9,7 @@
 //! - Simple: Single-attribute, query-document relevance
 //! - Multi: Full trait search with gates and weights
 
+pub mod bench;
 pub mod comparison;
 pub mod elaborate;
 pub mod evaluation;
@@ -29,6 +30,11 @@ pub mod types;
 // No async worker in the standalone harness.
 
 // Re-export main entry points
+pub use bench::{
+    core_pairs, render_report as render_bench_report, run_judge_bench, BenchCall, DimensionStat,
+    JudgeBenchOptions, JudgeBenchReport, CALLS_PER_RUN, CORPUS, OPPOSITE_ATTRIBUTE,
+    PARAPHRASE_ATTRIBUTE, PRIMARY_ATTRIBUTE,
+};
 pub use comparison::{
     compare_pair, ComparisonError, PairwiseComparisonAttribute, PairwiseComparisonEntity,
     PairwiseComparisonRequest, PairwiseComparisonSpec,

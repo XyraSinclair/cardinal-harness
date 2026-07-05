@@ -205,6 +205,28 @@ K-boundary and `--prune-below <p>` additionally stops spending exploration
 comparisons on items whose posterior chance of reaching the top-K drops below
 `p` — the pruned count lands in the receipts as `entities_pruned`.
 
+## The Judge Coherence Benchmark
+
+`cardinal bench --models a,b,c` scores models on *judgement* quality with
+no ground-truth labels: internal consistency under meaning-preserving
+transformations (order swap, reciprocal antisymmetry, cyclic frustration,
+framing spin, polarity reversal, paraphrase stability, null calibration)
+times a signal axis so a judge cannot ace it by refusing to discriminate.
+A genuine belief is a fixed point of the transformations that shouldn't
+matter — that's testable without knowing any right answers, which makes it
+a benchmark labs can hill-climb without it being memorizable.
+
+The dimensions cross-check (a content-blind hash judge aces order
+invariance but can't know the negated attribute must reverse; a sycophant
+keeps its correlations and loses spin), and the benchmark validates itself:
+five scripted pathological judges — oracle, constant, position-biased,
+sycophant, cyclic — run the full battery in the test suite, and each must
+be caught by exactly the dimension that names it. 114 comparisons per
+model, ~$0.05 on mini-class models, every rate with its denominator and
+95% CI. Full argument, formulas, gaming analysis, and honest caveats:
+[`docs/BENCHMARK.md`](docs/BENCHMARK.md). Live leaderboard receipts:
+[`artifacts/live/judge-bench-2026-07-05/`](artifacts/live/judge-bench-2026-07-05/).
+
 ## Library
 
 ```rust,no_run

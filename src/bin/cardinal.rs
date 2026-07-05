@@ -219,6 +219,37 @@ enum Commands {
         #[arg(long)]
         json: bool,
     },
+    /// Judge Coherence Benchmark: score models on judgement consistency
+    ///
+    /// No ground-truth labels: the benchmark measures internal consistency
+    /// under meaning-preserving transformations (order swap, reciprocal
+    /// antisymmetry, cyclic frustration, framing spin, polarity reversal,
+    /// paraphrase stability, null calibration) plus a signal axis so a
+    /// constant judge cannot hide in perfect consistency. Headline score =
+    /// signal × coherence. Fixed public corpus, 114 comparisons per model.
+    Bench {
+        /// Model slug(s), comma-separated
+        #[arg(long)]
+        models: String,
+        /// Prompt template slug
+        #[arg(long, default_value = "canonical_v2")]
+        template: String,
+        /// Concurrent comparisons per model
+        #[arg(long, default_value_t = 6)]
+        concurrency: usize,
+        /// Write full per-model reports (raw calls included) to this JSONL path
+        #[arg(long)]
+        out: Option<PathBuf>,
+        /// Emit the leaderboard as JSON on stdout
+        #[arg(long)]
+        json: bool,
+        /// Do not read or write the pairwise cache
+        #[arg(long)]
+        no_cache: bool,
+        /// SQLite cache path (default: shared user cache)
+        #[arg(long)]
+        cache: Option<PathBuf>,
+    },
     /// Measure a model's pure elicitation artifacts with null pairs
     ///
     /// Presents byte-identical text in both slots of the ratio-letter
@@ -1019,6 +1050,131 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 eprint!(" · frustration {f:.3}");
             }
             eprintln!();
+        }
+        Commands::Bench {
+            models,
+            template,
+            concurrency,
+            out,
+            json,
+            no_cache,
+            cache,
+        } => {
+            if std::env::var("OPENROUTER_API_KEY").is_err() {
+                return Err("OPENROUTER_API_KEY is not set. Create a key at \
+                     https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
+                    .into());
+            }
+            let model_list: Vec<String> = models
+                .split(',')
+                .map(|m| m.trim().to_string())
+                .filter(|m| !m.is_empty())
+                .collect();
+            if model_list.is_empty() {
+                return Err("no models given: --models a/b,c/d".into());
+            }
+            let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
+            let cache_store = if no_cache {
+                None
+            } else {
+                let cache_path = cache.unwrap_or_else(SqlitePairwiseCache::default_path);
+                Some(SqlitePairwiseCache::new(cache_path)?)
+            };
+            let cache_ref = cache_store
+                .as_ref()
+                .map(|c| c as &dyn cardinal_harness::cache::PairwiseCache);
+
+            let mut out_file = match out.as_ref() {
+                Some(path) => Some(std::io::BufWriter::new(std::fs::File::create(path)?)),
+                None => None,
+            };
+            let mut reports = Vec::new();
+            for model in &model_list {
+                eprintln!("benchmarking {model} ...");
+                let report = cardinal_harness::rerank::run_judge_bench(
+                    &gateway,
+                    cache_ref,
+                    cardinal_harness::rerank::JudgeBenchOptions {
+                        model: model.clone(),
+                        template: template.clone(),
+                        concurrency,
+                    },
+                )
+                .await?;
+                eprint!("{}", cardinal_harness::rerank::render_bench_report(&report));
+                if let Some(file) = out_file.as_mut() {
+                    use std::io::Write as _;
+                    writeln!(file, "{}", serde_json::to_string(&report)?)?;
+                }
+                reports.push(report);
+            }
+            if let Some(mut file) = out_file {
+                use std::io::Write as _;
+                file.flush()?;
+            }
+
+            reports.sort_by(|a, b| {
+                b.judge_score
+                    .unwrap_or(f64::NEG_INFINITY)
+                    .partial_cmp(&a.judge_score.unwrap_or(f64::NEG_INFINITY))
+                    .unwrap_or(std::cmp::Ordering::Equal)
+            });
+            if json {
+                let board: Vec<serde_json::Value> = reports
+                    .iter()
+                    .map(|r| {
+                        serde_json::json!({
+                            "model": r.model,
+                            "judge_score": r.judge_score,
+                            "signal_nats": r.signal.value,
+                            "coherence": r.coherence,
+                            "order_flip_rate": r.order_flip.value,
+                            "order_residual_nats": r.order_residual.value,
+                            "frustration": r.frustration.value,
+                            "spin_survival": r.spin_survival.value,
+                            "susceptibility_nats": r.susceptibility.value,
+                            "polarity_spearman": r.polarity.value,
+                            "paraphrase_spearman": r.paraphrase.value,
+                            "null_bias_nats": r.null_bias.value,
+                            "refusals": r.refusals,
+                            "cost_nanodollars": r.cost_nanodollars,
+                        })
+                    })
+                    .collect();
+                println!("{}", serde_json::to_string_pretty(&board)?);
+            } else {
+                println!(
+                    "{:<4} {:<34} {:>7} {:>7} {:>9} {:>6} {:>6} {:>7} {:>7} {:>8}",
+                    "rank",
+                    "model",
+                    "JUDGE",
+                    "signal",
+                    "coherence",
+                    "flip",
+                    "curl",
+                    "spin",
+                    "pol ρ",
+                    "cost $"
+                );
+                for (idx, r) in reports.iter().enumerate() {
+                    let f = |v: Option<f64>| {
+                        v.map(|x| format!("{x:.3}")).unwrap_or_else(|| "-".into())
+                    };
+                    println!(
+                        "{:<4} {:<34} {:>7} {:>7} {:>9} {:>6} {:>6} {:>7} {:>7} {:>8.4}",
+                        idx + 1,
+                        r.model,
+                        f(r.judge_score),
+                        f(r.signal.value),
+                        f(r.coherence),
+                        f(r.order_flip.value),
+                        f(r.frustration.value),
+                        f(r.spin_survival.value),
+                        f(r.polarity.value),
+                        r.cost_nanodollars as f64 / 1e9,
+                    );
+                }
+            }
         }
         Commands::Calibrate { models, nulls, out } => {
             if std::env::var("OPENROUTER_API_KEY").is_err() {
