@@ -405,6 +405,7 @@ list or request JSON
 
 ## Documentation
 
+- [docs/MATH_FRONTIER.md](docs/MATH_FRONTIER.md): the mathematical roadmap for cardinal & stable prior elicitation — Hodge split (shipped), spectral identifiability, elicitation-program equivalence, stochastic transitivity, pooling theory — with rejections recorded as findings
 - [docs/PRINCIPLES.md](docs/PRINCIPLES.md): the anti-slop discipline — refutability, scripted-pathology validation, denominators, mathematical register — each rule with the receipt that earned it
 - [docs/ALGORITHM.md](docs/ALGORITHM.md): scoring, uncertainty, stopping, and evaluation rationale
 - [docs/MODEL.md](docs/MODEL.md): compact mathematical contract, assumptions, and failure modes

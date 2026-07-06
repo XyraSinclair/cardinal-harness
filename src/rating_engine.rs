@@ -267,6 +267,10 @@ pub struct SolveSummary {
     pub residuals: Vec<f64>,
     pub diag_cov: Vec<f64>,
     pub hcr: f64,
+    /// The cyclic energy split into triangle-auditable curl and
+    /// triad-invisible harmonic components (see [`HodgeSplit`]).
+    /// Invariant: `hodge.local_curl_frac + hodge.harmonic_frac ≈ hcr`.
+    pub hodge: HodgeSplit,
     pub pcr: f64,
     pub total_info: f64,
     pub expected_rank_reversals: f64,
@@ -851,6 +855,264 @@ fn compute_hcr(mu: &[f64], residuals: &[f64], lam_eff: &[f64], cfg: &Config) -> 
 
     let hcr = num / den;
     hcr.clamp(0.0, 1.0)
+}
+
+/// The full combinatorial Hodge split of the cyclic residual.
+///
+/// The solve projects the observed edge field μ onto gradients; the
+/// residual r lives in the cycle space (dimension |E| − |V| + components).
+/// That cyclic energy splits further, w-orthogonally (w = λ_eff):
+///
+///   cycle space = im(curl*) ⊕ H
+///
+/// where curl is taken over the FILLED triangles (3-cliques whose three
+/// edges were all judged). `im(curl*)` is locally cyclic disagreement — a
+/// per-triad audit (A>B>C>A) can catch it. `H` (harmonic) is
+/// divergence-free AND curl-free on every filled triangle yet nonzero: a
+/// cycle longer than a triangle whose closing chords were never elicited.
+/// No triad spot-check can see it, by construction. Sparse (cheap)
+/// comparison graphs are exactly the graphs whose cycles are mostly long —
+/// elicitation efficiency and triad-auditability are in tension, and this
+/// receipt measures which kind of frustration a run actually has.
+///
+/// Invariant (Pythagoras in the w-inner product):
+/// `local_curl_frac + harmonic_frac == hcr` up to the same clamping.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct HodgeSplit {
+    /// Share of judgement energy in triangle-supported (auditable) curl.
+    pub local_curl_frac: f64,
+    /// Share of judgement energy in harmonic (triad-invisible) cycles.
+    pub harmonic_frac: f64,
+    /// Number of filled triangles found in the fused edge set.
+    pub filled_triangles: usize,
+    /// Dimension of the harmonic space: cycle_dim − rank(curl on filled
+    /// triangles). Zero means the graph DESIGN cannot host harmonic
+    /// disagreement — report it like a denominator.
+    pub harmonic_dim: usize,
+}
+
+/// Compute the Hodge split from the fused edges and solver residuals.
+/// Pure function of the same inputs `compute_hcr` consumes, plus the edge
+/// endpoints. See [`HodgeSplit`].
+pub fn compute_hodge_split(
+    endpoints: &[(usize, usize)],
+    mu: &[f64],
+    residuals: &[f64],
+    lam_eff: &[f64],
+    n_vertices: usize,
+    cfg: &Config,
+) -> HodgeSplit {
+    let m = endpoints.len();
+    let empty = HodgeSplit {
+        local_curl_frac: 0.0,
+        harmonic_frac: 0.0,
+        filled_triangles: 0,
+        harmonic_dim: 0,
+    };
+    if m == 0 || residuals.len() != m || lam_eff.len() != m || mu.len() != m {
+        return empty;
+    }
+
+    // Cycle dimension: |E| − |V| + components, on the vertices present.
+    let components = {
+        let mut parent: Vec<usize> = (0..n_vertices).collect();
+        fn find(parent: &mut [usize], x: usize) -> usize {
+            let mut root = x;
+            while parent[root] != root {
+                root = parent[root];
+            }
+            let mut cur = x;
+            while parent[cur] != root {
+                let next = parent[cur];
+                parent[cur] = root;
+                cur = next;
+            }
+            root
+        }
+        let mut touched = vec![false; n_vertices];
+        for &(i, j) in endpoints {
+            touched[i] = true;
+            touched[j] = true;
+            let (ri, rj) = (find(&mut parent, i), find(&mut parent, j));
+            if ri != rj {
+                parent[ri] = rj;
+            }
+        }
+        (0..n_vertices)
+            .filter(|&v| touched[v] && find(&mut parent, v) == v)
+            .count()
+    };
+    let touched_vertices = {
+        let mut seen = vec![false; n_vertices];
+        for &(i, j) in endpoints {
+            seen[i] = true;
+            seen[j] = true;
+        }
+        seen.iter().filter(|&&b| b).count()
+    };
+    let cycle_dim = (m + components).saturating_sub(touched_vertices);
+
+    let den: f64 = lam_eff
+        .iter()
+        .zip(mu.iter())
+        .map(|(lam, x)| lam * x * x)
+        .sum::<f64>()
+        + cfg.tiny;
+    if cycle_dim == 0 {
+        return empty;
+    }
+
+    // Enumerate filled triangles over the fused edge set.
+    use std::collections::HashMap as Map;
+    let mut edge_index: Map<(usize, usize), usize> = Map::new();
+    for (k, &(i, j)) in endpoints.iter().enumerate() {
+        let key = (i.min(j), i.max(j));
+        edge_index.entry(key).or_insert(k);
+    }
+    let mut adjacency: Vec<Vec<usize>> = vec![Vec::new(); n_vertices];
+    for &(i, j) in edge_index.keys() {
+        adjacency[i].push(j);
+        adjacency[j].push(i);
+    }
+    for list in &mut adjacency {
+        list.sort_unstable();
+        list.dedup();
+    }
+    let mut triangles: Vec<[usize; 3]> = Vec::new();
+    for a in 0..n_vertices {
+        for &b in adjacency[a].iter().filter(|&&b| b > a) {
+            for &c in adjacency[b].iter().filter(|&&c| c > b) {
+                if edge_index.contains_key(&(a, c)) {
+                    triangles.push([a, b, c]);
+                }
+            }
+        }
+    }
+    let t = triangles.len();
+
+    // Orientation sign of edge (u, v) relative to canonical (min, max):
+    // the residual r_e is the flow along i→j of the stored edge; we treat
+    // the stored orientation as canonical and give the triangle boundary
+    // signs relative to it.
+    let signed = |u: usize, v: usize| -> (usize, f64) {
+        let key = (u.min(v), u.max(v));
+        let k = edge_index[&key];
+        let (ei, _ej) = endpoints[k];
+        let sign = if ei == u { 1.0 } else { -1.0 };
+        (k, sign)
+    };
+
+    // C: t × m sparse rows of (edge, sign) triples for cycle a→b→c→a.
+    let rows: Vec<[(usize, f64); 3]> = triangles
+        .iter()
+        .map(|&[a, b, c]| [signed(a, b), signed(b, c), signed(c, a)])
+        .collect();
+
+    if t == 0 {
+        let num: f64 = lam_eff
+            .iter()
+            .zip(residuals.iter())
+            .map(|(lam, r)| lam * r * r)
+            .sum();
+        return HodgeSplit {
+            local_curl_frac: 0.0,
+            harmonic_frac: (num / den).clamp(0.0, 1.0),
+            filled_triangles: 0,
+            harmonic_dim: cycle_dim,
+        };
+    }
+
+    // Normal equations (C W⁻¹ Cᵀ) z = C r ; projection = W⁻¹ Cᵀ z.
+    // Dense t × t assembly; t is small on real comparison graphs. The
+    // system is consistent by construction; a pivoted Gauss with zero-pivot
+    // skip handles rank deficiency (dependent triangles) exactly.
+    let w_inv: Vec<f64> = lam_eff.iter().map(|&l| 1.0 / l.max(cfg.tiny)).collect();
+    let mut a = vec![vec![0.0f64; t + 1]; t];
+    for (p, row_p) in rows.iter().enumerate() {
+        for (q, row_q) in rows.iter().enumerate().skip(p) {
+            let mut acc = 0.0;
+            for &(e1, s1) in row_p {
+                for &(e2, s2) in row_q {
+                    if e1 == e2 {
+                        acc += s1 * s2 * w_inv[e1];
+                    }
+                }
+            }
+            a[p][q] = acc;
+            if p != q {
+                a[q][p] = acc;
+            }
+        }
+        let rhs: f64 = row_p.iter().map(|&(e, sgn)| sgn * residuals[e]).sum();
+        a[p][t] = rhs;
+    }
+    // Pivoted Gaussian elimination with zero-pivot skip.
+    let scale: f64 = a
+        .iter()
+        .map(|row| row[..t].iter().map(|x| x.abs()).fold(0.0, f64::max))
+        .fold(0.0, f64::max)
+        .max(cfg.tiny);
+    let tol = scale * 1e-12;
+    let mut z = vec![0.0f64; t];
+    let mut pivot_row = 0usize;
+    let mut pivots: Vec<(usize, usize)> = Vec::new();
+    for col in 0..t {
+        let Some(best) = (pivot_row..t)
+            .max_by(|&x, &y| a[x][col].abs().partial_cmp(&a[y][col].abs()).unwrap())
+        else {
+            break;
+        };
+        if a[best][col].abs() <= tol {
+            continue;
+        }
+        a.swap(pivot_row, best);
+        let pv = a[pivot_row][col];
+        for r in 0..t {
+            if r != pivot_row && a[r][col].abs() > 0.0 {
+                let f = a[r][col] / pv;
+                let (head, tail) = a.split_at_mut(pivot_row.max(r));
+                let (row_r, row_p) = if r < pivot_row {
+                    (&mut head[r], &tail[0])
+                } else {
+                    (&mut tail[0], &head[pivot_row])
+                };
+                for (x, y) in row_r[col..=t].iter_mut().zip(row_p[col..=t].iter()) {
+                    *x -= f * y;
+                }
+            }
+        }
+        pivots.push((pivot_row, col));
+        pivot_row += 1;
+    }
+    let curl_rank = pivots.len();
+    for &(r, c) in &pivots {
+        z[c] = a[r][t] / a[r][c];
+    }
+
+    // local = W⁻¹ Cᵀ z (in canonical edge orientation).
+    let mut local = vec![0.0f64; m];
+    for (p, row_p) in rows.iter().enumerate() {
+        for &(e, sgn) in row_p {
+            local[e] += w_inv[e] * sgn * z[p];
+        }
+    }
+    let local_energy: f64 = lam_eff
+        .iter()
+        .zip(local.iter())
+        .map(|(lam, x)| lam * x * x)
+        .sum();
+    let harmonic_energy: f64 = lam_eff
+        .iter()
+        .zip(residuals.iter().zip(local.iter()))
+        .map(|(lam, (r, l))| lam * (r - l) * (r - l))
+        .sum();
+
+    HodgeSplit {
+        local_curl_frac: (local_energy / den).clamp(0.0, 1.0),
+        harmonic_frac: (harmonic_energy / den).clamp(0.0, 1.0),
+        filled_triangles: t,
+        harmonic_dim: cycle_dim.saturating_sub(curl_rank),
+    }
 }
 
 fn probe_seed(seed: u64, edges: &[Edge], lam_eff: &[f64]) -> u64 {
@@ -1602,6 +1864,8 @@ impl RatingEngine {
         let scores_norm = normalize_per_component(&s, &self.labels);
 
         let hcr = compute_hcr(&mu, &residuals, &lam_eff, &self.cfg);
+        let endpoints: Vec<(usize, usize)> = self.edges.iter().map(|e| (e.i, e.j)).collect();
+        let hodge = compute_hodge_split(&endpoints, &mu, &residuals, &lam_eff, self.n, &self.cfg);
         let pcr = compute_pcr_lite(&mu, &residuals, &lam_eff, &self.cfg);
 
         let (expected_rev, max_flip, rank_risk) =
@@ -1631,6 +1895,7 @@ impl RatingEngine {
             residuals,
             diag_cov,
             hcr,
+            hodge,
             pcr,
             total_info,
             expected_rank_reversals: expected_rev,

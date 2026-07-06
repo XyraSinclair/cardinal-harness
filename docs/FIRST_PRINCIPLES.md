@@ -111,7 +111,7 @@ a computable receipt:
 
 | Physics | Judgement meaning | Receipt |
 |---|---|---|
-| **Frustration** (spin glass) | cyclic preference structure no scores can satisfy (A>B>C>A) | ✓ `judgement_frustration_mean` — the Hodge curl fraction Σλr²/Σλμ² of the log-ratio edge field, shipped; transitive judge ≈ quantization floor, planted rock-paper-scissors > 0.3 |
+| **Frustration** (spin glass) | cyclic preference structure no scores can satisfy (A>B>C>A) | ✓ `judgement_frustration_mean` (total) AND the full Hodge split (`SolveSummary.hodge`): triangle-auditable local curl vs harmonic cycles invisible to every triad audit; Pythagoras invariant local+harmonic ≈ hcr pinned end-to-end; harmonic_dim reported like a denominator (the JCB graph's is 0 by construction — pinned) |
 | **Hysteresis** | path dependence: judging A→B vs B→A | ✓ order-residual in nats + flip counts |
 | **Susceptibility** | response to a small applied field: framing spin | ✓ `judge --spin` (secant) and `judge --sweep` (response function over f ∈ −3…+3: odd slope, linear R², even component) |
 | **Temperature/entropy** | PMF spread per judgement; annealing across sampling temperature | ◐ entropy computable from stored PMFs; sweep unmeasured |
