@@ -26,6 +26,7 @@ pub mod options;
 pub mod orbit;
 pub mod policy_registry;
 pub mod report;
+pub mod sampling;
 pub mod simple;
 pub mod sort;
 pub mod spin;
@@ -70,6 +71,7 @@ pub use options::RerankRunOptions;
 pub use orbit::{orbit_transform, OrbitReport, CHARACTERS};
 pub use policy_registry::{load_policy_from_path, PolicyConfig, PolicyRegistry, PolicySpec};
 pub use report::{build_report, render_report_markdown, RerankReport, RerankReportOptions};
+pub use sampling::{nonce_draws, NonceDrawReport};
 pub use simple::rerank;
 pub use sort::{
     sort_documents, sort_texts, SortError, SortOptions, SortProbe, SortProbeKind, SortedItem,

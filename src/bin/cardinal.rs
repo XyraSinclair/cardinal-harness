@@ -399,6 +399,18 @@ enum Commands {
         /// orthogonal coefficient, Parseval as the energy budget
         #[arg(long)]
         orbit: bool,
+        /// Repeat the judgement N times varying only a suffix nonce
+        /// (cache-friendly: the long prefix stays byte-identical, so
+        /// provider prompt caching bills it at the cached rate) and report
+        /// the mean, the spread sigma_w — the within-pair
+        /// context-sensitivity noise the DL floor consumes — and the
+        /// provider's cached-token receipt
+        #[arg(long)]
+        draws: Option<usize>,
+        /// Sampling temperature for --draws (default 0: spread = pure
+        /// context sensitivity, not sampling noise)
+        #[arg(long, default_value_t = 0.0)]
+        temperature: f32,
         /// Wording-invariance probe: ask the same question as "times more",
         /// "what fraction", and "which has LESS" (6 comparisons) — a
         /// coherent ratio judge must recover the same signed log-ratio
@@ -1653,6 +1665,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             sweep,
             orbit,
             wordings,
+            draws,
+            temperature,
         } => {
             let text_a = read_item_arg(&item_a)?;
             let text_b = read_item_arg(&item_b)?;
@@ -1660,6 +1674,57 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .as_deref()
                 .unwrap_or("openai/gpt-5.4-mini")
                 .to_string();
+
+            if let Some(k) = draws {
+                if std::env::var("OPENROUTER_API_KEY").is_err() {
+                    return Err("OPENROUTER_API_KEY is not set. Create a key at \
+                         https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
+                        .into());
+                }
+                let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
+                let report = cardinal_harness::rerank::nonce_draws(
+                    &gateway,
+                    &model,
+                    &template,
+                    &by,
+                    ("A", &text_a),
+                    ("B", &text_b),
+                    k,
+                    temperature,
+                    7,
+                    Attribution::new("cardinal::judge::draws"),
+                )
+                .await?;
+                if json {
+                    println!("{}", serde_json::to_string_pretty(&report)?);
+                } else {
+                    for (i, d) in report.draws.iter().enumerate() {
+                        match d {
+                            Some(m) => println!("draw {i}: {m:+.3} nats"),
+                            None => println!("draw {i}: refused"),
+                        }
+                    }
+                    match (report.mean, report.sigma_w) {
+                        (Some(m), Some(s)) => println!(
+                            "mean {m:+.3} nats · sigma_w {s:.3} (n = {})",
+                            report.comparisons - report.refusals
+                        ),
+                        (Some(m), None) => println!("mean {m:+.3} nats (single usable draw)"),
+                        _ => println!("no usable draws"),
+                    }
+                    println!(
+                        "cache: {} of {} input tokens billed as cached",
+                        report.cache_read_tokens_total, report.input_tokens_total
+                    );
+                }
+                eprintln!(
+                    "{} draws ({} refused) · ${:.4}",
+                    report.comparisons,
+                    report.refusals,
+                    report.cost_nanodollars as f64 / 1e9,
+                );
+                return Ok(());
+            }
 
             if orbit {
                 if std::env::var("OPENROUTER_API_KEY").is_err() {

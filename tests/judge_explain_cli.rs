@@ -572,6 +572,139 @@ async fn distinguish_profiles_focal_item_measured() {
     let _ = std::fs::remove_dir_all(&dir);
 }
 
+/// A judge whose answer depends on the draw-token — context-sensitive.
+/// Its per-draw ratios vary with the nonce hash; the stable OmniJudge
+/// ignores the nonce entirely. Together they pin sigma_w at both ends,
+/// and the prefix-stability receipt pins the cache-critical invariant.
+#[derive(Clone)]
+struct NonceSensitiveJudge {
+    prompts: std::sync::Arc<std::sync::Mutex<Vec<String>>>,
+}
+
+impl Respond for NonceSensitiveJudge {
+    fn respond(&self, request: &Request) -> ResponseTemplate {
+        let parsed: serde_json::Value = serde_json::from_slice(&request.body).unwrap_or_default();
+        let user = parsed["messages"]
+            .as_array()
+            .and_then(|m| {
+                m.iter()
+                    .find(|x| x["role"] == "user")
+                    .and_then(|x| x["content"].as_str())
+            })
+            .unwrap_or("")
+            .to_string();
+        self.prompts.lock().unwrap().push(user.clone());
+        // Ratio wobbles with the nonce: deterministic context sensitivity.
+        let nonce = user.split("draw-token: ").nth(1).unwrap_or("0");
+        let h: u64 = nonce.bytes().map(u64::from).sum();
+        let ratio = 2.0 + (h % 7) as f64 * 0.35;
+        let content = format!(r#"{{"higher_ranked":"A","ratio":{ratio},"confidence":0.9}}"#);
+        ResponseTemplate::new(200).set_body_json(json!({
+            "choices": [{ "message": { "content": content }, "finish_reason": "stop" }],
+            "usage": { "prompt_tokens": 400, "completion_tokens": 10 }
+        }))
+    }
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn draws_measure_context_sensitivity_and_keep_the_prefix_stable() {
+    let prompts = std::sync::Arc::new(std::sync::Mutex::new(Vec::new()));
+    let server = MockServer::start().await;
+    Mock::given(method("POST"))
+        .and(path("/chat/completions"))
+        .respond_with(NonceSensitiveJudge {
+            prompts: prompts.clone(),
+        })
+        .mount(&server)
+        .await;
+    let output = run_cardinal(
+        &server.uri(),
+        &[
+            "judge",
+            "shiny GOLD ring",
+            "dull TIN spoon",
+            "--by",
+            "shininess",
+            "--model",
+            "test/judge",
+            "--no-cache",
+            "--draws",
+            "6",
+            "--json",
+        ],
+        "",
+    );
+    assert!(
+        output.status.success(),
+        "stderr: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let parsed: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(parsed["comparisons"], 6);
+    let sigma = parsed["sigma_w"].as_f64().unwrap();
+    assert!(
+        sigma > 0.02,
+        "nonce-sensitive judge must show context noise: {sigma}"
+    );
+    // The cache-critical invariant: all six user prompts are byte-identical
+    // up to the final draw-token line.
+    let seen = prompts.lock().unwrap().clone();
+    assert_eq!(seen.len(), 6);
+    let prefix_of = |s: &str| s.rsplit_once("draw-token:").map(|(p, _)| p.to_string()).unwrap();
+    let first = prefix_of(&seen[0]);
+    for s in &seen[1..] {
+        assert_eq!(
+            prefix_of(s),
+            first,
+            "prefix must be byte-identical across draws (prompt-cache invariant)"
+        );
+    }
+    // And the nonces themselves all differ.
+    let mut suffixes: Vec<&str> = seen
+        .iter()
+        .map(|s| s.rsplit_once("draw-token:").unwrap().1)
+        .collect();
+    suffixes.sort_unstable();
+    suffixes.dedup();
+    assert_eq!(suffixes.len(), 6, "every draw carries a fresh nonce");
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn draws_on_a_stable_judge_report_zero_sigma() {
+    let server = start_server().await;
+    let output = run_cardinal(
+        &server.uri(),
+        &[
+            "judge",
+            "shiny GOLD ring",
+            "dull TIN spoon",
+            "--by",
+            "shininess",
+            "--model",
+            "test/judge",
+            "--no-cache",
+            "--draws",
+            "5",
+            "--json",
+        ],
+        "",
+    );
+    assert!(
+        output.status.success(),
+        "stderr: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let parsed: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert!(
+        parsed["sigma_w"].as_f64().unwrap() < 1e-12,
+        "a nonce-blind judge has zero context noise: {parsed}"
+    );
+    assert!(
+        (parsed["mean"].as_f64().unwrap() - 3.9f64.ln()).abs() < 1e-9,
+        "{parsed}"
+    );
+}
+
 #[tokio::test(flavor = "multi_thread")]
 async fn judge_spin_confirms_framing_blind_judge() {
     // The metal judge only reads content: susceptibility must be ~0 and the
