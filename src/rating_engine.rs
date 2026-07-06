@@ -274,6 +274,9 @@ pub struct SolveSummary {
     /// Fiedler value + Foster's-theorem check (None above the dense-eigen
     /// size cap). See [`SpectralReceipts`].
     pub spectral: Option<SpectralReceipts>,
+    /// Leave-one-out consistency: each judgement vs the rest of the
+    /// graph, correctly studentized. See [`LooReceipts`].
+    pub loo: Option<LooReceipts>,
     pub pcr: f64,
     pub total_info: f64,
     pub expected_rank_reversals: f64,
@@ -872,13 +875,17 @@ fn compute_hcr(mu: &[f64], residuals: &[f64], lam_eff: &[f64], cfg: &Config) -> 
 ///   graph — a free correctness invariant over the same effective
 ///   resistances the planner optimizes; a nonzero residual means the
 ///   linear algebra, not the judge, is broken.
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct SpectralReceipts {
     pub fiedler_value: f64,
     pub foster_residual: f64,
     /// Σ_e w_e·R_eff(e), reported alongside its theorem-exact target.
     pub resistance_sum: f64,
     pub expected_resistance_sum: f64,
+    /// Per-edge leverage h_e = w_e·R_eff(e) ∈ [0,1] — how much each
+    /// judgement determines its own fitted value. Trace identity:
+    /// Σ h_e = n − c exactly (Foster), the model's degrees of freedom.
+    pub edge_leverage: Vec<f64>,
 }
 
 /// Compute spectral receipts from fused edge endpoints and weights.
@@ -946,9 +953,11 @@ pub fn spectral_receipts(
     // Effective resistances via the eigen pseudo-inverse:
     // R(i,j) = Σ_{λ_k > 0} (v_k[i] − v_k[j])² / λ_k.
     let mut resistance_sum = 0.0;
+    let mut edge_leverage = Vec::with_capacity(endpoints.len());
     for (&(i, j), &w) in endpoints.iter().zip(lam_eff.iter()) {
         let (a, b) = (map[i], map[j]);
         if a == b {
+            edge_leverage.push(0.0);
             continue;
         }
         let mut r = 0.0;
@@ -961,6 +970,7 @@ pub fn spectral_receipts(
             r += d * d / lambda;
         }
         resistance_sum += w * r;
+        edge_leverage.push((w * r).clamp(0.0, 1.0));
     }
     let expected = (touched - components) as f64;
     Some(SpectralReceipts {
@@ -968,7 +978,98 @@ pub fn spectral_receipts(
         foster_residual: (resistance_sum - expected).abs(),
         resistance_sum,
         expected_resistance_sum: expected,
+        edge_leverage,
     })
+}
+
+/// Leave-one-out consistency receipts: each judgement tested against the
+/// prediction of the REST of the graph.
+///
+/// The sum-over-histories reading of a comparison graph: the fitted value
+/// for edge e is the precision-weighted average of every path between its
+/// endpoints, and the edge's own measurement should agree with the
+/// ensemble of paths that EXCLUDE it. With leverage h_e = λ_e·R_eff(e),
+/// the leave-one-out residual is r_e/(1−h_e) and its correctly
+/// studentized form is
+///
+///   z_e = r_e · √λ_e / √(1 − h_e)
+///
+/// so |z| > 3 flags a judgement the whole rest of the graph disagrees
+/// with (an outlier, a corruption, or a genuinely held minority belief —
+/// the receipt locates the disagreement, it does not adjudicate it).
+///
+/// Studentization subtlety with teeth (the first implementation failed
+/// its own planted test): the IRLS robustifier CRUSHES an outlier's
+/// effective weight, so scaling by post-Huber λ_eff hides exactly the
+/// judgements the solver quietly downweighted. The receipt therefore
+/// scales by the judgement's CLAIMED precision (raw λ) against a robust
+/// MAD estimate of the weighted residual scale — it must see what the
+/// robustifier saw, not what it left behind. Bridges (h_e ≈ 1) carry no
+/// cross-check — removing them disconnects the graph — and are counted,
+/// not scored: a judgement only one edge supports is unaudited, which is
+/// itself worth knowing.
+#[derive(Debug, Clone, PartialEq)]
+pub struct LooReceipts {
+    /// Studentized leave-one-out residual per edge (None for bridges).
+    pub z: Vec<Option<f64>>,
+    /// Largest |z| observed (0 when none scoreable).
+    pub max_abs_z: f64,
+    /// Edge indices with |z| > 3: the judgements the rest of the graph
+    /// votes against.
+    pub flagged: Vec<usize>,
+    /// Edges with leverage ≈ 1: unauditable single-path judgements.
+    pub bridges: usize,
+    /// Robust scale (1.4826·MAD) of the √λ-weighted residuals.
+    pub sigma_hat: f64,
+}
+
+fn compute_loo(residuals: &[f64], lam_raw: &[f64], leverage: &[f64]) -> LooReceipts {
+    // Robust scale of weighted residuals, immune to the very outliers
+    // this receipt exists to find.
+    let mut weighted: Vec<f64> = residuals
+        .iter()
+        .zip(lam_raw.iter())
+        .map(|(&r, &lam)| (r * lam.max(0.0).sqrt()).abs())
+        .collect();
+    weighted.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
+    let mad = if weighted.is_empty() {
+        0.0
+    } else {
+        weighted[weighted.len() / 2]
+    };
+    let sigma_hat = (1.4826 * mad).max(1e-12);
+
+    let mut z = Vec::with_capacity(residuals.len());
+    let mut max_abs_z = 0.0f64;
+    let mut flagged = Vec::new();
+    let mut bridges = 0usize;
+    for (k, ((&r, &lam), &h)) in residuals
+        .iter()
+        .zip(lam_raw.iter())
+        .zip(leverage.iter())
+        .enumerate()
+    {
+        if h > 1.0 - 1e-9 {
+            bridges += 1;
+            z.push(None);
+            continue;
+        }
+        let zk = r * lam.max(0.0).sqrt() / (sigma_hat * (1.0 - h).sqrt());
+        if zk.abs() > max_abs_z {
+            max_abs_z = zk.abs();
+        }
+        if zk.abs() > 3.0 {
+            flagged.push(k);
+        }
+        z.push(Some(zk));
+    }
+    LooReceipts {
+        z,
+        max_abs_z,
+        flagged,
+        bridges,
+        sigma_hat,
+    }
 }
 
 /// The full combinatorial Hodge split of the cyclic residual.
@@ -1981,6 +2082,10 @@ impl RatingEngine {
         let endpoints: Vec<(usize, usize)> = self.edges.iter().map(|e| (e.i, e.j)).collect();
         let hodge = compute_hodge_split(&endpoints, &mu, &residuals, &lam_eff, self.n, &self.cfg);
         let spectral = spectral_receipts(&endpoints, &lam_eff, self.n, EXACT_DIAG_MAX_DIM);
+        let lam_raw: Vec<f64> = self.edges.iter().map(|e| e.lam).collect();
+        let loo = spectral
+            .as_ref()
+            .map(|s| compute_loo(&residuals, &lam_raw, &s.edge_leverage));
         let pcr = compute_pcr_lite(&mu, &residuals, &lam_eff, &self.cfg);
 
         let (expected_rev, max_flip, rank_risk) =
@@ -2012,6 +2117,7 @@ impl RatingEngine {
             hcr,
             hodge,
             spectral,
+            loo,
             pcr,
             total_info,
             expected_rank_reversals: expected_rev,

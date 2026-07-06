@@ -129,6 +129,32 @@ fn solver_summary_split_sums_to_hcr_on_a_planted_cyclic_judge() {
 }
 
 #[test]
+fn atlas_winner_c8_134_hosts_both_receipts_at_the_same_budget() {
+    // The design-atlas headline (docs/DESIGN_ATLAS.md): swapping stride 2
+    // for stride 3 in the JCB graph keeps 20 edges, 16 triangles, and
+    // Fiedler 4.0, while raising harmonic_dim from 0 to 1 — both curl
+    // receipts alive on ONE connected graph. Pinned so the recommended
+    // v2 core design's profile cannot silently drift.
+    let n = 8usize;
+    let mut edges = std::collections::BTreeSet::new();
+    for s in [1usize, 3, 4] {
+        for i in 0..n {
+            let j = (i + s) % n;
+            edges.insert((i.min(j), i.max(j)));
+        }
+    }
+    let edges: Vec<(usize, usize)> = edges.into_iter().collect();
+    assert_eq!(edges.len(), 20);
+    let ones = vec![1.0; edges.len()];
+    let split = compute_hodge_split(&edges, &ones, &ones, &ones, n, &cfg());
+    assert_eq!(split.filled_triangles, 16);
+    assert_eq!(split.harmonic_dim, 1, "the strictly-better design: {split:?}");
+    let spectral =
+        cardinal_harness::rating_engine::spectral_receipts(&edges, &ones, n, 256).unwrap();
+    assert!((spectral.fiedler_value - 4.0).abs() < 1e-9, "{spectral:?}");
+}
+
+#[test]
 fn jcb_graph_design_cannot_host_harmonic_disagreement() {
     // The benchmark's stride-{1,2,4} graph: 20 edges, cycle dim 13,
     // 16 triangles whose curl space has rank exactly 13. Pinned here so

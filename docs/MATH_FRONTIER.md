@@ -88,6 +88,27 @@ them; the test corrected it). Live: mini's dominant bias is the
 order·polarity interaction (22.3% of energy) — a measured instance of
 structure invisible to all marginal probes.
 
+## 3¾. Leave-one-out consistency + the design atlas — SHIPPED (2026-07-06)
+
+Two instruments in the classical styles:
+
+- **Sum-over-histories per judgement** (`SolveSummary.loo`): every edge
+  tested against the prediction of the rest of the graph — leverage
+  h_e = λ_e·R_eff(e) from the spectral pass (trace identity Σh = n − c,
+  Foster again), externally-robust studentization with the judgement's
+  CLAIMED precision against a MAD scale. Its own first implementation
+  failed the planted test: post-Huber weights hide exactly the outliers
+  the robustifier crushed — the receipt must see what the robustifier
+  saw. Pinned: planted corruption flagged at |z| > 3 and nothing else;
+  clean data unflagged; bridges counted as unaudited, never scored.
+- **Enumerated designs, not intuited ones** (`examples/design_atlas.rs`,
+  docs/DESIGN_ATLAS.md): all circulants at n ∈ {8,10,12} scored by
+  (edges, triangles, harmonic_dim, Fiedler). Headline: C₈(1,3,4)
+  strictly dominates the hand-picked v1 graph — same 20 edges, same 16
+  triangles, same Fiedler 4.0, harmonic_dim 1 instead of 0. One stride
+  away from strictly better, findable only by search. Routed to #49 as
+  the v2 core graph; profile pinned.
+
 ## 4. Stochastic transitivity hierarchy — NEXT (new invariance row)
 
 Weak/moderate/strong stochastic transitivity (WST ⊂ MST ⊂ SST) on
