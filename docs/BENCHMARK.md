@@ -146,6 +146,14 @@ and define v2:
   corpus before treating gaps under ~0.1 as real.
 - **Coherence ≠ correctness** (see above). Pair with reference-based evals;
   JCB is the precondition, not the replacement.
+- **The ceiling is structural**: no behavioral battery — this one included
+  — can distinguish an honest judge from an agent maintaining a coherent
+  FALSE preference structure across every transformation applied.
+  Consistency certifies the rigidity of the reported structure, never its
+  sincerity; sincerity is not an elicitable property of input–output
+  behavior. A theorem-shaped limit, not an engineering gap — shipped next
+  to the score, not in a footnote. (Elicitation-complexity thread in
+  `notes/math-frontier-2026-07-05/literature.md`.)
 - **Frustration includes quantization curl** from the ratio ladder
   (documented in FIRST_PRINCIPLES §5½); the same floor applies to every
   model, so rankings are unaffected, but absolute curl should not be read

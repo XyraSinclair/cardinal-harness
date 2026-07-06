@@ -271,6 +271,9 @@ pub struct SolveSummary {
     /// triad-invisible harmonic components (see [`HodgeSplit`]).
     /// Invariant: `hodge.local_curl_frac + hodge.harmonic_frac ≈ hcr`.
     pub hodge: HodgeSplit,
+    /// Fiedler value + Foster's-theorem check (None above the dense-eigen
+    /// size cap). See [`SpectralReceipts`].
+    pub spectral: Option<SpectralReceipts>,
     pub pcr: f64,
     pub total_info: f64,
     pub expected_rank_reversals: f64,
@@ -855,6 +858,117 @@ fn compute_hcr(mu: &[f64], residuals: &[f64], lam_eff: &[f64], cfg: &Config) -> 
 
     let hcr = num / den;
     hcr.clamp(0.0, 1.0)
+}
+
+/// Spectral identifiability receipts for a solved comparison graph.
+///
+/// - `fiedler_value`: smallest nonzero eigenvalue of the weighted graph
+///   Laplacian (algebraic connectivity). It lower-bounds how well the
+///   score differences are identified: posterior variance along the
+///   worst-identified direction scales as 1/fiedler. Zero-adjacent values
+///   mean the run's answer hinges on a near-cut edge.
+/// - `foster_residual`: |Σ_e w_e·R_eff(e) − (n_touched − components)|.
+///   Foster's theorem says the sum is EXACTLY n − c for any weighted
+///   graph — a free correctness invariant over the same effective
+///   resistances the planner optimizes; a nonzero residual means the
+///   linear algebra, not the judge, is broken.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct SpectralReceipts {
+    pub fiedler_value: f64,
+    pub foster_residual: f64,
+    /// Σ_e w_e·R_eff(e), reported alongside its theorem-exact target.
+    pub resistance_sum: f64,
+    pub expected_resistance_sum: f64,
+}
+
+/// Compute spectral receipts from fused edge endpoints and weights.
+/// Dense eigen-decomposition: intended for graphs up to a few hundred
+/// touched vertices (returns `None` above `max_dim` or on empty input).
+pub fn spectral_receipts(
+    endpoints: &[(usize, usize)],
+    lam_eff: &[f64],
+    n_vertices: usize,
+    max_dim: usize,
+) -> Option<SpectralReceipts> {
+    use nalgebra::DMatrix;
+    if endpoints.is_empty() || endpoints.len() != lam_eff.len() {
+        return None;
+    }
+    // Remap touched vertices to a compact index.
+    let mut map = vec![usize::MAX; n_vertices];
+    let mut touched = 0usize;
+    for &(i, j) in endpoints {
+        for v in [i, j] {
+            if map[v] == usize::MAX {
+                map[v] = touched;
+                touched += 1;
+            }
+        }
+    }
+    if touched < 2 || touched > max_dim {
+        return None;
+    }
+    let mut lap = DMatrix::<f64>::zeros(touched, touched);
+    for (&(i, j), &w) in endpoints.iter().zip(lam_eff.iter()) {
+        let (a, b) = (map[i], map[j]);
+        if a == b {
+            continue;
+        }
+        lap[(a, a)] += w;
+        lap[(b, b)] += w;
+        lap[(a, b)] -= w;
+        lap[(b, a)] -= w;
+    }
+    let eig = SymmetricEigen::new(lap);
+    let mut order: Vec<usize> = (0..touched).collect();
+    order.sort_by(|&x, &y| {
+        eig.eigenvalues[x]
+            .partial_cmp(&eig.eigenvalues[y])
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
+    let scale = order
+        .iter()
+        .map(|&k| eig.eigenvalues[k].abs())
+        .fold(0.0f64, f64::max)
+        .max(1e-300);
+    let zero_tol = scale * 1e-9;
+    let components = order
+        .iter()
+        .filter(|&&k| eig.eigenvalues[k].abs() <= zero_tol)
+        .count()
+        .max(1);
+    let fiedler_value = order
+        .iter()
+        .map(|&k| eig.eigenvalues[k])
+        .find(|&v| v > zero_tol)
+        .unwrap_or(0.0);
+
+    // Effective resistances via the eigen pseudo-inverse:
+    // R(i,j) = Σ_{λ_k > 0} (v_k[i] − v_k[j])² / λ_k.
+    let mut resistance_sum = 0.0;
+    for (&(i, j), &w) in endpoints.iter().zip(lam_eff.iter()) {
+        let (a, b) = (map[i], map[j]);
+        if a == b {
+            continue;
+        }
+        let mut r = 0.0;
+        for &k in &order {
+            let lambda = eig.eigenvalues[k];
+            if lambda <= zero_tol {
+                continue;
+            }
+            let d = eig.eigenvectors[(a, k)] - eig.eigenvectors[(b, k)];
+            r += d * d / lambda;
+        }
+        resistance_sum += w * r;
+    }
+    let expected = (touched - components) as f64;
+    Some(SpectralReceipts {
+        fiedler_value,
+        foster_residual: (resistance_sum - expected).abs(),
+        resistance_sum,
+        expected_resistance_sum: expected,
+    })
 }
 
 /// The full combinatorial Hodge split of the cyclic residual.
@@ -1866,6 +1980,7 @@ impl RatingEngine {
         let hcr = compute_hcr(&mu, &residuals, &lam_eff, &self.cfg);
         let endpoints: Vec<(usize, usize)> = self.edges.iter().map(|e| (e.i, e.j)).collect();
         let hodge = compute_hodge_split(&endpoints, &mu, &residuals, &lam_eff, self.n, &self.cfg);
+        let spectral = spectral_receipts(&endpoints, &lam_eff, self.n, EXACT_DIAG_MAX_DIM);
         let pcr = compute_pcr_lite(&mu, &residuals, &lam_eff, &self.cfg);
 
         let (expected_rev, max_flip, rank_risk) =
@@ -1896,6 +2011,7 @@ impl RatingEngine {
             diag_cov,
             hcr,
             hodge,
+            spectral,
             pcr,
             total_info,
             expected_rank_reversals: expected_rev,

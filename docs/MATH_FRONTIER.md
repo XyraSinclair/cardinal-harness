@@ -38,29 +38,38 @@ virtue. Pinned in `tests/hodge_split.rs`; any pair-design change that
 alters this surfaces. Measuring harmonic structure in real judges needs
 a mixed design (triangle-rich block + chordless-cycle block).
 
-## 2. Spectral identifiability receipts — NEXT
+## 2. Spectral identifiability receipts — SHIPPED (2026-07-05)
 
-Foster's theorem (Σ_e w-effective-resistances over edges = n − c) is a
-free correctness invariant on the solver's own Laplacian; the Fiedler
-value (algebraic connectivity) lower-bounds identifiability and belongs
-in `SolveSummary` next to hcr as the standing "how well-posed was this
-solve" number. Rank Centrality (Negahban-Oh-Shah) as a spectral
-cross-check estimator: near-minimax, computable from data already held,
-disagreement with the LS solve is itself a receipt.
+`spectral_receipts` in `rating_engine.rs`, populated in every solve up to
+the dense-eigen cap: the **Fiedler value** (algebraic connectivity — the
+standing "how well-posed was this solve" number; posterior variance along
+the worst-identified direction scales as 1/fiedler) and the **Foster
+residual** (Σ_e w_e·R_eff(e) must equal n − components EXACTLY, by
+Foster's theorem — a free correctness invariant over the same effective
+resistances the planner optimizes; nonzero means broken linear algebra,
+not a bad judge). Pinned on hand-computed spectra (P3, weighted triangle,
+disconnected graph) and end-to-end through IRLS
+(`tests/program_equivalence.rs`). Still open in this thread: Rank
+Centrality (Negahban–Oh–Shah) as a near-minimax spectral cross-check.
 
-## 3. Program equivalence for elicitation types — NEXT (the compass item)
+## 3. Program equivalence for elicitation types — SHIPPED (2026-07-05)
 
 Elicitation primitives as typed operations `(EntitySet, Attribute,
 Instrument, Model) → SufficientStatistics`, statically cacheable exactly
-when pure in those arguments (our content-addressed cache already
+when pure in those arguments (the content-addressed cache already
 enforces this — the theory names it). The free structure: a commutative
 monoid of sufficient statistics under evidence-fusion; two elicitation
-programs are equivalent iff they fuse to identical statistics. Property
-tests: shuffled/batched ingestion invariance (positive theorem — must
-pass) and split-vs-merge across an active Huber clip (negative — must
-fail, proving the equivalence boundary is real, robustness breaks naive
-compositionality). This is the mathematical skeleton for the operator's
-type-signature landscape and for agent-continuation elicitation later.
+programs are equivalent iff they fuse to identical statistics.
+
+Pinned in `tests/program_equivalence.rs` — with a CORRECTION to the
+theory notes, decided by the machine: arrival-order/batching invariance
+holds (≤1e-9), and same-pair weight re-partition is invariant **even
+under active Huber clipping** — the notes claimed a boundary there, but
+fusion is per-pair BEFORE IRLS and the λ-weighted mean is linear, so the
+monoid theorem is stronger at pair granularity than claimed. The real
+equivalence boundary is re-ROUTING evidence across distinct edges (a
+different program, not a re-partition). Rejected-claim receipt: the
+theory's deliberate counterexample failed to be one.
 
 ## 4. Stochastic transitivity hierarchy — NEXT (new invariance row)
 
