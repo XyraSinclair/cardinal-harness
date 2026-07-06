@@ -150,6 +150,21 @@ model transfers as calibration-weighted pooling where our null pairs and
 known-order anchor pairs play the role of calibration questions — the
 principled cross-model aggregation for "communications" use.
 
+## 5½. Nonce draws: cache-priced repeat elicitation — SHIPPED (2026-07-06)
+
+`nonce_draws` / `judge --draws k`: repeat the judgement varying only a
+suffix nonce after a byte-identical prefix (pinned) — provider prompt
+caching bills the long prefix at the cached rate, and at temperature 0
+the spread over nonces is the model's pure context-sensitivity noise:
+the within-pair σ_w the DL floor consumes, measured with the actual
+contaminant. Live: deepseek billed 95% of input as cached (8 judgements
+on a 1300-token prompt, $0.0010) and showed σ_w = 0.54 vs mini's 0.11 on
+the same pair — context sensitivity is a model property that discounts
+the portfolio ΔI/$ through the floor; between-run mean shift surfaced
+the two-level structure unprompted. This is the missing repeat-sampling
+instrument §6 gates on; the de Finetti no-shared-context clause is
+satisfied by construction (independent calls, fixed presentation).
+
 ## 6. Variance components before repeat-sampling ships — ESTIMATOR SHIPPED (2026-07-06)
 
 `repeat_pooling::pool_repeats`: two-level model m = Δ + b_pair + ε with
