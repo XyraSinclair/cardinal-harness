@@ -5,6 +5,10 @@ intent + literature sweep + theory ideation; full documents under
 `notes/math-frontier-2026-07-05/`, tier caveat: research agents served at
 sonnet, all load-bearing claims re-derived or tested before adoption).
 Ranked by (mathematical depth × buildability), status per item.
+Continuity: every NEXT item is a tracked issue — #45 (orbit group
+growth), #46 (sheaf/provenance wire format), #47 (stochastic
+transitivity + DL variance floor), #48 (Cooke + Rank Centrality +
+CUSUM), #49 (JCB v2 scale-up) — so the frontier survives sessions.
 
 ## Compass (operator's archive, verbatim)
 
