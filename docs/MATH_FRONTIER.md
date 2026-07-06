@@ -107,14 +107,20 @@ model transfers as calibration-weighted pooling where our null pairs and
 known-order anchor pairs play the role of calibration questions — the
 principled cross-model aggregation for "communications" use.
 
-## 6. Variance components before repeat-sampling ships
+## 6. Variance components before repeat-sampling ships — ESTIMATOR SHIPPED (2026-07-06)
 
-DerSimonian–Laird (random-effects) estimator for per-pair heterogeneity:
-judgment_t = latent_pair_belief + per-draw noise. Must exist BEFORE any
-repeat-sampling instrument, or naive k/σ² pooling will overweight
-structurally-frustrated pairs from day one. De Finetti exchangeability
-is the design constraint: repeat draws are exchangeable only if context
-is not shared across draws — pin this in the instrument contract now.
+`repeat_pooling::pool_repeats`: two-level model m = Δ + b_pair + ε with
+the DerSimonian–Laird moment estimator adapted to graph fits (Cochran's Q
+over weighted solve residuals, df = cycle dimension), then a floored
+re-solve with Var(m̄) = σ_b² + σ_w²/k — pooled precision is capped at
+1/σ_b² no matter how many draws. Pinned (`tests/repeat_pooling.rs`):
+planted (σ_w, σ_b) recovered; zero heterogeneity yields no phantom floor
+and matches the naive solve; and the misranking pin — a 200-draw
+frustrated pair flips the naive k/σ² order while the floored solve holds
+the truth. The repeat-sampling instrument may now ship without inheriting
+the overweighting bug. Still open in #47: the de Finetti exchangeability
+clause in the instrument contract (no shared context across draws) and
+the WST/MST/SST probe built on top.
 
 ## 7. Time as a change-point problem, not a trend
 

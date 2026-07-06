@@ -19,6 +19,7 @@ pub mod gain_calibration;
 pub mod gateway;
 pub mod prompts;
 pub mod rating_engine;
+pub mod repeat_pooling;
 pub mod rerank;
 pub mod text_chunking;
 pub mod trait_search;
