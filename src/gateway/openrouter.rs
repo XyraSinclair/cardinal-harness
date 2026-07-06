@@ -157,6 +157,10 @@ struct ChatApiRequest<'a> {
     top_logprobs: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     reasoning: Option<ReasoningConfig>,
+    /// OpenAI-style cache-routing hint: content-derived, independent of
+    /// nonce/padding, so repeat draws route to the same cache slot.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    prompt_cache_key: Option<&'a str>,
 }
 
 #[derive(Serialize)]
@@ -323,6 +327,7 @@ impl OpenRouterAdapter {
             },
             logprobs: req.logprobs,
             top_logprobs: req.top_logprobs,
+            prompt_cache_key: req.prompt_cache_key.as_deref(),
             reasoning: req.reasoning.clone().or_else(|| {
                 // Kimi K2.5 may emit billed reasoning with empty visible content unless
                 // reasoning is explicitly disabled.

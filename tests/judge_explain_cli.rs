@@ -593,7 +593,20 @@ impl Respond for NonceSensitiveJudge {
             })
             .unwrap_or("")
             .to_string();
-        self.prompts.lock().unwrap().push(user.clone());
+        let system_len = parsed["messages"]
+            .as_array()
+            .and_then(|m| {
+                m.iter()
+                    .find(|x| x["role"] == "system")
+                    .and_then(|x| x["content"].as_str())
+            })
+            .map(str::len)
+            .unwrap_or(0);
+        let cache_key = parsed["prompt_cache_key"].as_str().unwrap_or("").to_string();
+        self.prompts
+            .lock()
+            .unwrap()
+            .push(format!("{system_len}\u{1}{cache_key}\u{1}{user}"));
         // Ratio wobbles with the nonce: deterministic context sensitivity.
         let nonce = user.split("draw-token: ").nth(1).unwrap_or("0");
         let h: u64 = nonce.bytes().map(u64::from).sum();
@@ -646,24 +659,38 @@ async fn draws_measure_context_sensitivity_and_keep_the_prefix_stable() {
         sigma > 0.02,
         "nonce-sensitive judge must show context noise: {sigma}"
     );
-    // The cache-critical invariant: all six user prompts are byte-identical
-    // up to the final draw-token line.
+    // The cache-critical invariants: (a) user prompts byte-identical up
+    // to the draw-token line; (b) the system prompt is padded past the
+    // cache floor and identical across draws; (c) prompt_cache_key is
+    // identical across draws (content-derived, nonce-independent — the
+    // routing hint that keeps every draw on one provider cache slot).
     let seen = prompts.lock().unwrap().clone();
     assert_eq!(seen.len(), 6);
-    let prefix_of = |s: &str| s.rsplit_once("draw-token:").map(|(p, _)| p.to_string()).unwrap();
-    let first = prefix_of(&seen[0]);
+    let parts = |s: &str| {
+        let mut it = s.split('\u{1}');
+        (
+            it.next().unwrap().parse::<usize>().unwrap(),
+            it.next().unwrap().to_string(),
+            it.next().unwrap().to_string(),
+        )
+    };
+    let (sys0, key0, user0) = parts(&seen[0]);
+    assert!(
+        sys0 >= cardinal_harness::rerank::sampling::CACHE_FLOOR_CHARS,
+        "system must be padded past the cache floor: {sys0}"
+    );
+    assert!(!key0.is_empty(), "prompt_cache_key must be sent");
+    let prefix_of =
+        |u: &str| u.rsplit_once("draw-token:").map(|(p, _)| p.to_string()).unwrap();
+    let first_prefix = prefix_of(&user0);
+    let mut suffixes = vec![user0.rsplit_once("draw-token:").unwrap().1.to_string()];
     for s in &seen[1..] {
-        assert_eq!(
-            prefix_of(s),
-            first,
-            "prefix must be byte-identical across draws (prompt-cache invariant)"
-        );
+        let (sys, key, user) = parts(s);
+        assert_eq!(sys, sys0, "padded system identical across draws");
+        assert_eq!(key, key0, "cache key identical across draws");
+        assert_eq!(prefix_of(&user), first_prefix, "user prefix byte-identical");
+        suffixes.push(user.rsplit_once("draw-token:").unwrap().1.to_string());
     }
-    // And the nonces themselves all differ.
-    let mut suffixes: Vec<&str> = seen
-        .iter()
-        .map(|s| s.rsplit_once("draw-token:").unwrap().1)
-        .collect();
     suffixes.sort_unstable();
     suffixes.dedup();
     assert_eq!(suffixes.len(), 6, "every draw carries a fresh nonce");

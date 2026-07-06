@@ -228,6 +228,11 @@ pub struct ChatRequest {
     pub top_logprobs: Option<u32>,
     /// Optional normalized reasoning configuration for providers that support it.
     pub reasoning: Option<ReasoningConfig>,
+    /// OpenAI-style cache-routing hint (`prompt_cache_key`): should be
+    /// derived from the STABLE content (template + attribute + entities)
+    /// and independent of any nonce or padding, so repeat draws route to
+    /// the same provider cache slot. None = omit.
+    pub prompt_cache_key: Option<String>,
 }
 
 impl ChatRequest {
@@ -242,6 +247,7 @@ impl ChatRequest {
             logprobs: false,
             top_logprobs: None,
             reasoning: None,
+            prompt_cache_key: None,
         }
     }
 

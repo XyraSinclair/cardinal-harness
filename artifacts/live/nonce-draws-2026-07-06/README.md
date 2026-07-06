@@ -39,3 +39,22 @@ passages, "depth of insight about living well". n = 1 pair per model.
    96-token output cap (looked like refusals); raised to 256 → 8/8.
    A parse failure that presents as a refusal is a receipts bug — fixed
    same run.
+
+## Addendum: the diamond2 port (same day)
+
+The diamond archaeology (notes/diamond-archaeology-2026-07-06/) surfaced
+a $100-live-validated mechanism the first version here lacked: pad the
+system prompt past the provider's cache threshold inside a labeled
+neutral block, and send OpenAI's `prompt_cache_key` routing hint derived
+from the STABLE content (template + attribute + entities — independent of
+nonce and padding, pinned in tests). Result on the pair that previously
+showed zero:
+
+| | cached / input | cost (8 draws) |
+|---|---|---|
+| mini, before (no key, no padding) | 0 / 10,483 | $0.0088 |
+| mini, after (key + padding) | **12,544 / 17,059 (74%)** | **$0.0053** |
+
+40% cheaper despite the padded prompt being longer — the router was the
+missing piece, not the provider. σ_w unchanged (≈0.10): padding is
+judgment-inert, as required of a null transformation.

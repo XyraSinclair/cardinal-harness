@@ -67,6 +67,37 @@ fn splitmix(mut x: u64) -> u64 {
 /// final nonce line (pinned in tests) — the property that keeps the
 /// provider's prefix cache warm. Draws bypass the pairwise SQLite cache
 /// by construction (each is deliberately fresh).
+/// Character floor for the stable prefix. Providers cache prefixes only
+/// past a token threshold (OpenAI: 1024 tokens); short prompts are padded
+/// with a neutral, clearly-labeled block INSIDE the stable region so the
+/// threshold is crossed and every draw shares the padded prefix. ~4 chars
+/// per token with margin. (Ported from diamond2's CachePaddingPlan,
+/// validated there in a $100 live run.)
+pub const CACHE_FLOOR_CHARS: usize = 5200;
+
+fn pad_system(system: &str, floor: usize) -> String {
+    if system.len() >= floor {
+        return system.to_string();
+    }
+    let unit = " cache-pad: ignore this neutral prefix-padding token run for measurement caching. ";
+    let mut pad = String::new();
+    while system.len() + pad.len() + 60 < floor {
+        pad.push_str(unit);
+    }
+    format!(
+        "{system}
+<cache_padding purpose=\"prefix-cache-floor\">{pad}</cache_padding>"
+    )
+}
+
+fn fnv(mut state: u64, s: &str) -> u64 {
+    for b in s.bytes() {
+        state ^= u64::from(b);
+        state = state.wrapping_mul(0x0000_0100_0000_01B3);
+    }
+    state
+}
+
 #[expect(clippy::too_many_arguments)]
 pub async fn nonce_draws(
     gateway: &dyn ChatGateway,
@@ -88,6 +119,16 @@ pub async fn nonce_draws(
         crate::prompts::EntityRef::with_context("A", first.1),
         crate::prompts::EntityRef::with_context("B", second.1),
     );
+    // Cache-routing key: derived from the STABLE content only — identical
+    // across draws, unchanged by nonce or padding tweaks.
+    let cache_key = {
+        let mut state = 0xcbf2_9ce4_8422_2325_u64;
+        for part in [template_slug, criterion, first.1, second.1] {
+            state = fnv(state, part);
+        }
+        format!("cardinal:{template_slug}:{state:016x}")
+    };
+    let padded_system = pad_system(&instance.system, CACHE_FLOOR_CHARS);
 
     let mut draws = Vec::with_capacity(k);
     let mut nonces = Vec::with_capacity(k);
@@ -104,7 +145,7 @@ pub async fn nonce_draws(
         let request = ChatRequest {
             model: ChatModel::openrouter(model),
             messages: vec![
-                Message::system(instance.system.clone()),
+                Message::system(padded_system.clone()),
                 Message::user(user),
             ],
             temperature,
@@ -114,6 +155,7 @@ pub async fn nonce_draws(
             logprobs: false,
             top_logprobs: None,
             reasoning: None,
+            prompt_cache_key: Some(cache_key.clone()),
         };
         let response = gateway.chat(request).await?;
         cost += response.cost_nanodollars;

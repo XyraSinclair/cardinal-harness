@@ -379,6 +379,7 @@ async fn propose_via_chat(
             logprobs: false,
             top_logprobs: None,
             reasoning: None,
+            prompt_cache_key: None,
         })
         .await?;
 

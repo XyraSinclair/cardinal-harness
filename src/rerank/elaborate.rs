@@ -89,6 +89,7 @@ pub async fn elaborate_criterion(
             logprobs: false,
             top_logprobs: None,
             reasoning: None,
+            prompt_cache_key: None,
         })
         .await?;
 
