@@ -21,6 +21,7 @@ pub mod hooks;
 pub mod model_policy;
 pub mod multi;
 pub mod options;
+pub mod orbit;
 pub mod policy_registry;
 pub mod report;
 pub mod simple;
@@ -62,6 +63,7 @@ pub use multi::{
     MultiRerankError, RerankChargeEstimate, RerankExecution,
 };
 pub use options::RerankRunOptions;
+pub use orbit::{orbit_transform, OrbitReport, CHARACTERS};
 pub use policy_registry::{load_policy_from_path, PolicyConfig, PolicyRegistry, PolicySpec};
 pub use report::{build_report, render_report_markdown, RerankReport, RerankReportOptions};
 pub use simple::rerank;

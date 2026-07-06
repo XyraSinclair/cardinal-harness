@@ -354,6 +354,13 @@ enum Commands {
         /// full sweep instead of the 6-call --spin probe.
         #[arg(long)]
         sweep: bool,
+        /// Orbit transform: measure the judgment under the full Z₂³ group
+        /// (order × polarity × wording, 8 comparisons), pull back through
+        /// the known equivariances, and report the character decomposition
+        /// — belief = the invariant coefficient, every bias a named
+        /// orthogonal coefficient, Parseval as the energy budget
+        #[arg(long)]
+        orbit: bool,
         /// Wording-invariance probe: ask the same question as "times more",
         /// "what fraction", and "which has LESS" (6 comparisons) — a
         /// coherent ratio judge must recover the same signed log-ratio
@@ -1504,6 +1511,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             cache,
             spin,
             sweep,
+            orbit,
             wordings,
         } => {
             let text_a = read_item_arg(&item_a)?;
@@ -1512,6 +1520,63 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .as_deref()
                 .unwrap_or("openai/gpt-5.4-mini")
                 .to_string();
+
+            if orbit {
+                if std::env::var("OPENROUTER_API_KEY").is_err() {
+                    return Err("OPENROUTER_API_KEY is not set. Create a key at \
+                         https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
+                        .into());
+                }
+                let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
+                let cache_store = if no_cache {
+                    None
+                } else {
+                    let cache_path = cache.unwrap_or_else(SqlitePairwiseCache::default_path);
+                    Some(SqlitePairwiseCache::new(cache_path)?)
+                };
+                let cache_ref = cache_store
+                    .as_ref()
+                    .map(|c| c as &dyn cardinal_harness::cache::PairwiseCache);
+                let report = cardinal_harness::rerank::orbit_transform(
+                    &gateway,
+                    cache_ref,
+                    &model,
+                    &by,
+                    ("A", &text_a),
+                    ("B", &text_b),
+                    &template,
+                    Attribution::new("cardinal::judge::orbit"),
+                )
+                .await?;
+                if json {
+                    println!("{}", serde_json::to_string_pretty(&report)?);
+                } else if report.refusals > 0 {
+                    println!(
+                        "orbit incomplete: {} refusals in 8 variants — no transform",
+                        report.refusals
+                    );
+                } else {
+                    let total: f64 = report.energies.iter().sum();
+                    for (idx, name) in cardinal_harness::rerank::CHARACTERS.iter().enumerate() {
+                        println!(
+                            "{name:<26} {:+.3} nats  ({:.1}% of energy)",
+                            report.coefficients[idx],
+                            100.0 * report.energies[idx] / total.max(1e-12)
+                        );
+                    }
+                    if let Some(c) = report.coherence {
+                        println!("coherence (invariant fraction): {c:.3}");
+                    }
+                    println!("parseval residual: {:.2e}", report.parseval_residual);
+                }
+                eprintln!(
+                    "{} comparisons ({} cached) · ${:.4}",
+                    report.comparisons,
+                    report.comparisons_cached,
+                    report.cost_nanodollars as f64 / 1e9,
+                );
+                return Ok(());
+            }
 
             if wordings {
                 if std::env::var("OPENROUTER_API_KEY").is_err() {

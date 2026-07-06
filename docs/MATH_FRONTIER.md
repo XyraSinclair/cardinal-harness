@@ -71,6 +71,19 @@ equivalence boundary is re-ROUTING evidence across distinct edges (a
 different program, not a re-partition). Rejected-claim receipt: the
 theory's deliberate counterexample failed to be one.
 
+## 3½. The orbit transform — SHIPPED (2026-07-05)
+
+Harmonic analysis on the elicitation group Z₂³ (`src/rerank/orbit.rs`,
+`judge --orbit`): belief = trivial-character coefficient, biases =
+orthogonal character coefficients, Parseval = exact energy accounting,
+coherence = projection ratio. Subsumes the marginal probes as subgroup
+restrictions and adds the interaction coefficients they cannot see.
+Pinned: perfect judge (all energy trivial), the two position pathologies
+separated (order·polarity vs triple — the first derivation conflated
+them; the test corrected it). Live: mini's dominant bias is the
+order·polarity interaction (22.3% of energy) — a measured instance of
+structure invisible to all marginal probes.
+
 ## 4. Stochastic transitivity hierarchy — NEXT (new invariance row)
 
 Weak/moderate/strong stochastic transitivity (WST ⊂ MST ⊂ SST) on

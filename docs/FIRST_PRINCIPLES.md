@@ -154,6 +154,39 @@ ladder geometry does. Design consequence: to lower quantization curl,
 elicit finer *distinctions* (PMF instruments already do), not finer rungs.
 Corrected 2026-07-05, same day — receipts over vibes.
 
+## 5⅝. The orbit transform: the invariance table is a character table
+
+The unification the probes were shadows of: elicit one judgment under
+the full group G = Z₂³ (order swap × polarity negation × wording
+inversion), pull each answer back through the generator's known
+equivariance, and decompose the resulting function m: G → ℝ by the
+characters of the group (`judge --orbit`, 8 calls). Then:
+
+- **belief := m̂(∅)**, the orbit mean — the unique G-invariant projection;
+- every other Fourier coefficient is a **named, mutually orthogonal
+  bias**; the marginal probes (counterbalance, `--two-sided`,
+  `--wordings`) are restrictions of this transform to subgroups;
+- **Parseval is the energy budget**: mean-square judgment = belief² +
+  Σ bias² exactly (residual 0 in live runs) — so
+  coherence = belief²/mean-square is not a heuristic composite but a
+  projection ratio;
+- the **interaction coefficients** (|S| ≥ 2) are invisible to every
+  one-axis probe. Live receipt (`artifacts/live/orbit-2026-07-05/`,
+  n = 1 pair): gpt-5.4-mini's largest bias component is
+  order·polarity (−0.552 nats, 22.3% of energy — its slot preference
+  reverses under negation); claude-sonnet-4.6 is 98.7% G-invariant.
+
+Algebra pinned by scripted judges, including a machine-forced
+correction: "position bias" is TWO characters — always-favor-slot-A is
+order·polarity, always-name-token-A is the triple — indistinguishable to
+counterbalancing, separated exactly by the transform (each pinned at
+coefficient ln 2 with all others vanishing).
+
+Growth path: adjoin generators as they earn instrumentation — paraphrase
+(S_k), framing field (the continuous factor already swept in §5½),
+format perturbations — and the receipt set extends by character theory
+instead of by ad-hoc probe design.
+
 ## 5¾. Respecting the group: from probes to estimator
 
 The invariance table above is diagnostic — it measures violations. The

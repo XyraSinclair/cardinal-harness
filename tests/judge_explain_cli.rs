@@ -117,6 +117,10 @@ impl Respond for OmniJudge {
             let b = extract_between(&user_content, "<entity_B_context>", "</entity_B_context>")
                 .map(metal_score)
                 .unwrap_or(0);
+            // Polarity-aware: a negated criterion ("lack of X") reverses
+            // the metal direction — the orbit-perfect behavior.
+            let negated = user_content.contains("lack of");
+            let (a, b) = if negated { (b, a) } else { (a, b) };
             let higher = if a >= b { "A" } else { "B" };
             let lower = if a >= b { "B" } else { "A" };
             let ratio = if (a - b).abs() >= 2 { 3.9 } else { 1.5 };
@@ -841,6 +845,183 @@ async fn anp_produces_stochastic_limits_and_a_network_correction() {
         );
     }
     let _ = std::fs::remove_dir_all(&dir);
+}
+
+/// Two DISTINCT content-blind position pathologies that counterbalancing
+/// cannot tell apart — and the orbit transform separates exactly:
+///
+/// - NAME-AFFINITY: always outputs the token "A", whatever the question.
+///   Under the less-wording, naming A means A loses, so the pulled-back
+///   orbit is m(g) = (−1)^{s+p+w}·ln 2 — the TRIPLE character.
+/// - SLOT-FAVORITISM: always ranks the slot-A entity higher, answering
+///   each wording coherently (less-wording: names B as lower). Orbit
+///   m(g) = (−1)^{s+p}·ln 2 — the order·polarity character.
+///
+/// (The first draft of this test assumed both were the same pathology;
+/// the transform refuted that — the derivation note is in orbit.rs.)
+#[derive(Clone, Copy)]
+struct NameAffinityJudge;
+
+impl Respond for NameAffinityJudge {
+    fn respond(&self, request: &Request) -> ResponseTemplate {
+        let parsed: serde_json::Value = serde_json::from_slice(&request.body).unwrap_or_default();
+        let system = parsed["messages"]
+            .as_array()
+            .and_then(|m| {
+                m.iter()
+                    .find(|x| x["role"] == "system")
+                    .and_then(|x| x["content"].as_str())
+            })
+            .unwrap_or("");
+        let content = if system.contains("LESS of that attribute") {
+            r#"{"lower_ranked":"A","ratio":2.0,"confidence":0.9}"#
+        } else {
+            r#"{"higher_ranked":"A","ratio":2.0,"confidence":0.9}"#
+        };
+        ResponseTemplate::new(200).set_body_json(json!({
+            "choices": [{ "message": { "content": content.to_string() }, "finish_reason": "stop" }],
+            "usage": { "prompt_tokens": 10, "completion_tokens": 10 }
+        }))
+    }
+}
+
+#[derive(Clone, Copy)]
+struct SlotFavoritismJudge;
+
+impl Respond for SlotFavoritismJudge {
+    fn respond(&self, request: &Request) -> ResponseTemplate {
+        let parsed: serde_json::Value = serde_json::from_slice(&request.body).unwrap_or_default();
+        let system = parsed["messages"]
+            .as_array()
+            .and_then(|m| {
+                m.iter()
+                    .find(|x| x["role"] == "system")
+                    .and_then(|x| x["content"].as_str())
+            })
+            .unwrap_or("");
+        let content = if system.contains("LESS of that attribute") {
+            // Favoring slot A coherently: B is the lower one.
+            r#"{"lower_ranked":"B","ratio":2.0,"confidence":0.9}"#
+        } else {
+            r#"{"higher_ranked":"A","ratio":2.0,"confidence":0.9}"#
+        };
+        ResponseTemplate::new(200).set_body_json(json!({
+            "choices": [{ "message": { "content": content.to_string() }, "finish_reason": "stop" }],
+            "usage": { "prompt_tokens": 10, "completion_tokens": 10 }
+        }))
+    }
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn orbit_transform_puts_all_energy_in_belief_for_a_perfect_judge() {
+    let server = start_server().await;
+    let output = run_cardinal(
+        &server.uri(),
+        &[
+            "judge",
+            "shiny GOLD ring",
+            "dull TIN spoon",
+            "--by",
+            "shininess",
+            "--model",
+            "test/judge",
+            "--no-cache",
+            "--orbit",
+            "--json",
+        ],
+        "",
+    );
+    assert!(
+        output.status.success(),
+        "stderr: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let parsed: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    let coeffs = parsed["coefficients"].as_array().unwrap();
+    let belief = coeffs[0].as_f64().unwrap();
+    assert!(
+        (belief - 3.9f64.ln()).abs() < 1e-9,
+        "belief = orbit mean = ln 3.9: {belief}"
+    );
+    for (k, coeff) in coeffs.iter().enumerate().skip(1) {
+        assert!(
+            coeff.as_f64().unwrap().abs() < 1e-9,
+            "perfect judge has zero bias spectrum: coeff {k} = {coeff}"
+        );
+    }
+    assert!((parsed["coherence"].as_f64().unwrap() - 1.0).abs() < 1e-9);
+    assert!(parsed["parseval_residual"].as_f64().unwrap() < 1e-12);
+    assert_eq!(parsed["comparisons"], 8);
+}
+
+async fn orbit_coefficients<R: Respond + 'static>(judge: R) -> Vec<f64> {
+    let server = MockServer::start().await;
+    Mock::given(method("POST"))
+        .and(path("/chat/completions"))
+        .respond_with(judge)
+        .mount(&server)
+        .await;
+    let output = run_cardinal(
+        &server.uri(),
+        &[
+            "judge",
+            "shiny GOLD ring",
+            "dull TIN spoon",
+            "--by",
+            "shininess",
+            "--model",
+            "test/judge",
+            "--no-cache",
+            "--orbit",
+            "--json",
+        ],
+        "",
+    );
+    assert!(
+        output.status.success(),
+        "stderr: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let parsed: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert!(parsed["parseval_residual"].as_f64().unwrap() < 1e-12);
+    parsed["coefficients"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|v| v.as_f64().unwrap())
+        .collect()
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn orbit_transform_separates_the_two_position_pathologies() {
+    // Both judges are pure position bias to a counterbalance probe. The
+    // transform separates them: name-affinity excites exactly the triple
+    // character (index 7 = s·p·w); slot-favoritism exactly order·polarity
+    // (index 3 = s·p). Belief is zero for both — they believe nothing.
+    let name = orbit_coefficients(NameAffinityJudge).await;
+    let ln2 = 2.0f64.ln();
+    for (k, c) in name.iter().enumerate() {
+        if k == 7 {
+            assert!(
+                (c - ln2).abs() < 1e-9,
+                "name-affinity is the triple character: coeff[7] = {c}"
+            );
+        } else {
+            assert!(c.abs() < 1e-9, "coeff[{k}] must vanish: {c}");
+        }
+    }
+
+    let slot = orbit_coefficients(SlotFavoritismJudge).await;
+    for (k, c) in slot.iter().enumerate() {
+        if k == 3 {
+            assert!(
+                (c - ln2).abs() < 1e-9,
+                "slot-favoritism is order·polarity: coeff[3] = {c}"
+            );
+        } else {
+            assert!(c.abs() < 1e-9, "coeff[{k}] must vanish: {c}");
+        }
+    }
 }
 
 #[tokio::test(flavor = "multi_thread")]
