@@ -66,6 +66,12 @@ Background sync automation, if any, should default to `git fetch`, not blind
 
 ## Working Norms
 
+Read **`docs/PRINCIPLES.md`** before substantial work: the anti-slop
+discipline (refutability, scripted-pathology validation, denominators,
+mathematical register, errata-on-top) with the receipts that earned each
+rule. It is the standing answer to "are we still doing deep work?".
+
+
 - Preserve the core contract: pairwise ratio judgments aggregate into globally
   consistent cardinal scores with uncertainty.
 - Prefer extending existing rerank/gateway seams over adding parallel

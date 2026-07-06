@@ -405,6 +405,7 @@ list or request JSON
 
 ## Documentation
 
+- [docs/PRINCIPLES.md](docs/PRINCIPLES.md): the anti-slop discipline — refutability, scripted-pathology validation, denominators, mathematical register — each rule with the receipt that earned it
 - [docs/ALGORITHM.md](docs/ALGORITHM.md): scoring, uncertainty, stopping, and evaluation rationale
 - [docs/MODEL.md](docs/MODEL.md): compact mathematical contract, assumptions, and failure modes
 - [docs/PROMPTS.md](docs/PROMPTS.md): supported prompt templates, output contracts, and JSON request examples
