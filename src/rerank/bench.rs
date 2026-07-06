@@ -121,8 +121,31 @@ fn perturb_text(kind: &str, text: &str, is_target: bool) -> String {
     }
 }
 
+/// The harmonic block: four texts judged ONLY around a chordless 4-cycle
+/// (both orders), disjoint from the main corpus graph. The stride graph's
+/// triangles span its whole cycle space (harmonic_dim = 0, pinned in
+/// tests/hodge_split.rs), so triad-invisible frustration is unmeasurable
+/// there BY CONSTRUCTION; this block has cycle_dim = 1, zero triangles,
+/// harmonic_dim = 1 — any non-closure of the loop is pure harmonic
+/// energy, the kind no triad audit can ever see.
+pub const HARMONIC_BLOCK: [&str; 4] = [
+    "Fortune favors the bold.",
+    "Look before you leap.",
+    "He who hesitates is lost.",
+    "Slow and steady wins the race.",
+];
+
+/// The chordless cycle over the harmonic block (block-local indices).
+pub const HARMONIC_CYCLE: [(usize, usize); 4] = [(0, 1), (1, 2), (2, 3), (0, 3)];
+
+/// Core pairs that get the full Z₂³ orbit transform (6 of 20).
+#[must_use]
+pub fn orbit_pairs() -> Vec<(usize, usize)> {
+    core_pairs().into_iter().skip(1).step_by(3).take(6).collect()
+}
+
 /// Total provider calls in one benchmark run.
-pub const CALLS_PER_RUN: usize = 20 * 2 + 20 + 20 + 4 + 6 * 4 + 5 * 6;
+pub const CALLS_PER_RUN: usize = 20 * 2 + 20 + 20 + 4 + 6 * 4 + 5 * 6 + 6 * 8 + 4 * 2;
 
 /// Options for [`run_judge_bench`].
 #[derive(Debug, Clone)]
@@ -213,6 +236,19 @@ pub struct JudgeBenchReport {
     pub nuisance: DimensionStat,
     /// Per-perturbation mean |drift| breakdown (kind, nats, n).
     pub nuisance_breakdown: Vec<(String, f64, usize)>,
+    /// Mean orbit coherence over the orbit pairs: the fraction of each
+    /// judgment's energy in the G-invariant (belief) component of the
+    /// Z₂³ character decomposition. Subscore = value — the spectral
+    /// quantity the marginal axes approximate.
+    pub orbit_coherence: DimensionStat,
+    /// Mean share of judgment energy in the interaction characters
+    /// (|S| ≥ 2) — bias structure invisible to every marginal probe.
+    /// Reported, unscored (already inside 1 − coherence).
+    pub interaction_share: DimensionStat,
+    /// Harmonic fraction of the chordless-cycle block: triad-invisible
+    /// frustration, measurable because the block's harmonic_dim = 1 by
+    /// design. Subscore 1 − value.
+    pub harmonic: DimensionStat,
 
     /// Mean of available consistency subscores (reciprocity = merged order
     /// flip + residual, frustration, spin survival, polarity, paraphrase,
@@ -331,6 +367,26 @@ async fn one_call(
         cached: usage.cached,
         cost_nanodollars: usage.provider_cost_nanodollars,
     })
+}
+
+/// Solve the harmonic block and return its harmonic energy fraction.
+fn harmonic_split(observations: &[(usize, usize, f64)]) -> Option<f64> {
+    let mut raters = HashMap::new();
+    raters.insert("bench".to_string(), RaterParams::default());
+    let mut engine = RatingEngine::new(
+        HARMONIC_BLOCK.len(),
+        AttributeParams::default(),
+        raters,
+        Some(Config::default()),
+    )
+    .ok()?;
+    let obs: Vec<Observation> = observations
+        .iter()
+        .map(|&(i, j, m)| Observation::from_log_ratio_moments(i, j, m, 1.0, "bench", 1.0))
+        .collect();
+    engine.ingest(&obs);
+    let summary = engine.solve();
+    Some(summary.hodge.harmonic_frac)
 }
 
 fn solve_scores(
@@ -552,6 +608,82 @@ pub async fn run_judge_bench(
     }
     let (nuisance_mean, nuisance_ci) = mean_ci95(&nuisance_drifts);
 
+    // ---- Orbit block: full Z₂³ transform on selected core pairs ----
+    let mut orbit_coherences: Vec<f64> = Vec::new();
+    let mut interaction_shares: Vec<f64> = Vec::new();
+    for &(i, j) in &orbit_pairs() {
+        let report = super::orbit::orbit_transform(
+            gateway,
+            cache,
+            &model,
+            PRIMARY_ATTRIBUTE,
+            ("o0", CORPUS[i]),
+            ("o1", CORPUS[j]),
+            &template,
+            attribution.clone(),
+        )
+        .await?;
+        cost += report.cost_nanodollars;
+        cached += report.comparisons_cached;
+        refusals += report.refusals;
+        if let Some(c) = report.coherence {
+            orbit_coherences.push(c);
+            let total: f64 = report.energies.iter().sum();
+            if total > 0.0 {
+                let interactions: f64 = [3usize, 5, 6, 7]
+                    .iter()
+                    .map(|&k| report.energies[k])
+                    .sum();
+                interaction_shares.push(interactions / total);
+            }
+        }
+    }
+    let (orbit_mean, orbit_ci) = mean_ci95(&orbit_coherences);
+    let (interaction_mean, interaction_ci) = mean_ci95(&interaction_shares);
+
+    // ---- Harmonic block: chordless 4-cycle, both orders, own solve ----
+    let mut harmonic_outcomes: Vec<(usize, usize, [Option<f64>; 2])> = HARMONIC_CYCLE
+        .iter()
+        .map(|&(i, j)| (i, j, [None, None]))
+        .collect();
+    for (i, j, samples) in harmonic_outcomes.iter_mut() {
+        for (slot, fwd) in [(0usize, true), (1usize, false)] {
+            let out = one_call(
+                gateway,
+                cache,
+                &model,
+                &template,
+                PRIMARY_ATTRIBUTE,
+                *i,
+                *j,
+                (HARMONIC_BLOCK[*i], HARMONIC_BLOCK[*j]),
+                fwd,
+                &attribution,
+            )
+            .await?;
+            cost += out.cost_nanodollars;
+            if out.cached {
+                cached += 1;
+            }
+            match out.log_ratio_toward_i {
+                Some(m) => samples[slot] = Some(m),
+                None => refusals += 1,
+            }
+        }
+    }
+    let harmonic_obs: Vec<(usize, usize, f64)> = harmonic_outcomes
+        .iter()
+        .filter_map(|&(i, j, samples)| match samples {
+            [Some(a), Some(b)] => Some((i, j, (a + b) / 2.0)),
+            _ => None,
+        })
+        .collect();
+    let harmonic_value = if harmonic_obs.len() == HARMONIC_CYCLE.len() {
+        harmonic_split(&harmonic_obs)
+    } else {
+        None
+    };
+
     // ---- Spin block ----
     let mut spin_reports = Vec::new();
     let mut clear_survivals = 0usize;
@@ -669,6 +801,27 @@ pub async fn run_judge_bench(
         unit: "nats",
         subscore: nuisance_mean.map(|d| (-d).exp()),
     };
+    let orbit_coherence = DimensionStat {
+        value: orbit_mean,
+        ci95: orbit_ci,
+        n: orbit_coherences.len(),
+        unit: "energy fraction",
+        subscore: orbit_mean,
+    };
+    let interaction_share = DimensionStat {
+        value: interaction_mean,
+        ci95: interaction_ci,
+        n: interaction_shares.len(),
+        unit: "energy fraction",
+        subscore: None,
+    };
+    let harmonic = DimensionStat {
+        value: harmonic_value,
+        ci95: None,
+        n: usize::from(harmonic_obs.len() == HARMONIC_CYCLE.len()),
+        unit: "energy fraction",
+        subscore: harmonic_value.map(|h| (1.0 - h).clamp(0.0, 1.0)),
+    };
 
     // Order-flip and order-residual are measured from the SAME two calls per
     // pair — two views of one transformation. They enter the composite as a
@@ -679,21 +832,31 @@ pub async fn run_judge_bench(
         (a, b) => a.or(b),
     };
     // Coverage gate: refusing on hard pairs shrinks the curl numerator
-    // (refused edges vanish from the graph), so a refusal-heavy run must not
-    // be credited with transitivity. Curl only counts when ≥95% of core
-    // calls produced judgements.
-    let core_coverage = 1.0 - refusals as f64 / plan.len().max(1) as f64;
-    let frustration_gated = (core_coverage >= 0.95)
-        .then_some(frustration.subscore)
-        .flatten();
+    // (refused edges vanish from the graph), so a refusal-heavy run must
+    // not be credited with transitivity. Original design DROPPED gated
+    // axes — which the cyclic-judge test exposed as a reward (deleting a
+    // bad judge's worst axis raises its mean). Gated axes now score ZERO:
+    // refusal laundering strictly costs.
+    let core_coverage = 1.0 - refusals as f64 / CALLS_PER_RUN.max(1) as f64;
+    let gate = |subscore: Option<f64>| -> Option<f64> {
+        if core_coverage >= 0.95 {
+            subscore
+        } else {
+            Some(0.0)
+        }
+    };
+    let frustration_gated = gate(frustration.subscore);
+    let harmonic_gated = gate(harmonic.subscore);
     let consistency: Vec<f64> = [
         reciprocity,
         frustration_gated,
+        harmonic_gated,
         spin_survival.subscore,
         polarity.subscore,
         paraphrase.subscore,
         null_bias.subscore,
         nuisance.subscore,
+        orbit_coherence.subscore,
     ]
     .into_iter()
     .flatten()
@@ -731,6 +894,9 @@ pub async fn run_judge_bench(
         null_bias,
         nuisance,
         nuisance_breakdown: breakdown,
+        orbit_coherence,
+        interaction_share,
+        harmonic,
         coherence,
         coherence_harmonic,
         judge_score,
@@ -779,6 +945,9 @@ pub fn render_report(report: &JudgeBenchReport) -> String {
     out.push_str(&fmt_dim("paraphrase", &report.paraphrase));
     out.push_str(&fmt_dim("null-bias", &report.null_bias));
     out.push_str(&fmt_dim("nuisance", &report.nuisance));
+    out.push_str(&fmt_dim("orbit-coherence", &report.orbit_coherence));
+    out.push_str(&fmt_dim("interaction", &report.interaction_share));
+    out.push_str(&fmt_dim("harmonic", &report.harmonic));
     for (kind, mean, n) in &report.nuisance_breakdown {
         let _ = writeln!(out, "    nuisance:{kind:<12} {mean:+.3} nats (n={n})");
     }

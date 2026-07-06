@@ -35,9 +35,9 @@ pub mod wordings;
 // Re-export main entry points
 pub use anp::{anp, AnpAlternative, AnpCriterion, AnpError, AnpOptions, AnpReport};
 pub use bench::{
-    core_pairs, render_report as render_bench_report, run_judge_bench, BenchCall, DimensionStat,
-    JudgeBenchOptions, JudgeBenchReport, CALLS_PER_RUN, CORPUS, OPPOSITE_ATTRIBUTE,
-    PARAPHRASE_ATTRIBUTE, PRIMARY_ATTRIBUTE,
+    core_pairs, orbit_pairs, render_report as render_bench_report, run_judge_bench, BenchCall,
+    DimensionStat, JudgeBenchOptions, JudgeBenchReport, CALLS_PER_RUN, CORPUS, HARMONIC_BLOCK,
+    HARMONIC_CYCLE, OPPOSITE_ATTRIBUTE, PARAPHRASE_ATTRIBUTE, PRIMARY_ATTRIBUTE,
 };
 pub use comparison::{
     compare_pair, ComparisonError, PairwiseComparisonAttribute, PairwiseComparisonEntity,

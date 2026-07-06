@@ -41,6 +41,56 @@ fn corpus_index(text: &str) -> Option<usize> {
     CORPUS.iter().position(|&t| t == norm)
 }
 
+/// Depths for the harmonic block (transitive by default).
+const HARMONIC_DEPTHS: [f64; 4] = [2.2, 1.9, 1.5, 1.1];
+
+fn depth_of(text: &str) -> Option<f64> {
+    if let Some(k) = corpus_index(text) {
+        return Some(DEPTHS[k]);
+    }
+    let norm = normalize(text);
+    cardinal_harness::rerank::HARMONIC_BLOCK
+        .iter()
+        .position(|&t| t == norm)
+        .map(|k| HARMONIC_DEPTHS[k])
+}
+
+fn harmonic_index(text: &str) -> Option<usize> {
+    let norm = normalize(text);
+    cardinal_harness::rerank::HARMONIC_BLOCK
+        .iter()
+        .position(|&t| t == norm)
+}
+
+fn system_content(request: &Request) -> String {
+    let body: serde_json::Value = serde_json::from_slice(&request.body).unwrap_or_default();
+    body["messages"]
+        .as_array()
+        .and_then(|m| {
+            m.iter()
+                .find(|x| x["role"] == "system")
+                .and_then(|x| x["content"].as_str())
+        })
+        .unwrap_or("")
+        .to_string()
+}
+
+/// Render a direction+ratio answer in whatever template the request used:
+/// less_v1 asks for the LOWER entity; everything else for the higher.
+fn answer_for_template(system: &str, a_wins: bool, ratio: f64) -> ResponseTemplate {
+    let content = if system.contains("LESS of that attribute") {
+        let lower = if a_wins { "B" } else { "A" };
+        format!(r#"{{"lower_ranked":"{lower}","ratio":{ratio},"confidence":0.9}}"#)
+    } else {
+        let higher = if a_wins { "A" } else { "B" };
+        format!(r#"{{"higher_ranked":"{higher}","ratio":{ratio},"confidence":0.9}}"#)
+    };
+    ResponseTemplate::new(200).set_body_json(json!({
+        "choices": [{ "message": { "content": content }, "finish_reason": "stop" }],
+        "usage": { "prompt_tokens": 10, "completion_tokens": 10 }
+    }))
+}
+
 fn user_content(request: &Request) -> String {
     let body: serde_json::Value = serde_json::from_slice(&request.body).unwrap_or_default();
     body["messages"]
@@ -89,17 +139,17 @@ impl Respond for OracleJudge {
         if a == b {
             return answer("A", 1.0);
         }
-        let (Some(ia), Some(ib)) = (corpus_index(&a), corpus_index(&b)) else {
-            return answer("A", 1.0);
+        let system = system_content(request);
+        let (Some(da), Some(db)) = (depth_of(&a), depth_of(&b)) else {
+            return answer_for_template(&system, true, 1.0);
         };
-        let reversed = user.contains("shallowness");
-        let mut d = DEPTHS[ia] - DEPTHS[ib];
+        let reversed = user.contains("shallowness") || user.contains("lack of");
+        let mut d = da - db;
         if reversed {
             d = -d;
         }
-        let higher = if d >= 0.0 { "A" } else { "B" };
         // exp(|d|/2): log-additive in the latent, so cycle sums vanish.
-        answer(higher, (d.abs() / 2.0).exp())
+        answer_for_template(&system, d >= 0.0, (d.abs() / 2.0).exp())
     }
 }
 
@@ -114,11 +164,12 @@ impl Respond for SycophantJudge {
         let (a, b) = contexts(&user);
         if let Some(excerpt) = extract_between(&user, "the one beginning «", "» is clearly stronger")
         {
+            let system = system_content(request);
             if a.starts_with(excerpt) {
-                return answer("A", 3.9);
+                return answer_for_template(&system, true, 3.9);
             }
             if b.starts_with(excerpt) {
-                return answer("B", 3.9);
+                return answer_for_template(&system, false, 3.9);
             }
         }
         OracleJudge.respond(request)
@@ -130,8 +181,8 @@ impl Respond for SycophantJudge {
 struct ConstantJudge;
 
 impl Respond for ConstantJudge {
-    fn respond(&self, _request: &Request) -> ResponseTemplate {
-        answer("A", 1.0)
+    fn respond(&self, request: &Request) -> ResponseTemplate {
+        answer_for_template(&system_content(request), true, 1.0)
     }
 }
 
@@ -140,8 +191,9 @@ impl Respond for ConstantJudge {
 struct PositionJudge;
 
 impl Respond for PositionJudge {
-    fn respond(&self, _request: &Request) -> ResponseTemplate {
-        answer("A", 2.0)
+    fn respond(&self, request: &Request) -> ResponseTemplate {
+        // Slot-favoritism: coherently prefers slot A under every wording.
+        answer_for_template(&system_content(request), true, 2.0)
     }
 }
 
@@ -158,14 +210,21 @@ impl Respond for CyclicJudge {
         if a == b {
             return answer("A", 1.0);
         }
+        let system = system_content(request);
+        // Harmonic block: planted ring preference h_i beats h_{i+1 mod 4}
+        // — pure harmonic energy, invisible to any triangle.
+        if let (Some(ha), Some(hb)) = (harmonic_index(&a), harmonic_index(&b)) {
+            let a_wins = (hb + 4 - ha) % 4 == 1;
+            return answer_for_template(&system, a_wins, 3.9);
+        }
         let (Some(ia), Some(ib)) = (corpus_index(&a), corpus_index(&b)) else {
-            return answer("A", 1.0);
+            return answer_for_template(&system, true, 1.0);
         };
         let gap = (ib + 8 - ia) % 8;
         match gap {
-            1..=3 => answer("A", 3.9),
-            4 => answer("A", 1.0),
-            _ => answer("B", 3.9),
+            1..=3 => answer_for_template(&system, true, 3.9),
+            4 => answer_for_template(&system, true, 1.0),
+            _ => answer_for_template(&system, false, 3.9),
         }
     }
 }
@@ -194,8 +253,7 @@ impl Respond for HashJudge {
             t.hash(&mut h);
             h.finish()
         };
-        let higher = if key(&a) >= key(&b) { "A" } else { "B" };
-        answer(higher, 2.5)
+        answer_for_template(&system_content(request), key(&a) >= key(&b), 2.5)
     }
 }
 
@@ -255,6 +313,19 @@ async fn oracle_judge_scores_high_on_every_dimension() {
     assert_eq!(r.frustration.n, 13, "curl support must be cycle rank");
     // A reader sees through null edits.
     assert!(r.nuisance.value.unwrap() < 1e-9, "{}", diag(&r));
+    // Spectral axes: a coherent judge is G-invariant (all orbit energy in
+    // the belief character) and closes the chordless loop exactly
+    // (log-additive latents telescope around the 4-cycle).
+    assert!(
+        r.orbit_coherence.value.unwrap() > 0.999,
+        "oracle orbit coherence: {}",
+        diag(&r)
+    );
+    assert!(
+        r.harmonic.value.unwrap() < 1e-9,
+        "oracle harmonic: {}",
+        diag(&r)
+    );
 }
 
 #[tokio::test(flavor = "multi_thread")]
@@ -278,6 +349,13 @@ async fn hash_judge_is_caught_by_nuisance_perturbation() {
     // Content-blindness also shows in the attribute axes: it cannot know
     // the negated attribute must reverse.
     assert!(r.polarity.value.unwrap() > 0.9, "{}", diag(&r));
+    // And spectrally: ignoring the criterion means the polarity pullback
+    // flips half its orbit — coherence collapses toward 1/2.
+    assert!(
+        r.orbit_coherence.value.unwrap() < 0.6,
+        "content-blind judge cannot be G-invariant: {}",
+        diag(&r)
+    );
     let oracle = bench_with(OracleJudge).await;
     assert!(
         r.judge_score.unwrap() < oracle.judge_score.unwrap(),
@@ -369,11 +447,18 @@ async fn cyclic_judge_is_caught_by_frustration_and_only_frustration() {
         diag(&r),
         diag(&oracle)
     );
+    // The planted ring on the harmonic block is invisible to every
+    // triangle — only the harmonic axis can see it.
+    assert!(
+        r.harmonic.value.unwrap() > 0.5,
+        "planted chordless ring must be harmonic energy: {}",
+        diag(&r)
+    );
 }
 
 fn diag(r: &JudgeBenchReport) -> String {
     format!(
-        "judge_score={:?} signal={:?} flip={:?} residual={:?} curl={:?} spin={:?} chi={:?} pol={:?} para={:?} null={:?} nuisance={:?}",
+        "judge_score={:?} signal={:?} flip={:?} residual={:?} curl={:?} spin={:?} chi={:?} pol={:?} para={:?} null={:?} nuisance={:?} orbit={:?} harmonic={:?}",
         r.judge_score,
         r.signal.value,
         r.order_flip.value,
@@ -384,6 +469,8 @@ fn diag(r: &JudgeBenchReport) -> String {
         r.polarity.value,
         r.paraphrase.value,
         r.null_bias.value,
-        r.nuisance.value
+        r.nuisance.value,
+        r.orbit_coherence.value,
+        r.harmonic.value
     )
 }

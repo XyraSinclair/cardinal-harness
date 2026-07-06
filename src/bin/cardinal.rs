@@ -270,7 +270,7 @@ enum Commands {
     /// antisymmetry, cyclic frustration, framing spin, polarity reversal,
     /// paraphrase stability, null calibration) plus a signal axis so a
     /// constant judge cannot hide in perfect consistency. Headline score =
-    /// signal × coherence. Fixed public corpus, 138 comparisons per model.
+    /// signal × coherence. Fixed public corpus, 194 comparisons per model.
     Bench {
         /// Model slug(s), comma-separated
         #[arg(long)]

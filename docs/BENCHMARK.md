@@ -36,7 +36,7 @@ scores from an incoherent judge are noise about noise.
 
 ## Dimensions
 
-138 comparisons per model on a fixed public corpus (8 short texts, judged
+194 comparisons per model on a fixed public corpus (v1.2) (8 short texts, judged
 by "depth of insight about living well"), all through the ordinary
 counterbalanced pairwise machinery:
 
@@ -52,14 +52,20 @@ counterbalanced pairwise machinery:
 | 7 | **paraphrase** | Spearman ρ of scores vs a reworded attribute | ρ | (1 + ρ)/2 |
 | 8 | **null bias** | mean \|log-ratio\| on identical-item pairs | nats | e^(−x) |
 | 9 | **nuisance stability** | drift under semantically-null edits (whitespace, markdown, bullet, prestige-halo) vs the unperturbed call | nats | e^(−x) |
+| 10 | **orbit coherence** | fraction of judgment energy in the G-invariant character of the Z₂³ orbit transform (6 pairs × 8 variants) | energy fraction + CI | value |
+| 11 | **interaction share** | energy in the interaction characters — bias invisible to every marginal probe | energy fraction | reported, unscored |
+| 12 | **harmonic** | triad-invisible frustration on the chordless-cycle block (harmonic_dim = 1 by design) | energy fraction | 1 − x, coverage-gated |
 
 **Composite**: `coherence` = mean of the consistency axes, where **order
 flip and order residual enter as ONE reciprocity axis** (their mean) —
 they are measured from the same two calls per pair, and counting them
-twice would double-credit a position-bias fix. The frustration axis is
-**coverage-gated**: refused judgements vanish from the comparison graph,
-so refusing on the hardest pairs would launder cyclicity into apparent
-transitivity — curl only counts when ≥95% of core calls were answered.
+twice would double-credit a position-bias fix. The frustration and
+harmonic axes are **coverage-gated**: refused judgements vanish from the
+comparison graph, so refusing on hard pairs would launder cyclicity into
+apparent transitivity. Gated axes score ZERO below 95% coverage — the
+original design dropped them instead, which the cyclic-judge test exposed
+as a reward (deleting a bad judge's worst axis raises its mean); refusal
+laundering now strictly costs.
 **`JUDGE SCORE` = signal-subscore × coherence.** Multiplicative on
 purpose: zero discrimination or zero consistency zeroes the headline. A
 **harmonic-mean coherence** is reported alongside — one dead axis tanks
