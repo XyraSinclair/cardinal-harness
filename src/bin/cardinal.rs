@@ -219,6 +219,44 @@ enum Commands {
         #[arg(long)]
         json: bool,
     },
+    /// Canonize an attribute: converge on a communication primitive
+    ///
+    /// An attribute is canonical when it induces the SAME cardinal latent
+    /// in different minds. This measures exactly that: seed wording (plus
+    /// LLM-proposed refinements) judged over the entities by every judge
+    /// model given; candidates ranked by transmissibility (mean cross-judge
+    /// Spearman of the latent vectors), with per-judge signal and
+    /// redundancy against already-accepted attributes. The merge protocol
+    /// for the canonical-attribute loop: measured, never asserted.
+    Canonize {
+        /// Entities file; '-' or omitted reads stdin
+        input: Option<PathBuf>,
+        /// The seed attribute wording
+        #[arg(long)]
+        by: String,
+        /// Ask the model to propose N alternative wordings/refinements
+        #[arg(long, default_value_t = 3)]
+        propose: usize,
+        /// Judge models, comma-separated (at least 2)
+        #[arg(long)]
+        judges: String,
+        /// Already-accepted canonical attribute (repeatable): candidates
+        /// are scored for redundancy against these
+        #[arg(long = "accepted")]
+        accepted: Vec<String>,
+        /// Comparison budget per (candidate, judge) sort
+        #[arg(long)]
+        budget: Option<usize>,
+        /// RNG seed
+        #[arg(long, default_value_t = 7)]
+        seed: u64,
+        /// SQLite cache path
+        #[arg(long)]
+        cache: Option<PathBuf>,
+        /// Emit the full report as JSON on stdout
+        #[arg(long)]
+        json: bool,
+    },
     /// Analytic Network Process: goal, criteria, alternatives — with feedback
     ///
     /// AHP generalized to a network. Every supermatrix edge is a solved
@@ -1140,6 +1178,108 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 eprint!(" · frustration {f:.3}");
             }
             eprintln!();
+        }
+        Commands::Canonize {
+            input,
+            by,
+            propose,
+            judges,
+            accepted,
+            budget,
+            seed,
+            cache,
+            json,
+        } => {
+            let raw = read_sort_input(input.as_deref())?;
+            let entities = parse_sort_items(&raw)?;
+            let judge_list: Vec<String> = judges
+                .split(',')
+                .map(|m| m.trim().to_string())
+                .filter(|m| !m.is_empty())
+                .collect();
+            if std::env::var("OPENROUTER_API_KEY").is_err() {
+                return Err("OPENROUTER_API_KEY is not set. Create a key at \
+                     https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
+                    .into());
+            }
+            let gateway = Arc::new(ProviderGateway::from_env(Arc::new(NoopUsageSink))?);
+
+            let mut candidates = vec![by.clone()];
+            if propose > 0 {
+                let (proposed, usage) = cardinal_harness::rerank::propose_rewordings(
+                    gateway.as_ref(),
+                    judge_list.first().map(String::as_str).unwrap_or("openai/gpt-5.4-mini"),
+                    &by,
+                    propose,
+                    Attribution::new("cardinal::canonize::propose"),
+                )
+                .await?;
+                eprintln!(
+                    "proposed {} rewordings (${:.4}):",
+                    proposed.len(),
+                    usage.cost_nanodollars as f64 / 1e9
+                );
+                for c in &proposed {
+                    eprintln!("  - {c}");
+                }
+                for c in proposed {
+                    if !candidates.iter().any(|have| have.eq_ignore_ascii_case(&c)) {
+                        candidates.push(c);
+                    }
+                }
+            }
+
+            let cache_path = cache.unwrap_or_else(SqlitePairwiseCache::default_path);
+            let cache_store = SqlitePairwiseCache::new(cache_path)?;
+            let report = cardinal_harness::rerank::canonize(
+                gateway,
+                Some(&cache_store as &dyn cardinal_harness::cache::PairwiseCache),
+                entities,
+                candidates,
+                accepted,
+                cardinal_harness::rerank::CanonizeOptions {
+                    judges: judge_list,
+                    comparison_budget: budget,
+                    seed,
+                },
+            )
+            .await?;
+
+            if json {
+                println!("{}", serde_json::to_string_pretty(&report)?);
+            } else {
+                println!(
+                    "{:<7} {:>7} {:>7}  wording",
+                    "trans", "signal", "redund"
+                );
+                for c in &report.candidates {
+                    let t = c
+                        .transmissibility
+                        .map(|t| format!("{t:+.3}"))
+                        .unwrap_or_else(|| "-".into());
+                    let r = c
+                        .redundancy
+                        .map(|r| format!("{r:.3}"))
+                        .unwrap_or_else(|| "-".into());
+                    println!("{t:<7} {:>7.3} {r:>7}  {}", c.signal_nats, c.prompt);
+                }
+                if let Some(best) = report.candidates.first() {
+                    if let Some(t) = best.transmissibility {
+                        println!(
+                            "canonical candidate: \"{}\" — transmissibility {t:+.3} across {} judges",
+                            best.prompt,
+                            report.judges.len()
+                        );
+                    }
+                }
+            }
+            eprintln!(
+                "canonize: {} candidates x {} judges · {} comparisons · ${:.4}",
+                report.candidates.len(),
+                report.judges.len(),
+                report.comparisons_used,
+                report.cost_nanodollars as f64 / 1e9,
+            );
         }
         Commands::Anp {
             input,

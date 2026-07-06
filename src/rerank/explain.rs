@@ -334,6 +334,31 @@ pub async fn propose_distinguishing(
     propose_via_chat(gateway, model, system, user, attribution).await
 }
 
+/// Ask an LLM for alternative precise wordings/refinements of an
+/// attribute — candidates for the canonize protocol. Proposals are
+/// hypotheses; transmissibility across judges decides.
+pub async fn propose_rewordings(
+    gateway: &dyn ChatGateway,
+    model: &str,
+    attribute: &str,
+    how_many: usize,
+    attribution: Attribution,
+) -> Result<(Vec<String>, ProposalUsage), ExplainError> {
+    let system = "You reword attributes for judgement. Given an attribute \
+        someone rates items by, propose alternative precise wordings or sharper \
+        refinements of the SAME underlying dimension — versions that might \
+        elicit a more consistent, more meaningful ordering. Each must be a \
+        short, judgeable criterion phrase (2-10 words) usable in the question \
+        'which of these two items has more of X?'. Do not drift to different \
+        dimensions; reword and sharpen this one. Output only a JSON array of \
+        strings.";
+    let user = format!(
+        "Attribute: {attribute}\n\nPropose exactly {how_many} alternative \
+         wordings or refinements.\n\njson:"
+    );
+    propose_via_chat(gateway, model, system, user, attribution).await
+}
+
 async fn propose_via_chat(
     gateway: &dyn ChatGateway,
     model: &str,

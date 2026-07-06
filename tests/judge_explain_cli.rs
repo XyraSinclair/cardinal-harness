@@ -758,6 +758,126 @@ impl Respond for InversionBlindJudge {
     }
 }
 
+/// Two judge "minds" for the canonize protocol: they agree on metal-based
+/// wordings and EXACTLY disagree on any wording containing the marker
+/// "XYZZY" (judge-b reverses). Transmissibility must separate them.
+#[derive(Clone, Copy)]
+struct TwoMindsJudge;
+
+impl Respond for TwoMindsJudge {
+    fn respond(&self, request: &Request) -> ResponseTemplate {
+        let parsed: serde_json::Value = serde_json::from_slice(&request.body).unwrap_or_default();
+        let model = parsed["model"].as_str().unwrap_or("").to_string();
+        let system = parsed["messages"]
+            .as_array()
+            .and_then(|m| {
+                m.iter()
+                    .find(|x| x["role"] == "system")
+                    .and_then(|x| x["content"].as_str())
+            })
+            .unwrap_or("")
+            .to_string();
+        let user = parsed["messages"]
+            .as_array()
+            .and_then(|m| {
+                m.iter()
+                    .find(|x| x["role"] == "user")
+                    .and_then(|x| x["content"].as_str())
+            })
+            .unwrap_or("")
+            .to_string();
+        if system.contains("reword attributes") {
+            let content = r#"["glossiness of surface", "sparkle intensity XYZZY"]"#;
+            return ResponseTemplate::new(200).set_body_json(json!({
+                "choices": [{ "message": { "content": content }, "finish_reason": "stop" }],
+                "usage": { "prompt_tokens": 10, "completion_tokens": 10 }
+            }));
+        }
+        let a = extract_between(&user, "<entity_A_context>", "</entity_A_context>")
+            .map(metal_score)
+            .unwrap_or(0);
+        let b = extract_between(&user, "<entity_B_context>", "</entity_B_context>")
+            .map(metal_score)
+            .unwrap_or(0);
+        // Judge-b holds the opposite belief on the XYZZY dimension only.
+        let reverse = user.contains("XYZZY") && model.contains("judge-b");
+        let a_wins = if reverse { a < b } else { a >= b };
+        let higher = if a_wins { "A" } else { "B" };
+        let content = format!(r#"{{"higher_ranked":"{higher}","ratio":3.9,"confidence":0.9}}"#);
+        ResponseTemplate::new(200).set_body_json(json!({
+            "choices": [{ "message": { "content": content }, "finish_reason": "stop" }],
+            "usage": { "prompt_tokens": 10, "completion_tokens": 10 }
+        }))
+    }
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn canonize_ranks_wordings_by_cross_judge_transmissibility() {
+    let server = MockServer::start().await;
+    Mock::given(method("POST"))
+        .and(path("/chat/completions"))
+        .respond_with(TwoMindsJudge)
+        .mount(&server)
+        .await;
+    let dir = std::env::temp_dir().join(format!("cardinal-canonize-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let output = run_cardinal(
+        &server.uri(),
+        &[
+            "canonize",
+            "--by",
+            "shininess",
+            "--propose",
+            "2",
+            "--judges",
+            "test/judge-a,test/judge-b",
+            "--accepted",
+            "metallic magnificence",
+            "--budget",
+            "24",
+            "--cache",
+            dir.join("canonize.sqlite").to_str().unwrap(),
+            "--json",
+        ],
+        "shiny GOLD ring\nold SILVER coin\nplain BRONZE cup\ndull TIN spoon\n",
+    );
+    assert!(
+        output.status.success(),
+        "stderr: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let parsed: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    let cands = parsed["candidates"].as_array().unwrap();
+    assert_eq!(cands.len(), 3);
+    // Winner: a metal-consistent wording with perfect inter-mind agreement.
+    let best = &cands[0];
+    assert!(
+        !best["prompt"].as_str().unwrap().contains("XYZZY"),
+        "the untransmissible wording must not win: {parsed}"
+    );
+    assert!(
+        best["transmissibility"].as_f64().unwrap() > 0.99,
+        "shared-belief wording transmits: {best}"
+    );
+    // Loser: the wording the two minds hold OPPOSITE beliefs about.
+    let worst = &cands[2];
+    assert!(
+        worst["prompt"].as_str().unwrap().contains("XYZZY"),
+        "{parsed}"
+    );
+    assert!(
+        worst["transmissibility"].as_f64().unwrap() < -0.99,
+        "opposite beliefs anti-transmit: {worst}"
+    );
+    // Redundancy against the accepted metal attribute: the good wordings
+    // measure the SAME dimension, and the receipt says so.
+    assert!(
+        best["redundancy"].as_f64().unwrap() > 0.99,
+        "metal wordings are redundant with the accepted metal attribute: {best}"
+    );
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
 #[tokio::test(flavor = "multi_thread")]
 async fn anp_produces_stochastic_limits_and_a_network_correction() {
     // Full network on the metal scale: three criteria, four alternatives,

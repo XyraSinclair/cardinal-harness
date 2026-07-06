@@ -269,9 +269,15 @@ span a multi-objective space. All pieces exist; the loop is composition:
    against the goal (§7) and the multi-objective problem is mapped:
    Pareto front + named latents + weights.
 
-Status: steps 1–3 shipped with receipts; 4–5 are orchestration, not new
-math. This loop is the road from "sort my list" to "map my space" — and
-custom feeds are exactly a mapped space plus a standing AHP weighting.
+Status: steps 1–3 shipped with receipts; step 4–5's merge operation now
+ships as `cardinal canonize` — candidate wordings measured across
+MULTIPLE judge models and ranked by **transmissibility** (mean cross-judge
+Spearman of the induced latents), with per-judge signal and redundancy
+against the accepted set. The criterion is the communication-primitive
+property itself: an attribute is canonical exactly when it induces the
+same cardinal latent in different minds. This loop is the road from
+"sort my list" to "map my space" — and custom feeds are exactly a mapped
+space plus a standing AHP weighting.
 
 The focal-item inverse of this loop ships as `cardinal distinguish`
 (`differentiation_profile` in the library): given a set and one item,

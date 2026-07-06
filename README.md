@@ -173,6 +173,13 @@ there, from most magic to most manual:
   importance *for that goal*, and the solver's softmaxed log-latents come
   out as a normalized ratio-scale priority vector — weights ready to feed
   back into multi-attribute reranking.
+- **`cardinal canonize list.txt --by "depth" --judges m1,m2`** — the
+  merge protocol for attribute wordings: the seed plus LLM-proposed
+  refinements, each measured over the entities by EVERY judge model, and
+  ranked by transmissibility — the mean cross-judge rank agreement of the
+  induced latents. An attribute is a communication primitive exactly when
+  different minds recover the same cardinal latent from it; this measures
+  that, with redundancy receipts against your already-accepted dimensions.
 - **`cardinal distinguish list.txt --focus 12`** — the propagation
   primitive: given a set and one focal item, propose (or pass `--by`)
   candidate attributes, measure ALL of them over the whole set, and report

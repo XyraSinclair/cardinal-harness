@@ -11,6 +11,7 @@
 
 pub mod anp;
 pub mod bench;
+pub mod canonize;
 pub mod comparison;
 pub mod elaborate;
 pub mod evaluation;
@@ -34,6 +35,7 @@ pub mod wordings;
 
 // Re-export main entry points
 pub use anp::{anp, AnpAlternative, AnpCriterion, AnpError, AnpOptions, AnpReport};
+pub use canonize::{canonize, CandidateCanonicality, CanonizeError, CanonizeOptions, CanonizeReport};
 pub use bench::{
     core_pairs, orbit_pairs, render_report as render_bench_report, run_judge_bench, BenchCall,
     DimensionStat, JudgeBenchOptions, JudgeBenchReport, CALLS_PER_RUN, CORPUS, HARMONIC_BLOCK,
@@ -50,8 +52,8 @@ pub use experiments::{
 };
 pub use explain::{
     differentiation_profile, explain_ranking, propose_candidates, propose_distinguishing,
-    propose_for_goal, AttributeDifferentiation, AttributeExplanation, DifferentiationProfile,
-    ExplainError, ExplainOptions, Explanation, ProposalUsage,
+    propose_for_goal, propose_rewordings, AttributeDifferentiation, AttributeExplanation,
+    DifferentiationProfile, ExplainError, ExplainOptions, Explanation, ProposalUsage,
 };
 pub use hooks::{
     ComparisonEvent, ComparisonObserver, ObserverError, WarmStartData, WarmStartError,
