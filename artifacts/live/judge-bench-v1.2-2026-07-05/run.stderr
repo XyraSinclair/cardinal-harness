@@ -1,0 +1,120 @@
+benchmarking openai/gpt-5.4-mini ...
+model: openai/gpt-5.4-mini · template: canonical_v2
+  signal           +0.680 [+0.403, +0.956] nats (n=20)  → 0.493
+  order-flip       +0.200 [+0.081, +0.416] rate (n=20)  → 0.800
+  order-residual   +0.264 [+0.148, +0.380] nats (n=20)  → 0.768
+  frustration      +0.044 curl fraction (n=13)  → 0.956
+  spin-survival    +0.667 [+0.208, +0.939] rate (n=3)  → 0.667
+  susceptibility   +0.410 [+0.064, +0.755] nats/spin (n=5)
+  polarity         -0.690 spearman (n=8)  → 0.845
+  paraphrase       +0.643 spearman (n=8)  → 0.821
+  null-bias        +0.000 [+0.000, +0.000] nats (n=4)  → 1.000
+  nuisance         +0.581 [+0.257, +0.904] nats (n=24)  → 0.560
+  orbit-coherence  +0.247 [+0.038, +0.456] energy fraction (n=6)  → 0.247
+  interaction      +0.333 [+0.183, +0.482] energy fraction (n=6)
+  harmonic         +0.215 energy fraction (n=1)  → 0.785
+    nuisance:whitespace   +0.521 nats (n=6)
+    nuisance:markdown     +0.432 nats (n=6)
+    nuisance:bullet       +0.491 nats (n=6)
+    nuisance:halo         +0.878 nats (n=6)
+  coherence 0.741 (harmonic 0.628) · JUDGE SCORE 0.365 · 194 comparisons (194 cached) · 0 refusals · $0.0000
+benchmarking openai/gpt-5.4-nano ...
+model: openai/gpt-5.4-nano · template: canonical_v2
+  signal           +0.484 [+0.297, +0.672] nats (n=20)  → 0.384
+  order-flip       +0.400 [+0.219, +0.613] rate (n=20)  → 0.600
+  order-residual   +0.310 [+0.203, +0.418] nats (n=20)  → 0.733
+  frustration      +0.326 curl fraction (n=13)  → 0.674
+  spin-survival    +0.000 [+0.000, +0.562] rate (n=3)  → 0.000
+  susceptibility   +0.850 [+0.662, +1.038] nats/spin (n=5)
+  polarity         +0.381 spearman (n=8)  → 0.310
+  paraphrase       +0.333 spearman (n=8)  → 0.667
+  null-bias        +0.000 [+0.000, +0.000] nats (n=4)  → 1.000
+  nuisance         +0.913 [+0.725, +1.101] nats (n=24)  → 0.401
+  orbit-coherence  +0.151 [+0.003, +0.299] energy fraction (n=6)  → 0.151
+  interaction      +0.432 [+0.086, +0.779] energy fraction (n=6)
+  harmonic         +0.381 energy fraction (n=1)  → 0.619
+    nuisance:whitespace   +0.681 nats (n=6)
+    nuisance:markdown     +0.972 nats (n=6)
+    nuisance:bullet       +1.072 nats (n=6)
+    nuisance:halo         +0.926 nats (n=6)
+  coherence 0.499 (harmonic 0.000) · JUDGE SCORE 0.191 · 194 comparisons (172 cached) · 0 refusals · $0.0023
+benchmarking google/gemini-2.5-flash ...
+model: google/gemini-2.5-flash · template: canonical_v2
+  signal           +1.015 [+0.653, +1.377] nats (n=20)  → 0.637
+  order-flip       +0.150 [+0.052, +0.360] rate (n=20)  → 0.850
+  order-residual   +0.274 [+0.174, +0.374] nats (n=20)  → 0.760
+  frustration      +0.039 curl fraction (n=13)  → 0.961
+  spin-survival    +1.000 [+0.438, +1.000] rate (n=3)  → 1.000
+  susceptibility   +0.231 [+0.072, +0.390] nats/spin (n=5)
+  polarity         -0.810 spearman (n=8)  → 0.905
+  paraphrase       +1.000 spearman (n=8)  → 1.000
+  null-bias        +0.000 [+0.000, +0.000] nats (n=4)  → 1.000
+  nuisance         +0.492 [+0.200, +0.783] nats (n=24)  → 0.612
+  orbit-coherence  +0.394 [+0.303, +0.486] energy fraction (n=5)  → 0.394
+  interaction      +0.286 [+0.237, +0.335] energy fraction (n=5)
+  harmonic         +0.082 energy fraction (n=1)  → 0.918
+    nuisance:whitespace   +0.000 nats (n=6)
+    nuisance:markdown     +0.388 nats (n=6)
+    nuisance:bullet       +0.961 nats (n=6)
+    nuisance:halo         +0.617 nats (n=6)
+  coherence 0.844 (harmonic 0.773) · JUDGE SCORE 0.538 · 194 comparisons (138 cached) · 1 refusals · $0.0101
+benchmarking deepseek/deepseek-v4-flash ...
+model: deepseek/deepseek-v4-flash · template: canonical_v2
+  signal           +0.687 [+0.414, +0.960] nats (n=20)  → 0.497
+  order-flip       +0.200 [+0.081, +0.416] rate (n=20)  → 0.800
+  order-residual   +0.250 [+0.155, +0.345] nats (n=20)  → 0.779
+  frustration      +0.055 curl fraction (n=13)  → 0.945
+  spin-survival    +1.000 [+0.438, +1.000] rate (n=3)  → 1.000
+  susceptibility   +0.635 [+0.479, +0.791] nats/spin (n=5)
+  polarity         -0.762 spearman (n=8)  → 0.881
+  paraphrase       +0.952 spearman (n=8)  → 0.976
+  null-bias        +0.000 [+0.000, +0.000] nats (n=4)  → 1.000
+  nuisance         +0.356 [+0.175, +0.536] nats (n=24)  → 0.701
+  orbit-coherence  +0.357 [+0.200, +0.515] energy fraction (n=6)  → 0.357
+  interaction      +0.324 [+0.098, +0.551] energy fraction (n=6)
+  harmonic         +0.002 energy fraction (n=1)  → 0.998
+    nuisance:whitespace   +0.324 nats (n=6)
+    nuisance:markdown     +0.393 nats (n=6)
+    nuisance:bullet       +0.359 nats (n=6)
+    nuisance:halo         +0.346 nats (n=6)
+  coherence 0.850 (harmonic 0.769) · JUDGE SCORE 0.422 · 194 comparisons (138 cached) · 0 refusals · $0.0077
+benchmarking anthropic/claude-haiku-4.5 ...
+model: anthropic/claude-haiku-4.5 · template: canonical_v2
+  signal           +0.756 [+0.522, +0.990] nats (n=20)  → 0.530
+  order-flip       +0.100 [+0.028, +0.301] rate (n=20)  → 0.900
+  order-residual   +0.084 [+0.034, +0.135] nats (n=20)  → 0.919
+  frustration      +0.032 curl fraction (n=13)  → 0.968
+  spin-survival    +1.000 [+0.438, +1.000] rate (n=3)  → 1.000
+  susceptibility   +0.320 [+0.134, +0.506] nats/spin (n=5)
+  polarity         -0.810 spearman (n=8)  → 0.905
+  paraphrase       +0.833 spearman (n=8)  → 0.917
+  null-bias        +0.000 [+0.000, +0.000] nats (n=3)  → 1.000
+  nuisance         +0.080 [-0.008, +0.168] nats (n=24)  → 0.923
+  orbit-coherence  +0.213 [+0.113, +0.314] energy fraction (n=5)  → 0.213
+  interaction      +0.197 [+0.138, +0.256] energy fraction (n=5)
+  harmonic         +0.009 energy fraction (n=1)  → 0.991
+    nuisance:whitespace   +0.000 nats (n=6)
+    nuisance:markdown     +0.000 nats (n=6)
+    nuisance:bullet       +0.087 nats (n=6)
+    nuisance:halo         +0.232 nats (n=6)
+  coherence 0.870 (harmonic 0.687) · JUDGE SCORE 0.461 · 194 comparisons (138 cached) · 4 refusals · $0.0840
+benchmarking anthropic/claude-sonnet-4.6 ...
+model: anthropic/claude-sonnet-4.6 · template: canonical_v2
+  signal           +0.834 [+0.585, +1.083] nats (n=20)  → 0.566
+  order-flip       +0.000 [+0.000, +0.161] rate (n=20)  → 1.000
+  order-residual   +0.108 [+0.048, +0.168] nats (n=20)  → 0.898
+  frustration      +0.005 curl fraction (n=13)  → 0.995
+  spin-survival    +1.000 [+0.438, +1.000] rate (n=3)  → 1.000
+  susceptibility   +0.212 [+0.052, +0.372] nats/spin (n=5)
+  polarity         -0.881 spearman (n=8)  → 0.940
+  paraphrase       +0.929 spearman (n=8)  → 0.964
+  null-bias        +0.000 [+0.000, +0.000] nats (n=4)  → 1.000
+  nuisance         +0.092 [+0.046, +0.138] nats (n=24)  → 0.912
+  orbit-coherence  +0.561 [+0.287, +0.836] energy fraction (n=6)  → 0.561
+  interaction      +0.160 [+0.052, +0.268] energy fraction (n=6)
+  harmonic         +0.023 energy fraction (n=1)  → 0.977
+    nuisance:whitespace   +0.024 nats (n=6)
+    nuisance:markdown     +0.153 nats (n=6)
+    nuisance:bullet       +0.154 nats (n=6)
+    nuisance:halo         +0.037 nats (n=6)
+  coherence 0.922 (harmonic 0.895) · JUDGE SCORE 0.522 · 194 comparisons (138 cached) · 0 refusals · $0.1332
