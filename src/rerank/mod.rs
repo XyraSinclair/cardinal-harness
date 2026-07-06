@@ -14,6 +14,7 @@ pub mod bench;
 pub mod canonize;
 pub mod comparison;
 pub mod elaborate;
+pub mod ensemble;
 pub mod evaluation;
 pub mod experiments;
 pub mod explain;
@@ -46,6 +47,7 @@ pub use comparison::{
     PairwiseComparisonRequest, PairwiseComparisonSpec,
 };
 pub use elaborate::{elaborate_criterion, ElaborateError, ElaboratedCriterion};
+pub use ensemble::{judge_geometry, JudgeGeometry, JudgePortfolioEntry};
 pub use experiments::{
     expand_prompt_experiment_request, AttributePolarity, AttributeVariantSpec,
     PromptExperimentConfig, PromptExperimentError,
