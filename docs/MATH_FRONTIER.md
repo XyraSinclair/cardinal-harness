@@ -109,6 +109,28 @@ Two instruments in the classical styles:
   away from strictly better, findable only by search. Routed to #49 as
   the v2 core graph; profile pinned.
 
+## 3⅞. Judge portfolio theory — SHIPPED (2026-07-06)
+
+The ensemble question made exact (`src/rerank/ensemble.rs`,
+`examples/judge_portfolio.rs`): judges as a portfolio under correlated
+errors. Spearman-triad loadings (1904) on the z-scored latent
+correlations; full error covariance Ψ = R − llᵀ projected to the PSD
+cone; minimum-variance weights Ψ⁻¹l; total precision lᵀΨ⁻¹l; marginal
+information I − I₋ᵢ per dollar as the budgeted-roster ranking; effective
+error sources = PR of normalized Ψ. Diversification theorem pinned: a
+noisier-but-independent judge strictly adds information; a clone shares
+one error channel and one weight. Live zero-spend receipt from the
+retest pack: six frontier models carry **2.89 effective error channels**
+(the labs share failure modes); deepseek buys ~10× sonnet's marginal
+information per dollar; negative GLS weights appear exactly where shared
+error gets hedged — Markowitz in judge space. Three estimator designs
+failed en route (raw-PR, eigen loadings, un-projected Ψ → a negative
+precision live) — each documented and pinned. Open: per-attribute
+geometry (does the judge map change with the attribute?), Cooke
+calibration weighting composed on top (#48), and portfolio-aware planner
+integration (spend the next comparison on the judge with the best
+marginal information per dollar for THAT pair).
+
 ## 4. Stochastic transitivity hierarchy — NEXT (new invariance row)
 
 Weak/moderate/strong stochastic transitivity (WST ⊂ MST ⊂ SST) on
