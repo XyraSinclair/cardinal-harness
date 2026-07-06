@@ -611,6 +611,7 @@ pub async fn run_judge_bench(
     // ---- Orbit block: full Z₂³ transform on selected core pairs ----
     let mut orbit_coherences: Vec<f64> = Vec::new();
     let mut interaction_shares: Vec<f64> = Vec::new();
+    let mut extra_comparisons = 0usize;
     for &(i, j) in &orbit_pairs() {
         let report = super::orbit::orbit_transform(
             gateway,
@@ -626,6 +627,7 @@ pub async fn run_judge_bench(
         cost += report.cost_nanodollars;
         cached += report.comparisons_cached;
         refusals += report.refusals;
+        extra_comparisons += report.comparisons;
         if let Some(c) = report.coherence {
             orbit_coherences.push(c);
             let total: f64 = report.energies.iter().sum();
@@ -662,6 +664,7 @@ pub async fn run_judge_bench(
             )
             .await?;
             cost += out.cost_nanodollars;
+            extra_comparisons += 1;
             if out.cached {
                 cached += 1;
             }
@@ -902,7 +905,9 @@ pub async fn run_judge_bench(
         judge_score,
         primary_scores,
         refusals,
-        comparisons: plan.len() + spin_reports.iter().map(|(_, r)| r.comparisons).sum::<usize>(),
+        comparisons: plan.len()
+            + extra_comparisons
+            + spin_reports.iter().map(|(_, r)| r.comparisons).sum::<usize>(),
         comparisons_cached: cached,
         cost_nanodollars: cost,
         calls,
