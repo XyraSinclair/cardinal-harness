@@ -852,6 +852,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     if let Some(hcr) = meta.judgement_frustration_mean {
                         parts.push(format!("syst cyclic {:.1}% of energy", hcr * 100.0));
                     }
+                    if meta.topk_error > 0.0 {
+                        parts.push(format!(
+                            "rank risk {:.3} (top-k flip probability)",
+                            meta.topk_error
+                        ));
+                    }
                     if parts.len() > 1 {
                         eprintln!("error budget: {}", parts.join(" · "));
                     }
