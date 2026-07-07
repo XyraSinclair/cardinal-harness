@@ -219,6 +219,37 @@ enum Commands {
         #[arg(long)]
         json: bool,
     },
+    /// Slate: item + voice note in, stakeholder-backed attributes out
+    ///
+    /// The intake front door: name the stakeholders whose judgment of this
+    /// item matters (or let the model propose them), have each propose
+    /// attributes blind to the others, merge near-duplicates. Breadth —
+    /// how many unlike perspectives back an attribute — is the proxy for
+    /// "alive in social reality". The slate is hypotheses, priced in
+    /// pennies; measure with canonize/sort/distinguish, or invert with
+    /// explain when a believed ranking comes first.
+    Slate {
+        /// The item (literal text, or @path)
+        item: String,
+        /// Your voice-note ramble about why it's interesting (or @path)
+        #[arg(long)]
+        note: Option<String>,
+        /// Stakeholders, comma-separated (omit to have the model name them)
+        #[arg(long)]
+        stakeholders: Option<String>,
+        /// How many stakeholders to propose when none are given
+        #[arg(long, default_value_t = 4)]
+        stakeholder_count: usize,
+        /// Attributes per stakeholder
+        #[arg(long, default_value_t = 4)]
+        per: usize,
+        /// Model slug (OpenRouter)
+        #[arg(long)]
+        model: Option<String>,
+        /// Emit the full report as JSON on stdout
+        #[arg(long)]
+        json: bool,
+    },
     /// Canonize an attribute: converge on a communication primitive
     ///
     /// An attribute is canonical when it induces the SAME cardinal latent
@@ -1196,6 +1227,58 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 eprint!(" · frustration {f:.3}");
             }
             eprintln!();
+        }
+        Commands::Slate {
+            item,
+            note,
+            stakeholders,
+            stakeholder_count,
+            per,
+            model,
+            json,
+        } => {
+            if std::env::var("OPENROUTER_API_KEY").is_err() {
+                return Err("OPENROUTER_API_KEY is not set. Create a key at \
+                     https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
+                    .into());
+            }
+            let item_text = read_item_arg(&item)?;
+            let note_text = note.as_deref().map(read_item_arg).transpose()?;
+            let stakeholder_list: Vec<String> = stakeholders
+                .as_deref()
+                .map(|s| s.split(',').map(|x| x.trim().to_string()).collect())
+                .unwrap_or_default();
+            let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
+            let report = cardinal_harness::rerank::propose_slate(
+                &gateway,
+                model.as_deref().unwrap_or("openai/gpt-5.4-mini"),
+                &item_text,
+                note_text.as_deref(),
+                stakeholder_list,
+                stakeholder_count,
+                per,
+            )
+            .await?;
+            if json {
+                println!("{}", serde_json::to_string_pretty(&report)?);
+            } else {
+                println!("stakeholders: {}", report.stakeholders.join(" · "));
+                for entry in &report.slate {
+                    println!(
+                        "  [{}] {}  ({})",
+                        entry.backers.len(),
+                        entry.attribute,
+                        entry.backers.join(", ")
+                    );
+                }
+            }
+            eprintln!(
+                "slate: {} attributes from {} stakeholders · {} calls · ${:.4}",
+                report.slate.len(),
+                report.stakeholders.len(),
+                report.calls,
+                report.cost_nanodollars as f64 / 1e9,
+            );
         }
         Commands::Canonize {
             input,

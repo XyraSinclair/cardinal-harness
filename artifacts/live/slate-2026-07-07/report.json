@@ -1,0 +1,83 @@
+{
+  "stakeholders": [
+    "DevOps engineers",
+    "Security auditors",
+    "Site reliability teams",
+    "Automation platform users"
+  ],
+  "slate": [
+    {
+      "attribute": "false clean signal resistance",
+      "backers": [
+        "Security auditors",
+        "Site reliability teams",
+        "Automation platform users"
+      ]
+    },
+    {
+      "attribute": "silent-failure resistance",
+      "backers": [
+        "DevOps engineers",
+        "Site reliability teams"
+      ]
+    },
+    {
+      "attribute": "verification harness reliability",
+      "backers": [
+        "DevOps engineers",
+        "Security auditors"
+      ]
+    },
+    {
+      "attribute": "probe execution certainty",
+      "backers": [
+        "Security auditors",
+        "Automation platform users"
+      ]
+    },
+    {
+      "attribute": "probe-result correctness",
+      "backers": [
+        "DevOps engineers"
+      ]
+    },
+    {
+      "attribute": "empty-output guardrails",
+      "backers": [
+        "DevOps engineers"
+      ]
+    },
+    {
+      "attribute": "empty-result failure detection",
+      "backers": [
+        "Security auditors"
+      ]
+    },
+    {
+      "attribute": "probe result validity",
+      "backers": [
+        "Site reliability teams"
+      ]
+    },
+    {
+      "attribute": "execution-confirmation rigor",
+      "backers": [
+        "Site reliability teams"
+      ]
+    },
+    {
+      "attribute": "guards against empty outputs",
+      "backers": [
+        "Automation platform users"
+      ]
+    },
+    {
+      "attribute": "handles failed verification harnesses",
+      "backers": [
+        "Automation platform users"
+      ]
+    }
+  ],
+  "calls": 6,
+  "cost_nanodollars": 2632500
+}

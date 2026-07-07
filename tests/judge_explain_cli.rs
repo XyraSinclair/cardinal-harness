@@ -971,6 +971,91 @@ impl Respond for TwoMindsJudge {
     }
 }
 
+/// Serves the three slate stages: stakeholder naming, per-stakeholder
+/// proposals (with a deliberate overlap so the merge has work), and the
+/// merge pass.
+#[derive(Clone, Copy)]
+struct SlateJudge;
+
+impl Respond for SlateJudge {
+    fn respond(&self, request: &Request) -> ResponseTemplate {
+        let parsed: serde_json::Value = serde_json::from_slice(&request.body).unwrap_or_default();
+        let system = parsed["messages"]
+            .as_array()
+            .and_then(|m| {
+                m.iter()
+                    .find(|x| x["role"] == "system")
+                    .and_then(|x| x["content"].as_str())
+            })
+            .unwrap_or("")
+            .to_string();
+        let content = if system.contains("name stakeholders") {
+            r#"["jeweler", "metallurgist"]"#.to_string()
+        } else if system.contains("You are exactly this stakeholder: jeweler") {
+            r#"["sparkle under light", "craftsmanship of setting"]"#.to_string()
+        } else if system.contains("You are exactly this stakeholder: metallurgist") {
+            r#"["brilliance when lit", "purity of alloy"]"#.to_string()
+        } else if system.contains("merge attribute slates") {
+            // "sparkle under light" and "brilliance when lit" cluster.
+            r#"[{"attribute":"sparkle under light","backers":["jeweler","metallurgist"]},
+                {"attribute":"craftsmanship of setting","backers":["jeweler"]},
+                {"attribute":"purity of alloy","backers":["metallurgist"]}]"#
+                .to_string()
+        } else {
+            r#"["unexpected"]"#.to_string()
+        };
+        ResponseTemplate::new(200).set_body_json(json!({
+            "choices": [{ "message": { "content": content }, "finish_reason": "stop" }],
+            "usage": { "prompt_tokens": 10, "completion_tokens": 10 }
+        }))
+    }
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn slate_names_stakeholders_proposes_blind_and_merges_by_breadth() {
+    let server = MockServer::start().await;
+    Mock::given(method("POST"))
+        .and(path("/chat/completions"))
+        .respond_with(SlateJudge)
+        .mount(&server)
+        .await;
+    let output = run_cardinal(
+        &server.uri(),
+        &[
+            "slate",
+            "a shiny GOLD ring someone posted",
+            "--note",
+            "huh, people would probably want to prioritize this",
+            "--stakeholder-count",
+            "2",
+            "--per",
+            "2",
+            "--model",
+            "test/judge",
+            "--json",
+        ],
+        "",
+    );
+    assert!(
+        output.status.success(),
+        "stderr: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let parsed: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(
+        parsed["stakeholders"],
+        serde_json::json!(["jeweler", "metallurgist"])
+    );
+    let slate = parsed["slate"].as_array().unwrap();
+    assert_eq!(slate.len(), 3, "four proposals, one cluster: {parsed}");
+    // Breadth-first: the attribute both perspectives converged on leads.
+    assert_eq!(slate[0]["attribute"], "sparkle under light");
+    assert_eq!(slate[0]["backers"].as_array().unwrap().len(), 2);
+    assert_eq!(slate[1]["backers"].as_array().unwrap().len(), 1);
+    // 1 naming + 2 proposals + 1 merge.
+    assert_eq!(parsed["calls"], 4);
+}
+
 #[tokio::test(flavor = "multi_thread")]
 async fn canonize_ranks_wordings_by_cross_judge_transmissibility() {
     let server = MockServer::start().await;

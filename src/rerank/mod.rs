@@ -28,6 +28,7 @@ pub mod policy_registry;
 pub mod report;
 pub mod sampling;
 pub mod simple;
+pub mod slate;
 pub mod sort;
 pub mod spin;
 pub mod trace;
@@ -73,6 +74,7 @@ pub use policy_registry::{load_policy_from_path, PolicyConfig, PolicyRegistry, P
 pub use report::{build_report, render_report_markdown, RerankReport, RerankReportOptions};
 pub use sampling::{nonce_draws, NonceDrawReport};
 pub use simple::rerank;
+pub use slate::{propose_slate, SlateEntry, SlateError, SlateReport};
 pub use sort::{
     sort_documents, sort_texts, SortError, SortOptions, SortProbe, SortProbeKind, SortedItem,
     SortedTexts,

@@ -1,0 +1,7 @@
+name: probe-integrity
+description: >-
+  Prevent silently-vacuous probes: verification scripts, greps, remote checks,
+  and liveness tests that return empty/zero and get read as "clean/dead/pass"
+  when the probe never actually ran. Use when writing ANY verification harness,
+  security scan, dead-code/reference-closure analysis, remote (ssh) check,
+  parity/diff gate, or process-liveness check — or when a probe just returned
