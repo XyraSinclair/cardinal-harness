@@ -16,6 +16,7 @@
 pub mod cache;
 pub mod discrete;
 pub mod gain_calibration;
+pub mod packet;
 pub mod gateway;
 pub mod prompts;
 pub mod rating_engine;

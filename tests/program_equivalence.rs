@@ -60,23 +60,37 @@ fn posterior_is_invariant_to_arrival_order_and_batching() {
     a.ingest(&base);
     let sa = a.solve();
 
-    // Reversed order, ingested in three interleaved batches via the
-    // incremental path.
+    // Reversed order through the BULK path: since the fuse buckets are
+    // ordered (BTreeMap — a fix forced by the judgment packet's
+    // byte-identity pin), same multiset → BIT-identical posterior.
     let mut shuffled = base.clone();
     shuffled.reverse();
     let mut b = engine(n);
-    for chunk in shuffled.chunks(5) {
-        b.add_observations(chunk);
-    }
+    b.ingest(&shuffled);
     let sb = b.solve();
-
     for (x, y) in sa.scores.iter().zip(sb.scores.iter()) {
-        assert!(
-            (x - y).abs() < 1e-9,
-            "same multiset must give same posterior: {x} vs {y}"
+        assert_eq!(
+            x.to_bits(),
+            y.to_bits(),
+            "bulk path: same multiset must give byte-identical posterior"
         );
     }
-    assert!((sa.hcr - sb.hcr).abs() < 1e-9, "{} vs {}", sa.hcr, sb.hcr);
+    assert_eq!(sa.hcr.to_bits(), sb.hcr.to_bits());
+
+    // The INCREMENTAL path makes the weaker, still-true promise: batched
+    // arrival agrees to numerical tolerance (its edge order is arrival
+    // order by design).
+    let mut c = engine(n);
+    for chunk in shuffled.chunks(5) {
+        c.add_observations(chunk);
+    }
+    let sc = c.solve();
+    for (x, y) in sa.scores.iter().zip(sc.scores.iter()) {
+        assert!(
+            (x - y).abs() < 1e-9,
+            "incremental path: same multiset within tolerance: {x} vs {y}"
+        );
+    }
 }
 
 #[test]

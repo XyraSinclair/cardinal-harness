@@ -46,7 +46,13 @@ type IrlsHuberSolveResult = (
 
 type FuseBucketKey = (usize, usize);
 type FuseBucketEntry = (f64, f64, String);
-type FuseBuckets = HashMap<FuseBucketKey, Vec<FuseBucketEntry>>;
+// BTreeMap, deliberately: bucket iteration order feeds edge assembly,
+// and HashMap's per-instance random ordering made byte-identical solves
+// impossible for identical observation multisets (caught by the judgment
+// packet's byte-identity pin at ~30 ulps). Determinism of
+// multiset → posterior is a solver-level guarantee for the bulk-ingest
+// path; BTreeMap makes it structural.
+type FuseBuckets = std::collections::BTreeMap<FuseBucketKey, Vec<FuseBucketEntry>>;
 
 // ---------------------------------------------------------------------
 //  Config
@@ -1839,7 +1845,7 @@ impl RatingEngine {
 
     fn fuse_bulk(&mut self, observations: &[Observation]) {
         let t = self.attr.temperature.max(self.cfg.tiny);
-        let mut buckets: FuseBuckets = HashMap::new();
+        let mut buckets: FuseBuckets = FuseBuckets::new();
 
         for ob in observations {
             let i = ob.i;

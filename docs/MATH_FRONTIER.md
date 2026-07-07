@@ -131,6 +131,29 @@ calibration weighting composed on top (#48), and portfolio-aware planner
 integration (spend the next comparison on the judge with the best
 marginal information per dollar for THAT pair).
 
+## 3¹⁵⁄₁₆. The judgment packet — PROTOCOL CORE SHIPPED (2026-07-07)
+
+`src/packet.rs` (issue #46): belief as a medium. A packet = attribute +
+template + judge + (entity id, content hash) pairs + observations as
+(log-ratio, precision), canonically ordered, identified by blake3 over a
+canonical BYTE encoding (length-prefixed strings, f64 bit patterns — no
+JSON floats near the identity). `fuse` lands any partition of the same
+evidence, in any order, on a posterior **byte-identical** to the
+single-party solve — pinned with `to_bits` equality, not tolerance.
+
+The pin forced a solver-level fix with teeth: fuse buckets were HashMap,
+whose per-instance random iteration order made identical multisets differ
+by ~30 ulps across engines. Buckets are now BTreeMap; the
+program-equivalence pin tightened from 1e-9 to bitwise on the bulk path
+(the incremental path keeps its honest 1e-9). Determinism of
+multiset → posterior is now structural, not statistical.
+
+Also pinned: partial entity-set overlap fuses on the union; one flipped
+bit is a different packet; an impersonated entity (same id, different
+content hash) refuses to fuse. Open in #46: the seriate-side provenance
+chain (packet → capture ids), orbit-spectrum and gain metadata fields,
+and the two-party live demo from the pilot map's cache.
+
 ## 4. Stochastic transitivity hierarchy — NEXT (new invariance row)
 
 Weak/moderate/strong stochastic transitivity (WST ⊂ MST ⊂ SST) on
