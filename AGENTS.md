@@ -66,6 +66,12 @@ Background sync automation, if any, should default to `git fetch`, not blind
 
 ## Working Norms
 
+**Never publish claude.ai Artifacts from this repo** (operator ban,
+2026-07-08). Shareable pages (maps, leaderboards) are committed HTML under
+`artifacts/live/` and shown via a local static server on a free localhost
+port (`python3 -m http.server <port> --bind 127.0.0.1` from
+`artifacts/live/`). Never foreground a browser; print the URL.
+
 Read **`docs/PRINCIPLES.md`** before substantial work: the anti-slop
 discipline (refutability, scripted-pathology validation, denominators,
 mathematical register, errata-on-top) with the receipts that earned each
