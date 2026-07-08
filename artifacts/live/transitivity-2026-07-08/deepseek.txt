@@ -1,0 +1,5 @@
+triads 4 · WST 0 (0 beyond 2se) · MST 1 (0) · SST 1 (0) · min draws 4 · $0.0135
+  (0, 1, 2) p_ab 0.80 p_bc 0.80 p_ac 0.75 SST-viol depth 0.2se
+  (0, 1, 3) p_ab 0.80 p_bc 1.00 p_ac 1.00 depth 0.0se
+  (0, 2, 3) p_ab 0.75 p_bc 1.00 p_ac 1.00 depth 0.0se
+  (1, 2, 3) p_ab 0.80 p_bc 1.00 p_ac 1.00 depth 0.0se
