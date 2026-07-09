@@ -5,7 +5,17 @@
 [![docs.rs](https://img.shields.io/docsrs/cardinal-harness)](https://docs.rs/cardinal-harness)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Sort lists with LLMs — and get numbers you can defend.
+**Does the model actually believe what it just told you — or was it only
+echoing how you asked?** cardinal-harness measures the difference and gives
+you the number. A preference earns the name *belief* only if it survives the
+transformations that shouldn't matter — presentation order, wording,
+polarity, who's asking. This engine elicits LLM judgements as noisy
+measurements, tests them against exactly that battery, and prices everything
+that fails it in nats, with receipts. (Watch one judgement bend under
+framing while another refuses to move, on live committed data:
+[the receipt viewer](artifacts/live/receipt-viewer-2026-07-08/).)
+
+The everyday verb is sorting:
 
 ```console
 $ cardinal sort ideas.txt --by "expected impact on retention"
