@@ -8,10 +8,11 @@
 //! **byte-identical** to what a single party holding all the evidence
 //! would compute.
 //!
-//! Why byte-identical and not merely close: the solver's sufficient
-//! statistics form a commutative monoid (pinned in
-//! tests/program_equivalence.rs), so the posterior depends only on the
-//! observation MULTISET — and `fuse` canonicalizes that multiset (sorts
+//! Why byte-identical and not merely close: the solver depends only on
+//! the observation MULTISET — the free commutative monoid; under Huber
+//! weights no smaller mergeable sufficient statistic exists, which is
+//! why packets carry observations, not moments (pinned in
+//! tests/program_equivalence.rs) — and `fuse` canonicalizes that multiset (sorts
 //! entities by id, observations by content) before the solve, making the
 //! float operations themselves order-identical. What was a 1e-9
 //! tolerance under arbitrary arrival order becomes `==` under the
