@@ -60,9 +60,8 @@ Background sync automation, if any, should default to `git fetch`, not blind
 - `src/rerank/comparison.rs`: pairwise LLM comparison logic
 - `src/prompts.rs`: prompt templates and ratio ladder
 - `src/gateway/`: OpenRouter adapter, pricing, usage, logprobs
-- `src/pipeline.rs` and `src/pipeline/`: generate -> rank -> synthesize flows
-- `src/commander/`: strategic codebase evaluation workflow
-- `tests/`: gateway, rerank, trace, pipeline, and cache coverage
+- `src/packet.rs`: content-addressed judgment packets, idempotent byte-identical fusion
+- `tests/`: gateway, rerank, trace, packet, and cache coverage
 
 ## Working Norms
 

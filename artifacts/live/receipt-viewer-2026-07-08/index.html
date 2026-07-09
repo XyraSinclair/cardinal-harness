@@ -130,12 +130,18 @@ points per model; nothing is interpolated or simulated.</p>
 
 <h2>The whole response function, m(f)</h2>
 <p class="thesis">Seven field strengths × both presentation orders per model. gpt-5.4-mini has no
-stable direction — its response is a near-linear line through zero, slope
-+0.200 nats per step of social pressure (a <em>paramagnetic</em> judgement: the framing
-IS the signal). claude-sonnet-4.6 holds direction at every field point; its odd
-response is flat (χ ≈ 0) and the structure that remains is <em>even</em> —
-(m(+3)+m(−3))/2 − m(0) = +0.31 nats, a response to |f|, i.e. to insistence
-itself rather than its direction.</p>
+stable direction — sign(m) is not constant over the sweep, and the fitted odd slope is
++0.200 nats per step of social pressure (R² 0.81, which sits <em>below</em> this
+instrument's own linearity pin of 0.9 — a trend, not a certified line). claude-sonnet-4.6
+holds direction at every field point with a flat odd response (χ ≈ 0).
+<strong>Corrected 2026-07-09</strong> (red team, erratum on top of the sweep pack): the
+first narration of the even components was wrong in both directions — by the
+instrument's defined statistic (mean over f of (m(+f)+m(−f))/2 − m(0)),
+gpt-5.4-mini's even mean is <span class="mono">+0.239</span> (comparable to its odd
+slope, not near-zero) and claude-sonnet-4.6's is <span class="mono">+0.035</span>,
+sign-indefinite across fields (−0.148, −0.056, +0.310) — the once-quoted +0.31 is the
+f = 3 edge value alone. At n = 1 pair, the honest read of both even channels is:
+not yet determined.</p>
 <div class="legend">
   <span><span class="sw" style="background:var(--s1)"></span>gpt-5.4-mini — χ = +0.200 nats/step, R² 0.81, 14 comparisons, $0.0057</span>
   <span><span class="sw" style="background:var(--s2)"></span>claude-sonnet-4.6 — χ = −0.014 nats/step, R² 0.02, 14 comparisons, $0.0468</span>

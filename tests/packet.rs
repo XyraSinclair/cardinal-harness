@@ -165,3 +165,47 @@ fn packets_round_trip_through_json_with_identity_intact() {
          float-bit-exact; JSON is transport only)"
     );
 }
+
+#[test]
+fn redelivered_packet_is_absorbed_fusion_is_idempotent() {
+    // The CRDT claim, made testable (red team 2026-07-09: pre-fix, a
+    // duplicate packet double-counted its observations — commutative,
+    // associative, NOT idempotent). Merge must be set union over
+    // content-addressed packets: fuse([a, b, a]) == fuse([a, b]),
+    // byte-identical, and the duplicate id appears once in provenance.
+    let ents = entities(6);
+    let all = evidence(6, 7);
+    let (a_obs, b_obs): (Vec<_>, Vec<_>) =
+        all.iter().cloned().enumerate().fold((vec![], vec![]), |(mut a, mut b), (k, ob)| {
+            if k % 2 == 0 {
+                a.push(ob);
+            } else {
+                b.push(ob);
+            }
+            (a, b)
+        });
+    let pa = packet("alice", ents.clone(), a_obs);
+    let pb = packet("bob", ents.clone(), b_obs);
+
+    let clean = fuse(&[pa.clone(), pb.clone()]).unwrap();
+    let redelivered = fuse(&[pa.clone(), pb.clone(), pa.clone()]).unwrap();
+
+    for (x, y) in clean.scores.iter().zip(redelivered.scores.iter()) {
+        assert_eq!(
+            x.to_bits(),
+            y.to_bits(),
+            "re-delivered packet must be absorbed byte-identically"
+        );
+    }
+    assert_eq!(clean.observations, redelivered.observations);
+    assert_eq!(clean.fused_packet_ids, redelivered.fused_packet_ids);
+    assert_eq!(
+        redelivered
+            .fused_packet_ids
+            .iter()
+            .filter(|id| **id == pa.id().0)
+            .count(),
+        1,
+        "duplicate id must appear once in provenance"
+    );
+}

@@ -15,7 +15,18 @@
 //! entities by id, observations by content) before the solve, making the
 //! float operations themselves order-identical. What was a 1e-9
 //! tolerance under arbitrary arrival order becomes `==` under the
-//! protocol. A CRDT of belief.
+//! protocol.
+//!
+//! The CRDT statement, made precise (the loose form — "a CRDT of
+//! belief" over raw fuse — was killed by the 2026-07-09 red team, which
+//! caught that fusion without dedup double-counts a re-delivered
+//! packet): the replicated STATE is the SET of packets keyed by content
+//! address. `fuse` dedups by packet id, so merge is set union —
+//! commutative, associative, AND idempotent — and the posterior is a
+//! pure function of the state (a G-Set CRDT). What id-dedup cannot see:
+//! two DISTINCT packets built from overlapping raw draws still
+//! double-count; evidence-disjointness of distinct packets is the
+//! provenance layer's contract (#42/#46), not this function's.
 //!
 //! Integrity: the packet id is blake3 over a domain-tagged CANONICAL
 //! BYTE encoding (length-prefixed strings, f64 bit patterns — no JSON
@@ -172,10 +183,19 @@ pub struct FusedPosterior {
 /// the same evidence into packets, in any order — the protocol form of
 /// the monoid theorem.
 pub fn fuse(packets: &[JudgmentPacket]) -> Result<FusedPosterior, PacketError> {
+    // Idempotency: dedup by content-addressed packet id, so re-delivery
+    // of the same packet is absorbed (set-union merge semantics). Keeps
+    // first occurrence; order of survivors is irrelevant because the
+    // observation multiset is canonicalized below anyway.
+    let mut seen_ids = std::collections::HashSet::new();
+    let packets: Vec<&JudgmentPacket> = packets
+        .iter()
+        .filter(|p| seen_ids.insert(p.id().0))
+        .collect();
     let Some(first) = packets.first() else {
         return Err(PacketError::Empty);
     };
-    for p in packets {
+    for p in &packets {
         if p.attribute != first.attribute {
             return Err(PacketError::AttributeMismatch(
                 first.attribute.clone(),
@@ -192,7 +212,7 @@ pub fn fuse(packets: &[JudgmentPacket]) -> Result<FusedPosterior, PacketError> {
 
     // Union entities; refuse on content-hash disagreement.
     let mut hash_by_id: HashMap<&str, &str> = HashMap::new();
-    for p in packets {
+    for p in &packets {
         for (id, hash) in &p.entities {
             match hash_by_id.get(id.as_str()) {
                 Some(existing) if *existing != hash => {
@@ -218,7 +238,7 @@ pub fn fuse(packets: &[JudgmentPacket]) -> Result<FusedPosterior, PacketError> {
     // Collect the observation multiset in union coordinates, tagged by
     // judge (each party is its own rater), then canonicalize.
     let mut all: Vec<(usize, usize, u64, u64, String)> = Vec::new();
-    for p in packets {
+    for p in &packets {
         for ob in &p.observations {
             let (Some((id_i, _)), Some((id_j, _))) =
                 (p.entities.get(ob.i), p.entities.get(ob.j))

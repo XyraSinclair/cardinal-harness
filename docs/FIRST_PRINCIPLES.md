@@ -127,20 +127,26 @@ whoever asks. gemini-2.5-flash holds a direction on that same pair and
 yields only +0.12. The sycophancy question decomposes into: does this
 judgement have a spontaneous direction, and how much field moves it?
 
-The secant critique (adversarial self-review) is CLOSED as
+The secant critique (adversarial self-review) is PARTIALLY closed as
 instrumentation: `judge --sweep` measures the response function m(f) over
 field f ∈ −3…+3 and reports its decomposition — odd slope χ (linear
 susceptibility), linear R², and the even component mean
 (m(f)+m(−f))/2 − m(0), which captures dependence on field MAGNITUDE that
-no odd/linear model can represent. Live sweeps
-(`artifacts/live/spin-sweep-2026-07-05/`, n = 1 pair per model —
-instrument demonstrations, not model properties): gpt-5.4-mini m(f) ≈
-0.20·f (R² 0.81, sign not preserved through zero); claude-sonnet-4.6
-slope −0.014 with R² 0.02 and a positive even component (m(±3) ≈ +1.25 vs
-m(0) ≈ +0.94) — the response is in the even part, not the odd part.
-Distinguishable response shapes, all pinned by scripted judges where
-marked: flat, linear-odd, step (R² < 0.9, pinned), even-dominant
-(live n=1, unreplicated).
+no odd/linear model can represent. Caveats that stand (red team
+2026-07-09): the field is an ordinal wording ladder, so slope and R² are
+not reparameterization-invariant; and ±f quote different item excerpts,
+so the even channel confounds |f|-response with framing-side asymmetry —
+the sweep closed the secant's shape-blindness, not its wording problems.
+Live sweeps (`artifacts/live/spin-sweep-2026-07-05/`, n = 1 pair per
+model — instrument demonstrations, not model properties, corrected by
+the 2026-07-09 erratum in that pack): gpt-5.4-mini odd slope +0.200/step
+(R² 0.81, below the instrument's own R² > 0.9 linearity pin; sign not
+preserved through zero) with even mean +0.239 — comparable to the odd
+slope, not "near-zero"; claude-sonnet-4.6 odd slope −0.014 with R² 0.02
+and even mean +0.035, sign-indefinite across f (−0.148, −0.056, +0.310)
+— the earlier "response is in the even part" read rested on the f = 3
+edge value alone. Distinguishable response shapes, all pinned by
+scripted judges where marked: flat, linear-odd, step (R² < 0.9, pinned).
 
 **Finding from shipping frustration** (2026-07-05): a directionally
 transitive judge still shows ~0.13 curl — quantization frustration. First

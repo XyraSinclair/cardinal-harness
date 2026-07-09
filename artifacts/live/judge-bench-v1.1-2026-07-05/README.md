@@ -1,5 +1,12 @@
 # JCB v1.1 — nuisance-perturbation axis, live (2026-07-05)
 
+
+## Erratum (2026-07-05 test–retest)
+
+nano polarity (+0.38 here) flipped to −0.40 on an identical fresh run:
+read it as "polarity relation unstable/noise", not "ranks shallowness
+like depth". See `../judge-bench-retest-2026-07-05/`.
+
 Same six models and corpus as `judge-bench-2026-07-05` (v1), plus the new
 **nuisance stability** axis: each of 6 core pairs re-judged under four
 semantically-null edits — extra whitespace, `**markdown**`, `- bullet`
@@ -49,8 +56,3 @@ Reproduce: `cardinal bench --models ... --cache bench-cache.sqlite --out
 reports.jsonl` (cache in this pack replays all 828 judgements). Raw
 per-call receipts in `reports.jsonl`; console blocks in `run.stderr`.
 
-## Erratum (2026-07-05 test–retest)
-
-nano polarity (+0.38 here) flipped to −0.40 on an identical fresh run:
-read it as "polarity relation unstable/noise", not "ranks shallowness
-like depth". See `../judge-bench-retest-2026-07-05/`.

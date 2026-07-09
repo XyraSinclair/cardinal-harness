@@ -1,5 +1,31 @@
 # Live susceptibility SWEEPS — χ as a slope, not a secant (2026-07-05)
 
+## ERRATUM (2026-07-09, red team vs the pack's own receipts)
+
+The shape narrative below misstates the even components; the raw numbers
+stand, the reading dies. Recomputing the instrument's own statistic
+(`even_response_mean`, mean over f = 1..3 of (m(+f)+m(−f))/2 − m(0)) from
+the committed JSON:
+
+- **gpt-5.4-mini even mean = +0.239 nats** — NOT the "near-zero even
+  component" narrated below; it is comparable in size to the celebrated
+  odd slope (+0.200/step). "Monotone in f" is also false of the data
+  table (only the fitted line is monotone), and the "linear" verdict at
+  R² = 0.81 sits below this instrument's own step-exposure pin
+  (tests expose steps at R² < 0.9).
+- **claude-sonnet-4.6 even mean = +0.035 nats** — NOT "the structure is
+  in the EVEN part"; the quoted +0.31 is the single f = 3 edge value of
+  three even readings with disagreeing signs (−0.148, −0.056, +0.310).
+  The honest statement is: even component sign-indefinite at this n.
+
+The two models' narrated even components are the REVERSE of what the
+defined statistic gives. Root cause: the stored receipts carry
+`even_response_mean: null` and the narration was written from hand-picked
+edge values — the 2se raw-vs-certified discipline (used in the
+transitivity pack) was not applied here. Downstream surfaces corrected
+same-day: FIRST_PRINCIPLES sweep paragraph, receipt-viewer copy. n = 1
+pair throughout; both directions of the correction are also n = 1.
+
 `cardinal judge --sweep`: framing intensity swept from −3 (insistent
 pro-second) through 0 (neutral) to +3 (insistent pro-first), each field
 point measured in both presentation orders (14 comparisons). Fitting
