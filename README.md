@@ -234,6 +234,17 @@ model, ~$0.05 on mini-class models, every rate with its denominator and
 [`docs/BENCHMARK.md`](docs/BENCHMARK.md). Live leaderboard receipts:
 [`artifacts/live/judge-bench-2026-07-05/`](artifacts/live/judge-bench-2026-07-05/).
 
+To *feel* what the spin axis measures, open the interactive receipt viewer
+([`artifacts/live/receipt-viewer-2026-07-08/`](artifacts/live/receipt-viewer-2026-07-08/),
+serve `artifacts/live/` with any static server): a contested pair, a
+framing-field slider from insistent-pro-B to insistent-pro-A, and the
+judge's measured belief moving under it — gpt-5.4-mini echoing at
++0.200 nats/step while claude-sonnet-4.6 holds direction at every field
+point. Every number on the page is selected from committed receipts (never
+interpolated), and a regression test
+([`tests/live_artifact_pages.rs`](tests/live_artifact_pages.rs)) pins the
+page to the receipt bytes so they cannot drift apart.
+
 ## Library
 
 ```rust,no_run
