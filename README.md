@@ -292,6 +292,36 @@ attributes, hard gates ("must be above the 25th percentile on safety"),
 top-k-focused stopping, model ladder policies, and caching, use the full
 `multi_rerank` API — see [docs/WORKED_EXAMPLE.md](docs/WORKED_EXAMPLE.md).
 
+## The larger direction: judgment as a communication medium
+
+Sorting is the first useful verb, not the endpoint. The longer-term object is
+an **interpretable communication lane**: a bounded set of candidate items,
+ordered for a declared purpose by named attributes, explicit weights and
+gates, with uncertainty and the evidence needed to challenge the result.
+In that object:
+
+- entities are the things that might travel through the lane;
+- canonical attributes are human-readable dimensions on which people can
+  agree or disagree;
+- weights and gates state whose priorities apply, for which goal;
+- per-attribute posteriors preserve the trade-offs hidden by a total order;
+- traces and judgment packets make the ordering auditable, forkable, and
+  eventually fusible with another party's evidence.
+
+This crate is the bounded structured-judgment kernel for that system, not the
+feed host. Consumer systems such as ExoPriors own corpus ingestion, identity,
+retrieval, nearest-neighbor indexes, user history, and delivery. They hand
+cardinal-harness a finite candidate set and receive criterion-separable
+posteriors plus receipts. “Nearest,” “relevant,” “well-prioritized,” and
+“tagged” can share those receipts, but they are not interchangeable scores:
+retrieval, query relevance, multi-criteria prioritization, and classification
+have different denominators and failure modes.
+
+The judgment engine and packet-fusion core exist today. A portable run bundle,
+recipient-side offline reweighting and contestation, generic receipt rendering,
+and incremental lane generations do not. Until those contracts exist, this is
+honestly a batch judgment compiler for shortlists—not a feed product.
+
 ## Scope
 
 This repo is intentionally narrow. It contains:

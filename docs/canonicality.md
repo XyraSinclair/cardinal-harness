@@ -36,6 +36,7 @@ this list, and every row is labeled **covered** / **named-gap** /
 | Verdict validated out-of-group (battery B: fresh paraphrases + wording inversion now; time axis when its clock lands) | **named-gap** — the ship-gate for the verb |
 | Observation model at Book form (interval-censored likelihood, #51) | **named-gap** — the standing consolidation jump |
 | Anti-calibrated confidence knob deleted from Config in one sweep (config + goldens + docs) | **named-gap** — verdict receipted, deletion staged |
+| One portable judgment-study receipt binds candidate set, attributes, weights/gates, packets/trace, posterior, and report so another person can verify and reweight it without provider access | **named-gap** — tracked in #52; packet core exists, but the run envelope, trace→packet adapter, offline recomposition, and generic renderer do not |
 
 ## Craft
 
@@ -53,7 +54,7 @@ this list, and every row is labeled **covered** / **named-gap** /
 | Review residue committed (red-team, council, adjudications, rejected-findings-with-reasons) | **covered** |
 | Stopping/retirement rule for instruments in doctrine | **named-gap** — operator adjudication pending (rt-doctrine #6) |
 | One external validation exit (a reference the stack/operator didn't produce) | **named-gap** — the dogfooding hole, operator adjudication pending |
-| Hosted multi-tenant anything; auth; DB; feed ingestion | **ruled-out** (differentiation §4, standing) |
+| Hosted multi-tenant anything; auth; DB; feed ingestion or serving | **ruled-out** — portable bounded-lane judgment receipts remain in scope; retrieval and delivery belong to consumer systems such as ExoPriors |
 
 ## Drive state
 
