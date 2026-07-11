@@ -187,7 +187,11 @@ impl Respond for SycophantJudge {
         let ctx_b = extract_between(&user_content, "<entity_B_context>", "</entity_B_context>")
             .unwrap_or_default();
 
-        let favored = extract_between(&user_content, "the one beginning «", "» is clearly stronger");
+        let favored = extract_between(
+            &user_content,
+            "the one beginning «",
+            "» is clearly stronger",
+        );
         let higher = match favored {
             Some(excerpt) if ctx_a.trim().starts_with(excerpt) => "A",
             Some(excerpt) if ctx_b.trim().starts_with(excerpt) => "B",
@@ -265,6 +269,48 @@ async fn judge_json_and_show_prompt() {
     assert!(stderr.contains("--- system ---"), "stderr: {stderr}");
     assert!(stderr.contains("shininess"), "stderr: {stderr}");
     assert!(stderr.contains("dull TIN spoon"), "stderr: {stderr}");
+}
+
+#[test]
+fn judge_show_prompt_prints_seriate_evidence_bytes_before_missing_key_failure() {
+    let output = Command::new(cardinal_bin())
+        .args([
+            "judge",
+            "dull TIN spoon",
+            "shiny GOLD ring",
+            "--by",
+            "shininess",
+            "--model",
+            "test/judge",
+            "--template",
+            "ratio_letter_v1",
+            "--show-prompt",
+            "--no-cache",
+        ])
+        .env_remove("OPENROUTER_API_KEY")
+        .output()
+        .expect("run cardinal judge");
+
+    assert!(!output.status.success());
+    let stderr = String::from_utf8(output.stderr).unwrap();
+    let rendered = seriate::instrument::Instrument::render(
+        &seriate::instrument::ratio_letter::RatioLetterInstrument,
+        &seriate::Attribute::new("judge", "shininess"),
+        &seriate::Entity::new("dull TIN spoon"),
+        &seriate::Entity::new("shiny GOLD ring"),
+    );
+    let expected_prompt = format!(
+        "--- system ---\n{}\n--- user ---\n{}\n---",
+        rendered.system, rendered.user
+    );
+    assert!(
+        stderr.starts_with(&expected_prompt),
+        "stderr did not begin with exact seriate prompt: {stderr}"
+    );
+    let missing_key = stderr
+        .find("OPENROUTER_API_KEY is not set")
+        .expect("missing-key failure after prompt");
+    assert!(missing_key >= expected_prompt.len());
 }
 
 #[tokio::test(flavor = "multi_thread")]
@@ -602,7 +648,10 @@ impl Respond for NonceSensitiveJudge {
             })
             .map(str::len)
             .unwrap_or(0);
-        let cache_key = parsed["prompt_cache_key"].as_str().unwrap_or("").to_string();
+        let cache_key = parsed["prompt_cache_key"]
+            .as_str()
+            .unwrap_or("")
+            .to_string();
         self.prompts
             .lock()
             .unwrap()
@@ -680,8 +729,11 @@ async fn draws_measure_context_sensitivity_and_keep_the_prefix_stable() {
         "system must be padded past the cache floor: {sys0}"
     );
     assert!(!key0.is_empty(), "prompt_cache_key must be sent");
-    let prefix_of =
-        |u: &str| u.rsplit_once("draw-token:").map(|(p, _)| p.to_string()).unwrap();
+    let prefix_of = |u: &str| {
+        u.rsplit_once("draw-token:")
+            .map(|(p, _)| p.to_string())
+            .unwrap()
+    };
     let first_prefix = prefix_of(&user0);
     let mut suffixes = vec![user0.rsplit_once("draw-token:").unwrap().1.to_string()];
     for s in &seen[1..] {
@@ -824,7 +876,8 @@ impl Respond for LinearSycophantJudge {
         } else {
             ("B", (-toward_a).exp())
         };
-        let content = format!(r#"{{"higher_ranked":"{higher}","ratio":{ratio:.6},"confidence":0.9}}"#);
+        let content =
+            format!(r#"{{"higher_ranked":"{higher}","ratio":{ratio:.6},"confidence":0.9}}"#);
         ResponseTemplate::new(200).set_body_json(json!({
             "choices": [{ "message": { "content": content }, "finish_reason": "stop" }],
             "usage": { "prompt_tokens": 10, "completion_tokens": 10 }
@@ -1177,19 +1230,28 @@ async fn anp_produces_stochastic_limits_and_a_network_correction() {
 
     // Weights are distributions.
     let criteria = parsed["criteria"].as_array().unwrap();
-    let direct: f64 = criteria.iter().map(|c| c["direct_weight"].as_f64().unwrap()).sum();
+    let direct: f64 = criteria
+        .iter()
+        .map(|c| c["direct_weight"].as_f64().unwrap())
+        .sum();
     let limiting: f64 = criteria
         .iter()
         .map(|c| c["limiting_weight"].as_f64().unwrap())
         .sum();
     assert!((direct - 1.0).abs() < 1e-9, "direct sums to 1: {direct}");
-    assert!((limiting - 1.0).abs() < 1e-6, "limiting sums to 1: {limiting}");
+    assert!(
+        (limiting - 1.0).abs() < 1e-6,
+        "limiting sums to 1: {limiting}"
+    );
     let alts = parsed["alternatives"].as_array().unwrap();
     let alt_sum: f64 = alts
         .iter()
         .map(|a| a["limiting_priority"].as_f64().unwrap())
         .sum();
-    assert!((alt_sum - 1.0).abs() < 1e-6, "priorities sum to 1: {alt_sum}");
+    assert!(
+        (alt_sum - 1.0).abs() < 1e-6,
+        "priorities sum to 1: {alt_sum}"
+    );
 
     // Dominance ordering on the metal scale, in both clusters.
     assert_eq!(criteria[0]["name"], "gold");
@@ -1459,7 +1521,10 @@ async fn judge_wordings_catch_an_inversion_blind_judge() {
         "the less-wording sign flip must surface: {parsed}"
     );
     let d = parsed["max_disagreement_nats"].as_f64().unwrap();
-    assert!(d > 2.0, "sign flip at ratio 3.9 = 2·ln(3.9) disagreement: {d}");
+    assert!(
+        d > 2.0,
+        "sign flip at ratio 3.9 = 2·ln(3.9) disagreement: {d}"
+    );
 }
 
 #[tokio::test(flavor = "multi_thread")]
@@ -1534,10 +1599,7 @@ async fn judge_sweep_exposes_a_threshold_sycophant() {
     // The judge holds firm at fields −2..+3 and folds only at −3: nonzero
     // slope with a BAD linear fit — the sweep's signature of a threshold.
     assert!(chi > 0.1, "folding at one end pulls the slope up: {chi}");
-    assert!(
-        r2 < 0.9,
-        "a step is not a line — R² must expose it: {r2}"
-    );
+    assert!(r2 < 0.9, "a step is not a line — R² must expose it: {r2}");
     assert_eq!(parsed["belief_survives_sweep"], false, "{parsed}");
 }
 

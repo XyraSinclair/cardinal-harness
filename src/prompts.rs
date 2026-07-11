@@ -42,10 +42,26 @@ pub struct PromptInstance {
     pub system: String,
     pub user: String,
 }
+const RENDERED_PROMPT_DIGEST_DOMAIN: &[u8] = b"cardinal-harness/rendered-prompt/v1\0";
+
+pub(crate) fn rendered_prompt_digest(system: &str, user: &str) -> String {
+    let mut hasher = blake3::Hasher::new();
+    hasher.update(RENDERED_PROMPT_DIGEST_DOMAIN);
+    for part in [system.as_bytes(), user.as_bytes()] {
+        hasher.update(&(part.len() as u64).to_be_bytes());
+        hasher.update(part);
+    }
+    hasher.finalize().to_hex().to_string()
+}
 
 impl PromptInstance {
     pub fn to_messages(&self) -> Vec<Message> {
         vec![Message::system(&self.system), Message::user(&self.user)]
+    }
+
+    /// Content identity of the exact system and user message bytes.
+    pub fn rendered_digest(&self) -> String {
+        rendered_prompt_digest(&self.system, &self.user)
     }
 }
 

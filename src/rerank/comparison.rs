@@ -104,6 +104,8 @@ pub struct ComparisonUsage {
     pub provider_cost_is_estimate: bool,
     pub cached: bool,
     pub prompt_text: Option<String>,
+    /// Content identity of the exact system and user message bytes sent to the judge.
+    pub rendered_prompt_digest: String,
     pub question_text: Option<String>,
     pub raw_output: Option<String>,
     pub output_logprobs: Option<Vec<TokenLogprob>>,
@@ -145,12 +147,39 @@ impl PairwiseComparisonSpec<'_> {
 
     #[must_use]
     pub fn prompt_instance(self) -> PromptInstance {
+        if let Some(slug) = self
+            .attribute
+            .prompt_template_slug
+            .filter(|slug| is_evidence_slug(slug))
+        {
+            let instrument: Box<dyn seriate::instrument::Instrument> =
+                if slug == ORDINAL_LETTER_SLUG {
+                    Box::new(seriate::instrument::ordinal::OrdinalInstrument)
+                } else {
+                    Box::new(seriate::instrument::ratio_letter::RatioLetterInstrument)
+                };
+            let attribute = seriate::Attribute::new(self.attribute.id, self.attribute.prompt);
+            let entity_a = seriate::Entity::new(self.entity_a.text);
+            let entity_b = seriate::Entity::new(self.entity_b.text);
+            let rendered = instrument.render(&attribute, &entity_a, &entity_b);
+            return PromptInstance {
+                template_slug: slug.to_string(),
+                system: rendered.system,
+                user: rendered.user,
+            };
+        }
+
         self.prompt_template().render(
             self.attribute.id,
             self.attribute.prompt,
             EntityRef::with_context("A", self.entity_a.text),
             EntityRef::with_context("B", self.entity_b.text),
         )
+    }
+    /// Content identity of the exact system and user message bytes this spec renders.
+    #[must_use]
+    pub fn rendered_prompt_digest(self) -> String {
+        self.prompt_instance().rendered_digest()
     }
 
     #[must_use]
@@ -641,6 +670,7 @@ pub async fn compare_pair(
         return compare_pair_seriate(gateway, cache, request).await;
     }
     let prompt_instance = request.spec.prompt_instance();
+    let rendered_prompt_digest = prompt_instance.rendered_digest();
     let cache_key = cache.map(|_| request.spec.cache_key());
 
     if let (Some(cache), Some(ref key)) = (cache, &cache_key) {
@@ -654,6 +684,7 @@ pub async fn compare_pair(
                         provider_cost_is_estimate: false,
                         cached: true,
                         prompt_text: None,
+                        rendered_prompt_digest: rendered_prompt_digest.clone(),
                         question_text: None,
                         raw_output: None,
                         output_logprobs: None,
@@ -725,6 +756,7 @@ pub async fn compare_pair(
             provider_cost_is_estimate,
             cached: false,
             prompt_text: Some(prompt_text.clone()),
+            rendered_prompt_digest: rendered_prompt_digest.clone(),
             question_text: Some(request.spec.attribute.prompt.to_string()),
             raw_output: Some(response.content.clone()),
             output_logprobs: None,
@@ -952,6 +984,14 @@ async fn compare_pair_seriate(
     cache: Option<&dyn PairwiseCache>,
     request: PairwiseComparisonRequest<'_>,
 ) -> Result<(PairwiseJudgement, ComparisonUsage), ComparisonError> {
+    let instrument: Box<dyn seriate::instrument::Instrument> =
+        if request.spec.attribute.prompt_template_slug == Some(ORDINAL_LETTER_SLUG) {
+            Box::new(seriate::instrument::ordinal::OrdinalInstrument)
+        } else {
+            Box::new(seriate::instrument::ratio_letter::RatioLetterInstrument)
+        };
+    let rendered = request.spec.prompt_instance();
+    let rendered_prompt_digest = rendered.rendered_digest();
     let cache_key = cache.map(|_| request.spec.cache_key());
     if let (Some(cache), Some(ref key)) = (cache, &cache_key) {
         match cache.get(key).await {
@@ -964,6 +1004,7 @@ async fn compare_pair_seriate(
                         provider_cost_is_estimate: false,
                         cached: true,
                         prompt_text: None,
+                        rendered_prompt_digest: rendered_prompt_digest.clone(),
                         question_text: None,
                         raw_output: None,
                         output_logprobs: None,
@@ -988,22 +1029,7 @@ async fn compare_pair_seriate(
         ));
     }
 
-    let instrument: Box<dyn seriate::instrument::Instrument> =
-        if request.spec.attribute.prompt_template_slug == Some(ORDINAL_LETTER_SLUG) {
-            Box::new(seriate::instrument::ordinal::OrdinalInstrument)
-        } else {
-            Box::new(seriate::instrument::ratio_letter::RatioLetterInstrument)
-        };
-    let attribute =
-        seriate::Attribute::new(request.spec.attribute.id, request.spec.attribute.prompt);
-    let entity_a = seriate::Entity::new(request.spec.entity_a.text);
-    let entity_b = seriate::Entity::new(request.spec.entity_b.text);
-    let rendered = instrument.render(&attribute, &entity_a, &entity_b);
-
-    let messages = vec![
-        crate::gateway::Message::system(rendered.system.clone()),
-        crate::gateway::Message::user(rendered.user.clone()),
-    ];
+    let messages = rendered.to_messages();
     let base_request = ChatRequest::new(
         ChatModel::openrouter(request.spec.model),
         messages,
@@ -1060,6 +1086,7 @@ async fn compare_pair_seriate(
         provider_cost_is_estimate,
         cached: false,
         prompt_text: Some(prompt_text),
+        rendered_prompt_digest,
         question_text: Some(request.spec.attribute.prompt.to_string()),
         raw_output: Some(response.content.clone()),
         output_logprobs: fallback_stored_logprobs(response.output_logprobs.as_deref()),

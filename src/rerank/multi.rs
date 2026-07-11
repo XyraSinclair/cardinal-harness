@@ -611,6 +611,7 @@ pub async fn multi_rerank(
         attribute_prompt_hash: String,
         prompt_template_slug: String,
         template_hash: String,
+        rendered_prompt_digest: String,
         entity_a_hash: String,
         entity_b_hash: String,
         cache_key_hash: String,
@@ -875,12 +876,12 @@ pub async fn multi_rerank(
                         text: &trace_entity_b.text,
                     },
                 };
-                let template = comparison.prompt_template();
                 let cache_key = comparison.cache_key();
                 Some(TraceFields {
                     attribute_prompt_hash: cache_key.attribute_prompt_hash,
-                    prompt_template_slug: template.slug.to_string(),
+                    prompt_template_slug: cache_key.prompt_template_slug.clone(),
                     template_hash: cache_key.template_hash.clone(),
+                    rendered_prompt_digest: comparison.rendered_prompt_digest(),
                     entity_a_hash: cache_key.entity_a_hash,
                     entity_b_hash: cache_key.entity_b_hash,
                     cache_key_hash: cache_key.key_hash,
@@ -894,6 +895,7 @@ pub async fn multi_rerank(
                                output_tokens: u32,
                                provider_cost_nanodollars: i64,
                                provider_cost_is_estimate: bool,
+                               rendered_prompt_digest: Option<&str>,
                                error: Option<String>| {
                 let fields = trace_fields
                     .as_ref()
@@ -906,6 +908,9 @@ pub async fn multi_rerank(
                     attribute_prompt_hash: fields.attribute_prompt_hash.clone(),
                     prompt_template_slug: fields.prompt_template_slug.clone(),
                     template_hash: fields.template_hash.clone(),
+                    rendered_prompt_digest: rendered_prompt_digest
+                        .unwrap_or(&fields.rendered_prompt_digest)
+                        .to_string(),
                     entity_a_id: trace_entity_a.id.clone(),
                     entity_b_id: trace_entity_b.id.clone(),
                     entity_a_index: trace_entity_a_index,
@@ -953,6 +958,7 @@ pub async fn multi_rerank(
                             usage.output_tokens,
                             usage.provider_cost_nanodollars,
                             usage.provider_cost_is_estimate,
+                            Some(&usage.rendered_prompt_digest),
                             None,
                         );
                         event.refused = true;
@@ -1086,8 +1092,7 @@ pub async fn multi_rerank(
                             if entry[slot].is_none() {
                                 entry[slot] = Some(presented_m);
                                 if let [Some(unswapped), Some(swapped)] = *entry {
-                                    evidence_order_residual_sum_abs +=
-                                        (unswapped + swapped).abs();
+                                    evidence_order_residual_sum_abs += (unswapped + swapped).abs();
                                     evidence_order_residual_pairs += 1;
                                 }
                             }
@@ -1114,6 +1119,7 @@ pub async fn multi_rerank(
                             usage.output_tokens,
                             usage.provider_cost_nanodollars,
                             usage.provider_cost_is_estimate,
+                            Some(&usage.rendered_prompt_digest),
                             None,
                         );
                         event.higher_ranked = Some(match higher_ranked {
@@ -1161,7 +1167,7 @@ pub async fn multi_rerank(
                 }
                 Err(e) => {
                     if let Some(trace) = execution.trace {
-                        let event = build_trace(false, 0, 0, 0, false, Some(e.to_string()));
+                        let event = build_trace(false, 0, 0, 0, false, None, Some(e.to_string()));
                         trace.record(event)?;
                     }
                     if cache_only {

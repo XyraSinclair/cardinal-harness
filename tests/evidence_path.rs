@@ -4,13 +4,18 @@
 //! round-trips.
 
 use std::process::{Command, Stdio};
-use std::sync::Arc;
+use std::sync::{mpsc, Arc};
 use std::time::Duration;
 
 use cardinal_harness::gateway::openrouter::OpenRouterAdapter;
 use cardinal_harness::gateway::{Attribution, GatewayConfig, NoopUsageSink, ProviderGateway};
-use cardinal_harness::rerank::{sort_texts, RerankExecution, SortOptions};
-use cardinal_harness::SqlitePairwiseCache;
+use cardinal_harness::prompts::PromptInstance;
+use cardinal_harness::rerank::{
+    compare_pair, sort_texts, PairwiseComparisonAttribute, PairwiseComparisonEntity,
+    PairwiseComparisonRequest, PairwiseComparisonSpec, RerankExecution, RerankRunOptions,
+    SortOptions,
+};
+use cardinal_harness::{ComparisonTrace, SqlitePairwiseCache, TraceError, TraceSink};
 use serde_json::json;
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, Request, Respond, ResponseTemplate};
@@ -139,6 +144,255 @@ fn items() -> Vec<String> {
         "charlie **".into(),
         "delta *".into(),
     ]
+}
+
+fn evidence_spec(slug: &str) -> PairwiseComparisonSpec<'_> {
+    PairwiseComparisonSpec {
+        model: "test/judge",
+        attribute: PairwiseComparisonAttribute {
+            id: "brightness",
+            prompt: "brightness <with literal markup>",
+            prompt_template_slug: Some(slug),
+        },
+        entity_a: PairwiseComparisonEntity {
+            id: "alpha",
+            text: "alpha & amber",
+        },
+        entity_b: PairwiseComparisonEntity {
+            id: "beta",
+            text: "beta > blue",
+        },
+    }
+}
+
+#[test]
+fn evidence_prompt_instances_are_rendered_by_the_requested_seriate_instrument() {
+    for slug in ["ratio_letter_v1", "ordinal_letter_v1"] {
+        let instrument: Box<dyn seriate::instrument::Instrument> = match slug {
+            "ratio_letter_v1" => Box::new(seriate::instrument::ratio_letter::RatioLetterInstrument),
+            "ordinal_letter_v1" => Box::new(seriate::instrument::ordinal::OrdinalInstrument),
+            _ => unreachable!(),
+        };
+        let expected = instrument.render(
+            &seriate::Attribute::new("brightness", "brightness <with literal markup>"),
+            &seriate::Entity::new("alpha & amber"),
+            &seriate::Entity::new("beta > blue"),
+        );
+        let actual = evidence_spec(slug).prompt_instance();
+        let canonical = evidence_spec("canonical_v2").prompt_instance();
+
+        assert_eq!(actual.template_slug, slug);
+        assert_eq!(actual.system, expected.system, "system bytes for {slug}");
+        assert_eq!(actual.user, expected.user, "user bytes for {slug}");
+        assert_ne!(actual.system, canonical.system, "{slug} must not fall back");
+        assert_ne!(actual.user, canonical.user, "{slug} must not fall back");
+    }
+}
+
+#[test]
+fn rendered_prompt_digest_is_stable_sensitive_and_length_delimited() {
+    fn prompt(system: &str, user: &str) -> PromptInstance {
+        PromptInstance {
+            template_slug: "identity_test".into(),
+            system: system.into(),
+            user: user.into(),
+        }
+    }
+
+    let original = prompt("system bytes", "user bytes");
+    let digest = original.rendered_digest();
+    assert!(!digest.is_empty());
+    assert_eq!(digest, original.rendered_digest());
+    assert_ne!(
+        digest,
+        prompt("changed system", "user bytes").rendered_digest()
+    );
+    assert_ne!(
+        digest,
+        prompt("system bytes", "changed user").rendered_digest()
+    );
+    assert_ne!(
+        prompt("ab", "c").rendered_digest(),
+        prompt("a", "bc").rendered_digest(),
+        "part lengths must prevent concatenation-boundary collisions"
+    );
+}
+
+struct ChannelTraceSink(mpsc::Sender<ComparisonTrace>);
+
+impl TraceSink for ChannelTraceSink {
+    fn record(&self, event: ComparisonTrace) -> Result<(), TraceError> {
+        self.0.send(event).map_err(|_| TraceError::Closed)
+    }
+}
+
+#[tokio::test]
+async fn evidence_trace_identity_matches_the_exact_provider_prompt_and_seriate_template() {
+    let server = start_judge(LetterJudge {
+        reject_logprobs: false,
+        omit_logprobs: false,
+    })
+    .await;
+    let (trace_tx, trace_rx) = mpsc::channel();
+    let trace_sink = ChannelTraceSink(trace_tx);
+    let execution = RerankExecution::new(gateway_for(&server), Attribution::new("test::identity"))
+        .trace(&trace_sink);
+    let mut opts = letter_opts();
+    opts.comparison_budget = Some(2);
+    opts.comparison_concurrency = Some(1);
+    opts.counterbalance = true;
+
+    sort_texts(
+        vec!["alpha ****".into(), "delta *".into()],
+        "brightness",
+        execution,
+        opts,
+    )
+    .await
+    .unwrap();
+
+    let requests = server.received_requests().await.unwrap();
+    let events: Vec<_> = trace_rx.try_iter().collect();
+    assert_eq!(events.len(), requests.len());
+    assert!(!events.is_empty());
+
+    let instrument = seriate::instrument::ratio_letter::RatioLetterInstrument;
+    let expected_template_hash = seriate::instrument::Instrument::render(
+        &instrument,
+        &seriate::Attribute::new("fingerprint", "fingerprint"),
+        &seriate::Entity::new("A"),
+        &seriate::Entity::new("B"),
+    )
+    .template
+    .0
+     .0;
+
+    fn message_content<'a>(messages: &'a [serde_json::Value], role: &str) -> &'a str {
+        messages
+            .iter()
+            .find(|message| message["role"] == role)
+            .and_then(|message| message["content"].as_str())
+            .unwrap()
+    }
+
+    let mut provider_digests: Vec<String> = requests
+        .iter()
+        .map(|request| {
+            let body: serde_json::Value = serde_json::from_slice(&request.body).unwrap();
+            let messages = body["messages"].as_array().unwrap();
+            PromptInstance {
+                template_slug: "ratio_letter_v1".into(),
+                system: message_content(messages, "system").into(),
+                user: message_content(messages, "user").into(),
+            }
+            .rendered_digest()
+        })
+        .collect();
+    provider_digests.sort();
+    let mut trace_digests: Vec<_> = events
+        .iter()
+        .map(|event| event.rendered_prompt_digest.clone())
+        .collect();
+    trace_digests.sort();
+    assert_eq!(
+        trace_digests, provider_digests,
+        "every trace row must identify one exact provider prompt"
+    );
+    for event in events {
+        assert_eq!(event.prompt_template_slug, "ratio_letter_v1");
+        assert_eq!(event.template_hash, expected_template_hash);
+    }
+}
+
+#[tokio::test]
+async fn cached_evidence_trace_preserves_rendered_identity_without_prompt_text() {
+    let server = start_judge(LetterJudge {
+        reject_logprobs: false,
+        omit_logprobs: false,
+    })
+    .await;
+    let dir = tempfile::tempdir().unwrap();
+    let cache = SqlitePairwiseCache::new(dir.path().join("cache.sqlite")).unwrap();
+    let gateway = gateway_for(&server);
+    let run_options = RerankRunOptions {
+        rng_seed: Some(19),
+        cache_only: false,
+    };
+    let mut opts = letter_opts();
+    opts.comparison_budget = Some(2);
+    opts.comparison_concurrency = Some(1);
+    opts.counterbalance = true;
+    let entities = vec!["alpha ****".to_string(), "delta *".to_string()];
+
+    sort_texts(
+        entities.clone(),
+        "brightness",
+        RerankExecution::new(gateway.clone(), Attribution::new("test::cache-fill"))
+            .cache(&cache)
+            .run_options(run_options),
+        opts.clone(),
+    )
+    .await
+    .unwrap();
+
+    let (trace_tx, trace_rx) = mpsc::channel();
+    let trace_sink = ChannelTraceSink(trace_tx);
+    sort_texts(
+        entities.clone(),
+        "brightness",
+        RerankExecution::new(gateway.clone(), Attribution::new("test::cache-trace"))
+            .cache(&cache)
+            .run_options(RerankRunOptions {
+                rng_seed: Some(19),
+                cache_only: true,
+            })
+            .trace(&trace_sink),
+        opts,
+    )
+    .await
+    .unwrap();
+
+    let events: Vec<_> = trace_rx.try_iter().collect();
+    assert!(!events.is_empty());
+    for event in events {
+        assert!(event.cached);
+        let spec = PairwiseComparisonSpec {
+            model: &event.model,
+            attribute: PairwiseComparisonAttribute {
+                id: &event.attribute_id,
+                prompt: "brightness",
+                prompt_template_slug: Some("ratio_letter_v1"),
+            },
+            entity_a: PairwiseComparisonEntity {
+                id: &event.entity_a_id,
+                text: &entities[event.entity_a_index],
+            },
+            entity_b: PairwiseComparisonEntity {
+                id: &event.entity_b_id,
+                text: &entities[event.entity_b_index],
+            },
+        };
+        let expected_key = spec.cache_key();
+        let expected_digest = spec.rendered_prompt_digest();
+        assert_eq!(event.prompt_template_slug, "ratio_letter_v1");
+        assert_eq!(event.template_hash, expected_key.template_hash);
+        assert_eq!(event.rendered_prompt_digest, expected_digest);
+
+        let (_, usage) = compare_pair(
+            gateway.as_ref(),
+            Some(&cache),
+            PairwiseComparisonRequest {
+                spec,
+                cache_only: true,
+                attribution: Attribution::new("test::cached-usage"),
+            },
+        )
+        .await
+        .unwrap();
+        assert!(usage.cached);
+        assert!(usage.prompt_text.is_none());
+        assert_eq!(usage.rendered_prompt_digest, event.rendered_prompt_digest);
+    }
 }
 
 #[tokio::test]

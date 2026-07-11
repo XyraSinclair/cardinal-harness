@@ -17,6 +17,9 @@ pub struct ComparisonTrace {
     pub attribute_prompt_hash: String,
     pub prompt_template_slug: String,
     pub template_hash: String,
+    /// Content identity of the exact rendered system and user message bytes.
+    #[serde(default)]
+    pub rendered_prompt_digest: String,
     pub entity_a_id: String,
     pub entity_b_id: String,
     pub entity_a_index: usize,
