@@ -1,10 +1,6 @@
+use cardinal_harness::rating_engine::Observation;
 use cardinal_harness::{ComparisonTrace, JsonlTraceSink, TraceSink};
 use tempfile::tempdir;
-
-#[derive(Debug, serde::Deserialize)]
-struct TraceRow {
-    comparison_index: usize,
-}
 
 fn make_trace(comparison_index: usize) -> ComparisonTrace {
     ComparisonTrace {
@@ -15,6 +11,8 @@ fn make_trace(comparison_index: usize) -> ComparisonTrace {
         attribute_prompt_hash: "attr_hash".to_string(),
         prompt_template_slug: "canonical_v2".to_string(),
         template_hash: "template_hash".to_string(),
+        rendered_prompt_digest: "rendered_digest".to_string(),
+        engine_spec_id: "engine_spec".to_string(),
         entity_a_id: "a".to_string(),
         entity_b_id: "b".to_string(),
         entity_a_index: 0,
@@ -26,6 +24,15 @@ fn make_trace(comparison_index: usize) -> ComparisonTrace {
         higher_ranked: Some("A".to_string()),
         ratio: Some(2.0),
         confidence: Some(0.9),
+        solver_observation: (comparison_index == 1).then_some(Observation {
+            i: usize::MAX - 1,
+            j: usize::MAX,
+            ratio: f64::from_bits(1.0f64.to_bits() + 1),
+            confidence: -0.0,
+            rater_id: "rater/µ".to_string(),
+            reps: f64::MAX,
+            precision: Some(f64::from_bits(1)),
+        }),
         pairwise_logprob_posterior: None,
         output_logprob_token_count: None,
         pairwise_logprob_posterior_error: None,
@@ -56,6 +63,24 @@ fn jsonl_trace_sink_writes_events_and_flushes_on_join() {
     let lines: Vec<&str> = raw.lines().collect();
     assert_eq!(lines.len(), 2);
 
-    let first: TraceRow = serde_json::from_str(lines[0]).unwrap();
+    let first: ComparisonTrace = serde_json::from_str(lines[0]).unwrap();
     assert_eq!(first.comparison_index, 1);
+    assert_eq!(first.engine_spec_id, "engine_spec");
+    let observation = first.solver_observation.unwrap();
+    assert_eq!(observation.i, usize::MAX - 1);
+    assert_eq!(observation.j, usize::MAX);
+    assert_eq!(observation.rater_id, "rater/µ");
+    assert_eq!(
+        observation.ratio.to_bits(),
+        f64::from_bits(1.0f64.to_bits() + 1).to_bits()
+    );
+    assert_eq!(observation.confidence.to_bits(), (-0.0f64).to_bits());
+    assert_eq!(observation.reps.to_bits(), f64::MAX.to_bits());
+    assert_eq!(
+        observation.precision.map(f64::to_bits),
+        Some(f64::from_bits(1).to_bits())
+    );
+
+    let second: ComparisonTrace = serde_json::from_str(lines[1]).unwrap();
+    assert!(second.solver_observation.is_none());
 }

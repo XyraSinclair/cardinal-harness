@@ -16,6 +16,9 @@ use std::collections::{hash_map::DefaultHasher, HashMap};
 use std::f64::consts::SQRT_2;
 use std::hash::{Hash, Hasher};
 
+use serde::{Deserialize, Serialize};
+use seriate::ontology::ContentId;
+
 use nalgebra::linalg::{Cholesky, SymmetricEigen};
 use nalgebra::{DMatrix, DVector};
 use rand::rngs::StdRng;
@@ -31,6 +34,8 @@ const MAX_CANDIDATES: usize = 50_000;
 
 /// Maximum reps per observation to prevent ranking manipulation via extreme weights.
 const MAX_REPS: f64 = 1000.0;
+
+const ENGINE_SPEC_DOMAIN: &str = "cardinal.engine-spec.v1";
 
 /// When the reduced system is small, compute exact diag(L^-1) via Cholesky solves.
 const EXACT_DIAG_MAX_DIM: usize = 256;
@@ -61,7 +66,7 @@ type FuseBuckets = std::collections::BTreeMap<FuseBucketKey, Vec<FuseBucketEntry
 /// Configuration for the rating engine (IRLS solver + planner).
 ///
 /// See `docs/ALGORITHM.md` for rationale behind these defaults.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Config {
     // -- Confidence mapping --------------------------------------------------
     // Maps LLM confidence (0..1) to observation weight via g(c) = eps + (1-eps)*c^gamma.
@@ -153,7 +158,7 @@ impl Default for Config {
 //  Data model
 // ---------------------------------------------------------------------
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct AttributeParams {
     /// Global noise / difficulty parameter T.
     pub temperature: f64,
@@ -165,7 +170,7 @@ impl Default for AttributeParams {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct RaterParams {
     /// Efficacy / effective sample size (β).
     pub beta: f64,
@@ -185,7 +190,114 @@ impl Default for RaterParams {
     }
 }
 
-#[derive(Debug, Clone)]
+/// Complete, content-addressed constructor input for a [`RatingEngine`].
+///
+/// The spec contains configuration, not observations. A trace row binds its
+/// exact [`Observation`] to this spec's identity; together they are sufficient
+/// to replay what entered the solver without baking policy into the evidence.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct EngineSpec {
+    pub n: usize,
+    pub attribute: AttributeParams,
+    pub raters: Vec<(String, RaterParams)>,
+    pub config: Config,
+}
+
+impl EngineSpec {
+    /// Canonical binary encoding for content identity.
+    ///
+    /// Strings are length-prefixed, integers are normalized to little-endian
+    /// `u64`, floats use their exact IEEE-754 bit patterns, and raters are
+    /// sorted by identifier. JSON never participates in the identity.
+    #[must_use]
+    pub fn canonical_bytes(&self) -> Vec<u8> {
+        fn put_usize(out: &mut Vec<u8>, value: usize) {
+            out.extend_from_slice(&(value as u64).to_le_bytes());
+        }
+        fn put_f64(out: &mut Vec<u8>, value: f64) {
+            out.extend_from_slice(&value.to_bits().to_le_bytes());
+        }
+        fn put_str(out: &mut Vec<u8>, value: &str) {
+            put_usize(out, value.len());
+            out.extend_from_slice(value.as_bytes());
+        }
+        fn put_optional_usize(out: &mut Vec<u8>, value: Option<usize>) {
+            match value {
+                Some(value) => {
+                    out.push(1);
+                    put_usize(out, value);
+                }
+                None => out.push(0),
+            }
+        }
+
+        let AttributeParams { temperature } = &self.attribute;
+        let mut raters: Vec<_> = self.raters.iter().collect();
+        raters.sort_by(|left, right| left.0.cmp(&right.0));
+        let Config {
+            eps_confidence,
+            gamma_confidence,
+            huber_k,
+            irls_max_iters,
+            irls_tol,
+            ridge_lambda,
+            tiny,
+            max_log_ratio,
+            hutch_probes,
+            rank_weight_exponent,
+            rank_band_window,
+            small_gap_threshold,
+            max_rank_pairs,
+            top_k,
+            tail_weight,
+            lambda_risk,
+            rng_seed,
+        } = &self.config;
+
+        let mut out = Vec::new();
+        put_usize(&mut out, self.n);
+        put_f64(&mut out, *temperature);
+        put_usize(&mut out, raters.len());
+        for (id, params) in raters {
+            let RaterParams {
+                beta,
+                cost_per_edge,
+                default_confidence,
+            } = params;
+            put_str(&mut out, id);
+            put_f64(&mut out, *beta);
+            put_f64(&mut out, *cost_per_edge);
+            put_f64(&mut out, *default_confidence);
+        }
+
+        put_f64(&mut out, *eps_confidence);
+        put_f64(&mut out, *gamma_confidence);
+        put_f64(&mut out, *huber_k);
+        put_usize(&mut out, *irls_max_iters);
+        put_f64(&mut out, *irls_tol);
+        put_f64(&mut out, *ridge_lambda);
+        put_f64(&mut out, *tiny);
+        put_f64(&mut out, *max_log_ratio);
+        put_usize(&mut out, *hutch_probes);
+        put_f64(&mut out, *rank_weight_exponent);
+        put_usize(&mut out, *rank_band_window);
+        put_f64(&mut out, *small_gap_threshold);
+        put_optional_usize(&mut out, *max_rank_pairs);
+        put_optional_usize(&mut out, *top_k);
+        put_f64(&mut out, *tail_weight);
+        put_f64(&mut out, *lambda_risk);
+        out.extend_from_slice(&rng_seed.to_le_bytes());
+        out
+    }
+
+    /// Content identity of the complete engine constructor input.
+    #[must_use]
+    pub fn id(&self) -> ContentId {
+        ContentId::derive(ENGINE_SPEC_DOMAIN, &self.canonical_bytes())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Observation {
     pub i: usize,
     pub j: usize,
@@ -1278,8 +1390,8 @@ pub fn compute_hodge_split(
     let mut pivot_row = 0usize;
     let mut pivots: Vec<(usize, usize)> = Vec::new();
     for col in 0..t {
-        let Some(best) = (pivot_row..t)
-            .max_by(|&x, &y| a[x][col].abs().partial_cmp(&a[y][col].abs()).unwrap())
+        let Some(best) =
+            (pivot_row..t).max_by(|&x, &y| a[x][col].abs().partial_cmp(&a[y][col].abs()).unwrap())
         else {
             break;
         };
@@ -1709,6 +1821,23 @@ impl RatingEngine {
             last_lam_eff: None,
             last_chol: None,
         })
+    }
+
+    /// Snapshot the complete constructor input that determines solver policy.
+    #[must_use]
+    pub fn spec(&self) -> EngineSpec {
+        let mut raters: Vec<_> = self
+            .raters
+            .iter()
+            .map(|(id, params)| (id.clone(), params.clone()))
+            .collect();
+        raters.sort_by(|left, right| left.0.cmp(&right.0));
+        EngineSpec {
+            n: self.n,
+            attribute: self.attr.clone(),
+            raters,
+            config: self.cfg.clone(),
+        }
     }
 
     pub fn scores(&self) -> Option<&[f64]> {

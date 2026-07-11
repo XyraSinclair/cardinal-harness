@@ -39,11 +39,13 @@ see probes — but it can't fix it).
 4. **It applies the same skepticism to itself.** The planner's efficiency
    claim was benchmarked against uniform random pair selection, FAILED,
    got fixed (anchor-diverse exploration), and the fix cycle is pinned
-   two-sided in `tests/planner_regret.rs` with history. 280 tests, many of
-   them adversarial; honest negatives are kept, dated, and load-bearing.
+   two-sided in `tests/planner_regret.rs` with history. The test suite is
+   adversarial; honest negatives are kept, dated, and load-bearing.
 5. **Everything is receipted.** Comparisons, tokens, dollars, stop reasons,
-   evidence health, per-judgement traces, a SQLite cache with keyless
-   offline replay — and sibling project
+   evidence health, and per-judgement traces that bind the exact solver input
+   to a content-addressed engine configuration. SQLite supports zero-provider-call
+   reruns when the cache is present; portable keyless bundles remain the explicit
+   #52 gap. Sibling project
    [seriate](https://github.com/XyraSinclair/seriate) anchors judgements to
    raw provider bytes when full provenance matters.
 

@@ -7,6 +7,7 @@ use std::sync::mpsc;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::gateway::PairwiseLogprobPosterior;
+use crate::rating_engine::Observation;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ComparisonTrace {
@@ -20,6 +21,9 @@ pub struct ComparisonTrace {
     /// Content identity of the exact rendered system and user message bytes.
     #[serde(default)]
     pub rendered_prompt_digest: String,
+    /// Content identity of the [`crate::rating_engine::EngineSpec`] this row entered.
+    #[serde(default)]
+    pub engine_spec_id: String,
     pub entity_a_id: String,
     pub entity_b_id: String,
     pub entity_a_index: usize,
@@ -31,6 +35,13 @@ pub struct ComparisonTrace {
     pub higher_ranked: Option<String>,
     pub ratio: Option<f64>,
     pub confidence: Option<f64>,
+    /// Exact observation routed to solver ingestion for this row.
+    ///
+    /// The engine's deterministic input filters still apply; replay feeds the
+    /// same value through those filters. Absent for refusals, provider errors,
+    /// routing failures, and traces written before the replay contract existed.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub solver_observation: Option<Observation>,
     /// Compact posterior inferred from provider output logprobs, when
     /// available. This records probability mass over preferred side, ratio
     /// bucket, semantic answer, and signed log-ratio without dumping raw token

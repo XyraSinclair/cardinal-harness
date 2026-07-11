@@ -517,6 +517,17 @@ pub async fn multi_rerank(
         .map_err(|e| MultiRerankError::RatingEngine(e.to_string()))?;
         engines.insert(attr.id.clone(), engine);
     }
+    let engine_spec = engines
+        .values()
+        .next()
+        .expect("validated rerank request has at least one attribute")
+        .spec();
+    if engines.values().any(|engine| engine.spec() != engine_spec) {
+        return Err(MultiRerankError::RatingEngine(
+            "per-attribute engine specifications diverged".to_string(),
+        ));
+    }
+    let engine_spec_id = engine_spec.id().0;
 
     let mut manager = TraitSearchManager::new(config, engines)?;
 
@@ -543,6 +554,7 @@ pub async fn multi_rerank(
         .enumerate()
         .map(|(idx, a)| (a.id.as_str(), idx))
         .collect();
+    let mut warm_start_observations = 0usize;
 
     if let Some(provider) = execution.warm_start {
         match provider.warm_start(&req, rater_id).await {
@@ -588,6 +600,7 @@ pub async fn multi_rerank(
                 if total_loaded > 0 {
                     manager.invalidate();
                 }
+                warm_start_observations = total_loaded;
             }
             Err(e) => {
                 tracing::warn!(error = %e, "Warm-start provider failed");
@@ -911,6 +924,7 @@ pub async fn multi_rerank(
                     rendered_prompt_digest: rendered_prompt_digest
                         .unwrap_or(&fields.rendered_prompt_digest)
                         .to_string(),
+                    engine_spec_id: engine_spec_id.clone(),
                     entity_a_id: trace_entity_a.id.clone(),
                     entity_b_id: trace_entity_b.id.clone(),
                     entity_a_index: trace_entity_a_index,
@@ -922,6 +936,7 @@ pub async fn multi_rerank(
                     higher_ranked: None,
                     ratio: None,
                     confidence: None,
+                    solver_observation: None,
                     pairwise_logprob_posterior: None,
                     output_logprob_token_count: None,
                     pairwise_logprob_posterior_error: None,
@@ -1099,10 +1114,15 @@ pub async fn multi_rerank(
                         }
                         Observation::new(obs_i, obs_j, ratio, confidence, rater_id, 1.0)
                     };
-                    if let Err(e) = manager.add_observation(attr_id, obs) {
+                    let trace_observation = execution.trace.is_some().then(|| obs.clone());
+                    let solver_error = manager
+                        .add_observation(attr_id, obs)
+                        .err()
+                        .map(|error| error.to_string());
+                    if let Some(error) = &solver_error {
                         tracing::warn!(
                             attribute_id = %attr_id,
-                            error = %e,
+                            error,
                             "Failed to add observation"
                         );
                     } else {
@@ -1128,6 +1148,13 @@ pub async fn multi_rerank(
                         });
                         event.ratio = Some(ratio);
                         event.confidence = Some(confidence);
+                        if solver_error.is_none() {
+                            event.solver_observation = trace_observation;
+                        } else {
+                            event.error = solver_error
+                                .as_ref()
+                                .map(|error| format!("solver rejected observation: {error}"));
+                        }
                         event.pairwise_logprob_posterior = usage.pairwise_logprob_posterior.clone();
                         event.output_logprob_token_count =
                             usage.output_logprobs.as_ref().map(Vec::len);
@@ -1369,6 +1396,8 @@ pub async fn multi_rerank(
             format!("mixed: {}", models.join(", "))
         },
         rater_id_used: rater_id.to_string(),
+        engine_spec: Some(engine_spec),
+        warm_start_observations,
         provider_input_tokens,
         provider_output_tokens,
         provider_cost_nanodollars,

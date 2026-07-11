@@ -3,6 +3,8 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+use crate::rating_engine::EngineSpec;
+
 // =============================================================================
 // Tier 1: Simple Rerank (/v1/rerank)
 // =============================================================================
@@ -512,6 +514,14 @@ pub struct MultiRerankMeta {
     pub model_used: String,
     /// Rater ID that was used.
     pub rater_id_used: String,
+    /// Complete solver configuration preimage for replay.
+    /// Trace rows bind accepted observations to this spec's content ID.
+    #[serde(default)]
+    pub engine_spec: Option<EngineSpec>,
+    /// Warm-start observations entered the solver without trace rows.
+    /// Replay must fail closed when this is nonzero.
+    #[serde(default)]
+    pub warm_start_observations: usize,
     /// Provider input tokens consumed across all comparisons.
     pub provider_input_tokens: u32,
     /// Provider output tokens generated across all comparisons.

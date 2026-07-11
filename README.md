@@ -59,7 +59,7 @@ What you get that the alternatives don't, in one package:
 - **Active pair selection** and principled stopping under an explicit budget.
 - **Counterbalancing by default**: every planned pair is asked in both presentation orders, and the disagreement rate is reported — position bias measured, not assumed away.
 - **Attribute health probes**: judge the opposite side of your criterion (`--two-sided`) and alternate phrasings (`--also-by`), get rank-consistency receipts that tell you whether the attribute even coheres for this judge.
-- **Receipts**: JSONL trace per judgement, token/cost accounting, SQLite cache, seeded reproducibility.
+- **Receipts**: each JSONL row binds the exact rendered prompt and solver `Observation` to one content-addressed `EngineSpec`, alongside token/cost accounting, SQLite cache, and seeded reproducibility.
 
 ## Quickstart
 

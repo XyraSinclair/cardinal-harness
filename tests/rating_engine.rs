@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 use cardinal_harness::rating_engine::{
-    plan_edges_for_rater, AttributeParams, Config, Observation, PlannerMode, RaterParams,
-    RatingEngine,
+    plan_edges_for_rater, AttributeParams, Config, EngineSpec, Observation, PlannerMode,
+    RaterParams, RatingEngine,
 };
 
 fn sim_raters() -> HashMap<String, RaterParams> {
@@ -173,4 +173,123 @@ fn degenerate_precision_is_skipped_not_poisonous() {
         (scores[0] - scores[1]).abs() < 1e-12,
         "NaN precision must contribute nothing: {scores:?}"
     );
+}
+
+fn identity_spec() -> EngineSpec {
+    EngineSpec {
+        n: 7,
+        attribute: AttributeParams { temperature: 1.25 },
+        raters: vec![
+            (
+                "zeta".into(),
+                RaterParams {
+                    beta: 0.8,
+                    cost_per_edge: 1.75,
+                    default_confidence: 0.61,
+                },
+            ),
+            (
+                "alpha".into(),
+                RaterParams {
+                    beta: 1.3,
+                    cost_per_edge: 2.25,
+                    default_confidence: 0.84,
+                },
+            ),
+        ],
+        config: Config {
+            eps_confidence: 0.02,
+            gamma_confidence: 1.7,
+            huber_k: 1.2,
+            irls_max_iters: 9,
+            irls_tol: 1e-7,
+            ridge_lambda: 1e-8,
+            tiny: 1e-15,
+            max_log_ratio: 8.0,
+            hutch_probes: 7,
+            rank_weight_exponent: 1.4,
+            rank_band_window: 4,
+            small_gap_threshold: 0.3,
+            max_rank_pairs: Some(1_000),
+            top_k: Some(2),
+            tail_weight: 0.2,
+            lambda_risk: 0.6,
+            rng_seed: 42,
+        },
+    }
+}
+
+fn assert_spec_id_changes(base: &EngineSpec, mutate: impl FnOnce(&mut EngineSpec)) {
+    let mut changed = base.clone();
+    mutate(&mut changed);
+    assert_ne!(base.id(), changed.id());
+}
+
+fn next_f64(value: f64) -> f64 {
+    f64::from_bits(value.to_bits() + 1)
+}
+
+#[test]
+fn engine_spec_identity_is_order_canonical_and_covers_every_policy_field() {
+    let base = identity_spec();
+    let mut reordered = base.clone();
+    reordered.raters.reverse();
+    assert_eq!(base.canonical_bytes(), reordered.canonical_bytes());
+    assert_eq!(base.id(), reordered.id());
+
+    assert_spec_id_changes(&base, |spec| spec.n += 1);
+    assert_spec_id_changes(&base, |spec| {
+        spec.attribute.temperature = next_f64(spec.attribute.temperature)
+    });
+    assert_spec_id_changes(&base, |spec| spec.raters[0].0.push_str("-changed"));
+    assert_spec_id_changes(&base, |spec| {
+        spec.raters[0].1.beta = next_f64(spec.raters[0].1.beta)
+    });
+    assert_spec_id_changes(&base, |spec| {
+        spec.raters[0].1.cost_per_edge = next_f64(spec.raters[0].1.cost_per_edge)
+    });
+    assert_spec_id_changes(&base, |spec| {
+        spec.raters[0].1.default_confidence = next_f64(spec.raters[0].1.default_confidence)
+    });
+    assert_spec_id_changes(&base, |spec| {
+        spec.config.eps_confidence = next_f64(spec.config.eps_confidence)
+    });
+    assert_spec_id_changes(&base, |spec| {
+        spec.config.gamma_confidence = next_f64(spec.config.gamma_confidence)
+    });
+    assert_spec_id_changes(&base, |spec| {
+        spec.config.huber_k = next_f64(spec.config.huber_k)
+    });
+    assert_spec_id_changes(&base, |spec| spec.config.irls_max_iters += 1);
+    assert_spec_id_changes(&base, |spec| {
+        spec.config.irls_tol = next_f64(spec.config.irls_tol)
+    });
+    assert_spec_id_changes(&base, |spec| {
+        spec.config.ridge_lambda = next_f64(spec.config.ridge_lambda)
+    });
+    assert_spec_id_changes(&base, |spec| spec.config.tiny = next_f64(spec.config.tiny));
+    assert_spec_id_changes(&base, |spec| {
+        spec.config.max_log_ratio = next_f64(spec.config.max_log_ratio)
+    });
+    assert_spec_id_changes(&base, |spec| spec.config.hutch_probes += 1);
+    assert_spec_id_changes(&base, |spec| {
+        spec.config.rank_weight_exponent = next_f64(spec.config.rank_weight_exponent)
+    });
+    assert_spec_id_changes(&base, |spec| spec.config.rank_band_window += 1);
+    assert_spec_id_changes(&base, |spec| {
+        spec.config.small_gap_threshold = next_f64(spec.config.small_gap_threshold)
+    });
+    assert_spec_id_changes(&base, |spec| {
+        spec.config.max_rank_pairs = spec.config.max_rank_pairs.map(|value| value + 1)
+    });
+    assert_spec_id_changes(&base, |spec| {
+        spec.config.top_k = spec.config.top_k.map(|value| value + 1)
+    });
+    assert_spec_id_changes(&base, |spec| {
+        spec.config.tail_weight = next_f64(spec.config.tail_weight)
+    });
+    assert_spec_id_changes(&base, |spec| {
+        spec.config.lambda_risk = next_f64(spec.config.lambda_risk)
+    });
+    assert_spec_id_changes(&base, |spec| spec.config.rng_seed += 1);
 }
