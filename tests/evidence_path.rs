@@ -395,6 +395,96 @@ async fn cached_evidence_trace_preserves_rendered_identity_without_prompt_text()
     }
 }
 
+async fn trace_for_evidence_response(response: ResponseTemplate) -> ComparisonTrace {
+    let server = MockServer::start().await;
+    Mock::given(method("POST"))
+        .and(path("/chat/completions"))
+        .respond_with(response)
+        .mount(&server)
+        .await;
+    let (trace_tx, trace_rx) = mpsc::channel();
+    let trace_sink = ChannelTraceSink(trace_tx);
+    let mut opts = letter_opts();
+    opts.comparison_budget = Some(1);
+    opts.comparison_concurrency = Some(1);
+    opts.counterbalance = false;
+
+    sort_texts(
+        vec!["alpha ****".into(), "delta *".into()],
+        "brightness",
+        RerankExecution::new(
+            gateway_for(&server),
+            Attribution::new("test::terminal-path"),
+        )
+        .trace(&trace_sink),
+        opts,
+    )
+    .await
+    .unwrap();
+
+    let events: Vec<_> = trace_rx.try_iter().collect();
+    assert_eq!(events.len(), 1);
+    events.into_iter().next().unwrap()
+}
+
+fn assert_ratio_letter_trace_identity(event: &ComparisonTrace) {
+    let entities = ["alpha ****", "delta *"];
+    let spec = PairwiseComparisonSpec {
+        model: &event.model,
+        attribute: PairwiseComparisonAttribute {
+            id: &event.attribute_id,
+            prompt: "brightness",
+            prompt_template_slug: Some("ratio_letter_v1"),
+        },
+        entity_a: PairwiseComparisonEntity {
+            id: &event.entity_a_id,
+            text: entities[event.entity_a_index],
+        },
+        entity_b: PairwiseComparisonEntity {
+            id: &event.entity_b_id,
+            text: entities[event.entity_b_index],
+        },
+    };
+    let expected_key = spec.cache_key();
+    assert_eq!(event.prompt_template_slug, "ratio_letter_v1");
+    assert_eq!(event.template_hash, expected_key.template_hash);
+    assert_eq!(event.rendered_prompt_digest, spec.rendered_prompt_digest());
+}
+
+#[tokio::test]
+async fn evidence_parse_refusal_trace_retains_rendered_identity() {
+    let event = trace_for_evidence_response(ResponseTemplate::new(200).set_body_json(json!({
+        "choices": [{
+            "message": { "content": "?" },
+            "finish_reason": "stop"
+        }],
+        "usage": { "prompt_tokens": 11, "completion_tokens": 1 }
+    })))
+    .await;
+
+    assert!(event.refused);
+    assert!(event.error.is_none());
+    assert_ratio_letter_trace_identity(&event);
+}
+
+#[tokio::test]
+async fn evidence_provider_error_trace_retains_error_and_rendered_identity() {
+    let event = trace_for_evidence_response(ResponseTemplate::new(502).set_body_json(json!({
+        "error": { "message": "upstream unavailable", "code": "bad_gateway" }
+    })))
+    .await;
+
+    assert!(
+        event
+            .error
+            .as_deref()
+            .is_some_and(|error| error.contains("upstream unavailable")),
+        "trace must retain provider error: {:?}",
+        event.error
+    );
+    assert_ratio_letter_trace_identity(&event);
+}
+
 #[tokio::test]
 async fn letter_path_recovers_planted_order_with_logprob_receipts() {
     let server = start_judge(LetterJudge {
