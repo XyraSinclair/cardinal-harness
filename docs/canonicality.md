@@ -37,6 +37,7 @@ this list, and every row is labeled **covered** / **named-gap** /
 | Observation model at Book form (interval-censored likelihood, #51) | **named-gap** — the standing consolidation jump |
 | Anti-calibrated confidence knob deleted from Config in one sweep (config + goldens + docs) | **named-gap** — verdict receipted, deletion staged |
 | One portable judgment-study receipt binds candidate set, attributes, weights/gates, packets/trace, posterior, and report so another person can verify and reweight it without provider access | **named-gap** — tracked in #52; packet core exists, but the run envelope, trace→packet adapter, offline recomposition, and generic renderer do not |
+| Stakeholder value lenses are source-linked to actor-authored evidence, human-ratified, tested on held-out choices, honest about equivalent explanations, and kept separate until an explicit governance rule combines them | **named-gap** — tracked in #53; current `slate` simulates stakeholders, `explain` fits in-sample, and `weigh`/`canonize` use model judges |
 
 ## Craft
 
