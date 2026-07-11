@@ -36,8 +36,8 @@ this list, and every row is labeled **covered** / **named-gap** /
 | Verdict validated out-of-group (battery B: fresh paraphrases + wording inversion now; time axis when its clock lands) | **named-gap** — the ship-gate for the verb |
 | Observation model at Book form (interval-censored likelihood, #51) | **named-gap** — the standing consolidation jump |
 | Anti-calibrated confidence knob deleted from Config in one sweep (config + goldens + docs) | **named-gap** — verdict receipted, deletion staged |
-| One portable judgment-study receipt binds candidate set, attributes, weights/gates, packets/trace, posterior, and report so another person can verify and reweight it without provider access | **named-gap** — tracked in #52; packet core exists, but the run envelope, trace→packet adapter, offline recomposition, and generic renderer do not |
-| Stakeholder value lenses are source-linked to actor-authored evidence, human-ratified, tested on held-out choices, honest about equivalent explanations, and kept separate until an explicit governance rule combines them | **named-gap** — tracked in #53; current `slate` simulates stakeholders, `explain` fits in-sample, and `weigh`/`canonize` use model judges |
+| Portable evidence uses a three-level contract: `JudgmentPacket` is the content-addressed evidence atom; a thin `JudgmentStudyReceipt` Merkle root commits independently addressable manifests, observations, packets, projections, and derivations; append-only ledger events are consumer orchestration, not the public evidence format | **named-gap** — tracked in #52; packet core exists, but the run envelope, trace→packet adapter, offline recomposition, and generic renderer do not |
+| A human-ratified preference lens over one bounded shortlist is a falsifiable branch; the three-stakeholder value-lens workflow is one contingent consumer demo, not the product definition or prerequisite for other judgment lanes | **named-gap** — one-human gate and broader demo tracked in #53; current `slate` simulates stakeholders, `explain` fits in-sample, and `weigh`/`canonize` use model judges |
 
 ## Craft
 
