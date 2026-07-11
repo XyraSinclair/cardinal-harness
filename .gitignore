@@ -17,6 +17,9 @@ target
 # Local pairwise cache
 .cardinal_pairwise_cache.sqlite
 .cardinal_pairwise_cache.lock
+.cardinal_pairwise_cache.sqlite-shm
+.cardinal_pairwise_cache.sqlite-wal
+.cardinal_pairwise_cache.sqlite-journal
 artifacts/live/**/cache.sqlite
 artifacts/live/**/cache.lock
 scorecard.png
