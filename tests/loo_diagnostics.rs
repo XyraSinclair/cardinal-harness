@@ -12,7 +12,13 @@ use cardinal_harness::rating_engine::{
 fn engine(n: usize) -> RatingEngine {
     let mut raters = HashMap::new();
     raters.insert("sim".to_string(), RaterParams::default());
-    RatingEngine::new(n, AttributeParams::default(), raters, Some(Config::default())).unwrap()
+    RatingEngine::new(
+        n,
+        AttributeParams::default(),
+        raters,
+        Some(Config::default()),
+    )
+    .unwrap()
 }
 
 fn all_pairs_obs(latents: &[f64], noise_seed: u64, noise: f64) -> Vec<Observation> {
@@ -82,16 +88,13 @@ fn leverage_trace_equals_model_degrees_of_freedom() {
     let summary = e.solve();
     let spectral = summary.spectral.expect("spectral");
     let trace: f64 = spectral.edge_leverage.iter().sum();
-    assert!(
-        (trace - 3.0).abs() < 1e-6,
-        "trace(H) = n − c = 3: {trace}"
-    );
+    assert!((trace - 3.0).abs() < 1e-6, "trace(H) = n − c = 3: {trace}");
 }
 
 #[test]
 fn a_bridge_is_counted_as_unaudited_not_scored() {
     // Path graph: every edge is a bridge — no judgement has a second
-    // opinion, and the receipt must say so rather than invent one.
+    // opinion, and the diagnostic must say so rather than invent one.
     let mut e = engine(4);
     let obs = vec![
         Observation::new(0, 1, 1.5, 0.9, "sim", 1.0),

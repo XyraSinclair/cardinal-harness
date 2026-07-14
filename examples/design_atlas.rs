@@ -7,16 +7,16 @@
 //! S ⊆ {1..⌊n/2⌋}, the circulant graph C_n(S) gets:
 //!
 //! - m: edges (calls per order per attribute — the budget)
-//! - triangles: filled 3-cliques (support for the LOCAL curl receipt)
+//! - triangles: filled 3-cliques (support for the LOCAL curl diagnostic)
 //! - harmonic_dim: cycle_dim − rank(curl) (support for the GLOBAL,
-//!   triad-invisible receipt — zero means that receipt is structurally
+//!   triad-invisible diagnostic — zero means that diagnostic is structurally
 //!   dead on this design)
 //! - fiedler: algebraic connectivity at unit weights (identifiability;
 //!   posterior variance along the worst direction scales as 1/fiedler)
 //!
 //! Usage: cargo run --example design_atlas
 
-use cardinal_harness::rating_engine::{compute_hodge_split, spectral_receipts, Config};
+use cardinal_harness::rating_engine::{compute_hodge_split, spectral_diagnostics, Config};
 
 fn circulant(n: usize, strides: &[usize]) -> Vec<(usize, usize)> {
     let mut edges = std::collections::BTreeSet::new();
@@ -43,7 +43,7 @@ fn main() {
             let edges = circulant(n, &strides);
             let m = edges.len();
             let ones = vec![1.0; m];
-            let Some(spectral) = spectral_receipts(&edges, &ones, n, 256) else {
+            let Some(spectral) = spectral_diagnostics(&edges, &ones, n, 256) else {
                 continue;
             };
             if spectral.fiedler_value < 1e-9 {
@@ -59,19 +59,19 @@ fn main() {
                 spectral.fiedler_value / m as f64,
             );
             println!("{line}");
-            // The dual designs: BOTH receipts alive on one connected graph.
+            // The dual designs: BOTH diagnostics alive on one connected graph.
             if hodge.filled_triangles >= 4 && hodge.harmonic_dim >= 1 {
                 best_dual.push((spectral.fiedler_value / m as f64, line));
             }
         }
     }
     best_dual.sort_by(|a, b| b.0.partial_cmp(&a.0).unwrap());
-    println!("\nDUAL-RECEIPT designs (triangles ≥ 4 AND harmonic_dim ≥ 1), by fiedler/edge:");
+    println!("\nDUAL-DIAGNOSTIC designs (triangles ≥ 4 AND harmonic_dim ≥ 1), by fiedler/edge:");
     for (_, line) in best_dual.iter().take(12) {
         println!("  {line}");
     }
     if best_dual.is_empty() {
-        println!("  NONE — no connected circulant on these sizes supports both receipts;");
+        println!("  NONE — no connected circulant on these sizes supports both diagnostics;");
         println!("  mixed/disjoint-block designs are forced, not a style choice.");
     }
 }

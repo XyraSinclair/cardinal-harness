@@ -4,7 +4,7 @@
 //! first) plus candidate attribute prompts. It measures each candidate with
 //! the normal pairwise-ratio machinery, reports how well each one alone
 //! agrees with your order, fits non-negative weights whose combination best
-//! reconstructs it, and returns the full cost receipts. Use it to turn a gut
+//! reconstructs it, and returns the full cost accounting. Use it to turn a gut
 //! ranking into named, weighted, reusable criteria — or to discover that
 //! none of your candidate attributes explains your own taste.
 
@@ -63,7 +63,7 @@ pub struct AttributeExplanation {
 /// Result of [`explain_ranking`].
 #[derive(Debug, Serialize)]
 pub struct Explanation {
-    /// Per-candidate receipts, in the order the candidates were given.
+    /// Per-candidate evidence, in the order the candidates were given.
     pub attributes: Vec<AttributeExplanation>,
     /// Spearman correlation of the fitted weighted combination with the
     /// reference order — how much of your ranking these attributes jointly
@@ -234,8 +234,8 @@ pub async fn explain_ranking(
 
 /// Ask an LLM to propose candidate attributes that might explain a given
 /// ranking (best first). Returns short criterion strings, ready for
-/// [`explain_ranking`]. One chat call; receipts in the returned usage tuple.
-/// Usage receipt for a single proposal call.
+/// [`explain_ranking`]. One chat call; usage in the returned tuple.
+/// Token and cost accounting for a single proposal call.
 #[derive(Debug, Clone, Copy, Serialize)]
 pub struct ProposalUsage {
     pub input_tokens: u32,
@@ -399,7 +399,7 @@ async fn propose_via_chat(
     Ok((parsed, usage))
 }
 
-/// One attribute's measured differentiation receipt for a focal item.
+/// One attribute's measured differentiation result for a focal item.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AttributeDifferentiation {
     /// Attribute id used in traces and cache keys (`distinguish_<n>`).
@@ -422,7 +422,7 @@ pub struct AttributeDifferentiation {
 pub struct DifferentiationProfile {
     /// The focal entity id.
     pub focal_id: String,
-    /// Per-attribute receipts, sorted by focal z-score descending: the top
+    /// Per-attribute results, sorted by focal z-score descending: the top
     /// entries are the measured directions along which the item stands out.
     pub attributes: Vec<AttributeDifferentiation>,
     /// Run metadata (comparisons, tokens, cost, counterbalancing flips,

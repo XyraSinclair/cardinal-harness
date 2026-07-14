@@ -129,10 +129,7 @@ pub async fn wording_invariance(
         });
     }
 
-    let ms: Vec<f64> = readings
-        .iter()
-        .filter_map(|r| r.mean_log_ratio)
-        .collect();
+    let ms: Vec<f64> = readings.iter().filter_map(|r| r.mean_log_ratio).collect();
     let max_disagreement_nats = if ms.len() >= 2 {
         let mut max = 0.0f64;
         for i in 0..ms.len() {

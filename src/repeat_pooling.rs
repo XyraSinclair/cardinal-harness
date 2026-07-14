@@ -63,8 +63,13 @@ fn solve_with_vars(
 ) -> Option<(Vec<f64>, Vec<f64>, Vec<f64>)> {
     let mut raters = HashMap::new();
     raters.insert("pool".to_string(), RaterParams::default());
-    let mut engine =
-        RatingEngine::new(n, AttributeParams::default(), raters, Some(Config::default())).ok()?;
+    let mut engine = RatingEngine::new(
+        n,
+        AttributeParams::default(),
+        raters,
+        Some(Config::default()),
+    )
+    .ok()?;
     let obs: Vec<Observation> = means
         .iter()
         .zip(variances.iter())

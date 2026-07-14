@@ -5,17 +5,17 @@
 //! 1. **Charset**: `python3 -m http.server` (the working-norm server for
 //!    these pages) sends no charset header, so a UTF-8 page without
 //!    `<meta charset="utf-8">` renders as windows-1252 mojibake — every
-//!    em-dash, ρ and χ garbled. The receipt viewer shipped mojibake in its
+//!    em-dash, ρ and χ garbled. The evidence viewer shipped mojibake in its
 //!    first render, and the sweep then found map.html and leaderboard.html
 //!    already carrying the same latent bug (fixed 2abcb43). Served bytes
 //!    are physics (PRINCIPLES §11).
 //!
-//! 2. **Page/receipt drift**: the receipt viewer inlines every measured
-//!    number verbatim from the committed receipt JSONs. Nothing but this
-//!    test enforces that the page and the receipts stay in agreement —
-//!    an artifact page that drifts from its receipts is precisely the
-//!    "faking numbers for a better demo" failure the differentiation doc
-//!    names as the thing that would torch the stack's credibility.
+//! 2. **Page/evidence drift**: the evidence viewer inlines every measured
+//!    number verbatim from the committed JSON sources. Nothing but this test
+//!    enforces that the page and the sources stay in agreement—an artifact
+//!    page that drifts from its evidence is precisely the “faking numbers for
+//!    a better demo” failure the differentiation doc names as the thing that
+//!    would torch the stack's credibility.
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -63,7 +63,7 @@ fn committed_html_declares_charset() {
 
 /// Extract the raw numeric literal tokens following `"key":` occurrences in
 /// JSON text. Raw-text extraction (not serde -> f64 -> Display) on purpose:
-/// the page inlined the receipt bytes verbatim, and the pin is on those
+/// the page inlined the source bytes verbatim, and the pin is on those
 /// exact byte sequences (e.g. `0.0` must stay `0.0`, not `0`).
 fn raw_number_tokens(json_text: &str, key: &str) -> Vec<String> {
     let needle = format!("\"{key}\":");
@@ -84,14 +84,16 @@ fn raw_number_tokens(json_text: &str, key: &str) -> Vec<String> {
     tokens
 }
 
-/// Every measured number in the committed spin receipts must appear
-/// verbatim in the receipt viewer page. If a receipt is corrected or the
-/// page is edited, the two must move together.
+/// Every measured number in the committed spin evidence must appear verbatim
+/// in the evidence viewer page. If a source is corrected or the page is edited,
+/// the two must move together.
 #[test]
-fn receipt_viewer_numbers_match_committed_receipts() {
-    let page = fs::read_to_string(repo_path("artifacts/live/receipt-viewer-2026-07-08/index.html"))
-        .expect("receipt viewer page");
-    let receipts = [
+fn evidence_viewer_numbers_match_committed_sources() {
+    let page = fs::read_to_string(repo_path(
+        "artifacts/live/evidence-viewer-2026-07-08/index.html",
+    ))
+    .expect("evidence viewer page");
+    let sources = [
         "artifacts/live/spin-sweep-2026-07-05/contested_gpt-5.4-mini.json",
         "artifacts/live/spin-sweep-2026-07-05/contested_claude-sonnet-4.6.json",
         "artifacts/live/spin-probe-2026-07-05/contested_pair_gpt-5.4-mini.json",
@@ -107,8 +109,8 @@ fn receipt_viewer_numbers_match_committed_receipts() {
     ];
     let mut checked = 0usize;
     let mut missing = Vec::new();
-    for rel in receipts {
-        let text = fs::read_to_string(repo_path(rel)).expect("readable receipt");
+    for rel in sources {
+        let text = fs::read_to_string(repo_path(rel)).expect("readable evidence source");
         for key in keys {
             for token in raw_number_tokens(&text, key) {
                 checked += 1;
@@ -121,11 +123,11 @@ fn receipt_viewer_numbers_match_committed_receipts() {
     // 2 sweeps x (7 readings + chi + r2 + cost) + 3 probes x (3 readings + chi + cost).
     assert_eq!(
         checked, 35,
-        "receipt shape changed: expected 35 pinned numbers, found {checked} — update the pin \
-         AND the page together"
+        "evidence shape changed: expected 35 pinned numbers, found {checked} — update the pin \
+         and the page together"
     );
     assert!(
         missing.is_empty(),
-        "receipt numbers absent from the viewer page (page and receipts have drifted): {missing:?}"
+        "evidence numbers absent from the viewer page (page and sources have drifted): {missing:?}"
     );
 }

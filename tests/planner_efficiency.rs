@@ -701,3 +701,46 @@ fn noisy_judge_ensemble_recovers_topk_most_of_the_time() {
         "sigma=0.6 noise should occasionally cause a miss -- 100% recovery would suggest the noise is not actually exercised (got {recovered}/{seeds})"
     );
 }
+
+fn proposal_weight_ratio(exponent: f64) -> f64 {
+    let scores = planted_scores(N, 0.35);
+    let mut engines = HashMap::new();
+    engines.insert("high".to_string(), wheel_engine(N, &scores));
+    engines.insert("low".to_string(), wheel_engine(N, &scores));
+    let mut topk = TopKConfig::new(K);
+    topk.weight_exponent = exponent;
+    topk.min_explore_degree = 0;
+    let config = TraitSearchConfig::new(
+        N,
+        vec![
+            AttributeConfig::new("high", 4.0),
+            AttributeConfig::new("low", 1.0),
+        ],
+        topk,
+        vec![],
+    );
+    let mut manager = TraitSearchManager::new(config, engines).unwrap();
+    manager.recompute_global_state().unwrap();
+    let proposals = manager
+        .propose_batch("sim", 128, PlannerMode::Hybrid)
+        .unwrap();
+    let best = |attribute: &str| {
+        proposals
+            .iter()
+            .filter(|proposal| proposal.attribute_id == attribute)
+            .map(|proposal| proposal.global_score)
+            .fold(0.0_f64, f64::max)
+    };
+    best("high") / best("low")
+}
+
+#[test]
+fn attribute_weight_exponent_controls_cross_attribute_planning() {
+    let linear = proposal_weight_ratio(1.0);
+    let quadratic = proposal_weight_ratio(2.0);
+    assert!((linear - 4.0).abs() < 1e-9, "linear ratio: {linear}");
+    assert!(
+        (quadratic - 16.0).abs() < 1e-8,
+        "quadratic ratio: {quadratic}"
+    );
+}

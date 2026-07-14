@@ -302,7 +302,7 @@ fn live_method_suite_fixture_has_frozen_public_shape() {
 }
 
 #[test]
-fn live_method_receipt_pack_is_complete_portable_and_secret_free() {
+fn live_method_evidence_pack_is_complete_portable_and_secret_free() {
     let pack_dir = repo_path(PACK_REL);
     let summary_path = pack_dir.join("summary.json");
     let summary = read_json(&summary_path);
@@ -317,11 +317,11 @@ fn live_method_receipt_pack_is_complete_portable_and_secret_free() {
 
     assert!(
         pack_dir.join("README.md").is_file(),
-        "receipt pack README is missing"
+        "evidence pack README is missing"
     );
     assert!(
         pack_dir.join("summary.md").is_file(),
-        "receipt pack summary.md is missing"
+        "evidence pack summary.md is missing"
     );
 
     let mut request_count = 0usize;
@@ -385,20 +385,14 @@ fn live_method_receipt_pack_is_complete_portable_and_secret_free() {
     }
     assert!(
         request_count > 500,
-        "live pack should contain every raw provider call receipt"
+        "live pack should contain every raw provider call record"
     );
     assert_eq!(
         request_count, response_count,
-        "request/response receipt count mismatch"
+        "request/response count mismatch"
     );
-    assert_eq!(
-        request_count, parsed_count,
-        "request/parsed receipt count mismatch"
-    );
-    assert_eq!(
-        request_count, usage_count,
-        "request/usage receipt count mismatch"
-    );
+    assert_eq!(request_count, parsed_count, "request/parsed count mismatch");
+    assert_eq!(request_count, usage_count, "request/usage count mismatch");
 
     let cases = array(&summary, "cases");
     assert_eq!(integer(&summary, "case_count") as usize, cases.len());
@@ -431,12 +425,12 @@ fn live_method_receipt_pack_is_complete_portable_and_secret_free() {
         );
         add_usage(&mut total_usage, field(reference, "usage"));
 
-        let reference_receipts =
+        let reference_evidence =
             files_named(&case_dir.join("calls").join(REFERENCE_METHOD), "usage.json");
         assert_eq!(
-            reference_receipts.len(),
+            reference_evidence.len(),
             pairwise_call_count,
-            "reference call receipt count should equal attributes * nC2 for {case_name}"
+            "reference call count should equal attributes * nC2 for {case_name}"
         );
 
         let methods = array(case_row, "methods");
@@ -465,17 +459,17 @@ fn live_method_receipt_pack_is_complete_portable_and_secret_free() {
             );
             add_usage(&mut total_usage, field(method, "usage"));
 
-            let expected_receipts = match method_name {
+            let expected_evidence = match method_name {
                 "scalar_matrix" | "list_sort" => 1,
                 "ordinal_pairwise" | "cardinal_pairwise_ratio" => pairwise_call_count,
                 other => panic!("unhandled method {other}"),
             };
-            let actual_receipts =
+            let actual_evidence =
                 files_named(&case_dir.join("calls").join(method_name), "usage.json");
             assert_eq!(
-                actual_receipts.len(),
-                expected_receipts,
-                "call receipt count mismatch for {case_name}/{method_name}"
+                actual_evidence.len(),
+                expected_evidence,
+                "call count mismatch for {case_name}/{method_name}"
             );
         }
         for expected_method in CANDIDATE_METHODS {
@@ -490,7 +484,7 @@ fn live_method_receipt_pack_is_complete_portable_and_secret_free() {
 }
 
 #[test]
-fn live_method_budget_normalized_rows_match_case_receipts() {
+fn live_method_budget_normalized_rows_match_case_evidence() {
     let summary = read_json(&repo_path(PACK_REL).join("summary.json"));
     let mut buckets: BTreeMap<(String, String), BudgetBucket> = BTreeMap::new();
 

@@ -67,21 +67,29 @@ fn any_partition_fuses_byte_identical_to_the_whole() {
     // Two parties, arbitrary split — same judge tag so the evidence
     // multiset is literally identical to the whole.
     let (a_obs, b_obs): (Vec<_>, Vec<_>) =
-        all.iter().cloned().enumerate().fold((vec![], vec![]), |(mut a, mut b), (k, ob)| {
-            if k % 3 == 0 {
-                a.push(ob);
-            } else {
-                b.push(ob);
-            }
-            (a, b)
-        });
+        all.iter()
+            .cloned()
+            .enumerate()
+            .fold((vec![], vec![]), |(mut a, mut b), (k, ob)| {
+                if k % 3 == 0 {
+                    a.push(ob);
+                } else {
+                    b.push(ob);
+                }
+                (a, b)
+            });
     let pa = packet("party", ents.clone(), a_obs);
     let pb = packet("party", ents.clone(), b_obs);
 
     let ab = fuse(&[pa.clone(), pb.clone()]).unwrap();
     let ba = fuse(&[pb, pa]).unwrap();
 
-    for ((w, x), y) in whole.scores.iter().zip(ab.scores.iter()).zip(ba.scores.iter()) {
+    for ((w, x), y) in whole
+        .scores
+        .iter()
+        .zip(ab.scores.iter())
+        .zip(ba.scores.iter())
+    {
         assert_eq!(
             w.to_bits(),
             x.to_bits(),
@@ -91,6 +99,24 @@ fn any_partition_fuses_byte_identical_to_the_whole() {
     }
     assert_eq!(whole.hcr.to_bits(), ab.hcr.to_bits());
     assert_eq!(ab.observations, whole.observations);
+    assert_eq!(whole.diag_cov.len(), whole.entities.len());
+    for ((w, x), y) in whole
+        .diag_cov
+        .iter()
+        .zip(ab.diag_cov.iter())
+        .zip(ba.diag_cov.iter())
+    {
+        assert_eq!(
+            w.to_bits(),
+            x.to_bits(),
+            "uncertainty must be byte-identical across evidence partitions"
+        );
+        assert_eq!(
+            x.to_bits(),
+            y.to_bits(),
+            "uncertainty must be independent of packet order"
+        );
+    }
 }
 
 #[test]
@@ -101,26 +127,66 @@ fn partial_overlap_of_entity_sets_fuses_on_the_union() {
     let a_ents: Vec<_> = all_ents[..5].to_vec();
     let b_ents: Vec<_> = all_ents[2..].to_vec();
     let a_obs = vec![
-        PacketObservation { i: 0, j: 1, log_ratio: 0.4, precision: 1.0 },
-        PacketObservation { i: 1, j: 2, log_ratio: 0.4, precision: 1.0 },
-        PacketObservation { i: 2, j: 3, log_ratio: 0.4, precision: 1.0 },
-        PacketObservation { i: 3, j: 4, log_ratio: 0.4, precision: 1.0 },
+        PacketObservation {
+            i: 0,
+            j: 1,
+            log_ratio: 0.4,
+            precision: 1.0,
+        },
+        PacketObservation {
+            i: 1,
+            j: 2,
+            log_ratio: 0.4,
+            precision: 1.0,
+        },
+        PacketObservation {
+            i: 2,
+            j: 3,
+            log_ratio: 0.4,
+            precision: 1.0,
+        },
+        PacketObservation {
+            i: 3,
+            j: 4,
+            log_ratio: 0.4,
+            precision: 1.0,
+        },
     ];
     let b_obs = vec![
-        PacketObservation { i: 0, j: 1, log_ratio: 0.4, precision: 1.0 },
-        PacketObservation { i: 1, j: 2, log_ratio: 0.4, precision: 1.0 },
-        PacketObservation { i: 2, j: 3, log_ratio: 0.4, precision: 1.0 },
-        PacketObservation { i: 3, j: 4, log_ratio: 0.4, precision: 1.0 },
+        PacketObservation {
+            i: 0,
+            j: 1,
+            log_ratio: 0.4,
+            precision: 1.0,
+        },
+        PacketObservation {
+            i: 1,
+            j: 2,
+            log_ratio: 0.4,
+            precision: 1.0,
+        },
+        PacketObservation {
+            i: 2,
+            j: 3,
+            log_ratio: 0.4,
+            precision: 1.0,
+        },
+        PacketObservation {
+            i: 3,
+            j: 4,
+            log_ratio: 0.4,
+            precision: 1.0,
+        },
     ];
-    let fused = fuse(&[
-        packet("alice", a_ents, a_obs),
-        packet("bob", b_ents, b_obs),
-    ])
-    .unwrap();
+    let fused = fuse(&[packet("alice", a_ents, a_obs), packet("bob", b_ents, b_obs)]).unwrap();
     assert_eq!(fused.entities.len(), 7, "union of both parties' worlds");
     // The chain is consistent: scores strictly decreasing along e00..e06.
     for w in fused.scores.windows(2) {
-        assert!(w[0] > w[1], "chained evidence must order the union: {:?}", fused.scores);
+        assert!(
+            w[0] > w[1],
+            "chained evidence must order the union: {:?}",
+            fused.scores
+        );
     }
 }
 
@@ -176,14 +242,17 @@ fn redelivered_packet_is_absorbed_fusion_is_idempotent() {
     let ents = entities(6);
     let all = evidence(6, 7);
     let (a_obs, b_obs): (Vec<_>, Vec<_>) =
-        all.iter().cloned().enumerate().fold((vec![], vec![]), |(mut a, mut b), (k, ob)| {
-            if k % 2 == 0 {
-                a.push(ob);
-            } else {
-                b.push(ob);
-            }
-            (a, b)
-        });
+        all.iter()
+            .cloned()
+            .enumerate()
+            .fold((vec![], vec![]), |(mut a, mut b), (k, ob)| {
+                if k % 2 == 0 {
+                    a.push(ob);
+                } else {
+                    b.push(ob);
+                }
+                (a, b)
+            });
     let pa = packet("alice", ents.clone(), a_obs);
     let pb = packet("bob", ents.clone(), b_obs);
 

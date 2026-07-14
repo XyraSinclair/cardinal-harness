@@ -99,8 +99,13 @@ fn solver_summary_split_sums_to_hcr_on_a_planted_cyclic_judge() {
     let n = 6;
     let mut raters = HashMap::new();
     raters.insert("sim".to_string(), RaterParams::default());
-    let mut engine =
-        RatingEngine::new(n, AttributeParams::default(), raters, Some(Config::default())).unwrap();
+    let mut engine = RatingEngine::new(
+        n,
+        AttributeParams::default(),
+        raters,
+        Some(Config::default()),
+    )
+    .unwrap();
     // i beats i+1 and i+2 (mod 6) by 2.5×: strongly cyclic.
     let mut obs = Vec::new();
     for i in 0..n {
@@ -122,18 +127,15 @@ fn solver_summary_split_sums_to_hcr_on_a_planted_cyclic_judge() {
     );
     // Stride-{1,2} on a 6-ring is triangle-rich (i, i+1, i+2 all joined):
     // the curl should be dominantly local/auditable.
-    assert!(
-        split.local_curl_frac > split.harmonic_frac,
-        "{split:?}"
-    );
+    assert!(split.local_curl_frac > split.harmonic_frac, "{split:?}");
 }
 
 #[test]
-fn atlas_winner_c8_134_hosts_both_receipts_at_the_same_budget() {
+fn atlas_winner_c8_134_hosts_both_diagnostics_at_the_same_budget() {
     // The design-atlas headline (docs/DESIGN_ATLAS.md): swapping stride 2
     // for stride 3 in the JCB graph keeps 20 edges, 16 triangles, and
     // Fiedler 4.0, while raising harmonic_dim from 0 to 1 — both curl
-    // receipts alive on ONE connected graph. Pinned so the recommended
+    // diagnostics alive on ONE connected graph. Pinned so the recommended
     // v2 core design's profile cannot silently drift.
     let n = 8usize;
     let mut edges = std::collections::BTreeSet::new();
@@ -148,9 +150,12 @@ fn atlas_winner_c8_134_hosts_both_receipts_at_the_same_budget() {
     let ones = vec![1.0; edges.len()];
     let split = compute_hodge_split(&edges, &ones, &ones, &ones, n, &cfg());
     assert_eq!(split.filled_triangles, 16);
-    assert_eq!(split.harmonic_dim, 1, "the strictly-better design: {split:?}");
+    assert_eq!(
+        split.harmonic_dim, 1,
+        "the strictly-better design: {split:?}"
+    );
     let spectral =
-        cardinal_harness::rating_engine::spectral_receipts(&edges, &ones, n, 256).unwrap();
+        cardinal_harness::rating_engine::spectral_diagnostics(&edges, &ones, n, 256).unwrap();
     assert!((spectral.fiedler_value - 4.0).abs() < 1e-9, "{spectral:?}");
 }
 
@@ -170,7 +175,7 @@ fn jcb_graph_design_cannot_host_harmonic_disagreement() {
     assert_eq!(
         split.harmonic_dim, 0,
         "triangles span the whole cycle space on this design — harmonic \
-         receipts on the JCB graph are zero BY CONSTRUCTION, not by judge \
+         diagnostics on the JCB graph are zero BY CONSTRUCTION, not by judge \
          virtue: {split:?}"
     );
 }

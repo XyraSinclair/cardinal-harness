@@ -81,7 +81,9 @@ pub enum PacketError {
     AttributeMismatch(String, String),
     #[error("packets disagree on template: {0:?} vs {1:?}")]
     TemplateMismatch(String, String),
-    #[error("entity {0} carries different content hashes across packets — tampering or id collision")]
+    #[error(
+        "entity {0} carries different content hashes across packets — tampering or id collision"
+    )]
     EntityHashMismatch(String),
     #[error("observation index out of range")]
     BadIndex,
@@ -166,13 +168,15 @@ impl JudgmentPacket {
 }
 
 /// The fused posterior: scores over the union entity list, plus the
-/// receipts of the fusion itself.
+/// provenance of the fusion itself.
 #[derive(Debug, Serialize)]
 pub struct FusedPosterior {
     /// Union entities, sorted by id.
     pub entities: Vec<(String, String)>,
     /// Latent scores, aligned to `entities`.
     pub scores: Vec<f64>,
+    /// Marginal latent variances, aligned to `entities`.
+    pub diag_cov: Vec<f64>,
     /// Total cyclic fraction of the fused evidence.
     pub hcr: f64,
     /// The ids of the packets that were fused (sorted).
@@ -241,8 +245,7 @@ pub fn fuse(packets: &[JudgmentPacket]) -> Result<FusedPosterior, PacketError> {
     let mut all: Vec<(usize, usize, u64, u64, String)> = Vec::new();
     for p in &packets {
         for ob in &p.observations {
-            let (Some((id_i, _)), Some((id_j, _))) =
-                (p.entities.get(ob.i), p.entities.get(ob.j))
+            let (Some((id_i, _)), Some((id_j, _))) = (p.entities.get(ob.i), p.entities.get(ob.j))
             else {
                 return Err(PacketError::BadIndex);
             };
@@ -290,6 +293,7 @@ pub fn fuse(packets: &[JudgmentPacket]) -> Result<FusedPosterior, PacketError> {
     Ok(FusedPosterior {
         entities,
         scores: summary.scores,
+        diag_cov: summary.diag_cov,
         hcr: summary.hcr,
         fused_packet_ids,
         observations: all.len(),

@@ -465,6 +465,53 @@ fn cli_rerank_validates_before_gateway_setup() {
 }
 
 #[test]
+fn cli_rerank_cache_only_is_keyless() {
+    let dir = tempdir().unwrap();
+    let request_path = dir.path().join("request.json");
+    let out_path = dir.path().join("out.json");
+    let cache_path = dir.path().join("empty-cache.sqlite");
+    std::fs::write(
+        &request_path,
+        serde_json::json!({
+            "entities": [
+                {"id": "a", "text": "A"},
+                {"id": "b", "text": "B"}
+            ],
+            "attributes": [
+                {"id": "clarity", "prompt": "clarity", "weight": 1.0}
+            ],
+            "topk": {"k": 1},
+            "comparison_budget": 1
+        })
+        .to_string(),
+    )
+    .unwrap();
+
+    let output = Command::new(cardinal_bin())
+        .args(["rerank", "--request"])
+        .arg(&request_path)
+        .arg("--out")
+        .arg(&out_path)
+        .arg("--cache")
+        .arg(&cache_path)
+        .arg("--cache-only")
+        .env_remove("OPENROUTER_API_KEY")
+        .output()
+        .expect("run keyless cache-only rerank");
+
+    assert!(!output.status.success(), "empty cache should fail");
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("cache_only") || stderr.contains("cache miss"),
+        "expected a cache miss after keyless setup; stderr={stderr}"
+    );
+    assert!(
+        !stderr.contains("OPENROUTER_API_KEY"),
+        "cache-only mode must not require a provider key; stderr={stderr}"
+    );
+}
+
+#[test]
 fn cli_report_json_smoke() {
     let dir = tempdir().unwrap();
 

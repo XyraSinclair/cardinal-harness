@@ -12,7 +12,7 @@ When you ask an LLM to "rate this essay 1–10", the scores are:
 - **Anchor-dependent**: the first item scored sets an arbitrary reference point.
 - **Inconsistent**: the same item can get different absolute scores in different contexts.
 
-Pairwise comparisons ("which is better, and by how much?") can reduce these failure modes when the attribute is coherent and the two items give the rater a useful reference point. They are not magic: the evaluation receipt should be read as local evidence for specific synthetic regimes, not as proof that pairwise prompts universally beat direct scoring.
+Pairwise comparisons ("which is better, and by how much?") can reduce these failure modes when the attribute is coherent and the two items give the rater a useful reference point. They are not magic: the evaluation record should be read as local evidence for specific synthetic regimes, not as proof that pairwise prompts universally beat direct scoring.
 
 ## Why ratios instead of just "which is better?"
 
@@ -28,23 +28,33 @@ This ladder is approximately geometric (roughly evenly spaced in log-space), whi
 
 ## The solver: why IRLS with Huber loss?
 
-Given a set of noisy pairwise log-ratio observations, we need to recover a consistent global set of scores. This is a weighted least-squares problem on a graph, where each comparison is an edge with a measured difference and a weight (from the confidence score).
+Given a set of noisy pairwise log-ratio observations, we need to recover a consistent global set of scores. This is a weighted least-squares problem on a graph, where each comparison is an edge with a measured difference and either explicit measured precision or unit precision.
 
 **Why robust regression?** LLMs are noisy judges. Some comparisons are outliers — the model misunderstands, hallucinates, or produces an inconsistent judgment. Ordinary least squares would let one bad comparison distort all the scores. Huber loss provides a smooth transition between L2 (for small residuals) and L1 (for large residuals), automatically downweighting outliers without discarding them entirely.
 
-**Why IRLS specifically?** Iteratively Reweighted Least Squares turns the robust regression into a sequence of ordinary weighted least-squares problems, each solvable via Cholesky decomposition in the current implementation. This is numerically stable and well-understood for the small and medium active sets covered by the checked-in scaling receipt; larger production frontiers need sparse linear algebra or smaller active sets.
+**Why IRLS specifically?** Iteratively Reweighted Least Squares turns the robust regression into a sequence of ordinary weighted least-squares problems, each solvable via Cholesky decomposition in the current implementation. This is numerically stable and well-understood for the small and medium active sets covered by the checked-in scaling report; larger production frontiers need sparse linear algebra or smaller active sets.
 
 **Why Huber over other robust losses?** Huber loss (with k=1.5) is the standard choice in robust statistics. It's less aggressive than Tukey's biweight (which can zero-out observations entirely) but more robust than plain L2. The k=1.5 threshold means observations with residuals beyond 1.5 standard deviations get downweighted but never fully discarded.
 
-## Confidence mapping
+## Observation precision
 
-Each LLM comparison includes a confidence score (0 to 1). This maps to observation variance via:
+Model-reported confidence is retained in traces as a statement by the judge,
+not treated as calibrated precision. Point observations receive unit precision.
+Evidence paths that measure a response distribution may instead attach an
+explicit positive `precision`; invalid measured precision causes the
+observation to be skipped rather than silently converted into a default.
+Rater efficacy, repeats, and attribute temperature then scale that precision:
 
+```text
+edge weight = rater efficacy × measured-or-unit precision × repeats
+              / attribute temperature
 ```
-g(c) = eps + (1 - eps) * c^gamma
-```
 
-With `eps=0.001` and `gamma=2.0`, this means: low-confidence observations get high variance (low weight in the solver), and high-confidence observations get low variance (high weight). The squaring (`gamma=2`) makes the system more sensitive to confidence differences — the LLM has to be quite confident before an observation gets substantial weight.
+`censored_likelihood` is a separate experimental ordered-probit path. It treats
+each ladder rung as an interval-censored response under a declared noise scale
+and weak prior. It is not wired into production execution: the clean synthetic
+channel passes its comparison gate, while contaminated-channel robustness and
+coverage remain required before any cutover.
 
 ## Gauge pinning
 

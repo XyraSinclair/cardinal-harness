@@ -39,7 +39,7 @@ fn clean_ordering_case_is_perfect_topk() {
     let rank_quality = metrics
         .rank_quality
         .as_ref()
-        .expect("clean synthetic case should emit rank-quality receipts");
+        .expect("clean synthetic case should emit rank-quality diagnostics");
     assert!(
         rank_quality.ndcg_at_k >= 0.99,
         "perfect top-k should also have near-perfect nDCG, got {}",
@@ -153,7 +153,7 @@ fn ordinal_pairwise_mode_exposes_scale_loss_control() {
 }
 
 #[test]
-fn comparison_summary_makes_cardinal_minus_likert_receipts_explicit() {
+fn comparison_summary_makes_cardinal_minus_likert_deltas_explicit() {
     let summary = run_evaluation_comparison_summary(None, LikertEvalConfig::default())
         .expect("comparison summary should run");
 

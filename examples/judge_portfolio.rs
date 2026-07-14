@@ -10,7 +10,9 @@
 use cardinal_harness::rerank::judge_geometry;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let path = std::env::args().nth(1).ok_or("usage: judge_portfolio <reports.jsonl>")?;
+    let path = std::env::args()
+        .nth(1)
+        .ok_or("usage: judge_portfolio <reports.jsonl>")?;
     let mut names = Vec::new();
     let mut latents = Vec::new();
     let mut costs = Vec::new();
@@ -31,7 +33,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "consensus share {:.3} · effective error sources {:.2} · total information {:.2} · n = {}",
         g.consensus_share, g.effective_error_sources, g.total_information, g.n_entities
     );
-    println!("{:<30} {:>7} {:>7} {:>8} {:>8} {:>10}", "judge", "load", "weight", "dI", "cost $", "dI/$");
+    println!(
+        "{:<30} {:>7} {:>7} {:>8} {:>8} {:>10}",
+        "judge", "load", "weight", "dI", "cost $", "dI/$"
+    );
     for &i in &g.portfolio_order {
         let e = &g.judges[i];
         println!(
@@ -46,7 +51,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     println!("\ncorrelation:");
     for row in &g.correlation {
-        println!("  {}", row.iter().map(|v| format!("{v:+.2}")).collect::<Vec<_>>().join(" "));
+        println!(
+            "  {}",
+            row.iter()
+                .map(|v| format!("{v:+.2}"))
+                .collect::<Vec<_>>()
+                .join(" ")
+        );
     }
     Ok(())
 }

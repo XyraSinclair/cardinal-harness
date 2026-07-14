@@ -30,7 +30,7 @@
 //! - **effective error sources**: participation ratio of Ψ normalized to
 //!   unit diagonal — how many independent error channels the roster has.
 //!
-//! Small-J caveat carried in the receipts: triad loadings need J ≥ 3 and
+//! Small-J caveat carried in the diagnostics: triad loadings need J ≥ 3 and
 //! are only clone-robust when honest triads are the majority (J ≥ 6 for
 //! one clone pair); J = 2 falls back to the symmetric √ρ and is labeled
 //! by `n_entities`/J as everything else is.
@@ -38,7 +38,7 @@
 use nalgebra::{DMatrix, DVector};
 use serde::Serialize;
 
-/// One judge's portfolio receipts.
+/// One judge's portfolio diagnostics.
 #[derive(Debug, Clone, Serialize)]
 pub struct JudgePortfolioEntry {
     pub judge: String,
@@ -151,7 +151,12 @@ pub fn judge_geometry(
     let mut r = DMatrix::<f64>::identity(j, j);
     for a in 0..j {
         for b in (a + 1)..j {
-            let rho = z[a].iter().zip(z[b].iter()).map(|(x, y)| x * y).sum::<f64>() / n as f64;
+            let rho = z[a]
+                .iter()
+                .zip(z[b].iter())
+                .map(|(x, y)| x * y)
+                .sum::<f64>()
+                / n as f64;
             r[(a, b)] = rho;
             r[(b, a)] = rho;
         }
@@ -185,10 +190,7 @@ pub fn judge_geometry(
     }
     let psi = {
         let eig = nalgebra::SymmetricEigen::new(psi);
-        let clipped = DVector::<f64>::from_iterator(
-            j,
-            eig.eigenvalues.iter().map(|l| l.max(1e-3)),
-        );
+        let clipped = DVector::<f64>::from_iterator(j, eig.eigenvalues.iter().map(|l| l.max(1e-3)));
         &eig.eigenvectors * DMatrix::from_diagonal(&clipped) * eig.eigenvectors.transpose()
     };
 

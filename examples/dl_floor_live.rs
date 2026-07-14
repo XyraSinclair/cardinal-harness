@@ -12,13 +12,17 @@ use cardinal_harness::rerank::{nonce_draws, CORPUS, PRIMARY_ATTRIBUTE};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let model = std::env::args().nth(1).ok_or("usage: dl_floor_live <model> [k]")?;
-    let k: usize = std::env::args().nth(2).and_then(|s| s.parse().ok()).unwrap_or(6);
+    let model = std::env::args()
+        .nth(1)
+        .ok_or("usage: dl_floor_live <model> [k]")?;
+    let k: usize = std::env::args()
+        .nth(2)
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(6);
     let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
     // A cycle-bearing pair set over 5 corpus items: enough graph for the
     // DL residual to have degrees of freedom.
-    let pairs: [(usize, usize); 7] =
-        [(0, 1), (1, 2), (2, 3), (3, 4), (0, 2), (1, 3), (0, 4)];
+    let pairs: [(usize, usize); 7] = [(0, 1), (1, 2), (2, 3), (3, 4), (0, 2), (1, 3), (0, 4)];
     let mut repeat = Vec::new();
     let mut cost = 0i64;
     let mut cached = 0u64;
@@ -57,8 +61,22 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         pooled.q_statistic,
         pooled.degrees_of_freedom,
     );
-    println!("floored scores: {:?}", pooled.scores.iter().map(|s| (s * 100.0).round() / 100.0).collect::<Vec<_>>());
-    println!("naive   scores: {:?}", pooled.scores_naive.iter().map(|s| (s * 100.0).round() / 100.0).collect::<Vec<_>>());
+    println!(
+        "floored scores: {:?}",
+        pooled
+            .scores
+            .iter()
+            .map(|s| (s * 100.0).round() / 100.0)
+            .collect::<Vec<_>>()
+    );
+    println!(
+        "naive   scores: {:?}",
+        pooled
+            .scores_naive
+            .iter()
+            .map(|s| (s * 100.0).round() / 100.0)
+            .collect::<Vec<_>>()
+    );
     println!(
         "{} draws total · cached {cached}/{input} input tokens · ${:.4}",
         pairs.len() * k,

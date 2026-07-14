@@ -14,10 +14,11 @@
 //! See `docs/ALGORITHM.md` for the design rationale.
 
 pub mod cache;
+pub mod censored_likelihood;
 pub mod discrete;
 pub mod gain_calibration;
-pub mod packet;
 pub mod gateway;
+pub mod packet;
 pub mod prompts;
 pub mod rating_engine;
 pub mod repeat_pooling;

@@ -1,7 +1,7 @@
 //! Lightweight scaling benchmark for the public rating-engine path.
 //!
 //! This intentionally avoids an external benchmark framework so it can run in
-//! `cargo run --example bench_scaling` and emit JSONL receipts for docs/CI jobs.
+//! `cargo run --example bench_scaling` and emit JSONL measurements for docs/CI jobs.
 
 use std::collections::HashMap;
 use std::env;
@@ -20,7 +20,7 @@ const MAX_PLANNER_CANDIDATES: usize = 50_000;
 
 const DEFAULT_MAX_N: usize = 250;
 const DEFAULT_OUT: &str = "artifacts/bench/scaling.jsonl";
-const RECEIPT_SCHEMA: &str = "bench_scaling_v2";
+const REPORT_SCHEMA: &str = "bench_scaling_v2";
 const RATER_ID: &str = "bench";
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -125,7 +125,7 @@ fn run_case(
     let planner_ms = planner_started.elapsed().as_secs_f64() * 1_000.0;
 
     Ok(json!({
-        "receipt_schema": RECEIPT_SCHEMA,
+        "report_schema": REPORT_SCHEMA,
         "build": build_metadata,
         "limits": {
             "max_n_arg": max_n_arg,

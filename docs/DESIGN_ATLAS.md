@@ -2,9 +2,9 @@
 
 `cargo run --example design_atlas` enumerates every circulant design
 C_n(S) for n ∈ {8, 10, 12} and scores its invariant profile: edges
-(budget), filled triangles (support for the LOCAL curl receipt),
-harmonic dimension (support for the GLOBAL, triad-invisible receipt —
-zero means that receipt is structurally dead), and the Fiedler value
+(budget), filled triangles (support for the LOCAL curl diagnostic),
+harmonic dimension (support for the GLOBAL, triad-invisible diagnostic —
+zero means that diagnostic is structurally dead), and the Fiedler value
 (identifiability). Milliseconds of compute; the point is that design
 intuition loses to exhaustive search even at n = 8.
 
@@ -21,7 +21,7 @@ hand-picked design was one stride away from strictly better, and nothing
 short of enumeration would have said so: the v1 harmonic block had to be
 bolted on as a DISJOINT component (whose scores don't share the main
 graph's gauge) precisely because the core graph couldn't host the
-receipt. C₈(1,3,4) hosts both receipts on the SAME entities.
+diagnostic. C₈(1,3,4) hosts both diagnostics on the SAME entities.
 
 Recommendation (routed to #49): JCB v2's core graph is C₈(1,3,4) per
 8-entity domain block. v1.x keeps its frozen design — versioned
@@ -34,12 +34,12 @@ profiles so any silent change surfaces.
   triangles, harmonic_dim 15. A design for measuring global cyclicity
   almost exclusively; useful as a dedicated probe when triad-invisible
   structure is the question.
-- **Dual-receipt designs are the exception, not the rule**: of 15
+- **Dual-diagnostic designs are the exception, not the rule**: of 15
   connected circulants at n = 8, exactly three have both triangles ≥ 4
   and harmonic_dim ≥ 1. Dense designs fill their cycle space with
   triangles (harmonic dies); sparse ones lose triangles (curl dies). The
   window is narrow, which is exactly why it must be searched.
-- Best identifiability-per-edge at n = 8 with both receipts alive:
+- Best identifiability-per-edge at n = 8 with both diagnostics alive:
   C₈(1,3,4) at fiedler/edge = 0.200.
 
 Full tables regenerate deterministically from the example. Extend the

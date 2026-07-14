@@ -1,6 +1,6 @@
 //! Template-gain calibration: mixed-wording evidence that calibrates itself.
 //!
-//! The wording-invariance receipts (2026-07-05) measured that the SAME
+//! The wording-invariance measurements (2026-07-05) found that the SAME
 //! judgement elicited through different wordings comes back with different
 //! magnitudes — the fraction wording runs +0.35…+0.92 nats hotter than the
 //! ratio wording on frontier models, directions intact. The
@@ -57,8 +57,13 @@ pub struct GainCalibratedSolve {
 fn solve_scores(n: usize, obs: &[(usize, usize, f64)]) -> Option<Vec<f64>> {
     let mut raters = HashMap::new();
     raters.insert("gain".to_string(), RaterParams::default());
-    let mut engine =
-        RatingEngine::new(n, AttributeParams::default(), raters, Some(Config::default())).ok()?;
+    let mut engine = RatingEngine::new(
+        n,
+        AttributeParams::default(),
+        raters,
+        Some(Config::default()),
+    )
+    .ok()?;
     let observations: Vec<Observation> = obs
         .iter()
         .map(|&(i, j, m)| Observation::from_log_ratio_moments(i, j, m, 1.0, "gain", 1.0))
@@ -94,14 +99,12 @@ pub fn solve_with_template_gains(
     templates.sort();
     templates.dedup();
 
-    let mut gains: HashMap<String, f64> =
-        templates.iter().map(|t| (t.clone(), 1.0)).collect();
+    let mut gains: HashMap<String, f64> = templates.iter().map(|t| (t.clone(), 1.0)).collect();
 
     // Uncalibrated baseline: one solve pretending every template has g = 1.
     let naive: Vec<(usize, usize, f64)> = obs.iter().map(|o| (o.i, o.j, o.log_ratio)).collect();
     let naive_scores = solve_scores(n, &naive)?;
-    let unit_gains: HashMap<String, f64> =
-        templates.iter().map(|t| (t.clone(), 1.0)).collect();
+    let unit_gains: HashMap<String, f64> = templates.iter().map(|t| (t.clone(), 1.0)).collect();
     let rms_residual_uncalibrated = rms(obs, &naive_scores, &unit_gains);
 
     let mut scores = naive_scores;
@@ -145,10 +148,8 @@ pub fn solve_with_template_gains(
     }
 
     let rms_residual = rms(obs, &scores, &gains);
-    let mut gains_out: Vec<(String, f64)> = templates
-        .iter()
-        .map(|t| (t.clone(), gains[t]))
-        .collect();
+    let mut gains_out: Vec<(String, f64)> =
+        templates.iter().map(|t| (t.clone(), gains[t])).collect();
     gains_out.sort_by(|a, b| a.0.cmp(&b.0));
 
     Some(GainCalibratedSolve {

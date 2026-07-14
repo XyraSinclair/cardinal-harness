@@ -22,7 +22,7 @@
 //! the criteria↔alternatives subchain is bipartite when α = 0 and plain
 //! powers then oscillate with period 2; the average converges regardless.
 //!
-//! The headline receipt is mathematical: limiting criteria weights vs the
+//! The headline diagnostic is mathematical: limiting criteria weights vs the
 //! direct AHP weights — the network correction, per criterion, in
 //! probability mass. Every edge of the supermatrix is a solved pairwise
 //! measurement, never an assertion.
@@ -181,12 +181,11 @@ fn execution<'a>(
     seed: u64,
     tag: &'static str,
 ) -> RerankExecution<'a> {
-    let mut execution = RerankExecution::new(gateway, Attribution::new(tag)).run_options(
-        RerankRunOptions {
+    let mut execution =
+        RerankExecution::new(gateway, Attribution::new(tag)).run_options(RerankRunOptions {
             rng_seed: Some(seed),
             cache_only: false,
-        },
-    );
+        });
     if let Some(cache) = cache {
         execution = execution.cache(cache);
     }

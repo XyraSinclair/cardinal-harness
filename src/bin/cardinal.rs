@@ -104,7 +104,7 @@ enum Commands {
         also_by: Vec<String>,
         /// Ask each planned pair in one random order only, instead of the
         /// default both-orders counterbalancing (halves cost, loses the
-        /// position-bias receipt)
+        /// position-bias diagnostic)
         #[arg(long)]
         no_counterbalance: bool,
         /// Prompt template: canonical_v2 (default), canonical_bucket_v1, or
@@ -188,7 +188,7 @@ enum Commands {
     /// with the counterbalanced pairwise machinery, and report where the
     /// focal item actually lands per attribute — percentile and z-score,
     /// best direction first. Proposals are hypotheses; the profile is the
-    /// receipt.
+    /// evidence.
     Distinguish {
         /// Input file; '-' or omitted reads stdin (one item per line, or a
         /// JSON array of strings / {id, text} objects)
@@ -296,7 +296,7 @@ enum Commands {
     /// alternatives measured per criterion, and alternatives feeding back
     /// into criteria weights via their per-criterion z-scores. Priorities
     /// are the Cesàro limit of the influence walk from the goal. The
-    /// headline receipt: limiting vs direct criteria weights — the network
+    /// headline diagnostic: limiting vs direct criteria weights — the network
     /// correction in probability mass.
     Anp {
         /// Alternatives file; '-' or omitted reads stdin (one per line, or
@@ -435,7 +435,7 @@ enum Commands {
         /// provider prompt caching bills it at the cached rate) and report
         /// the mean, the spread sigma_w — the within-pair
         /// context-sensitivity noise the DL floor consumes — and the
-        /// provider's cached-token receipt
+        /// provider's cached-token count
         #[arg(long)]
         draws: Option<usize>,
         /// Sampling temperature for --draws (default 0: spread = pure
@@ -697,31 +697,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 return Ok(());
             }
 
-            let have_key = std::env::var("OPENROUTER_API_KEY").is_ok();
-            let gateway = if have_key {
-                ProviderGateway::from_env(Arc::new(NoopUsageSink))?
-            } else if cache_only {
-                // Keyless cache-only runs never reach the network; use an
-                // inert adapter so a fully cached sort works offline.
-                let adapter =
-                    cardinal_harness::gateway::openrouter::OpenRouterAdapter::with_config(
-                        "cache-only",
-                        "http://127.0.0.1:9",
-                        std::time::Duration::from_secs(1),
-                        None,
-                        None,
-                    )?;
-                ProviderGateway::with_config(
-                    adapter,
-                    Arc::new(NoopUsageSink),
-                    cardinal_harness::gateway::GatewayConfig::default(),
-                )
-            } else {
-                return Err("OPENROUTER_API_KEY is not set. Create a key at \
-                     https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`, \
-                     or use --cache-only to replay cached judgements."
-                    .into());
-            };
+            let gateway = provider_gateway(cache_only)?;
 
             let cache_store = if no_cache {
                 None
@@ -1097,11 +1073,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             // Resolve the focal item: 1-based line number, id, or exact text.
             let focal_id = if let Ok(index) = focus.parse::<usize>() {
                 if index == 0 || index > documents.len() {
-                    return Err(format!(
-                        "--focus {index} out of range (1..={})",
-                        documents.len()
-                    )
-                    .into());
+                    return Err(
+                        format!("--focus {index} out of range (1..={})", documents.len()).into(),
+                    );
                 }
                 documents[index - 1].id.clone()
             } else if let Some(doc) = documents.iter().find(|d| d.id == focus) {
@@ -1174,11 +1148,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .map(|d| d.text.clone())
                 .unwrap_or_default();
             let profile = cardinal_harness::rerank::differentiation_profile(
-                documents,
-                &focal_id,
-                candidates,
-                execution,
-                opts,
+                documents, &focal_id, candidates, execution, opts,
             )
             .await?;
 
@@ -1309,7 +1279,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             if propose > 0 {
                 let (proposed, usage) = cardinal_harness::rerank::propose_rewordings(
                     gateway.as_ref(),
-                    judge_list.first().map(String::as_str).unwrap_or("openai/gpt-5.4-mini"),
+                    judge_list
+                        .first()
+                        .map(String::as_str)
+                        .unwrap_or("openai/gpt-5.4-mini"),
                     &by,
                     propose,
                     Attribution::new("cardinal::canonize::propose"),
@@ -1349,10 +1322,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             if json {
                 println!("{}", serde_json::to_string_pretty(&report)?);
             } else {
-                println!(
-                    "{:<7} {:>7} {:>7}  wording",
-                    "trans", "signal", "redund"
-                );
+                println!("{:<7} {:>7} {:>7}  wording", "trans", "signal", "redund");
                 for c in &report.candidates {
                     let t = c
                         .transmissibility
@@ -1592,9 +1562,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     "cost $"
                 );
                 for (idx, r) in reports.iter().enumerate() {
-                    let f = |v: Option<f64>| {
-                        v.map(|x| format!("{x:.3}")).unwrap_or_else(|| "-".into())
-                    };
+                    let f =
+                        |v: Option<f64>| v.map(|x| format!("{x:.3}")).unwrap_or_else(|| "-".into());
                     println!(
                         "{:<4} {:<34} {:>7} {:>7} {:>9} {:>6} {:>6} {:>7} {:>7} {:>8.4}",
                         idx + 1,
@@ -1908,9 +1877,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         }
                     }
                     match report.sign_consistent {
-                        Some(true) => println!(
-                            "inversion: OK — the judge can mirror its own scale"
-                        ),
+                        Some(true) => {
+                            println!("inversion: OK — the judge can mirror its own scale")
+                        }
                         Some(false) => println!(
                             "inversion: FAILS — asking \"which has less\" flips the belief"
                         ),
@@ -1987,7 +1956,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     match report.belief_survives_sweep {
                         Some(true) => println!("sign(m) constant over the sweep: yes"),
                         Some(false) => println!("sign(m) constant over the sweep: no"),
-                        None => println!("sign(m) constant over the sweep: undetermined (m(0) = 0)"),
+                        None => {
+                            println!("sign(m) constant over the sweep: undetermined (m(0) = 0)")
+                        }
                     }
                 }
                 eprintln!(
@@ -2522,7 +2493,7 @@ no combination of these attributes reconstructs your ranking"
                 rng_seed,
                 cache_only,
             };
-            let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
+            let gateway = provider_gateway(cache_only)?;
 
             let (trace_sink, trace_worker) = if let Some(path) = trace {
                 let (sink, worker) = JsonlTraceSink::new(path)?;
@@ -2712,6 +2683,34 @@ fn csv_field(raw: &str) -> String {
     } else {
         raw.to_string()
     }
+}
+
+fn provider_gateway(
+    cache_only: bool,
+) -> Result<ProviderGateway<NoopUsageSink>, Box<dyn std::error::Error>> {
+    if cache_only {
+        let adapter = cardinal_harness::gateway::openrouter::OpenRouterAdapter::with_config(
+            "cache-only",
+            "http://127.0.0.1:9",
+            std::time::Duration::from_secs(1),
+            None,
+            None,
+        )?;
+        return Ok(ProviderGateway::with_config(
+            adapter,
+            Arc::new(NoopUsageSink),
+            cardinal_harness::gateway::GatewayConfig::default(),
+        ));
+    }
+
+    if std::env::var("OPENROUTER_API_KEY").is_err() {
+        return Err("OPENROUTER_API_KEY is not set. Create a key at \
+             https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`, \
+             or use --cache-only to replay cached judgements."
+            .into());
+    }
+
+    Ok(ProviderGateway::from_env(Arc::new(NoopUsageSink))?)
 }
 
 fn load_policy(

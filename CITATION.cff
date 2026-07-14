@@ -20,4 +20,4 @@ abstract: >-
   via robust IRLS over the comparison graph, actively selects the
   most informative next comparison, and stops when the top-k
   ranking is certain within a stated budget. It records full
-  cost, usage, and trace receipts for every run.
+  cost, usage, and trace evidence for every run.

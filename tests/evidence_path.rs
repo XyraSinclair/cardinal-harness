@@ -486,7 +486,7 @@ async fn evidence_provider_error_trace_retains_error_and_rendered_identity() {
 }
 
 #[tokio::test]
-async fn letter_path_recovers_planted_order_with_logprob_receipts() {
+async fn letter_path_recovers_planted_order_with_logprob_evidence() {
     let server = start_judge(LetterJudge {
         reject_logprobs: false,
         omit_logprobs: false,
@@ -512,7 +512,10 @@ async fn letter_path_recovers_planted_order_with_logprob_receipts() {
         sorted.meta.evidence_judgements
     );
     let mass = sorted.meta.evidence_visible_mass_mean.unwrap();
-    assert!((mass - 0.95).abs() < 1e-6, "visible mass receipt: {mass}");
+    assert!(
+        (mass - 0.95).abs() < 1e-6,
+        "visible mass diagnostic: {mass}"
+    );
     // Counterbalancing still measured (letter judge is content-driven).
     assert!(sorted.meta.pairs_counterbalanced > 0);
     assert_eq!(sorted.meta.position_flips, 0);
@@ -533,7 +536,7 @@ async fn logprob_rejection_degrades_loudly_to_sampled_mode() {
     let texts: Vec<&str> = sorted.items.iter().map(|i| i.text.as_str()).collect();
     assert_eq!(texts[0], "alpha ****");
     assert_eq!(texts[3], "delta *");
-    // ...and the receipts say, loudly, that no judgement ran in logprob mode.
+    // ...and run metadata says, loudly, that no judgement ran in logprob mode.
     assert!(sorted.meta.evidence_judgements > 0);
     assert_eq!(sorted.meta.logprob_mode_judgements, 0);
     let mass = sorted.meta.evidence_visible_mass_mean.unwrap();
@@ -607,7 +610,7 @@ async fn evidence_moments_survive_the_cache_round_trip() {
 }
 
 #[tokio::test(flavor = "multi_thread")]
-async fn cli_sort_with_letter_template_prints_evidence_receipts() {
+async fn cli_sort_with_letter_template_prints_evidence_diagnostics() {
     let server = start_judge(LetterJudge {
         reject_logprobs: false,
         omit_logprobs: false,
@@ -721,7 +724,7 @@ impl Respond for OrdinalJudge {
 }
 
 #[tokio::test]
-async fn ordinal_dialect_judge_full_pipeline_with_residual_receipt() {
+async fn ordinal_dialect_judge_full_pipeline_with_residual_diagnostic() {
     let server = MockServer::start().await;
     Mock::given(method("POST"))
         .and(path("/chat/completions"))
@@ -886,7 +889,7 @@ async fn calibrate_catches_position_prior_and_clears_honest_judge() {
 }
 
 #[tokio::test]
-async fn frustration_receipt_zero_for_transitive_judge_high_for_cyclic() {
+async fn frustration_diagnostic_zero_for_transitive_judge_high_for_cyclic() {
     // Transitive star judge: curl fraction ~0.
     let server = start_judge(LetterJudge {
         reject_logprobs: false,
@@ -902,7 +905,7 @@ async fn frustration_receipt_zero_for_transitive_judge_high_for_cyclic() {
     // Not ~0, and honestly so: the star judge is transitive in DIRECTION
     // but answers bucketed magnitudes (1.5 / 3.9), which are not
     // log-additive — quantization alone injects real curl (~0.13 here).
-    // The receipt measuring that is a feature: magnitude inconsistency is
+    // The diagnostic measuring that is a feature: magnitude inconsistency is
     // inconsistency. The pin separates quantization-level curl from
     // structural cycles (below).
     assert!(

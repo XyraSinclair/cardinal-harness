@@ -1,5 +1,5 @@
 <meta charset="utf-8">
-<title>One judgement is a belief. The other is an echo. — interactive susceptibility receipts</title>
+<title>One judgement is a belief. The other is an echo. — interactive susceptibility evidence</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 :root{--paper:#F4F5F2;--ink:#1C2420;--muted:#66716B;--accent:#2A6E62;--accent-ink:#1E5148;--line:#D8DCD4;--card:#FBFBF9;
@@ -70,7 +70,7 @@ footer code{font-family:ui-monospace,monospace;font-size:.75rem}
 </style>
 
 <div class="wrap">
-<div class="eyebrow">cardinal-harness · interactive receipt viewer · measured 2026-07-05</div>
+<div class="eyebrow">cardinal-harness · interactive evidence viewer · measured 2026-07-05</div>
 <h1>One judgement is a belief. The other is an echo.</h1>
 <p class="thesis">The same two aphorisms, the same criterion, the same question — asked under a
 requester note that leans harder and harder one way. A judgement earns the name
@@ -149,45 +149,45 @@ not yet determined.</p>
 <div id="chartbox"></div>
 <div id="tip"></div>
 
-<h2>Two-point probe receipts (the same instrument, cheaper)</h2>
+<h2>Two-point probe evidence (the same instrument, cheaper)</h2>
 <p class="thesis">Before the sweep existed, the probe used one secant: neutral, one pro-A framing,
-one pro-B framing (6 comparisons, ~$0.002). Three receipts, three different verdicts —
+one pro-B framing (6 comparisons, ~$0.002). Three runs, three different verdicts —
 susceptibility is <strong>state-dependent, not a model constant</strong>: the same
 gpt-5.4-mini that echoes on the contested pair leans slightly <em>against</em> the
 asker on a clear one.</p>
 <div class="cards" id="probes"></div>
 
-<div class="caveat"><strong>Denominators and noise, before you quote this.</strong> Every receipt here is
+<div class="caveat"><strong>Denominators and noise, before you quote this.</strong> Every result here is
 n&nbsp;=&nbsp;1 pair — an <em>instrument demonstration</em>, never a model property. The
 two-point probe measured gpt-5.4-mini's neutral at exactly 0.000; the sweep, a
 separate run, measured m(0) = −0.227 — that spread is what run-to-run noise on a
-contested pair looks like, and both receipts stand as measurements of their own
+contested pair looks like, and both measurements stand for their own
 runs. Judgments land on a discrete ratio ladder and each cell is a mean over two
 presentation orders, so exact repeats across cells (e.g. 0.916 = ln 2.5 twice)
 are genuine, not transcription errors. Wording erratum, on the record: the first
 shipped framing reached models with <code>'</code> HTML-escaped to
 <code>&amp;apos;</code>; all framings shown here are the corrected, apostrophe-free
-wordings, and earlier receipts remain valid as measurements of the bytes actually sent.</div>
+wordings, and earlier measurements remain valid for the bytes actually sent.</div>
 
 <details><summary>Every measured number on this page, as a table</summary>
 <table id="datatable"></table>
 </details>
 
 <footer>
-<p>Raw receipts, replayable: <code>artifacts/live/spin-sweep-2026-07-05/contested_gpt-5.4-mini.json</code> ·
+<p>Raw evidence, replayable: <code>artifacts/live/spin-sweep-2026-07-05/contested_gpt-5.4-mini.json</code> ·
 <code>contested_claude-sonnet-4.6.json</code> ·
 <code>artifacts/live/spin-probe-2026-07-05/contested_pair_gpt-5.4-mini.json</code> ·
 <code>contested_pair_gemini-2.5-flash.json</code> · <code>clear_pair_shininess.json</code>.
 Instrument: <code>cardinal judge --spin / --sweep</code> (<code>src/rerank/spin.rs</code>);
 framing wordings rendered above are the literal templates from that file. Scripted-pathology
 pins for this instrument (exact slope recovery, step-function exposure at R² &lt; 0.9) live in
-<code>tests/judge_explain_cli.rs</code>. cardinal-harness, receipts culture: every number
+<code>tests/judge_explain_cli.rs</code>. cardinal-harness, evidence culture: every number
 recomputable from the committed JSON.</p>
 </footer>
 </div>
 
 <script>
-// ── Data: verbatim from committed receipts. Do not edit here; edit nothing — fix the receipts. ──
+// ── Data: verbatim from committed evidence. Do not edit here; fix the source data. ──
 const SWEEP = {
   gpt: {
     name: "gpt-5.4-mini", color: "#157F63",

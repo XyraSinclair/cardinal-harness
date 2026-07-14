@@ -1,8 +1,6 @@
 # cardinal-harness
 
 [![CI](https://github.com/XyraSinclair/cardinal-harness/actions/workflows/ci.yml/badge.svg)](https://github.com/XyraSinclair/cardinal-harness/actions/workflows/ci.yml)
-[![crates.io](https://img.shields.io/crates/v/cardinal-harness.svg)](https://crates.io/crates/cardinal-harness)
-[![docs.rs](https://img.shields.io/docsrs/cardinal-harness)](https://docs.rs/cardinal-harness)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 **Does the model actually believe what it just told you — or was it only
@@ -11,9 +9,9 @@ you the number. A preference earns the name *belief* only if it survives the
 transformations that shouldn't matter — presentation order, wording,
 polarity, who's asking. This engine elicits LLM judgements as noisy
 measurements, tests them against exactly that battery, and prices everything
-that fails it in nats, with receipts. (Watch one judgement bend under
+that fails it in nats, with evidence. (Watch one judgement bend under
 framing while another refuses to move, on live committed data:
-[the receipt viewer](artifacts/live/receipt-viewer-2026-07-08/).)
+[the evidence viewer](artifacts/live/evidence-viewer-2026-07-08/).)
 
 The everyday verb is sorting:
 
@@ -25,7 +23,7 @@ $ cardinal sort ideas.txt --by "expected impact on retention"
 times more of X does A have than B?") into globally consistent **cardinal
 scores with uncertainty**, spends each next comparison where it buys the most
 information about the order, and stops when the top-k is certain enough — or
-the budget runs out. Every run returns receipts: comparisons, tokens, dollar
+the budget runs out. Every run returns evidence: comparisons, tokens, dollar
 cost, stop reason, and an optional per-judgement trace.
 
 ## Why not just ask the model to sort?
@@ -49,7 +47,7 @@ it losing to uniform random pair selection; the fix (anchor-diverse
 exploration, replacing a hub-and-spoke geometry) now has it winning at
 scarce budgets (where saving comparisons matters), tying at medium ones,
 and slightly trailing random at large budgets on global order — all pinned
-two-sided, history preserved in the test file and issue #43. The receipts
+two-sided, history preserved in the test file and issue #43. The evidence
 culture applies to our own planner first.
 
 What you get that the alternatives don't, in one package:
@@ -58,19 +56,24 @@ What you get that the alternatives don't, in one package:
 - **Uncertainty per item** and a top-k error estimate, honestly reported.
 - **Active pair selection** and principled stopping under an explicit budget.
 - **Counterbalancing by default**: every planned pair is asked in both presentation orders, and the disagreement rate is reported — position bias measured, not assumed away.
-- **Attribute health probes**: judge the opposite side of your criterion (`--two-sided`) and alternate phrasings (`--also-by`), get rank-consistency receipts that tell you whether the attribute even coheres for this judge.
-- **Receipts**: each JSONL row binds the exact rendered prompt and solver `Observation` to one content-addressed `EngineSpec`, alongside token/cost accounting, SQLite cache, and seeded reproducibility.
+- **Attribute health probes**: judge the opposite side of your criterion (`--two-sided`) and alternate phrasings (`--also-by`), get rank-consistency evidence that tells you whether the attribute even coheres for this judge.
+- **Provenance**: each JSONL row binds the exact rendered prompt and solver `Observation` to one content-addressed `EngineSpec`, alongside token/cost accounting, SQLite cache, and seeded reproducibility.
 
 ## Quickstart
 
 ```bash
-cargo install cardinal-harness
+cargo install --git https://github.com/XyraSinclair/cardinal-harness --locked
 export OPENROUTER_API_KEY=your_key_here   # any model on OpenRouter
 
 cardinal sort examples/sort-demo.txt --by "usefulness as advice for a software engineer" --scores
 ```
 
-Real output (preserved, with full receipts, under
+This builds current `main`. Tagged binaries are available from
+[GitHub Releases](https://github.com/XyraSinclair/cardinal-harness/releases);
+the crate is not currently published to crates.io because `seriate` is a
+git-only dependency.
+
+Real output (preserved with full evidence under
 [`artifacts/live/sort-demo-2026-07-02/`](artifacts/live/sort-demo-2026-07-02/)):
 
 ```text
@@ -86,7 +89,7 @@ Real output (preserved, with full receipts, under
 sorted 8 items by "usefulness as advice for a software engineer" · 32 comparisons (1 cached, 0 refused) · $0.0500 · stop: budget_exhausted
 ```
 
-Note what the receipt admits: at the default 4·n budget those posterior stds
+Note what the evidence shows: at the default 4·n budget those posterior stds
 overlap. You get a well-motivated point estimate of the order, not a certified
 one — raise `--budget` or focus `--top-k` when you need certainty. The same
 run replays offline, keyless, for $0 via `--cache-only`.
@@ -109,10 +112,10 @@ or rejects logprobs, the path degrades loudly to sampled mode and the run
 summary says so (`evidence: 63/63 logprob-mode, visible 0.99`).
 
 Live head-to-head at equal budget and cost on gpt-5.4-mini
-([receipts](artifacts/live/evidence-path-2026-07-04/)): top-to-bottom
+([evidence](artifacts/live/evidence-path-2026-07-04/)): top-to-bottom
 separation **≈4.0σ vs ≈1.4σ** for the canonical JSON path — roughly 3× the
 resolving power per dollar, because each call consumes the model's prior
-instead of one sample from it. Caveats in the receipt pack, including that
+instead of one sample from it. Caveats in the evidence pack, including that
 the two instruments induce correlated but not identical orderings
 (Spearman 0.74) — different elicitations tap different priors.
 
@@ -189,16 +192,16 @@ there, from most magic to most manual:
   ranked by transmissibility — the mean cross-judge rank agreement of the
   induced latents. An attribute is a communication primitive exactly when
   different minds recover the same cardinal latent from it; this measures
-  that, with redundancy receipts against your already-accepted dimensions.
+  that, with redundancy evidence against your already-accepted dimensions.
 - **`cardinal distinguish list.txt --focus 12`** — the propagation
   primitive: given a set and one focal item, propose (or pass `--by`)
   candidate attributes, measure ALL of them over the whole set, and report
   where the focal item actually lands per attribute — percentile and
   z-score, best direction first. The proposal is a hypothesis; the measured
-  profile is the receipt. This is how you find the attribute under which a
+  profile is the evidence. This is how you find the attribute under which a
   differentiated item deserves to travel.
 
-A real explain receipt (preserved under
+A real explain evidence pack (preserved under
 [`artifacts/live/taste-tools-demo-2026-07-02/`](artifacts/live/taste-tools-demo-2026-07-02/)),
 run against a ranking whose true generating attribute was known:
 
@@ -220,7 +223,7 @@ list; a demonstration of the mechanism, not a benchmark.)
 When only the top of a list matters, `--top-k K` focuses the planner on the
 K-boundary and `--prune-below <p>` additionally stops spending exploration
 comparisons on items whose posterior chance of reaching the top-K drops below
-`p` — the pruned count lands in the receipts as `entities_pruned`.
+`p` — the pruned count lands in run metadata as `entities_pruned`.
 
 ## The Judge Coherence Benchmark
 
@@ -238,22 +241,22 @@ invariance but can't know the negated attribute must reverse; a sycophant
 keeps its correlations and loses spin), and the benchmark validates itself:
 five scripted pathological judges — oracle, constant, position-biased,
 sycophant, cyclic — run the full battery in the test suite, and each must
-be caught by exactly the dimension that names it. 114 comparisons per
+be caught by exactly the dimension that names it. 194 comparisons per
 model, ~$0.05 on mini-class models, every rate with its denominator and
 95% CI. Full argument, formulas, gaming analysis, and honest caveats:
-[`docs/BENCHMARK.md`](docs/BENCHMARK.md). Live leaderboard receipts:
+[`docs/BENCHMARK.md`](docs/BENCHMARK.md). Live leaderboard evidence:
 [`artifacts/live/judge-bench-2026-07-05/`](artifacts/live/judge-bench-2026-07-05/).
 
-To *feel* what the spin axis measures, open the interactive receipt viewer
-([`artifacts/live/receipt-viewer-2026-07-08/`](artifacts/live/receipt-viewer-2026-07-08/),
+To *feel* what the spin axis measures, open the interactive evidence viewer
+([`artifacts/live/evidence-viewer-2026-07-08/`](artifacts/live/evidence-viewer-2026-07-08/),
 serve `artifacts/live/` with any static server): a contested pair, a
 framing-field slider from insistent-pro-B to insistent-pro-A, and the
 judge's measured belief moving under it — gpt-5.4-mini echoing at
 +0.200 nats/step while claude-sonnet-4.6 holds direction at every field
-point. Every number on the page is selected from committed receipts (never
+point. Every number on the page is selected from committed evidence (never
 interpolated), and a regression test
 ([`tests/live_artifact_pages.rs`](tests/live_artifact_pages.rs)) pins the
-page to the receipt bytes so they cannot drift apart.
+page to the source bytes so they cannot drift apart.
 
 ## Library
 
@@ -312,13 +315,13 @@ This crate is the bounded structured-judgment kernel for that system, not the
 feed host. Consumer systems such as ExoPriors own corpus ingestion, identity,
 retrieval, nearest-neighbor indexes, user history, and delivery. They hand
 cardinal-harness a finite candidate set and receive criterion-separable
-posteriors plus receipts. “Nearest,” “relevant,” “well-prioritized,” and
-“tagged” can share those receipts, but they are not interchangeable scores:
+posteriors plus evidence. “Nearest,” “relevant,” “well-prioritized,” and
+“tagged” can share that evidence, but they are not interchangeable scores:
 retrieval, query relevance, multi-criteria prioritization, and classification
 have different denominators and failure modes.
 
 The judgment engine and packet-fusion core exist today. A portable run bundle,
-recipient-side offline reweighting and contestation, generic receipt rendering,
+recipient-side offline reweighting and contestation, generic evidence rendering,
 and incremental lane generations do not. Until those contracts exist, this is
 honestly a batch judgment compiler for shortlists—not a feed product.
 
@@ -345,17 +348,17 @@ compare.
 
 The trade is explicit: this costs more than one-shot scoring, saves
 comparisons versus exhaustive pairwise judging, and returns uncertainty plus
-receipts instead of only a sorted list. The public evidence is deliberately
+evidence instead of only a sorted list. The public evidence is deliberately
 reproducible and deliberately narrow — it does **not** show a universal win:
 
-- Offline synthetic evaluation and Likert/scalar comparison receipts live under `artifacts/eval/`.
-- Preserved real OpenRouter cardinal-policy receipts live under `artifacts/live/openrouter-benchmark-2026-06-30/`: three policy runs, 459 fresh provider comparisons, 0 cache hits, 0 refusals, $0.994335 provider-reported cost.
+- Offline synthetic evaluation and Likert/scalar comparison evidence lives under `artifacts/eval/`.
+- Preserved real OpenRouter cardinal-policy evidence lives under `artifacts/live/openrouter-benchmark-2026-06-30/`: three policy runs, 459 fresh provider comparisons, 0 cache hits, 0 refusals, $0.994335 provider-reported cost.
 - A live structured-judgment method comparison lives under `artifacts/live/method-comparison-2026-06-30-suite-v1/`: scalar matrix vs whole-list sort vs ordinal pairwise vs cardinal pairwise-ratio, judged against a separate LLM reference across six frozen task families.
-- A live `sort` demo receipt lives under `artifacts/live/sort-demo-2026-07-02/`.
-- `tests/live_method_receipts.rs` guards the live method pack: schema version, frozen suite hash, per-call receipts, usage totals, and absence of provider keys or local paths.
-- The compact five-metric offline summary is mixed: 10 cardinal wins, 12 Likert wins, 18 ties. The raw-receipt delta reports 10/12/20 across 42 comparable rows.
+- A live `sort` evidence pack lives under `artifacts/live/sort-demo-2026-07-02/`.
+- `tests/live_method_evidence.rs` guards the live method pack: schema version, frozen suite hash, per-call evidence, usage totals, and absence of provider keys or local paths.
+- The compact five-metric offline summary is mixed: 10 cardinal wins, 12 Likert wins, 18 ties. The raw-evidence delta reports 10/12/20 across 42 comparable rows.
 - The live method comparison is also mixed: cardinal ties the best regime on two task families, stays close on two, and lags sharply on two.
-- All current cardinal synthetic runs stop at `budget_exhausted`; the receipts do not prove early stopping or lower cost.
+- All current cardinal synthetic runs stop at `budget_exhausted`; the evidence does not prove early stopping or lower cost.
 - Equal call counts are not equal token cost: pairwise prompts carry two items, scalar prompts one.
 - An adversarial test battery (266 tests, [docs/TESTING.md](docs/TESTING.md)) pins the solver's mathematical claims — planted-truth recovery, Huber influence bounds, calibration coverage, pathological-judge behavior, method head-to-heads — and its honest negatives: ordinal beats ratio under heavy noise, and the budget-efficiency claim remains unproven.
 
@@ -384,9 +387,9 @@ Two prompt templates are supported:
 
 | Slug | Output shape | Use when |
 |------|--------------|----------|
-| `canonical_v2` | `{"higher_ranked":"A|B","ratio":1.0..26.0,"confidence":0.0..1.0}` | Default pairwise-ratio judgement. Use this unless you specifically need bucket-token logprobs. |
-| `canonical_bucket_v1` | `{"higher_ranked":"A|B","ratio_bucket":0..16,"confidence":0.0..1.0}` | Bucket-index variant for runs that need to map output logprobs onto the fixed ratio ladder. |
-| `ordinal_v1` | `{"higher_ranked":"A|B","confidence":0.0..1.0}` | Natural direction-only judgement; enters the solver as a fixed modest log-ratio. Strictly less informative than ratios — use as a baseline/control or when magnitude questions confuse the judge. |
+| `canonical_v2` | `{"higher_ranked":"A|B","ratio":1.0..26.0,"confidence":0.0..1.0}` | Default pairwise-ratio judgement. Self-reported confidence is trace metadata, not solver precision. |
+| `canonical_bucket_v1` | `{"higher_ranked":"A|B","ratio_bucket":0..16,"confidence":0.0..1.0}` | Bucket-index variant for runs that need to map output logprobs onto the fixed ratio ladder. Self-reported confidence is trace metadata. |
+| `ordinal_v1` | `{"higher_ranked":"A|B","confidence":0.0..1.0}` | Natural direction-only judgement; enters the solver as a fixed modest log-ratio with unit precision. Strictly less informative than ratios — use as a baseline/control or when magnitude questions confuse the judge. |
 
 Both templates use the same ratio ladder and the same refusal shape:
 `{"refused":true}`. Unknown `prompt_template_slug` values are rejected.
@@ -425,7 +428,7 @@ cargo run --bin cardinal -- report \
   --request examples/multi-rerank-request.json \
   --response output.json --out report.md
 
-# Offline synthetic evaluation receipts (no API key).
+# Offline synthetic evaluation evidence (no API key).
 cargo run --bin cardinal -- eval --out artifacts/eval/synthetic_eval.jsonl --curve-csv artifacts/eval/synthetic_curves.csv
 cargo run --bin cardinal -- eval-likert --out artifacts/eval/likert_eval.jsonl --curve-csv artifacts/eval/likert_curves.csv
 cargo run --bin cardinal -- eval-compare --mode ratio --out artifacts/eval/comparison_summary.json
@@ -436,7 +439,7 @@ cargo run --bin cardinal -- cache-prune --max-age-days 30
 ```
 
 Live benchmark scripts (`examples/live_openrouter_benchmark.py`,
-`examples/live_method_comparison.py`) reproduce the checked-in receipt packs;
+`examples/live_method_comparison.py`) reproduce the checked-in evidence packs;
 both require `OPENROUTER_API_KEY` and spend provider credits.
 
 ## Architecture
@@ -464,15 +467,15 @@ list or request JSON
 ## Documentation
 
 - [docs/MATH_FRONTIER.md](docs/MATH_FRONTIER.md): the mathematical roadmap for cardinal & stable prior elicitation — Hodge split (shipped), spectral identifiability, elicitation-program equivalence, stochastic transitivity, pooling theory — with rejections recorded as findings
-- [docs/PRINCIPLES.md](docs/PRINCIPLES.md): the anti-slop discipline — refutability, scripted-pathology validation, denominators, mathematical register — each rule with the receipt that earned it
+- [docs/PRINCIPLES.md](docs/PRINCIPLES.md): the anti-slop discipline — refutability, scripted-pathology validation, denominators, mathematical register — each rule with the evidence that earned it
 - [docs/ALGORITHM.md](docs/ALGORITHM.md): scoring, uncertainty, stopping, and evaluation rationale
 - [docs/MODEL.md](docs/MODEL.md): compact mathematical contract, assumptions, and failure modes
 - [docs/PROMPTS.md](docs/PROMPTS.md): supported prompt templates, output contracts, and JSON request examples
-- [docs/WORKED_EXAMPLE.md](docs/WORKED_EXAMPLE.md): concrete rerank walkthrough with request shape, gates, stop reasons, uncertainty, cache, and reproducibility receipts
-- [docs/EVALUATION.md](docs/EVALUATION.md): checked-in synthetic evaluation receipts and an honest cardinal-vs-Likert comparison
-- [docs/BENCHMARKS.md](docs/BENCHMARKS.md): scaling harness and current dense-solver receipt
+- [docs/WORKED_EXAMPLE.md](docs/WORKED_EXAMPLE.md): concrete rerank walkthrough with request shape, gates, stop reasons, uncertainty, cache, and reproducibility evidence
+- [docs/EVALUATION.md](docs/EVALUATION.md): checked-in synthetic evidence and an honest cardinal-vs-Likert comparison
+- [docs/BENCHMARKS.md](docs/BENCHMARKS.md): scaling harness and current dense-solver evidence
 - [docs/TESTING.md](docs/TESTING.md): the adversarial test battery — what it attacks, the two solver bugs it found, and the honest negatives it pinned
-- [docs/WHAT_WHY_HOW.md](docs/WHAT_WHY_HOW.md): the one-page shareable version — exactly what this is good for, why, and how, with receipts for every claim
+- [docs/WHAT_WHY_HOW.md](docs/WHAT_WHY_HOW.md): the one-page shareable version — exactly what this is good for, why, and how, with evidence for every claim
 - [docs/FIRST_PRINCIPLES.md](docs/FIRST_PRINCIPLES.md): the type system of structured judgement — the instrument grid (arity × scale × output-form), the invariance group of a belief, efficiency theory, and the honest occupancy map of which cells this repo fills
 - [docs/COMPARISON.md](docs/COMPARISON.md): how this relates to RankGPT-style listwise ranking, pairwise preference prompting, Bradley–Terry/Elo aggregation, and query-relevance rerankers
 

@@ -9,8 +9,8 @@ this list, and every row is labeled **covered** / **named-gap** /
 
 | Row | Status |
 |---|---|
-| Every published number recomputable from committed receipts (JSONL + replayable cache in dated `artifacts/live/` packs) | **covered** |
-| Committed HTML pages regression-pinned: charset + page/receipt verbatim-number drift (`tests/live_artifact_pages.rs`, both pins validated on planted fakes) | **covered** (map/leaderboard number-drift pins: **named-gap**) |
+| Every published number recomputable from committed evidence (JSONL + replayable cache in dated `artifacts/live/` packs) | **covered** |
+| Committed HTML pages regression-pinned: charset + page/source verbatim-number drift (`tests/live_artifact_pages.rs`, both pins validated on planted fakes) | **covered** (map/leaderboard number-drift pins: **named-gap**) |
 | Every probe/benchmark axis validated on a scripted pathology before live claims | **covered** |
 | Pricing/weighting formulas carry their own backtest that can lose (warranty backtest LOST 2026-07-09; confidence knob anti-calibrated) | **covered** |
 | Errata on top of the pack, downstream surfaces corrected same day | **covered by practice**; mechanical placement check: **named-gap** |
@@ -24,22 +24,22 @@ this list, and every row is labeled **covered** / **named-gap** /
 | First screen answers what/for-whom/why and leads with the one object (belief as invariant potential), sorting as the everyday verb right behind it | **covered** (this drive) |
 | One command produces a real result for a cold-cloner; keyless path via committed replayable cache stated explicitly | **named-gap** — quickstart assumes `OPENROUTER_API_KEY`; cache-replay demo exists but is not the stated first step |
 | No private names, session slang, or unresolvable references on entry surfaces | **named-gap** pending sweep |
-| Outer vocabulary plain (belief, echo, survives, breaks, moves with the asker); χ/Hodge/paramagnetic live in code, receipts' fine print, and maintainer docs where the math is literal | **named-gap** — council-sanctioned split, partially applied |
-| The ten-second feel: interactive receipt viewer linked beside the benchmark | **covered** |
+| Outer vocabulary plain (belief, echo, survives, breaks, moves with the asker); χ/Hodge/paramagnetic live in code, fine print, and maintainer docs where the math is literal | **named-gap** — council-sanctioned split, partially applied |
+| The ten-second feel: interactive evidence viewer linked beside the benchmark | **covered** |
 
 ## Depth
 
 | Row | Status |
 |---|---|
 | Theory doc regenerates the system from invariants (FIRST_PRINCIPLES as the maintainer appendix it is) | **covered**; front-door extraction of its arXiv-grade findings: **named-gap** |
-| The one verb (`believe`/`audit`: probe battery behind one word, verdict-first receipt) | **named-gap**, gated on held-out validation — bars pre-registered in `notes/council-essence-2026-07-09/SYNTHESIS.md`; time-axis timer runs in background, gates nothing else |
+| The one verb (`believe`/`audit`: probe battery behind one word, verdict-first summary) | **named-gap**, gated on held-out validation — bars pre-registered in `notes/council-essence-2026-07-09/SYNTHESIS.md`; time-axis timer runs in background, gates nothing else |
 | Verdict validated out-of-group (battery B: fresh paraphrases + wording inversion now; time axis when its clock lands) | **named-gap** — the ship-gate for the verb |
-| Observation model at Book form (interval-censored likelihood, #51) | **named-gap** — the standing consolidation jump |
-| Anti-calibrated confidence knob deleted from Config in one sweep (config + goldens + docs) | **named-gap** — verdict receipted, deletion staged |
+| Observation model at Book form (interval-censored likelihood, #51) | **partially covered** — corrected ordered-probit core and clean-channel comparison are off-path; contaminated-channel robustness, coverage, and production integration remain gated |
+| Anti-calibrated confidence knob deleted from Config in one sweep (config + goldens + docs) | **covered** — point observations now use measured precision or unit precision |
 | Rendered judge bytes are content-addressed directly; normal/evidence execution, cache, trace, and `judge --show-prompt` identify the actual instrument bytes | **covered** — phase 1 of #54; live and cache-hit evidence traces are pinned against exact provider messages |
 | Successful trace rows bind the exact solver `Observation` to a content-addressed `EngineSpec`; point and PMF paths replay incrementally to bit-identical means/stds, while missing, mismatched, incomplete, or warm-start evidence fails closed | **covered** — phase 2 of #54; planted confidence-reconstruction laundering diverges as required |
 | Answer label and payload position are independently measurable in all four cells before any default delimiter migration | **named-gap** — phase 3 of #54; four-cell renderer remains |
-| Portable evidence uses a three-level contract: `JudgmentPacket` is the content-addressed evidence atom; a thin `JudgmentStudyReceipt` Merkle root commits independently addressable manifests, observations, packets, projections, and derivations; append-only ledger events are consumer orchestration, not the public evidence format | **named-gap** — tracked in #52; packet core exists, but the run envelope, trace→packet adapter, offline recomposition, and generic renderer do not |
+| Portable evidence uses a three-level contract: `JudgmentPacket` is the content-addressed evidence atom; a thin `JudgmentStudyRecord` Merkle root commits independently addressable manifests, observations, packets, projections, and derivations; append-only ledger events are consumer orchestration, not the public evidence format | **named-gap** — tracked in #52; packet core exists, but the run envelope, trace→packet adapter, offline recomposition, and generic renderer do not |
 | A human-ratified preference lens over one bounded shortlist is a falsifiable branch; the three-stakeholder value-lens workflow is one contingent consumer demo, not the product definition or prerequisite for other judgment lanes | **named-gap** — research branch deferred; #53 is closed until a frozen one-human case and source/holdout protocol exist |
 
 ## Craft
@@ -58,7 +58,7 @@ this list, and every row is labeled **covered** / **named-gap** /
 | Review residue committed (red-team, council, adjudications, rejected-findings-with-reasons) | **covered** |
 | Stopping/retirement rule for instruments in doctrine | **named-gap** — operator adjudication pending (rt-doctrine #6) |
 | One external validation exit (a reference the stack/operator didn't produce) | **named-gap** — the dogfooding hole, operator adjudication pending |
-| Hosted multi-tenant anything; auth; DB; feed ingestion or serving | **ruled-out** — portable bounded-lane judgment receipts remain in scope; retrieval and delivery belong to consumer systems such as ExoPriors |
+| Hosted multi-tenant anything; auth; DB; feed ingestion or serving | **ruled-out** — portable bounded-lane judgment records remain in scope; retrieval and delivery belong to consumer systems such as ExoPriors |
 
 ## Drive state
 

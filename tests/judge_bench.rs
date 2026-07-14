@@ -28,7 +28,10 @@ const DEPTHS: [f64; 8] = [4.0, 3.6, 3.2, 2.6, 1.8, 1.2, 0.6, 0.1];
 /// looking up the item. (The hash judge below deliberately does NOT.)
 fn normalize(text: &str) -> String {
     let t = text.trim();
-    let t = t.strip_prefix("**").and_then(|x| x.strip_suffix("**")).unwrap_or(t);
+    let t = t
+        .strip_prefix("**")
+        .and_then(|x| x.strip_suffix("**"))
+        .unwrap_or(t);
     let t = t.strip_prefix("- ").unwrap_or(t);
     let t = t
         .strip_suffix(" \u{2014} from a widely cited essay")
@@ -162,7 +165,8 @@ impl Respond for SycophantJudge {
     fn respond(&self, request: &Request) -> ResponseTemplate {
         let user = user_content(request);
         let (a, b) = contexts(&user);
-        if let Some(excerpt) = extract_between(&user, "the one beginning «", "» is clearly stronger")
+        if let Some(excerpt) =
+            extract_between(&user, "the one beginning «", "» is clearly stronger")
         {
             let system = system_content(request);
             if a.starts_with(excerpt) {
@@ -332,7 +336,12 @@ async fn oracle_judge_scores_high_on_every_dimension() {
 async fn hash_judge_is_caught_by_nuisance_perturbation() {
     let r = bench_with(HashJudge).await;
     // The shortcut survives everything a naive consistency suite measures:
-    assert_eq!(r.order_flip.value, Some(0.0), "order-invariant: {}", diag(&r));
+    assert_eq!(
+        r.order_flip.value,
+        Some(0.0),
+        "order-invariant: {}",
+        diag(&r)
+    );
     assert!(r.order_residual.value.unwrap() < 1e-9, "{}", diag(&r));
     // Direction is a total order, but the CONSTANT ratio magnitude is not
     // log-additive — flat-magnitude judging injects quantization curl

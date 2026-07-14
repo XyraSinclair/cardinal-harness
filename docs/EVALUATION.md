@@ -1,8 +1,8 @@
 # Evaluation Evidence
 
-This page is the checked-in receipt surface for the offline synthetic harness, the live OpenRouter cardinal-policy receipt pack, and the live structured-judgment method comparison. The offline receipt records what the current code and deterministic simulator produce. The live receipts prove current provider integration and reporting paths work against real traffic. None of these receipts shows a universal win over scalar ratings.
+This page is the checked-in evidence surface for the offline synthetic harness, the live OpenRouter cardinal-policy study pack, and the live structured-judgment method comparison. The offline record shows what the current code and deterministic simulator produce. The live studies prove current provider integration and reporting paths work against real traffic. None shows a universal win over scalar ratings.
 
-## Reproduce the receipt
+## Reproduce the study
 
 Run from the repository root. These commands are offline; they use the deterministic simulator and do not require `OPENROUTER_API_KEY`.
 
@@ -33,8 +33,8 @@ Checked-in outputs:
 - `artifacts/eval/synthetic_eval.jsonl`: raw cardinal pairwise synthetic results, one JSON object per case.
 - `artifacts/eval/likert_eval.jsonl`: raw Likert/scalar baseline results, one JSON object per case.
 - `artifacts/eval/comparison_summary.json`: compact cardinal-vs-Likert deltas and win/loss/tie counts from the built-in comparator.
-- `artifacts/eval/synthetic_curves.csv`: cardinal trajectory receipt.
-- `artifacts/eval/likert_curves.csv`: Likert trajectory receipt.
+- `artifacts/eval/synthetic_curves.csv`: cardinal trajectory data.
+- `artifacts/eval/likert_curves.csv`: Likert trajectory data.
 - `artifacts/eval/offline-workflow/cardinal_vs_likert_delta.csv`: script-friendly per-case, per-metric deltas from `examples/offline_eval_delta.py`.
 - `artifacts/eval/offline-workflow/cardinal_vs_likert_summary.txt`: short text summary of the same CSV.
 
@@ -42,15 +42,15 @@ Optional generated aid:
 
 - `cargo run --bin cardinal -- eval-compare --mode ordinal --out artifacts/eval/comparison_summary_ordinal.json` compares the same active-comparison loop using ordinal "which item is higher?" judgements instead of ratio magnitudes.
 
-Do not compare the two curve CSV `error` columns directly. `synthetic_curves.csv` records the cardinal model's estimated top-k boundary error and can exceed 1. `likert_curves.csv` records observed `1 - topk_precision`. They are trajectory receipts with different semantics, not a shared y-axis.
+Do not compare the two curve CSV `error` columns directly. `synthetic_curves.csv` records the cardinal model's estimated top-k boundary error and can exceed 1. `likert_curves.csv` records observed `1 - topk_precision`. They are trajectories with different semantics, not a shared y-axis.
 
-## Live OpenRouter receipt pack
+## Live OpenRouter study pack
 
 Source directory: `artifacts/live/openrouter-benchmark-2026-06-30/`.
 
 The live pack was generated through `examples/live_openrouter_benchmark.py` with `OPENROUTER_API_KEY` set. It runs `cardinal rerank` on three project-relevant case families, preserving each policy's request JSON, response JSON, trace JSONL, markdown report, cache export, `summary.json`, and `summary.md`.
 
-Aggregate receipt:
+Aggregate study record:
 
 | Policy | Comparisons | Cached | Refused | Cost USD | Top public evidence | Top routing policy | Top release risks |
 |---|---:|---:|---:|---:|---|---|---|
@@ -68,7 +68,7 @@ python3 examples/live_openrouter_benchmark.py \
   --policy-config examples/model-policy-quality-only.json
 ```
 
-Refresh `combined-summary.json` and this directory's `README.md` after re-running policy directories; they are aggregate receipts, not source data.
+Refresh `combined-summary.json` and this directory's `README.md` after re-running policy directories; they are aggregate reports, not source data.
 
 ## Live structured-judgment method comparison
 
@@ -76,7 +76,7 @@ Source directory: `artifacts/live/method-comparison-2026-06-30-suite-v1/`.
 
 The method comparison was generated through `examples/live_method_comparison.py` with `OPENROUTER_API_KEY` set. It runs six frozen, attribute-weighted case families through scalar matrix scoring, whole-list sorting, ordinal pairwise judging, and cardinal pairwise-ratio judging, then compares each method with a separate live pairwise-ratio reference model.
 
-Aggregate receipt:
+Aggregate study record:
 
 | Case | Best candidate agreement with reference | Cardinal pairwise-ratio agreement | Notable disagreement |
 |---|---|---|---|
@@ -101,9 +101,9 @@ python3 examples/live_method_comparison.py \
   --max-usd 10
 ```
 
-`summary.json` is the machine-readable aggregate. `summary.md` and `README.md` are generated views of the same data. `examples/live-method-suite.json` is the frozen suite input. Each case directory also preserves `case.json`, one JSON result per method, and per-call request/response/parsed/usage receipts under `calls/`.
+`summary.json` is the machine-readable aggregate. `summary.md` and `README.md` are generated views of the same data. `examples/live-method-suite.json` is the frozen suite input. Each case directory also preserves `case.json`, one JSON result per method, and per-call request/response/parsed/usage records under `calls/`.
 
-`tests/live_method_receipts.rs` is the local conformance guard for that pack. It checks the summary schema version, the pinned suite SHA-256, case and method JSON consistency, per-call request/response/parsed/usage completeness, aggregate usage totals, budget-normalized rows, and absence of checked-in provider keys or local absolute paths.
+`tests/live_method_evidence.rs` is the local conformance guard for that pack. It checks the summary schema version, the pinned suite SHA-256, case and method JSON consistency, per-call request/response/parsed/usage completeness, aggregate usage totals, budget-normalized rows, and absence of checked-in provider keys or local absolute paths.
 
 ## Method
 
@@ -112,7 +112,7 @@ The suite runs the same synthetic cases through two deterministic evaluators:
 1. `eval` uses the cardinal pairwise-ratio path. Synthetic pairwise judgements feed the reranker, which fits latent scores, estimates uncertainty, and records the final rank metrics.
 2. `eval-likert` uses a scalar baseline. It spends the same number of model-call slots as the cardinal run, samples per-item ratings on a 10-point scale, infers utility scores from those ratings, and records the same headline rank metrics where possible.
 3. `eval-compare` runs both suites with `levels = 10` and `budget_multiplier = 1.0`, then emits mechanical deltas in `comparison_summary.json`.
-4. `examples/offline_eval_delta.py` reads the two JSONL receipts directly and emits an auditable CSV/text comparison. It is useful when you want to diff receipts generated by different commits or flags.
+4. `examples/offline_eval_delta.py` reads the two JSONL study records directly and emits an auditable CSV/text comparison. It is useful when you want to compare artifacts generated by different commits or flags.
 
 The current comparison gives equal call counts to cardinal comparisons and Likert ratings. That is a simple reproducible regime, not a claim about equal token cost: pairwise prompts contain two items, while scalar prompts rate one item. It also does not model live-provider variance, prompt sensitivity, refusal behavior, or pricing differences.
 
@@ -130,7 +130,7 @@ The current comparison gives equal call counts to cardinal comparisons and Liker
 
 For quality metrics, `delta` means cardinal minus Likert. For `comparisons_used`, `delta` is still cardinal minus Likert, but `higher_is_better` is `false` and the `outcome` field applies the lower-is-better direction.
 
-## Current cardinal-vs-Likert receipt
+## Current cardinal-vs-Likert study
 
 Source: `artifacts/eval/comparison_summary.json`.
 
@@ -147,12 +147,12 @@ Source: `artifacts/eval/comparison_summary.json`.
 
 Aggregate over 8 cases and 5 compared metrics per case: cardinal wins 10, Likert wins 12, and 18 are ties.
 
-## What the receipt says
+## What the study says
 
 - Cardinal clearly wins `scale_compression_40`: an extreme outlier collapses 10-level Likert ratings for the non-outlier frontier, while ratio comparisons recover the true top-k and a much stronger Kendall tau-b at the same call count.
 - Cardinal ties Likert on top-k precision/recall for `clean_ordering_10`, `noisy_ordering_50`, `clustered_scores_30`, and `inconsistent_cycle_12`; it beats Likert on coverage in the latter three under this simulator.
 - Likert wins important ranking metrics. It beats cardinal on top-k precision/recall and tau-b for `multi_attr_weighted_20`, `outlier_robustness_25`, and `gated_feasibility_30`, and it beats tau-b for `noisy_ordering_50`, `clustered_scores_30`, and `inconsistent_cycle_12`.
-- No method wins on resource use in this receipt. Every case uses the same number of cardinal comparisons and Likert ratings, so `comparisons_used` is a tie in all eight cases. Equal call count is not equal token cost.
+- No method wins on resource use in this study. Every case uses the same number of cardinal comparisons and Likert ratings, so `comparisons_used` is a tie in all eight cases. Equal call count is not equal token cost.
 - Gated top-k precision and recall are gate-aware: predicted top-k over predicted-feasible items is compared with true top-k over true-feasible items. Gate false negatives do not shrink the target set and make a run look better than it is.
 - All current cardinal synthetic runs stop at `budget_exhausted`. Do not describe the current artifact as proof of early stopping, lower cost, or strict accuracy dominance.
 
@@ -170,7 +170,7 @@ The repo has a deterministic local evaluation surface with checked-in raw artifa
 
 ## Next empirical proof target
 
-The next public-grade receipt should turn the live comparison into a larger frozen benchmark suite:
+The next public-grade study should turn the live comparison into a larger frozen benchmark suite:
 
 1. more task families and held-out prompts;
 2. repeated runs or model swaps to separate method behavior from one model's quirks;

@@ -2,7 +2,7 @@
 //! commutative monoid of sufficient statistics — two programs that
 //! accumulate the same multiset of observations must produce the same
 //! posterior, regardless of arrival order or batching. Plus spectral
-//! receipts: Foster's theorem as a free correctness invariant and the
+//! diagnostics: Foster's theorem as a free correctness invariant and the
 //! Fiedler value against hand-computed spectra.
 //!
 //! The split/merge case tests a claimed BOUNDARY from the theory notes
@@ -16,7 +16,7 @@
 use std::collections::HashMap;
 
 use cardinal_harness::rating_engine::{
-    spectral_receipts, AttributeParams, Config, Observation, RaterParams, RatingEngine,
+    spectral_diagnostics, AttributeParams, Config, Observation, RaterParams, RatingEngine,
 };
 
 fn raters() -> HashMap<String, RaterParams> {
@@ -26,7 +26,13 @@ fn raters() -> HashMap<String, RaterParams> {
 }
 
 fn engine(n: usize) -> RatingEngine {
-    RatingEngine::new(n, AttributeParams::default(), raters(), Some(Config::default())).unwrap()
+    RatingEngine::new(
+        n,
+        AttributeParams::default(),
+        raters(),
+        Some(Config::default()),
+    )
+    .unwrap()
 }
 
 /// Deterministic pseudo-random observation set over n items, including a
@@ -126,31 +132,33 @@ fn same_pair_weight_repartition_is_invariant_even_under_active_huber() {
 #[test]
 fn foster_theorem_holds_on_hand_computed_graphs() {
     // Unweighted path P3: R_eff = 1 per edge, sum 2 = n − 1; Fiedler = 1.
-    let s = spectral_receipts(&[(0, 1), (1, 2)], &[1.0, 1.0], 3, 256).unwrap();
+    let s = spectral_diagnostics(&[(0, 1), (1, 2)], &[1.0, 1.0], 3, 256).unwrap();
     assert!(s.foster_residual < 1e-9, "{s:?}");
     assert!((s.fiedler_value - 1.0).abs() < 1e-9, "{s:?}");
 
     // Weighted triangle, w = 2: Fiedler = 6; Foster sum = 3·2·(1/3·1/2·2)…
     // exactly n − 1 = 2 by the theorem regardless of weights.
-    let s = spectral_receipts(&[(0, 1), (1, 2), (0, 2)], &[2.0, 2.0, 2.0], 3, 256).unwrap();
+    let s = spectral_diagnostics(&[(0, 1), (1, 2), (0, 2)], &[2.0, 2.0, 2.0], 3, 256).unwrap();
     assert!(s.foster_residual < 1e-9, "{s:?}");
     assert!((s.fiedler_value - 6.0).abs() < 1e-9, "{s:?}");
 
     // Two disconnected edges: components = 2, expected sum = 4 − 2 = 2,
     // Fiedler = smallest NONZERO eigenvalue = 2·w = 2.
-    let s = spectral_receipts(&[(0, 1), (2, 3)], &[1.0, 1.0], 4, 256).unwrap();
+    let s = spectral_diagnostics(&[(0, 1), (2, 3)], &[1.0, 1.0], 4, 256).unwrap();
     assert!(s.foster_residual < 1e-9, "{s:?}");
     assert!((s.expected_resistance_sum - 2.0).abs() < 1e-12, "{s:?}");
     assert!((s.fiedler_value - 2.0).abs() < 1e-9, "{s:?}");
 }
 
 #[test]
-fn solver_populates_spectral_receipts_and_foster_holds_end_to_end() {
+fn solver_populates_spectral_diagnostics_and_foster_holds_end_to_end() {
     let n = 7;
     let mut e = engine(n);
     e.ingest(&observations(n));
     let summary = e.solve();
-    let spectral = summary.spectral.expect("small graph must get receipts");
+    let spectral = summary
+        .spectral
+        .expect("small graph must get spectral diagnostics");
     assert!(
         spectral.foster_residual < 1e-6,
         "Foster's theorem is exact; a residual means broken linear algebra: {spectral:?}"

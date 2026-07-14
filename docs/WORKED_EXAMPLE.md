@@ -71,7 +71,7 @@ A few details matter:
 - `canonical_bucket_v1` asks for a bucket index into the same ladder, which is useful when a run wants output-token logprob accounting for the ratio choice.
 - The `evidence` gate uses `percentile`, not an absolute latent score. That makes the example less sensitive to the arbitrary location and scale of the latent solver.
 - `rater_id` is part of the run provenance. Use a stable value when you want repeated runs to be attributable and auditable.
-- `model` is omitted here so the CLI default or an explicit policy can choose the current model. Pin a model only when you want that model choice to become part of the receipt.
+- `model` is omitted here so the CLI default or an explicit policy can choose the current model. Pin a model only when you want that model choice to become part of the study record.
 - `randomize_presentation_order` should normally stay true; the trace records whether a comparison was presented swapped.
 
 ## 2. What one comparison asks for
@@ -104,7 +104,7 @@ Do not read these snippets as evidence that `proposal_b` will win on a live prov
 
 ## 3. Offline comparison workflow, no API key required
 
-Before running a live provider, reproduce the synthetic comparison surface entirely offline. This workflow generates the cardinal pairwise synthetic receipt, generates the Likert/scalar baseline receipt, then writes CSV and text deltas from the two JSONL files.
+Before running a live provider, reproduce the synthetic comparison surface entirely offline. This workflow generates the cardinal pairwise synthetic results, generates the Likert/scalar baseline results, then writes CSV and text deltas from the two JSONL files.
 
 ```bash
 mkdir -p artifacts/eval/offline-workflow
@@ -143,7 +143,7 @@ cat artifacts/eval/offline-workflow/cardinal_vs_likert_summary.txt
 
 Then inspect the CSV for the specific metric rows. The summary is intentionally conservative: it reports both aggregate comparable metric rows and the top-k precision count, and it repeats that the comparison is synthetic.
 
-The generated files are synthetic receipts, not model outputs. They are useful for checking where pairwise-ratio inference beats the Likert baseline under the current deterministic simulator and where it loses. Do not cite them as proof that cardinal reranking is universally better than scalar ratings.
+The generated files are synthetic study records, not model outputs. They are useful for checking where pairwise-ratio inference beats the Likert baseline under the current deterministic simulator and where it loses. Do not cite them as proof that cardinal reranking is universally better than scalar ratings.
 
 To focus on one case while debugging, pass the same case name to both generators:
 
@@ -159,7 +159,7 @@ cargo run --bin cardinal -- eval-likert \
   --curve-csv artifacts/eval/offline-workflow/likert_noisy_ordering_50_curves.csv
 ```
 
-That single-case mode is still offline and deterministic; it just produces a smaller receipt.
+That single-case mode is still offline and deterministic; it just produces a smaller study record.
 
 
 ## 4. Run the rerank with a live provider
@@ -269,7 +269,7 @@ Selected fields, illustrative shape only:
 }
 ```
 
-Those numbers are not a receipt. They are included only to make the fields legible, and the token/cost fields are intentionally omitted from the illustration. Treat your actual `worked-example-response.json`, trace, and report as the receipt.
+Those numbers are illustrative, not evidence. They are included only to make the fields legible, and the token/cost fields are intentionally omitted. Treat your actual `worked-example-response.json`, trace, and report as the run record.
 
 ### Stop reason
 
@@ -299,7 +299,7 @@ Per entity:
 
 A narrow-looking rank with high `global_topk_error` is not settled. A low `global_topk_error` with an incoherent attribute prompt is still only a precise answer to a bad question.
 
-## 7. Cache and reproducibility receipts
+## 7. Cache and reproducibility
 
 With SQLite cache enabled by the default CLI path, repeated comparisons can be served from `.cardinal_pairwise_cache.sqlite`. Cache hits matter for both cost and reproducibility:
 
@@ -314,7 +314,7 @@ Export the cache when you need an auditable bundle:
 cargo run --bin cardinal -- cache-export --out worked-example-cache.jsonl
 ```
 
-A minimal receipt bundle for a run is:
+A minimal auditable bundle for a run is:
 
 ```text
 worked-example-request.json
@@ -339,7 +339,7 @@ Do not compare cache-only latency or provider-cost fields to a live run as if th
 
 ## 8. What would make this example untrustworthy
 
-This harness is useful only when the attribute is meaningful and the receipts are preserved. Be skeptical if:
+This harness is useful only when the attribute is meaningful and the evidence is preserved. Be skeptical if:
 
 - the prompt asks for a vague virtue such as "best" without saying best for what;
 - the winner changed after `budget_exhausted`, but the report is presented as settled;

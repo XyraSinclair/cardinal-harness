@@ -12,9 +12,9 @@
 //!      to the gauge origin) must not change recovered pairwise differences,
 //!      and translating the origin of the latent truth must not change the
 //!      observations generated from it (so recovery quality is unaffected).
-//!   4. Confidence weighting: higher-confidence observations should pull scores
-//!      further from the ridge-regularized gauge origin / a competing prior
-//!      than lower-confidence observations carrying the same information.
+//!   4. Stated-confidence invariance: the point path treats model-reported
+//!      confidence as metadata; otherwise uncalibrated self-assessment can
+//!      manufacture solver precision.
 //!   5. Ratio-ladder sanity: a bigger elicited ratio must produce a bigger
 //!      recovered gap, monotonically, all the way up to the ladder cap (26.0).
 //!
@@ -435,10 +435,10 @@ fn outlier_rank_displacement_bounded_at_15pct_adversarial() {
 /// `huber_k` is 1e15 rather than 1e6 here: on graphs with continuous,
 /// generic per-edge noise (as generated below) 1e6 is already enough
 /// headroom over any residual scale, but 1e15 costs nothing and stays safe
-/// even if a run happens to produce several near-tied residuals (see the
-/// `confidence_weighting_anchored_triangle_strong_effect` doc comment and
-/// `huber_mad_scale_collapses_on_near_tied_residuals` below for why a
-/// merely-large `huber_k` is not always enough to truly disable Huber).
+/// even if a run happens to produce several near-tied residuals. The
+/// `point_confidence_is_metadata_in_an_anchored_triangle` and
+/// `huber_mad_scale_collapses_on_near_tied_residuals` tests below explain why
+/// a merely-large `huber_k` is not always enough to disable Huber.
 #[test]
 fn huber_robust_fit_beats_naive_least_squares_under_outliers() {
     const SEEDS: u64 = 40;
@@ -610,101 +610,49 @@ fn gauge_invariance_shift_of_latent_origin_leaves_recovery_unchanged() {
 }
 
 // =======================================================================
-// 4. CONFIDENCE WEIGHTING
+// 4. STATED CONFIDENCE IS METADATA
 // =======================================================================
 
-/// Claim (minimal / literal form): on a bare two-item graph with a single
-/// observation, a confidence-0.9 observation must pull the free node's score
-/// at least as far from the ridge-regularized gauge origin as an otherwise
-/// identical confidence-0.1 observation, with a strictly larger |delta|.
-///
-/// Mechanism: with exactly one edge, the reduced normal equation is
-/// `(w + ridge) * s_free = -w * mu`, i.e. `s_free = -mu * w / (w + ridge)`.
-/// Higher confidence -> larger weight `w` -> shrinkage factor `w/(w+ridge)`
-/// closer to 1 -> |s_free| closer to |mu|. This is a genuine (if numerically
-/// subtle, since `ridge_lambda` defaults to 1e-9) prediction of the model,
-/// not a tautology: a solver that ignored confidence entirely, or that
-/// applied confidence weighting in the wrong direction, would fail this.
 #[test]
-fn confidence_weighting_two_item_graph_direction() {
-    let ratio = 4.0; // fixed magnitude judgement, only confidence differs
+fn point_confidence_does_not_change_a_two_item_fit() {
+    let ratio = 4.0;
     let mut lo_eng = engine(2);
     lo_eng.ingest(&[Observation::new(0, 1, ratio, 0.1, RATER, 1.0)]);
-    let lo_scores = lo_eng.solve().scores;
+    let lo = lo_eng.solve();
 
     let mut hi_eng = engine(2);
     hi_eng.ingest(&[Observation::new(0, 1, ratio, 0.9, RATER, 1.0)]);
-    let hi_scores = hi_eng.solve().scores;
+    let hi = hi_eng.solve();
 
-    let lo_delta = (lo_scores[0] - lo_scores[1]).abs();
-    let hi_delta = (hi_scores[0] - hi_scores[1]).abs();
-
-    assert!(
-        hi_delta > lo_delta,
-        "confidence 0.9 observation should move |delta| further than confidence 0.1: hi={hi_delta:.12} lo={lo_delta:.12}"
+    assert_eq!(
+        lo.scores.iter().map(|x| x.to_bits()).collect::<Vec<_>>(),
+        hi.scores.iter().map(|x| x.to_bits()).collect::<Vec<_>>()
     );
-    // Both should still be very close to ln(ratio) since ridge is tiny relative
-    // to either weight; the *difference* between them is the whole point.
-    let ln_ratio = ratio.ln();
-    assert!((hi_delta - ln_ratio).abs() < 1e-3);
-    assert!(lo_delta < ln_ratio);
+    assert_eq!(
+        lo.diag_cov.iter().map(|x| x.to_bits()).collect::<Vec<_>>(),
+        hi.diag_cov.iter().map(|x| x.to_bits()).collect::<Vec<_>>()
+    );
 }
 
-/// Claim (robust / amplified form): when a candidate observation must
-/// compete against strong, consistent "anchor" evidence pulling the same
-/// item toward a different value, a low-confidence conflicting observation
-/// moves the fitted score much less than a high-confidence one. This
-/// exercises the same weighting mechanism as the minimal test above, but in
-/// a regime (an inconsistent triangle) where the effect is large and
-/// unambiguous rather than ridge-scale, giving a much more demanding bound.
-///
-/// `huber_k` is set to an astronomically huge value (1e18, not just 1e6) to
-/// disable the *robust* reweighting pass (tested separately in the
-/// outlier-robustness tests above). 1e6 is NOT big enough here: with two
-/// anchor edges agreeing near-exactly, `solve_irls_huber`'s outlier-scale
-/// estimate (`mad(residuals)`) is computed from floating-point noise around
-/// 1e-9 rather than a genuine residual spread (its own `scale <= cfg.tiny`
-/// guard only catches an *exactly* zero MAD, and `cfg.tiny` is 1e-18 — far
-/// below realistic FP noise), so `delta = huber_k * scale` collapses to a
-/// similarly tiny threshold and every edge (including the anchors) gets
-/// crushed by the Huber clip. See `debug_probe_...`-style investigation in
-/// the review notes; 1e18 keeps `delta` enormous even against a
-/// noise-floor-sized `scale`, which is what genuinely disables Huber here.
 #[test]
-fn confidence_weighting_anchored_triangle_strong_effect() {
-    // Anchors: 0 and 2 are both strongly declared equal to 1 (mu=0, high reps).
-    let anchor_reps = 50.0;
+fn point_confidence_is_metadata_in_an_anchored_triangle() {
     let build = |conflict_confidence: f64| -> Vec<f64> {
         let mut cfg = Config::default();
         cfg.huber_k = 1.0e18;
         let mut eng = engine_with_cfg(3, cfg);
         eng.ingest(&[
-            Observation::new(0, 1, 1.0, 1.0, RATER, anchor_reps),
-            Observation::new(1, 2, 1.0, 1.0, RATER, anchor_reps),
-            // Conflicting evidence: item 2 is claimed to be `ratio`x item 0.
+            Observation::new(0, 1, 1.0, 1.0, RATER, 50.0),
+            Observation::new(1, 2, 1.0, 1.0, RATER, 50.0),
             Observation::new(2, 0, 6.0, conflict_confidence, RATER, 1.0),
         ]);
         eng.solve().scores
     };
 
-    let lo_scores = build(0.05);
-    let hi_scores = build(0.95);
-
-    // Consensus (from the anchors alone) says items 0,1,2 should all be equal,
-    // i.e. deviation of item 2 from item 0 should be near zero absent the
-    // conflicting edge. The conflicting edge pulls item 2 away from that
-    // consensus; a higher-confidence conflicting edge must pull harder.
-    let lo_dev = (lo_scores[2] - lo_scores[0]).abs();
-    let hi_dev = (hi_scores[2] - hi_scores[0]).abs();
-
-    assert!(
-        hi_dev > lo_dev * 2.0,
-        "high-confidence conflicting evidence should pull the score much further from anchored consensus than low-confidence: hi_dev={hi_dev:.6} lo_dev={lo_dev:.6}"
-    );
-    // And the low-confidence run should stay close to the anchored consensus.
-    assert!(
-        lo_dev < 0.35,
-        "low-confidence conflicting evidence should barely move the anchored consensus, got dev={lo_dev:.6}"
+    let lo = build(0.05);
+    let hi = build(0.95);
+    assert_eq!(
+        lo.iter().map(|x| x.to_bits()).collect::<Vec<_>>(),
+        hi.iter().map(|x| x.to_bits()).collect::<Vec<_>>()
     );
 }
 
@@ -817,11 +765,10 @@ fn huber_mad_scale_collapses_on_near_tied_residuals() {
     let scores = eng.solve().scores;
     let dev = (scores[2] - scores[0]).abs();
 
-    // Ground truth from the reduced 2x2 normal equations (node 0 pinned),
-    // solved by hand: s2 = w3*ln(6) / (25 + w3) with w3 = g_of_c(0.95) =
-    // eps + (1-eps)*0.95^2 = 0.9025975 (eps=1e-3, gamma=2, the Config
-    // defaults), which nalgebra-based `huber_k = 1e18` independently confirms.
-    let expected = 0.0624353452;
+    // Ground truth from the reduced 2x2 normal equations (node 0 pinned):
+    // the point path now gives the conflicting edge unit weight, so
+    // s2 = ln(6) / (25 + 1).
+    let expected = 6.0f64.ln() / 26.0;
     assert!(
         (dev - expected).abs() < 0.01,
         "expected naive-WLS deviation ~{expected:.6} (huber nominally disabled at huber_k=1e6), \

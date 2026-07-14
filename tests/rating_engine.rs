@@ -122,8 +122,8 @@ fn explicit_precision_dominates_stated_confidence_in_conflict() {
     // claim that i wins 4x, and a PMF-derived claim (tight variance,
     // precision 1000) that i LOSES 4x. The measured claim must win the
     // fused edge; with symmetric stated confidences instead, the claims
-    // cancel to a near-tie. This pins the precision channel as a real,
-    // separate weighting path — not a relabeled g(c).
+    // cancel to a near-tie. This pins measured precision as a real,
+    // separate weighting path rather than a relabeled self-report.
     let mut engine = RatingEngine::new(2, AttributeParams::default(), sim_raters(), None).unwrap();
     engine.ingest(&[
         Observation::new(0, 1, 4.0, 0.5, "sim", 1.0),
@@ -185,7 +185,6 @@ fn identity_spec() -> EngineSpec {
                 RaterParams {
                     beta: 0.8,
                     cost_per_edge: 1.75,
-                    default_confidence: 0.61,
                 },
             ),
             (
@@ -193,13 +192,10 @@ fn identity_spec() -> EngineSpec {
                 RaterParams {
                     beta: 1.3,
                     cost_per_edge: 2.25,
-                    default_confidence: 0.84,
                 },
             ),
         ],
         config: Config {
-            eps_confidence: 0.02,
-            gamma_confidence: 1.7,
             huber_k: 1.2,
             irls_max_iters: 9,
             irls_tol: 1e-7,
@@ -247,15 +243,6 @@ fn engine_spec_identity_is_order_canonical_and_covers_every_policy_field() {
     });
     assert_spec_id_changes(&base, |spec| {
         spec.raters[0].1.cost_per_edge = next_f64(spec.raters[0].1.cost_per_edge)
-    });
-    assert_spec_id_changes(&base, |spec| {
-        spec.raters[0].1.default_confidence = next_f64(spec.raters[0].1.default_confidence)
-    });
-    assert_spec_id_changes(&base, |spec| {
-        spec.config.eps_confidence = next_f64(spec.config.eps_confidence)
-    });
-    assert_spec_id_changes(&base, |spec| {
-        spec.config.gamma_confidence = next_f64(spec.config.gamma_confidence)
     });
     assert_spec_id_changes(&base, |spec| {
         spec.config.huber_k = next_f64(spec.config.huber_k)

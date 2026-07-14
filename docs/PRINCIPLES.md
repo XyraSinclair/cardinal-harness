@@ -2,7 +2,7 @@
 
 How this repo keeps shipping profound work in its canonical flavor —
 structured, provenanced, invariance-tested LLM judgment. Each principle
-earned its place by catching something real; the receipt is cited. Read
+earned its place by catching something real; the evidence is cited. Read
 before any substantial work session.
 
 ## 1. Refutability is the product
@@ -11,7 +11,7 @@ Ship every claim as something that can lose: two-sided pins with dated
 history, planted pathologies that must be caught, controlled experiments
 aimed at our own hypotheses. **Session health metric: self-refutation
 count.** A session that never proved itself wrong wasn't testing anything.
-(Receipts: ladder-curl experiment killed our own quantization hypothesis;
+(Evidence: ladder-curl experiment killed our own quantization hypothesis;
 nano's polarity headline died on retest; the Cesàro convergence criterion
 was unreachable and the unit pins caught it; the byte-sum hash judge
 failed to avalanche and the attack had to be made competent.)
@@ -26,11 +26,11 @@ New axis ⇒ new scripted judge that dies by exactly it.
 
 ## 3. No claim without its denominator and noise class
 
-n = 1 receipts are instrument demonstrations, labeled as such — never
+n = 1 runs are instrument demonstrations, labeled as such — never
 model properties. Relation axes (polarity, paraphrase) carry ~4× the
 run-to-run noise of direction axes (flip, spin, curl) at current corpus
 size: know an axis's noise floor before narrating its value. Test–retest
-is a standing cost of every leaderboard version, not a one-off. (Receipt:
+is a standing cost of every leaderboard version, not a one-off. (Evidence:
 mean |ΔJUDGE| 0.022 but polarity swung ±0.4 on the same model.)
 
 ## 4. Mathematics is the register; stories are contamination
@@ -51,17 +51,17 @@ experimentalist-style — statistical and systematic side by side in native
 units, never silently pooled. A belief whose systematics dominate is not
 improved by more sampling; it names the transformation to fix.
 
-## 6. Receipts or it didn't happen; errata on top, never rewrites
+## 6. Evidence or it didn't happen; errata on top, never rewrites
 
 Every published number recomputable from committed raw judgements (JSONL
 + replayable cache in dated `artifacts/live/` packs). When a claim dies,
 append the erratum to the original pack and correct downstream surfaces
-the same day — the receipt stands, the correction stands on it.
+the same day—the evidence stands, and the correction stands on it.
 
 ## 7. Adversary before audience
 
 Red-team every design before it ships: enumerate the exploits per axis,
-pair each with a countermeasure or list it as OPEN in the doc. (Receipts:
+pair each with a countermeasure or list it as OPEN in the doc. (Evidence:
 reciprocity double-counting and refusal-laundering were fixed pre-launch
 because an adversary pass demanded it; the open-attack list IS the v2
 spec.) Also red-team the fix: a countermeasure that never faced its

@@ -1,5 +1,5 @@
 //! The first real map: canonical attributes × real corpus entities ×
-//! a judge portfolio, with the full receipts stack.
+//! a judge portfolio, with the full evidence stack.
 //!
 //! Usage: corpus_map <entities.jsonl> <out_dir> <judge1,judge2> <cost_cap_dollars> <budget_per_run> "attr1" "attr2" ...
 
@@ -16,7 +16,9 @@ use cardinal_harness::rerank::{
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let [entities_path, out_dir, judges, cap, budget, attrs @ ..] = args.as_slice() else {
-        return Err("usage: corpus_map <entities.jsonl> <out> <j1,j2> <cap$> <budget> attrs...".into());
+        return Err(
+            "usage: corpus_map <entities.jsonl> <out> <j1,j2> <cap$> <budget> attrs...".into(),
+        );
     };
     let judges: Vec<String> = judges.split(',').map(str::to_string).collect();
     let cap_nanodollars = (cap.parse::<f64>()? * 1e9) as i64;
@@ -32,29 +34,37 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         })
         .collect();
-    eprintln!("{} entities · {} judges · {} attributes · cap ${cap}", documents.len(), judges.len(), attrs.len());
+    eprintln!(
+        "{} entities · {} judges · {} attributes · cap ${cap}",
+        documents.len(),
+        judges.len(),
+        attrs.len()
+    );
 
     let gateway = Arc::new(ProviderGateway::from_env(Arc::new(NoopUsageSink))?);
-    let cache = SqlitePairwiseCache::new(std::path::PathBuf::from(format!("{out_dir}/map-cache.sqlite")))?;
+    let cache = SqlitePairwiseCache::new(std::path::PathBuf::from(format!(
+        "{out_dir}/map-cache.sqlite"
+    )))?;
     let mut total_cost = 0i64;
     let mut out = std::fs::File::create(format!("{out_dir}/latents.jsonl"))?;
 
     for attribute in attrs {
         for judge in &judges {
             if total_cost >= cap_nanodollars {
-                eprintln!("COST CAP REACHED at ${:.2} — stopping cleanly", total_cost as f64 / 1e9);
+                eprintln!(
+                    "COST CAP REACHED at ${:.2} — stopping cleanly",
+                    total_cost as f64 / 1e9
+                );
                 return Ok(());
             }
             eprintln!("run: {judge} × \"{attribute}\"");
-            let execution = RerankExecution::new(
-                gateway.clone(),
-                Attribution::new("cardinal::corpus_map"),
-            )
-            .cache(&cache as &dyn PairwiseCache)
-            .run_options(RerankRunOptions {
-                rng_seed: Some(7),
-                cache_only: false,
-            });
+            let execution =
+                RerankExecution::new(gateway.clone(), Attribution::new("cardinal::corpus_map"))
+                    .cache(&cache as &dyn PairwiseCache)
+                    .run_options(RerankRunOptions {
+                        rng_seed: Some(7),
+                        cache_only: false,
+                    });
             let sorted = sort_documents(
                 documents.clone(),
                 attribute,

@@ -7,14 +7,35 @@ Versioning once it reaches `1.0.0`.
 
 ## [Unreleased]
 
+### Added
+- An experimental ordered-probit module for ladder-valued judgements, with
+  symmetric cut construction, interval-censored likelihood fitting, a declared
+  weak prior, gauge-projected covariance, and zero-spend synthetic comparison
+  against the former point-center model. It remains off the production path
+  until contaminated-channel and calibration gates pass.
+
+### Changed
+- Point observations now use explicit measured `precision` when present and
+  unit precision otherwise. Removed the anti-calibrated
+  `eps_confidence`/`gamma_confidence` transform and planner
+  `default_confidence`; model-stated confidence remains trace metadata.
+  The deterministic method suite moves from ratio 0.648 versus ordinal 0.726
+  under the old transform to ratio 0.808 versus ordinal 0.726, and three named
+  cases now match full-budget Likert tau at half the comparison budget.
+- Renamed spectral, leave-one-out, and multi-attribute diagnostic APIs to say
+  what they contain rather than using a generic audit-artifact label.
+- Corrected install and release documentation: source installs track `main`,
+  tagged binaries come from GitHub Releases, and the crate is not currently
+  published to crates.io.
+
 ## [0.8.0] - 2026-07-04
 
 ### Added
 - `cardinal calibrate`: null-pair artifact measurement — identical text in
-  both slots; directional mass = pure position+letter prior. Live receipt:
+  both slots; directional mass = pure position+letter prior. Live study:
   four models measured clean (parity 1.000, bias 0.0000 nats) at the null
   point.
-- Multi-objective receipts on every multi-attribute response: the Pareto
+- Multi-attribute diagnostics on every multi-attribute response: the Pareto
   front (non-dominated on weight-oriented posterior means) and the
   attribute correlation matrix (planted trade-off test pins a negative
   off-diagonal). Cross-attribute information SHARING remains open (#44).
@@ -29,7 +50,7 @@ Versioning once it reaches `1.0.0`.
   0.871, top-5 12/16 vs 10/16).
 - The synthetic ratio-vs-ordinal suite relationship FLIPPED under the new
   geometry (ordinal 0.726 vs ratio 0.648) — re-pinned with measurement
-  history preserved; live logprob-PMF receipts are unaffected.
+  history preserved; live logprob-PMF evidence is unaffected.
 
 ## [0.7.0] - 2026-07-04
 
@@ -38,7 +59,7 @@ Versioning once it reaches `1.0.0`.
   (A / B / =) as a second evidence template — the cheapest logprob-native
   path; direction PMFs enter the solver at fixed modest magnitude with
   measured uncertainty.
-- Order-residual receipt: for pairs asked in both orders in evidence mode,
+- Order-residual diagnostic: for pairs asked in both orders in evidence mode,
   the mean |sum of presented-coordinate log-ratio means| — position bias in
   nats, per run (`evidence_order_residual_mean_abs`; ~0 for an unbiased
   judge, large under pure position bias; strictly richer than binary flip
@@ -68,15 +89,15 @@ Versioning once it reaches `1.0.0`.
 - Explicit-precision observations: `Observation::from_log_ratio_moments`
   feeds PMF mean/variance into the IRLS solver directly, replacing the
   `g(c)` stated-confidence mapping for evidence-mode judgements.
-- Evidence health receipts in response meta and the sort summary line:
+- Evidence health diagnostics in response meta and the sort summary line:
   `evidence_judgements`, `logprob_mode_judgements`,
   `evidence_visible_mass_mean`.
 - Loud degradation: providers that reject the logprobs parameter
   (reasoning-class models) or silently omit logprobs fall back to sampled
-  mode, visibly in the receipts.
+  mode, visibly in run metadata.
 - Cache schema: nullable `log_ratio_mean` / `log_ratio_var` /
   `visible_mass` columns; evidence moments survive cache replay.
-- Live receipt: at equal budget and cost on gpt-5.4-mini the PMF path
+- Live study: at equal budget and cost on gpt-5.4-mini the PMF path
   yields ~3x the top-to-bottom separation per dollar (4.0 sigma vs 1.4
   sigma); instruments agree at Spearman 0.74 — documented honestly.
 
@@ -119,8 +140,8 @@ Versioning once it reaches `1.0.0`.
 - Top-k exploration pruning: `prune_p_topk_below` on top-k specs (and
   `--prune-below` on `sort`) stops spending forced-exploration comparisons on
   items whose posterior chance of reaching the top-k is negligible;
-  `entities_pruned` receipt in response meta.
-- Live taste-tooling receipt pack under
+  `entities_pruned` count in response meta.
+- Live taste-tooling study pack under
   `artifacts/live/taste-tools-demo-2026-07-02/` showing attribute recovery:
   explain identifies the criterion that actually generated a ranking (ρ=+0.98,
   weight 0.85) against three LLM-proposed decoys.
@@ -130,16 +151,16 @@ Versioning once it reaches `1.0.0`.
 ### Added
 - Counterbalanced comparisons: `counterbalance_pairs` on rerank requests asks
   every planned pair in both presentation orders, cancelling position bias
-  per-pair; `pairs_counterbalanced` / `position_flips` receipts in response
+  per-pair; `pairs_counterbalanced` / `position_flips` diagnostics in response
   meta. Default ON for the `sort` surface (`--no-counterbalance` to opt out).
 - Attribute health probes on `sort`: `--two-sided` judges the opposite of the
   criterion ("lack of X", weight −1) and `--also-by` judges paraphrases; both
-  report sign-adjusted Spearman rank-consistency receipts (`probes` in JSON
+  report sign-adjusted Spearman rank-consistency diagnostics (`probes` in JSON
   output, verdict lines on stderr).
 - Natural ordinal prompt template `ordinal_v1` (direction + confidence only),
   entering the solver as a fixed modest log-ratio shared with the synthetic
   ordinal mode (`ORDINAL_OBSERVATION_RATIO`).
-- Live healthy-elicitation receipt pack under
+- Live healthy-elicitation study pack under
   `artifacts/live/healthy-sort-demo-2026-07-02/`: a real Sonnet 4.6 run
   measuring 11/51 order flips, +0.81 opposite-side consistency, and a +0.35
   (shaky) paraphrase.
@@ -150,7 +171,7 @@ Versioning once it reaches `1.0.0`.
 - `cardinal sort`: sort newline-delimited items (or a JSON array) from a file
   or stdin by a natural-language criterion, with `--scores`, `--reverse`,
   `--format text|json|jsonl|csv`, `--top-k`, `--budget`, `--trace`,
-  `--cache-only` (keyless offline replay), and a one-line cost/stop receipt
+  `--cache-only` (keyless offline replay), and one-line cost/stop accounting
   on stderr. Refuses to print output when every comparison failed.
 - Library conveniences `sort_texts` / `sort_documents` (`rerank::sort`) over
   the single-attribute rerank path, including a middle-boundary default for
@@ -160,7 +181,7 @@ Versioning once it reaches `1.0.0`.
   with sha256 checksums.
 - Tight crates.io packaging (explicit `include`, ~50 files), docs.rs metadata,
   and `CITATION.cff`.
-- Live `cardinal sort` demo receipt pack under
+- Live `cardinal sort` demo study pack under
   `artifacts/live/sort-demo-2026-07-02/`.
 - Fixed CI checks under current stable toolchain (rustfmt/clippy/rustdoc).
 - Updated transitive dependency `bytes` to address RUSTSEC-2026-0007.

@@ -20,7 +20,7 @@
 //! because no draw shares mutable context with another — each is an
 //! independent call whose only difference is the nonce. The presentation
 //! order is FIXED across draws (maximum shared prefix); order effects are
-//! the counterbalance receipt's job, not this instrument's.
+//! the counterbalance diagnostic's job, not this instrument's.
 
 use serde::Serialize;
 
@@ -35,7 +35,7 @@ pub struct NonceDrawReport {
     /// Signed log-ratio toward the first item, per draw (None = refused
     /// or unparseable).
     pub draws: Vec<Option<f64>>,
-    /// The nonce used for each draw (receipts; deterministic from seed).
+    /// The nonce used for each draw (audit trail; deterministic from seed).
     pub nonces: Vec<String>,
     /// Mean over usable draws.
     pub mean: Option<f64>,
@@ -44,7 +44,7 @@ pub struct NonceDrawReport {
     /// (temperature > 0).
     pub sigma_w: Option<f64>,
     /// Provider-reported cached input tokens, summed over draws — the
-    /// prompt-cache receipt. Zero can mean "provider does not report",
+    /// prompt-cache token count. Zero can mean "provider does not report",
     /// not "no caching"; read with `input_tokens_total`.
     pub cache_read_tokens_total: u64,
     pub input_tokens_total: u64,
@@ -111,8 +111,7 @@ pub async fn nonce_draws(
     seed: u64,
     attribution: Attribution,
 ) -> Result<NonceDrawReport, super::comparison::ComparisonError> {
-    let template = prompt_by_slug(template_slug)
-        .unwrap_or(crate::prompts::DEFAULT_PROMPT);
+    let template = prompt_by_slug(template_slug).unwrap_or(crate::prompts::DEFAULT_PROMPT);
     let instance = template.render(
         "draws",
         criterion,
@@ -138,16 +137,16 @@ pub async fn nonce_draws(
     let mut input_tokens_total = 0u64;
 
     for i in 0..k {
-        let nonce = format!("{:016x}", splitmix(seed ^ (i as u64).wrapping_mul(0x2545F4914F6CDD1D)));
+        let nonce = format!(
+            "{:016x}",
+            splitmix(seed ^ (i as u64).wrapping_mul(0x2545F4914F6CDD1D))
+        );
         // Suffix placement: everything before this line is byte-identical
         // across draws — the cache-critical invariant.
         let user = format!("{}\ndraw-token: {nonce}", instance.user);
         let request = ChatRequest {
             model: ChatModel::openrouter(model),
-            messages: vec![
-                Message::system(padded_system.clone()),
-                Message::user(user),
-            ],
+            messages: vec![Message::system(padded_system.clone()), Message::user(user)],
             temperature,
             max_tokens: Some(256),
             json_mode: true,
@@ -161,8 +160,9 @@ pub async fn nonce_draws(
         cost += response.cost_nanodollars;
         cache_read_tokens_total += u64::from(response.cache_read_tokens.unwrap_or(0));
         input_tokens_total += u64::from(response.input_tokens);
-        let judgement = parse_pairwise_response(&response.content, instance.template_slug.as_str(), None)
-            .unwrap_or(PairwiseJudgement::Refused);
+        let judgement =
+            parse_pairwise_response(&response.content, instance.template_slug.as_str(), None)
+                .unwrap_or(PairwiseJudgement::Refused);
         match signed_log_ratio_toward_first(&judgement, true) {
             Some(m) => draws.push(Some(m)),
             None => {

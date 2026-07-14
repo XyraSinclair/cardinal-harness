@@ -1535,7 +1535,10 @@ That's my assessment."#;
             .expect("posterior");
         assert_eq!(posterior.selected_ratio_bucket, RatioBucket::R09);
         assert!(posterior.answer_distribution.support_probability() > 0.0);
-        assert!(posterior.confidence.as_scalar() > 0.0);
+        assert!(matches!(
+            posterior.confidence,
+            ConfidenceSource::Logprob { .. }
+        ));
         assert!(posterior.probability_negative() > posterior.probability_positive());
     }
 

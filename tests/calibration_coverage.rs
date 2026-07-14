@@ -27,14 +27,13 @@ fn std_normal(rng: &mut StdRng) -> f64 {
     (-2.0 * u1.ln()).sqrt() * (2.0 * PI * u2).cos()
 }
 
-fn raters(beta: f64, default_confidence: f64) -> HashMap<String, RaterParams> {
+fn raters(beta: f64) -> HashMap<String, RaterParams> {
     let mut m = HashMap::new();
     m.insert(
         "judge".to_string(),
         RaterParams {
             beta,
             cost_per_edge: 1.0,
-            default_confidence,
         },
     );
     m
@@ -52,8 +51,7 @@ fn planted_engine(
     reps: f64,
     rng: &mut StdRng,
 ) -> RatingEngine {
-    let mut engine =
-        RatingEngine::new(n, AttributeParams::default(), raters(1.0, confidence), None).unwrap();
+    let mut engine = RatingEngine::new(n, AttributeParams::default(), raters(1.0), None).unwrap();
     let mut obs = Vec::with_capacity(edges.len());
     for &(i, j) in edges {
         let true_log_ratio = truth[i] - truth[j];
@@ -147,12 +145,10 @@ fn gauge_aligned_coverage_hits(
 /// sit near 0.95, in a defensible band. This is the core promise of the
 /// uncertainty engine: intervals should mean what they claim to mean.
 ///
-/// `confidence=1.0` and `sigma=1.0` are *matched to the model*: with
-/// `beta=1`, `reps=1`, `temperature=1`, the engine's assumed observation
-/// precision `lam = g(confidence)*beta*reps/T` is exactly 1.0, i.e. it
-/// assumes unit-variance log-ratio noise -- which is exactly what we inject.
-/// This isolates the posterior-variance estimator's own calibration from any
-/// confidence-vs-noise mismatch.
+/// `beta=1`, `reps=1`, and `temperature=1` are matched to the point model:
+/// its unit precision means unit-variance log-ratio noise, exactly what this
+/// test injects. Stated confidence remains in the wire observation but does
+/// not alter solver precision.
 ///
 /// FINDING: observed coverage is ~0.997, not ~0.95. Investigation (see report)
 /// traces this to `TraitSearchManager`-style diff-variance reasoning and the
@@ -318,8 +314,7 @@ fn coverage_survives_adversarial_outlier_mixture() {
     for r in 0..replicas {
         let mut rng = StdRng::seed_from_u64(40_000 + r as u64);
         let mut engine =
-            RatingEngine::new(n, AttributeParams::default(), raters(1.0, confidence), None)
-                .unwrap();
+            RatingEngine::new(n, AttributeParams::default(), raters(1.0), None).unwrap();
         let mut obs = Vec::with_capacity(edges.len());
         for &(i, j) in &edges {
             let true_log_ratio = truth[i] - truth[j];
@@ -438,8 +433,7 @@ fn uncertainty_smaller_for_more_observed_item_same_graph() {
     for s in 0..seeds {
         let mut rng = StdRng::seed_from_u64(70_000 + s);
         let mut engine =
-            RatingEngine::new(n, AttributeParams::default(), raters(1.0, confidence), None)
-                .unwrap();
+            RatingEngine::new(n, AttributeParams::default(), raters(1.0), None).unwrap();
 
         let mut obs = Vec::with_capacity(base_edges.len() + 8);
         for &(i, j) in &base_edges {

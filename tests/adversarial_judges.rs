@@ -4,7 +4,7 @@
 //! `OpenRouterAdapter` and drives it through the *real* sort path
 //! (`sort_texts` / `sort_documents`, i.e. `simple::rerank` /
 //! `multi::multi_rerank` under the hood — the same code CLI `cardinal sort`
-//! uses). The claim under test in each case is a property the receipts (or
+//! uses). The claim under test in each case is a property the diagnostics (or
 //! the recovered order) must exhibit no matter how the judge misbehaves:
 //! the machinery must fail informatively, not silently or catastrophically.
 
@@ -575,7 +575,7 @@ fn poisoned_docs() -> Vec<RerankDocument> {
 }
 
 /// Claim: a run against a judge that refuses every pair touching one
-/// poisoned item still completes, surfaces the refusals in the receipts,
+/// poisoned item still completes, surfaces the refusals in run metadata,
 /// and still recovers the correct order among the unpoisoned items.
 #[tokio::test]
 async fn refuser_completes_and_orders_unpoisoned_items_correctly() {
@@ -594,7 +594,7 @@ async fn refuser_completes_and_orders_unpoisoned_items_correctly() {
 
     assert!(
         sorted.meta.comparisons_refused > 0,
-        "expected refusals in the receipt: {:?}",
+        "expected refusals in run metadata: {:?}",
         sorted.meta
     );
     let unpoisoned_order: Vec<String> = ids_by_rank(&sorted)
@@ -608,7 +608,7 @@ async fn refuser_completes_and_orders_unpoisoned_items_correctly() {
     );
 }
 
-/// Claim: the refusal count in the receipts is not just nonzero but
+/// Claim: the refusal count in run metadata is not just nonzero but
 /// *exact* — it equals the number of attempted comparisons that actually
 /// touched the poisoned item, no more (no phantom refusals) and no fewer
 /// (no swallowed refusals).
@@ -804,7 +804,7 @@ impl Respond for FormatVandalJudge {
 
 /// Claim: a judge whose transport-level responses are garbage on 1-in-3
 /// calls must not corrupt the run. The failed calls must surface in the
-/// receipts as attempted-but-not-used, and the order recovered from the
+/// run metadata as attempted-but-not-used, and the order recovered from the
 /// surviving well-formed calls must still be correct given enough budget.
 #[tokio::test]
 async fn format_vandal_surfaces_failed_calls_and_recovers_correct_order() {

@@ -28,7 +28,7 @@
 //!
 //! Cost: `CALLS_PER_RUN` comparisons per model (~$0.05 on mini-class
 //! models). Deterministic corpus and pair design; temperature per template
-//! default; every raw judgement is returned for receipt storage.
+//! default; every raw judgement is returned for audit storage.
 
 use std::collections::HashMap;
 
@@ -141,7 +141,12 @@ pub const HARMONIC_CYCLE: [(usize, usize); 4] = [(0, 1), (1, 2), (2, 3), (0, 3)]
 /// Core pairs that get the full Z₂³ orbit transform (6 of 20).
 #[must_use]
 pub fn orbit_pairs() -> Vec<(usize, usize)> {
-    core_pairs().into_iter().skip(1).step_by(3).take(6).collect()
+    core_pairs()
+        .into_iter()
+        .skip(1)
+        .step_by(3)
+        .take(6)
+        .collect()
 }
 
 /// Total provider calls in one benchmark run.
@@ -168,7 +173,7 @@ impl Default for JudgeBenchOptions {
     }
 }
 
-/// One raw pairwise call receipt.
+/// One raw pairwise call record.
 #[derive(Debug, Clone, Serialize)]
 pub struct BenchCall {
     /// Which battery block this call belongs to.
@@ -270,7 +275,7 @@ pub struct JudgeBenchReport {
     pub comparisons_cached: usize,
     pub cost_nanodollars: i64,
 
-    /// Raw per-call receipts (order-swap and attribute blocks).
+    /// Raw per-call records (order-swap and attribute blocks).
     pub calls: Vec<BenchCall>,
     /// Raw spin reports per spin pair, keyed "i-j".
     pub spin_reports: Vec<(String, SpinProbeReport)>,
@@ -359,8 +364,7 @@ async fn one_call(
         PairwiseJudgement::Observation { confidence, .. } => Some(*confidence),
         PairwiseJudgement::Refused => None,
     };
-    let log_ratio_toward_i =
-        super::types::signed_log_ratio_toward_first(&judgement, i_in_slot_a);
+    let log_ratio_toward_i = super::types::signed_log_ratio_toward_first(&judgement, i_in_slot_a);
     Ok(CallOutcome {
         log_ratio_toward_i,
         confidence,
@@ -399,8 +403,13 @@ fn solve_scores(
     }
     let mut raters = HashMap::new();
     raters.insert(rater.to_string(), RaterParams::default());
-    let mut engine =
-        RatingEngine::new(n, AttributeParams::default(), raters, Some(Config::default())).ok()?;
+    let mut engine = RatingEngine::new(
+        n,
+        AttributeParams::default(),
+        raters,
+        Some(Config::default()),
+    )
+    .ok()?;
     let obs: Vec<Observation> = observations
         .iter()
         .map(|&(i, j, m)| Observation::from_log_ratio_moments(i, j, m, 1.0, rater, 1.0))
@@ -632,10 +641,7 @@ pub async fn run_judge_bench(
             orbit_coherences.push(c);
             let total: f64 = report.energies.iter().sum();
             if total > 0.0 {
-                let interactions: f64 = [3usize, 5, 6, 7]
-                    .iter()
-                    .map(|&k| report.energies[k])
-                    .sum();
+                let interactions: f64 = [3usize, 5, 6, 7].iter().map(|&k| report.energies[k]).sum();
                 interaction_shares.push(interactions / total);
             }
         }
@@ -726,7 +732,8 @@ pub async fn run_judge_bench(
         }
         spin_reports.push((format!("{i}-{j}"), report));
     }
-    let survival_rate = (clear_assessed > 0).then(|| clear_survivals as f64 / clear_assessed as f64);
+    let survival_rate =
+        (clear_assessed > 0).then(|| clear_survivals as f64 / clear_assessed as f64);
     let (chi_mean, chi_ci) = mean_ci95(&chis);
 
     // ---- Subscores and composite ----
@@ -869,7 +876,7 @@ pub async fn run_judge_bench(
     // Harmonic mean of the same axes: the game-resistant aggregate (one dead
     // axis tanks it; pathologies cannot hide inside an average). Reported
     // alongside the arithmetic headline — at v1 corpus size a single unlucky
-    // clear-pair zeroes an axis, so the harsher aggregate is a receipt, not
+    // clear-pair zeroes an axis, so the harsher aggregate is evidence, not
     // yet the ranking.
     let coherence_harmonic = (!consistency.is_empty()).then(|| {
         if consistency.iter().any(|&s| s <= 0.0) {
@@ -907,7 +914,10 @@ pub async fn run_judge_bench(
         refusals,
         comparisons: plan.len()
             + extra_comparisons
-            + spin_reports.iter().map(|(_, r)| r.comparisons).sum::<usize>(),
+            + spin_reports
+                .iter()
+                .map(|(_, r)| r.comparisons)
+                .sum::<usize>(),
         comparisons_cached: cached,
         cost_nanodollars: cost,
         calls,
@@ -939,7 +949,11 @@ pub fn render_report(report: &JudgeBenchReport) -> String {
             n = d.n
         )
     };
-    let _ = writeln!(out, "model: {} · template: {}", report.model, report.template);
+    let _ = writeln!(
+        out,
+        "model: {} · template: {}",
+        report.model, report.template
+    );
     out.push_str(&fmt_dim("signal", &report.signal));
     out.push_str(&fmt_dim("order-flip", &report.order_flip));
     out.push_str(&fmt_dim("order-residual", &report.order_residual));

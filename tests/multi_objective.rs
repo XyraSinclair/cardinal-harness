@@ -1,4 +1,4 @@
-//! Multi-objective receipts: Pareto front and attribute correlations.
+//! Multi-attribute summary: Pareto front and attribute correlations.
 
 use std::sync::Arc;
 use std::time::Duration;

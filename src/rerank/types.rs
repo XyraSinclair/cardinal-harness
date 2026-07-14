@@ -411,7 +411,7 @@ pub struct MultiRerankRequest {
     /// Ask every planned pair in BOTH presentation orders (A-then-B and
     /// B-then-A), spending two comparisons per pair. This cancels position
     /// bias per-pair instead of merely averaging it across the run, and
-    /// turns order disagreement into a measurable receipt
+    /// turns order disagreement into a measurable diagnostic
     /// (`pairs_counterbalanced` / `position_flips` in the response meta).
     /// Default: false (preserves existing request semantics; the `sort`
     /// surface enables it by default).
@@ -592,7 +592,7 @@ pub struct MultiRerankResponse {
     pub pareto_front: Vec<usize>,
     /// Pearson correlation matrix between attribute latent-mean vectors
     /// (attribute order matches the request). High off-diagonal values mean
-    /// the attributes are measuring nearly the same thing — a receipt for
+    /// the attributes are measuring nearly the same thing — evidence for
     /// deciding whether the extra attribute earns its comparison budget.
     /// Empty when fewer than two attributes.
     #[serde(default)]

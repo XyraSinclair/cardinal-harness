@@ -262,9 +262,9 @@ pub fn validate_multi_rerank_request(req: &MultiRerankRequest) -> Result<(), Mul
             "topk.tolerated_error must be finite and >= 0".into(),
         ));
     }
-    if !req.topk.weight_exponent.is_finite() {
+    if !req.topk.weight_exponent.is_finite() || req.topk.weight_exponent < 0.0 {
         return Err(MultiRerankError::InvalidRequest(
-            "topk.weight_exponent must be finite".into(),
+            "topk.weight_exponent must be finite and >= 0".into(),
         ));
     }
     if !req.topk.stop_sigma_inflate.is_finite() || req.topk.stop_sigma_inflate <= 0.0 {
@@ -311,6 +311,7 @@ pub fn validate_multi_rerank_request(req: &MultiRerankRequest) -> Result<(), Mul
     }
 
     let mut attribute_ids: HashSet<&str> = HashSet::new();
+    let mut attribute_definitions: HashSet<(&str, &str)> = HashSet::new();
     for a in &req.attributes {
         if !a.weight.is_finite() {
             return Err(MultiRerankError::InvalidRequest(format!(
@@ -329,6 +330,13 @@ pub fn validate_multi_rerank_request(req: &MultiRerankRequest) -> Result<(), Mul
         if !attribute_ids.insert(a.id.as_str()) {
             return Err(MultiRerankError::InvalidRequest(format!(
                 "duplicate attribute id: {}",
+                a.id
+            )));
+        }
+        let template = a.prompt_template_slug.as_deref().unwrap_or("canonical_v2");
+        if !attribute_definitions.insert((a.prompt.as_str(), template)) {
+            return Err(MultiRerankError::InvalidRequest(format!(
+                "duplicate attribute definition: prompt and template match attribute {}",
                 a.id
             )));
         }
@@ -459,10 +467,9 @@ fn build_engine_config(run_options: &RerankRunOptions, topk: &TopKConfig) -> Eng
     if let Some(seed) = run_options.rng_seed {
         config.rng_seed = seed;
     }
-    config.rank_weight_exponent = topk.weight_exponent;
     config.top_k = Some(topk.k);
     if topk.k > 0 {
-        config.tail_weight = (1.0 / (topk.k as f64).powf(topk.weight_exponent)).clamp(0.05, 1.0);
+        config.tail_weight = (1.0 / topk.k as f64).clamp(0.05, 1.0);
     }
     config
 }
@@ -632,14 +639,14 @@ pub async fn multi_rerank(
 
     let mut refused_pairs: HashSet<(usize, usize, usize)> = HashSet::new();
     let mut models_used: HashSet<String> = HashSet::new();
-    // Counterbalancing receipts: first decisive direction observed per
+    // Counterbalancing diagnostics: first decisive direction observed per
     // (attribute, pair) in each presentation order; a pair counts once.
     let mut counterbalance_dirs: HashMap<(usize, usize, usize), [Option<HigherRanked>; 2]> =
         HashMap::new();
     let mut counterbalance_done: HashSet<(usize, usize, usize)> = HashSet::new();
     let mut pairs_counterbalanced: usize = 0;
     let mut position_flips: usize = 0;
-    // Evidence-mode receipts (ratio-letter path).
+    // Evidence-mode accounting (ratio-letter path).
     let mut evidence_judgements: usize = 0;
     let mut logprob_mode_judgements: usize = 0;
     let mut visible_mass_sum: f64 = 0.0;
@@ -1091,7 +1098,7 @@ pub async fn multi_rerank(
                             1.0,
                         )
                     } else {
-                        // Point-path order residual: same receipt as the
+                        // Point-path order residual: same diagnostic as the
                         // PMF path, from the presented-coordinate signed
                         // log-ratio. An unbiased judge's two orders sum to
                         // zero; the residual is position bias in nats.
@@ -1432,10 +1439,10 @@ pub async fn multi_rerank(
         stop_reason,
     };
 
-    // Multi-objective receipts: Pareto front (non-dominated on per-attribute
+    // Multi-attribute summary: Pareto front (non-dominated on per-attribute
     // posterior means, weight-sign oriented) and the attribute correlation
     // matrix (do the attributes measure different things?).
-    let (pareto_front, attribute_correlations) = multi_objective_receipts(&req, &entities_out);
+    let (pareto_front, attribute_correlations) = multi_objective_summary(&req, &entities_out);
 
     Ok(MultiRerankResponse {
         entities: entities_out,
@@ -1449,7 +1456,7 @@ pub async fn multi_rerank(
 /// finished entity results. Orientation: each attribute's latent means are
 /// multiplied by the sign of its weight, so "higher is better" holds
 /// uniformly (a negative-weight attribute like "lack of X" counts inverted).
-fn multi_objective_receipts(
+fn multi_objective_summary(
     req: &MultiRerankRequest,
     entities: &[MultiRerankEntityResult],
 ) -> (Vec<usize>, Vec<Vec<f64>>) {
@@ -1648,6 +1655,45 @@ mod tests {
         });
         let err = validate_multi_rerank_request(&req).unwrap_err();
         assert!(matches!(err, MultiRerankError::InvalidRequest(_)));
+    }
+
+    #[test]
+    fn validate_rejects_duplicate_attribute_definitions() {
+        let mut req = base_request();
+        req.attributes.push(MultiRerankAttributeSpec {
+            id: "attr-copy".to_string(),
+            prompt: req.attributes[0].prompt.clone(),
+            prompt_template_slug: Some("canonical_v2".to_string()),
+            weight: 1.0,
+        });
+        let err = validate_multi_rerank_request(&req).unwrap_err();
+        assert!(
+            matches!(err, MultiRerankError::InvalidRequest(message) if message.contains("duplicate attribute definition"))
+        );
+    }
+
+    #[test]
+    fn validate_rejects_negative_attribute_weight_exponent() {
+        let mut req = base_request();
+        req.topk.weight_exponent = -1.0;
+        let err = validate_multi_rerank_request(&req).unwrap_err();
+        assert!(
+            matches!(err, MultiRerankError::InvalidRequest(message) if message.contains("weight_exponent"))
+        );
+    }
+
+    #[test]
+    fn attribute_weight_exponent_does_not_change_rank_weighting() {
+        let mut req = base_request();
+        req.topk.k = 2;
+        req.topk.weight_exponent = 2.5;
+        let (_, topk) = build_trait_search_config(&req);
+        let config = build_engine_config(&RerankRunOptions::default(), &topk);
+        assert_eq!(
+            config.rank_weight_exponent,
+            EngineConfig::default().rank_weight_exponent
+        );
+        assert!((config.tail_weight - 0.5).abs() < 1e-12);
     }
 
     #[test]

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Compare offline cardinal synthetic eval receipts against Likert receipts.
+"""Compare offline cardinal synthetic eval records against Likert records.
 
 This script intentionally uses only Python's standard library. It does not call a
-provider and does not require an API key. The output is a receipt aid, not a
+provider and does not require an API key. The output is an audit aid, not a
 statistical significance test.
 """
 
@@ -68,7 +68,7 @@ def winner_label(delta: float, higher_is_better: bool) -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Write CSV and text deltas between cardinal and Likert offline eval receipts."
+        description="Write CSV and text deltas between cardinal and Likert offline eval records."
     )
     parser.add_argument("--cardinal", required=True, type=Path)
     parser.add_argument("--likert", required=True, type=Path)
@@ -133,8 +133,8 @@ def main() -> None:
     topk_lines = [row for row in rows if row["metric"] == decisive_metric]
     with args.summary.open("w", encoding="utf-8") as handle:
         handle.write("Offline cardinal-vs-Likert synthetic comparison\n")
-        handle.write(f"Cardinal receipt: {args.cardinal}\n")
-        handle.write(f"Likert receipt:   {args.likert}\n")
+        handle.write(f"Cardinal record: {args.cardinal}\n")
+        handle.write(f"Likert record:   {args.likert}\n")
         handle.write(f"Delta CSV:        {args.csv}\n")
         handle.write(f"Compared cases:   {len(cases)}\n")
         handle.write(f"Compared metrics: {len(rows)}\n")
@@ -161,7 +161,7 @@ def main() -> None:
                 f"(delta {row['delta_cardinal_minus_likert']}; {row['winner']})\n"
             )
         handle.write(
-            "\nThis is a mechanical comparison of deterministic synthetic receipts. "
+            "\nThis is a mechanical comparison of deterministic synthetic records. "
             "It is not a live-LLM benchmark and does not establish universal superiority.\n"
         )
 

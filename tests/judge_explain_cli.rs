@@ -566,7 +566,7 @@ async fn weigh_propose_runs_automated_ahp() {
 #[tokio::test(flavor = "multi_thread")]
 async fn distinguish_profiles_focal_item_measured() {
     // The propagation primitive: propose attributes for the focal item, then
-    // MEASURE where it lands on each — the profile is the receipt, not the
+    // MEASURE where it lands on each — the profile is the evidence, not the
     // proposer's say-so. Focal item is the shiniest metal, so it must come
     // out at the top percentile of both proposed attributes.
     let server = start_server().await;
@@ -621,7 +621,7 @@ async fn distinguish_profiles_focal_item_measured() {
 /// A judge whose answer depends on the draw-token — context-sensitive.
 /// Its per-draw ratios vary with the nonce hash; the stable OmniJudge
 /// ignores the nonce entirely. Together they pin sigma_w at both ends,
-/// and the prefix-stability receipt pins the cache-critical invariant.
+/// and the prefix-stability check pins the cache-critical invariant.
 #[derive(Clone)]
 struct NonceSensitiveJudge {
     prompts: std::sync::Arc<std::sync::Mutex<Vec<String>>>,
@@ -1168,7 +1168,7 @@ async fn canonize_ranks_wordings_by_cross_judge_transmissibility() {
         "opposite beliefs anti-transmit: {worst}"
     );
     // Redundancy against the accepted metal attribute: the good wordings
-    // measure the SAME dimension, and the receipt says so.
+    // measure the SAME dimension, and the diagnostic says so.
     assert!(
         best["redundancy"].as_f64().unwrap() > 0.99,
         "metal wordings are redundant with the accepted metal attribute: {best}"

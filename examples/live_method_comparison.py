@@ -716,7 +716,7 @@ def write_markdown(summary: dict[str, Any], path: Path) -> None:
     lines = [
         "# Live Structured-Judgment Method Comparison",
         "",
-        "This receipt is generated from real OpenRouter chat-completion calls.",
+        "This study record is generated from real OpenRouter chat-completion calls.",
         "It compares structured judgment regimes on the same frozen attribute-weighted item lists.",
         "The reference is another live LLM regime, not human ground truth.",
         "",

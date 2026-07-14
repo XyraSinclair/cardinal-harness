@@ -1,7 +1,7 @@
 # First principles: the type system of structured LLM judgement
 
 Permute the smallest words and see what the space actually is; then check,
-cell by cell, whether the repo occupies it. ✓ = implemented with receipts,
+cell by cell, whether the repo occupies it. ✓ = implemented with evidence,
 ◐ = partial, ✗ = absent (and honestly so).
 
 ## 1. The primitives
@@ -15,7 +15,7 @@ Seven nouns, everything else is composition:
 | **Presentation** | which entity in which slot, this call | `Presentation`, reflection algebra |
 | **Judgement** | one elicited answer, typed by instrument | `PairwiseJudgement`, seriate `JudgementRecord` |
 | **Evidence** | the judgement as a distribution, mass accounted | `AnswerEvidence` + `PmfCompleteness` |
-| **Weight** | how much one judgement moves the fit | `g(c)` or measured PMF precision |
+| **Weight** | how much one judgement moves the fit | unit point precision or measured PMF precision, scaled by rater/repeats/temperature |
 | **Posterior** | latents ± uncertainty over the set, per attribute | `CompiledPosterior`, rating engine solve |
 
 ## 2. The instrument grid
@@ -31,7 +31,7 @@ An instrument is a point in **arity × scale × output-form**:
 | Cell | Status | Notes |
 |---|---|---|
 | pairwise · ratio · point | ✓ `canonical_v2` | the founding instrument |
-| pairwise · ratio · PMF | ✓ `ratio_letter_v1` | 52-letter alphabet; live receipt: ~3× separation/dollar vs point |
+| pairwise · ratio · PMF | ✓ `ratio_letter_v1` | 52-letter alphabet; live study: ~3× separation/dollar vs point |
 | pairwise · ordinal · point | ✓ `ordinal_v1` | direction + confidence JSON |
 | pairwise · ordinal · PMF | ✓ `ordinal_letter_v1` | 3-token alphabet; cheapest instrument |
 | pairwise · interval · any | ✗ | "how much more, additively" — meaningful only for bounded attributes; low priority, ratio subsumes on log scale |
@@ -67,11 +67,11 @@ up to log₂(52) ≈ 5.7 bits per call at the same price as a point.
 
 | Property | Status |
 |---|---|
-| per-call cost receipts (nanodollars, tokens) | ✓ everywhere |
+| per-call cost accounting (nanodollars, tokens) | ✓ everywhere |
 | pre-run worst-case pricing | ✓ `--estimate` (per-template honest: $0.011 vs $1.19) |
 | budget defaults O(n), not O(n²) | ✓ 4·n |
 | planner vs baseline measured | ✓ regret benchmark; wins scarce-budget, pinned two-sided |
-| **bits-per-dollar as a formal receipt** | ✗ — we showed 3× separation/dollar informally; entropy-of-posterior-reduction per nanodollar is computable from what we already store |
+| **bits-per-dollar as a formal efficiency metric** | ✗ — we showed 3× separation/dollar informally; entropy-of-posterior-reduction per nanodollar is computable from what we already store |
 | best–worst call efficiency | ✗ (see grid) |
 
 ## 5. Stability: the invariance group of a belief
@@ -81,35 +81,35 @@ is a fixed point of the transformations that shouldn't matter. The group:
 
 | Axis | Instrumented? |
 |---|---|
-| presentation order | ✓ counterbalance default + flip receipts + order-residual (nats) |
-| polarity (attribute ↔ its opposite) | ✓ `--two-sided`, consistency receipt |
-| paraphrase (same attribute, other words) | ✓ `--also-by`, consistency receipt |
+| presentation order | ✓ counterbalance default + flip diagnostics + order residual (nats) |
+| polarity (attribute ↔ its opposite) | ✓ `--two-sided`, consistency diagnostic |
+| paraphrase (same attribute, other words) | ✓ `--also-by`, consistency diagnostic |
 | null content (pure prior) | ✓ `cardinal calibrate` (4 models measured clean) |
-| **framing spin** (persuasive preamble pushing a side) | ✓ `cardinal judge --spin`: the same pair under neutral, pro-first, and pro-second requester framings × both orders; reports susceptibility χ in nats and whether the belief survives — "if you spin it, do they still agree" made a receipt |
+| **framing spin** (persuasive preamble pushing a side) | ✓ `cardinal judge --spin`: the same pair under neutral, pro-first, and pro-second requester framings × both orders; reports susceptibility χ in nats and whether the belief survives — "if you spin it, do they still agree" made measurable |
 | **temperature** | ✗ never swept — one JSD data point (t=0 logprobs vs t=1 samples, 0.128 on gpt-5.4-mini) is a hint, not a map |
 | **reasoning effort / thinking params** | ✗ never swept; we only know reasoning models refuse logprobs |
-| **wording of the ratio question** (times-more ↔ fraction ↔ times-less: the group inverses on (ℝ₊,×)) | ✓ `judge --wordings` + live receipt: frontier models keep the SIGN (inversion works) but the fraction wording elicits +0.35…+0.92 nats larger magnitudes — human ratio-bias reproduced in machines; magnitudes are wording-calibrated, not absolute |
-| **nuisance edits** (whitespace, markdown, bullets, prestige halo) | ✓ bench axis 9 + live receipts (6 pairs × 4 edits, single run per model): Anthropic measured near-blind (0.08–0.09 nats), prestige suffix moved gpt-5.4-mini 0.878 nats — headline-sized effects, headline-unworthy denominators until replicated |
-| judge model | ◐ seriate probe compares models; no standing cross-model receipt in cardinal runs |
+| **wording of the ratio question** (times-more ↔ fraction ↔ times-less: the group inverses on (ℝ₊,×)) | ✓ `judge --wordings` + live study: frontier models keep the SIGN (inversion works) but the fraction wording elicits +0.35…+0.92 nats larger magnitudes — human ratio-bias reproduced in machines; magnitudes are wording-calibrated, not absolute |
+| **nuisance edits** (whitespace, markdown, bullets, prestige halo) | ✓ bench axis 9 + live measurements (6 pairs × 4 edits, single run per model): Anthropic measured near-blind (0.08–0.09 nats), prestige suffix moved gpt-5.4-mini 0.878 nats — headline-sized effects, headline-unworthy denominators until replicated |
+| judge model | ◐ seriate probe compares models; no standing cross-model study in cardinal runs |
 | time (same judge, days apart) | ✗ |
 
-The stability axes we cover, we cover with receipts; the remaining ✗ rows
+The stability axes we cover, we cover with evidence; the remaining ✗ rows
 (parameter sweeps, time drift) are the cheapest untouched science in the repo.
 
 The invariance group is now also an INSTRUMENT: `cardinal bench` (the Judge
 Coherence Benchmark, docs/BENCHMARK.md) runs order swap, reciprocal
 antisymmetry, frustration, spin, polarity, paraphrase, null calibration,
-and nuisance perturbation as a standardized 138-call battery per model,
+and nuisance perturbation as a standardized 194-call battery per model,
 × a signal axis, → one leaderboard number labs can hill-climb without
 ground-truth labels. The benchmark validates itself against six scripted
 pathological judges in `tests/judge_bench.rs`.
 
-## 5½. The physics of a judge (receipts, not metaphors)
+## 5½. The physics of a judge (measurements, not metaphors)
 
 Prior elicitation behaves like a physical system, and each analogy lands on
-a computable receipt:
+a computable diagnostic:
 
-| Physics | Judgement meaning | Receipt |
+| Physics | Judgement meaning | Diagnostic |
 |---|---|---|
 | **Frustration** (spin glass) | cyclic preference structure no scores can satisfy (A>B>C>A) | ✓ `judgement_frustration_mean` (total) AND the full Hodge split (`SolveSummary.hodge`): triangle-auditable local curl vs harmonic cycles invisible to every triad audit; Pythagoras invariant local+harmonic ≈ hcr pinned end-to-end; harmonic_dim reported like a denominator (the JCB graph's is 0 by construction — pinned) |
 | **Hysteresis** | path dependence: judging A→B vs B→A | ✓ order-residual in nats + flip counts |
@@ -158,7 +158,7 @@ from **rung usage coarseness**: a judge that expresses everything as two
 rungs (1.5-or-3.9) injects two orders of magnitude more curl than the
 ladder geometry does. Design consequence: to lower quantization curl,
 elicit finer *distinctions* (PMF instruments already do), not finer rungs.
-Corrected 2026-07-05, same day — receipts over vibes.
+Corrected 2026-07-05, same day — evidence over vibes.
 
 ## 5⅝. The orbit transform: the invariance table is a character table
 
@@ -177,7 +177,7 @@ characters of the group (`judge --orbit`, 8 calls). Then:
   coherence = belief²/mean-square is not a heuristic composite but a
   projection ratio;
 - the **interaction coefficients** (|S| ≥ 2) are invisible to every
-  one-axis probe. Live receipt (`artifacts/live/orbit-2026-07-05/`,
+  one-axis probe. Live study (`artifacts/live/orbit-2026-07-05/`,
   n = 1 pair): gpt-5.4-mini's largest bias component is
   order·polarity (−0.552 nats, 22.3% of energy — its slot preference
   reverses under negation); claude-sonnet-4.6 is 98.7% G-invariant.
@@ -190,7 +190,7 @@ coefficient ln 2 with all others vanishing).
 
 Growth path: adjoin generators as they earn instrumentation — paraphrase
 (S_k), framing field (the continuous factor already swept in §5½),
-format perturbations — and the receipt set extends by character theory
+format perturbations — and the diagnostic set extends by character theory
 instead of by ad-hoc probe design.
 
 ## 5¾. Respecting the group: from probes to estimator
@@ -203,7 +203,7 @@ how beliefs are COMPUTED, the way experimental physics treats symmetry:
    channels with unknown gains; `gain_calibration::solve_with_template_gains`
    fits per-template gains jointly with the scores (bilinear alternation,
    reference channel pinned — the same gauge move as the additive score
-   constant). Live receipt (`artifacts/live/wording-gains-2026-07-05/`):
+   constant). Live study (`artifacts/live/wording-gains-2026-07-05/`):
    gains are per-model constants (sonnet fraction 1.43×, mini fraction
    0.56×), sonnet's less-channel is calibrated to 1.009, and the residual
    payoff column honestly reports where the linear gain model itself runs
@@ -227,7 +227,7 @@ how beliefs are COMPUTED, the way experimental physics treats symmetry:
 Current posture: temperature pinned 0.0 for evidence calls, 1.0 for
 agreement samples; `top_logprobs` 20 (providers silently cap at 5);
 max_tokens 16 (provider floor). **Nothing has been swept.** The open
-questions with direct receipts waiting: does temperature move the PMF or
+questions with direct experiments waiting: does temperature move the PMF or
 only the sample? (provider-dependent logit scaling — measurable via JSD
 curves); does reasoning effort change judgement stability on models that
 allow it in sampled mode? Both are afternoon-sized experiments on the
@@ -255,7 +255,7 @@ alternatives (per-criterion multi-rerank), alternatives → criteria
 cross-criterion quantity) — and takes the Cesàro limit of the influence
 walk from the goal (windowed averaging; robust to the bipartite
 periodicity that plain powers cannot handle, unit-pinned against known
-stationary distributions). The receipt is the network correction:
+stationary distributions). The diagnostic is the network correction:
 limiting minus direct criteria weights, in probability mass — how much
 the interdependence structure moves the answer away from the hierarchy.
 
@@ -275,7 +275,7 @@ span a multi-objective space. All pieces exist; the loop is composition:
    against the goal (§7) and the multi-objective problem is mapped:
    Pareto front + named latents + weights.
 
-Status: steps 1–3 shipped with receipts; step 4–5's merge operation now
+Status: steps 1–3 shipped with evidence; step 4–5's merge operation now
 ships as `cardinal canonize` — candidate wordings measured across
 MULTIPLE judge models and ranked by **transmissibility** (mean cross-judge
 Spearman of the induced latents), with per-judge signal and redundancy
@@ -298,14 +298,14 @@ by the proposer's say-so.
 
 Are we storing the judgements? Yes — in-repo, replayable:
 
-- **~900 live provider judgements** across 9 receipt packs under
+- **~900 live provider judgements** across 9 study packs under
   `artifacts/live/`: 1,483 trace/cache JSONL lines (sort demos 32+120,
   taste tools 164, evidence path 110, policy benchmark 459 across three
-  policies, smoke 2) plus 838 per-call raw receipt files
+  policies, smoke 2) plus 838 per-call raw evidence files
   (request/response/parsed/usage) in the method-comparison packs.
-- Synthetic/eval receipts under `artifacts/eval/` (regenerable
+- Synthetic/eval records under `artifacts/eval/` (regenerable
   deterministically; stored as summaries by design).
-- Test-time judgements: thousands per `cargo test` run across 282 tests —
+- Test-time judgements: thousands per `cargo test` run across hundreds of tests —
   simulated, seeded, regenerated rather than stored, deliberately.
 - Gap found while counting: the evidence-path pack had unexported caches
   (sqlite gitignored); repaired in the same commit as this document.

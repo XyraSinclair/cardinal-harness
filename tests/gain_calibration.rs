@@ -5,7 +5,12 @@
 
 use cardinal_harness::gain_calibration::{solve_with_template_gains, GainObservation};
 
-fn planted(n: usize, gains: &[(&str, f64)], noise: f64, seed: u64) -> (Vec<f64>, Vec<GainObservation>) {
+fn planted(
+    n: usize,
+    gains: &[(&str, f64)],
+    noise: f64,
+    seed: u64,
+) -> (Vec<f64>, Vec<GainObservation>) {
     // Deterministic latents and a cheap LCG for reproducible noise.
     let latents: Vec<f64> = (0..n).map(|i| i as f64 * 0.45).collect();
     let mut state = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
@@ -37,7 +42,11 @@ fn planted(n: usize, gains: &[(&str, f64)], noise: f64, seed: u64) -> (Vec<f64>,
 fn recovers_planted_gains_and_beats_naive_solve() {
     let (_latents, obs) = planted(
         8,
-        &[("canonical_v2", 1.0), ("fraction_v1", 1.8), ("less_v1", 0.7)],
+        &[
+            ("canonical_v2", 1.0),
+            ("fraction_v1", 1.8),
+            ("less_v1", 0.7),
+        ],
         0.05,
         7,
     );

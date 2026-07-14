@@ -1,6 +1,6 @@
-//! The stochastic-transitivity hierarchy, pinned — including the receipt
+//! The stochastic-transitivity hierarchy, pinned — including the diagnostic
 //! this instrument exists for: a judge whose MEAN log-ratios telescope
-//! exactly (zero curl, invisible to every Hodge receipt) while its choice
+//! exactly (zero curl, invisible to every Hodge diagnostic) while its choice
 //! probabilities violate strong stochastic transitivity.
 
 use std::collections::HashMap;
@@ -66,8 +66,13 @@ fn zero_curl_judge_with_sst_violation_is_caught_here_and_only_here() {
     // solver's cyclic residual vanishes.
     let mut raters = HashMap::new();
     raters.insert("sim".to_string(), RaterParams::default());
-    let mut engine =
-        RatingEngine::new(3, AttributeParams::default(), raters, Some(Config::default())).unwrap();
+    let mut engine = RatingEngine::new(
+        3,
+        AttributeParams::default(),
+        raters,
+        Some(Config::default()),
+    )
+    .unwrap();
     let mean = |v: &[f64]| v.iter().sum::<f64>() / v.len() as f64;
     engine.ingest(&[
         Observation::from_log_ratio_moments(0, 1, mean(&ab), 1.0, "sim", 1.0),
@@ -77,7 +82,7 @@ fn zero_curl_judge_with_sst_violation_is_caught_here_and_only_here() {
     let summary = engine.solve();
     assert!(
         summary.hcr < 1e-9,
-        "zero curl by construction — the mean-level receipts see nothing: {}",
+        "zero curl by construction — the mean-level diagnostics see nothing: {}",
         summary.hcr
     );
 }
@@ -93,9 +98,7 @@ fn a_cyclic_tournament_is_exactly_a_wst_violation() {
     // is only ~1.5 combined SE — the margin machinery correctly refused
     // to call it (the first version of this test asserted otherwise and
     // lost the argument to its own instrument).
-    let win: Vec<f64> = (0..60)
-        .map(|t| if t < 45 { 0.3 } else { -0.3 })
-        .collect();
+    let win: Vec<f64> = (0..60).map(|t| if t < 45 { 0.3 } else { -0.3 }).collect();
     let report = stochastic_transitivity(&[
         draws(0, 1, win.clone()),
         draws(1, 2, win.clone()),

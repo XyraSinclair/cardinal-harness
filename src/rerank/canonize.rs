@@ -56,7 +56,7 @@ pub struct CandidateCanonicality {
     /// judge), when accepted attributes were given: high = redundant
     /// dimension. `None` when no accepted set.
     pub redundancy: Option<f64>,
-    /// Per-judge latent vectors, entity input order (receipts).
+    /// Per-judge latent vectors, entity input order (supporting evidence).
     pub latents_per_judge: Vec<Vec<f64>>,
 }
 

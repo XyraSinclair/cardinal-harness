@@ -39,11 +39,13 @@ pub mod wordings;
 
 // Re-export main entry points
 pub use anp::{anp, AnpAlternative, AnpCriterion, AnpError, AnpOptions, AnpReport};
-pub use canonize::{canonize, CandidateCanonicality, CanonizeError, CanonizeOptions, CanonizeReport};
 pub use bench::{
     core_pairs, orbit_pairs, render_report as render_bench_report, run_judge_bench, BenchCall,
     DimensionStat, JudgeBenchOptions, JudgeBenchReport, CALLS_PER_RUN, CORPUS, HARMONIC_BLOCK,
     HARMONIC_CYCLE, OPPOSITE_ATTRIBUTE, PARAPHRASE_ATTRIBUTE, PRIMARY_ATTRIBUTE,
+};
+pub use canonize::{
+    canonize, CandidateCanonicality, CanonizeError, CanonizeOptions, CanonizeReport,
 };
 pub use comparison::{
     compare_pair, ComparisonError, PairwiseComparisonAttribute, PairwiseComparisonEntity,
@@ -80,8 +82,11 @@ pub use sort::{
     sort_documents, sort_texts, SortError, SortOptions, SortProbe, SortProbeKind, SortedItem,
     SortedTexts,
 };
-pub use spin::{spin_probe, spin_sweep, SpinFraming, SpinProbeReport, SpinReading, SpinSweepReport, SweepReading};
+pub use spin::{
+    spin_probe, spin_sweep, SpinFraming, SpinProbeReport, SpinReading, SpinSweepReport,
+    SweepReading,
+};
 pub use trace::{ComparisonTrace, JsonlTraceSink, TraceError, TraceSink, TraceWorker};
 pub use transitivity::{stochastic_transitivity, TransitivityReport, TriadTest};
-pub use wordings::{wording_invariance, WordingInvarianceReport, WordingReading, WORDING_SLUGS};
 pub use types::*;
+pub use wordings::{wording_invariance, WordingInvarianceReport, WordingReading, WORDING_SLUGS};

@@ -827,10 +827,10 @@ pub struct ChatResponse {
     pub cache_write_tokens: Option<u32>,
 }
 
-/// Source of confidence information for an observation.
+/// Provenance for confidence-like information retained with an observation.
 ///
-/// Different confidence sources have different calibration properties.
-/// The rating engine can apply per-source calibration curves.
+/// These values are descriptive metadata. Solver precision must come from a
+/// measured response distribution, not from collapsing this enum to a scalar.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum ConfidenceSource {
     /// Model self-reported confidence (from JSON output field).
@@ -858,35 +858,6 @@ pub enum ConfidenceSource {
         /// Contributing sources and their weights.
         components: Vec<(String, f64)>,
     },
-}
-
-impl ConfidenceSource {
-    /// Extract a scalar confidence value for use in the rating engine.
-    ///
-    /// This collapses the rich confidence information into a single float
-    /// suitable for the `g(c)` mapping function.
-    pub fn as_scalar(&self) -> f64 {
-        match self {
-            ConfidenceSource::SelfReported(c) => *c,
-            ConfidenceSource::Logprob {
-                top_prob,
-                neighborhood_prob,
-                ..
-            } => {
-                // Blend top_prob and neighborhood_prob.
-                // neighborhood_prob is more robust to long tails.
-                0.4 * top_prob + 0.6 * neighborhood_prob
-            }
-            ConfidenceSource::LabsCoherence {
-                internal_consistency,
-                epistemic_uncertainty,
-            } => {
-                // High consistency + low uncertainty = high confidence.
-                (internal_consistency * (1.0 - epistemic_uncertainty)).clamp(0.0, 1.0)
-            }
-            ConfidenceSource::Blended { value, .. } => *value,
-        }
-    }
 }
 
 fn token_numeric_value(token: &str) -> Option<f64> {
@@ -1241,43 +1212,6 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_confidence_source_self_reported() {
-        let cs = ConfidenceSource::SelfReported(0.85);
-        assert!((cs.as_scalar() - 0.85).abs() < 1e-6);
-    }
-
-    #[test]
-    fn test_confidence_source_logprob() {
-        let cs = ConfidenceSource::Logprob {
-            entropy: 0.5,
-            top_prob: 0.8,
-            neighborhood_prob: 0.95,
-        };
-        // 0.4 * 0.8 + 0.6 * 0.95 = 0.32 + 0.57 = 0.89
-        let scalar = cs.as_scalar();
-        assert!((scalar - 0.89).abs() < 1e-6, "got {scalar}");
-    }
-
-    #[test]
-    fn test_confidence_source_labs_coherence() {
-        let cs = ConfidenceSource::LabsCoherence {
-            internal_consistency: 0.9,
-            epistemic_uncertainty: 0.1,
-        };
-        // 0.9 * (1.0 - 0.1) = 0.81
-        assert!((cs.as_scalar() - 0.81).abs() < 1e-6);
-    }
-
-    #[test]
-    fn test_confidence_source_blended() {
-        let cs = ConfidenceSource::Blended {
-            value: 0.75,
-            components: vec![("self_report".into(), 0.5), ("logprob".into(), 0.5)],
-        };
-        assert!((cs.as_scalar() - 0.75).abs() < 1e-6);
-    }
-
-    #[test]
     fn test_confidence_from_logprobs_basic() {
         let ladder = vec![1.0, 1.05, 1.1, 1.2, 1.3, 1.5, 1.75, 2.1, 2.5];
 
@@ -1425,16 +1359,14 @@ mod tests {
         )
         .expect("posterior");
 
-        assert!(
-            high_confidence.confidence.as_scalar() > low_confidence.confidence.as_scalar(),
-            "winner ambiguity should lower confidence"
-        );
-        assert!(
-            low_confidence
-                .higher_ranked_distribution
-                .probability_of(|side| { *side == PairwisePreferredSide::B })
-                > 0.4
-        );
+        let high_b = high_confidence
+            .higher_ranked_distribution
+            .probability_of(|side| *side == PairwisePreferredSide::B);
+        let low_b = low_confidence
+            .higher_ranked_distribution
+            .probability_of(|side| *side == PairwisePreferredSide::B);
+        assert!(high_b < 0.1);
+        assert!(low_b > 0.4);
     }
 
     #[test]

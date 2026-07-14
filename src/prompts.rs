@@ -247,7 +247,7 @@ json:"#,
 };
 
 /// The group-inverse wording: "which has LESS, and how many times less".
-/// Exists for the wording-invariance receipt — a coherent judge must give
+/// Exists for the wording-invariance check — a coherent judge must give
 /// the mirror of its "times more" answer. The parser lowers the answer to
 /// the same (winner, ratio) shape as every other template.
 pub const PROMPT_LESS_V1: PromptTemplate = PromptTemplate {

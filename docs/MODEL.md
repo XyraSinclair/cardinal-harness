@@ -10,7 +10,7 @@ A pairwise judgement on entities $(i, j)$ returns:
 
 - `higher_ranked`: which side has more of the attribute,
 - `ratio`: how many times more, chosen from the finite ladder in `docs/PROMPTS.md`,
-- `confidence`: self-reported or posterior confidence in $[0, 1]$,
+- `confidence`: optional self-report in $[0,1]$, retained as trace metadata rather than assumed precision,
 - optional refusal.
 
 A non-refused judgement becomes a noisy edge:
@@ -19,7 +19,7 @@ $$
 y_{ij} = \operatorname{sign}(i,j) \log(r_{ij}) \approx s_i - s_j.
 $$
 
-Repeated judgements on the same pair are precision-weighted observations of the same latent difference.
+Repeated judgements on the same pair are fused as observations of the same latent difference. Point observations have unit precision; evidence paths may supply positive measured precision derived from a response distribution.
 
 ## Robust solve
 
@@ -32,7 +32,7 @@ $$
 Implementation notes:
 
 - ratio values are clamped onto the finite ladder before becoming log edges,
-- confidence and repeats affect precision weights,
+- explicit measured precision, repeats, rater efficacy, and attribute temperature determine edge weights; self-reported confidence does not,
 - Huber-style residual weighting reduces the damage from inconsistent or adversarial edges,
 - ridge regularization and gauge pinning keep disconnected or weakly connected systems numerically sane,
 - the current implementation uses dense linear algebra and caps item counts accordingly.
@@ -128,7 +128,7 @@ This crate does not claim:
 - Severe outlier edges can still move the top-k frontier despite robust weighting.
 - Budget stops can return a good-looking ordering with an unsettled error bound.
 - Per-attribute normalization can hide a bad attribute if the weight configuration is wrong.
-- Logprob-derived confidence depends on provider behavior and tokenization details.
+- Distribution-derived precision depends on provider logprob behavior and tokenization details.
 - Dense covariance and planner work bound the current practical scale.
 
-The evaluation receipt in `docs/EVALUATION.md` shows current strengths and embarrassment cases from the synthetic harness.
+The evaluation study record in `docs/EVALUATION.md` shows current strengths and embarrassment cases from the synthetic harness.

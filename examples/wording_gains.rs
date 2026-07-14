@@ -10,9 +10,9 @@ use std::sync::Arc;
 use cardinal_harness::gain_calibration::{solve_with_template_gains, GainObservation};
 use cardinal_harness::gateway::{Attribution, NoopUsageSink, ProviderGateway};
 use cardinal_harness::rerank::{
-    compare_pair, core_pairs, HigherRanked, PairwiseComparisonAttribute,
-    PairwiseComparisonEntity, PairwiseComparisonRequest, PairwiseComparisonSpec,
-    PairwiseJudgement, CORPUS, PRIMARY_ATTRIBUTE, WORDING_SLUGS,
+    compare_pair, core_pairs, HigherRanked, PairwiseComparisonAttribute, PairwiseComparisonEntity,
+    PairwiseComparisonRequest, PairwiseComparisonSpec, PairwiseJudgement, CORPUS,
+    PRIMARY_ATTRIBUTE, WORDING_SLUGS,
 };
 
 #[tokio::main]

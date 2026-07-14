@@ -73,7 +73,7 @@ port (`python3 -m http.server <port> --bind 127.0.0.1` from
 
 Read **`docs/PRINCIPLES.md`** before substantial work: the anti-slop
 discipline (refutability, scripted-pathology validation, denominators,
-mathematical register, errata-on-top) with the receipts that earned each
+mathematical register, errata-on-top) with the evidence that earned each
 rule. It is the standing answer to "are we still doing deep work?".
 
 

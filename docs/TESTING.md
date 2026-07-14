@@ -16,10 +16,11 @@ over). That is the point of the battery: it is strong enough to find things.
 
 | Suite | Attacks | Highlights |
 |---|---|---|
-| `property_solver` (14) | IRLS+Huber recovery claims | Planted-truth Kendall-tau floors over 40–120-seed ensembles; adversarially reversed observations at 5%/15% with bounded rank displacement; robust-vs-naive fit comparison (tau 0.709 vs 0.556 under 15% corruption); gauge/shift invariance to 1e-6; confidence-weight ridge shrinkage verified against the hand-derived closed form; strict monotonicity across all 17 ratio-ladder rungs |
+| `property_solver` (14) | IRLS+Huber recovery claims | Planted-truth Kendall-tau floors over 40–120-seed ensembles; adversarially reversed observations at 5%/15% with bounded rank displacement; robust-vs-naive fit comparison (tau 0.709 vs 0.556 under 15% corruption); gauge/shift invariance to 1e-6; stated-confidence invariance on bare and anchored graphs; strict monotonicity across all 17 ratio-ladder rungs |
+| `censored_likelihood` (10) | Experimental ladder-channel model | Symmetric cuts; probability/score/information reflection; central and off-center finite differences; small-noise point-cell limit; finite extreme-cell fit; gauge-projected covariance; explicit deep-tail underflow; monotone graph optimization; seeded clean-channel comparison against point centers |
 | `metamorphic_invariance` (11) | Full sort path invariances | Input-order and relabeling invariance; duplicate texts score near-equal; weak IIA (adding a clearly-worst item does not invert the top three); sorting by X and by "lack of X" produce reversed orders |
 | `calibration_coverage` (12) | Uncertainty honesty | Gauge-aligned 95% CI coverage over 200-seed ensembles; posterior std shrinks as observations double; top-k error tiny on huge planted gaps and >0.2 on planted coin flips; `p_flip` semantics pinned (≈0 far above boundary, ≈1 far below, ≈0.5 at it) |
-| `adversarial_judges` (12) | Pathological-judge taxonomy | Pure position bias → receipts show 100% flips; intransitive A>B>C>A → solver averages through the cycle; scale-compressed (ratio always 1.05) → order still recovered; refuser → receipts count it, rest ordered; gaslighter (confidence 0.99, direction seeded-random) → posterior stds larger than under a truthful judge; format vandal → failed calls surface, order survives |
+| `adversarial_judges` (12) | Pathological-judge taxonomy | Pure position bias → diagnostics show 100% flips; intransitive A>B>C>A → solver averages through the cycle; scale-compressed (ratio always 1.05) → order still recovered; refuser → run metadata counts it, rest ordered; gaslighter (confidence 0.99, direction seeded-random) → robust fit limits damage without treating confidence as precision; format vandal → failed calls surface, order survives |
 | `method_dominance` (12) | Cardinal vs Likert vs ordinal | Cardinal beats Likert on the scale-compression regime (pinned); cardinal beats ordinal on suite-mean tau (0.703 vs 0.650, pinned); error trajectories weakly improving on every case |
 | `planner_efficiency` (12) | Active planning and stopping | ≥70% of exploitation proposals touch the boundary band; pruning changes `explore_pruned_count` but never the top-k set; answered proposals reduce top-k error; the critical straddling pair is proposed first; certified stopping fires well below n(n−1)/2 observations |
 
@@ -40,18 +41,19 @@ over). That is the point of the battery: it is strong enough to find things.
    unconditionally, before the main loop's budget check — a 33% overrun in
    the repro. Fixed: prewarm spends from, and stops at, the same
    `comparison_budget`. Regression:
-   `method_dominance::prewarm_ignores_comparison_budget_and_can_overrun_it`.
+   `method_dominance::prewarm_respects_comparison_budget`.
 
-## Honest negatives the battery pinned
+## Current empirical boundaries
 
-- **Ratio does not always beat ordinal.** On suite-mean tau it does (0.703 vs
-  0.650), but under heavy noise + outlier pressure (small n, high sigma),
-  direction-only ordinal judgements are *more* robust than ratio magnitudes.
-  Magnitude is extra signal and extra attack surface.
-- **The budget-efficiency claim is thin.** Across the checked-in synthetic
-  cases, only `clean_ordering_10` shows cardinal-at-half-budget matching
-  Likert-at-full-budget — and it is a tie at the tau ceiling, not a win.
-  The receipts culture stands: query-efficiency superiority remains unproven.
+- **Ratio beats ordinal on this suite, not by theorem.** Removing the
+  confidence transform moved suite-mean tau to 0.808 versus 0.726 and restored
+  ratio's advantage in the high-noise fixture. These are deterministic
+  synthetic-channel measurements, not a universal model or attribute claim.
+- **Budget efficiency improved, but remains bounded.** After deleting the
+  confidence transform, three checked-in cases show cardinal at half budget
+  matching Likert at full budget: `clean_ordering_10`,
+  `inconsistent_cycle_12`, and `outlier_robustness_25`. The exact set is pinned;
+  this is not a universal query-efficiency claim.
 - **Coverage is conservative, not exact.** Gauge-aligned 95% intervals cover
   ~99.7% on the tested ensembles — miscalibrated in the safe direction
   (intervals honest but wide). Pinned so a drift toward overconfidence fails

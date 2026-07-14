@@ -3,7 +3,7 @@
 //!
 //! The Hodge machinery audits mean log-ratios; a judge can telescope its
 //! means exactly (zero curl) while its draw-to-draw DIRECTIONS are
-//! incoherent — probabilistic intransitivity that no mean-level receipt
+//! incoherent — probabilistic intransitivity that no mean-level diagnostic
 //! can see. The classical hierarchy, for a triad oriented so both
 //! premises hold (p_ij ≥ ½, p_jk ≥ ½):
 //!
@@ -29,7 +29,7 @@ use serde::Serialize;
 
 use crate::repeat_pooling::RepeatDraws;
 
-/// One testable triad's receipts.
+/// Diagnostics for one testable triad.
 #[derive(Debug, Clone, Serialize)]
 pub struct TriadTest {
     /// Entity indices, oriented so premises hold: p(a>b) ≥ ½, p(b>c) ≥ ½.
@@ -90,7 +90,7 @@ fn se(p: f64, k: usize) -> f64 {
     ((p * (1.0 - p)).max(0.25 / k as f64) / k as f64).sqrt()
 }
 
-/// Compute the stochastic-transitivity receipts from repeat draws.
+/// Compute stochastic-transitivity diagnostics from repeat draws.
 /// A triad is testable when all three of its pairs carry draws.
 pub fn stochastic_transitivity(pairs: &[RepeatDraws]) -> TransitivityReport {
     use std::collections::HashMap;
@@ -138,9 +138,7 @@ pub fn stochastic_transitivity(pairs: &[RepeatDraws]) -> TransitivityReport {
                     (z, y, x),
                 ]
                 .into_iter()
-                .find(|&(a, b, c)| {
-                    prob(a, b).unwrap().0 >= 0.5 && prob(b, c).unwrap().0 >= 0.5
-                })
+                .find(|&(a, b, c)| prob(a, b).unwrap().0 >= 0.5 && prob(b, c).unwrap().0 >= 0.5)
                 .expect("every 3-tournament has a Hamiltonian path");
                 let (p_ab, k_ab) = prob(a, b).unwrap();
                 let (p_bc, k_bc) = prob(b, c).unwrap();
@@ -199,7 +197,11 @@ pub fn stochastic_transitivity(pairs: &[RepeatDraws]) -> TransitivityReport {
         wst_violations_2se: count_2se(|t| t.wst_violated),
         mst_violations_2se: count_2se(|t| t.mst_violated),
         sst_violations_2se: count_2se(|t| t.sst_violated),
-        min_draws: if min_draws == usize::MAX { 0 } else { min_draws },
+        min_draws: if min_draws == usize::MAX {
+            0
+        } else {
+            min_draws
+        },
         triads,
     }
 }

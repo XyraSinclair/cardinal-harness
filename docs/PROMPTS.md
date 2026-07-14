@@ -42,7 +42,7 @@ In bucket mode, `ratio_bucket` is the zero-based index into the ratio ladder abo
 {"higher_ranked":"A","confidence":0.74}
 ```
 
-In ordinal mode, the live judgement records only direction and confidence. Internally it is converted into the same fixed modest ratio used by the synthetic ordinal evaluator so the solver receives a directional log-ratio observation without inventing a magnitude estimate.
+In ordinal mode, the live judgement records only direction and self-reported confidence. Internally it is converted into the same fixed modest ratio used by the synthetic ordinal evaluator, with unit precision, so the solver receives a directional log-ratio observation without inventing a magnitude or trusting uncalibrated self-assessment.
 
 Refusal for either template:
 
@@ -56,7 +56,7 @@ Refusal for either template:
 - `ratio`: how much more, constrained to the canonical ladder range; used by `canonical_v2`
 - `ratio_bucket`: zero-based ratio ladder index; used by `canonical_bucket_v1`
 - `ordinal_v1`: no ratio field; magnitude is intentionally not elicited
-- `confidence`: self-reported confidence in `[0, 1]`
+- `confidence`: self-reported confidence in `[0, 1]`; trace metadata, not solver precision
 - `refused`: explicit refusal channel for genuinely blocked cases
 
 ## Request examples

@@ -732,7 +732,12 @@ impl TraitSearchManager {
                 }
                 None => 1.0,
             };
-            let weight_factor = (attr.weight / scale).powi(2) * uncertainty_weight;
+            let normalized_weight = attr.weight.abs() / scale;
+            let weight_factor = if normalized_weight == 0.0 {
+                0.0
+            } else {
+                normalized_weight.powf(self.config.topk.weight_exponent) * uncertainty_weight
+            };
 
             let proposals_attr =
                 plan_edges_for_rater(engine, &candidates, rater_id, planner_mode, use_effective)

@@ -68,7 +68,10 @@ fn a_clone_pair_shares_one_error_channel_and_one_weight() {
     assert!(
         g.judges[5].marginal_information < 0.5 * g.judges[0].marginal_information,
         "a clone adds far less than an honest judge: {:?}",
-        g.judges.iter().map(|e| e.marginal_information).collect::<Vec<_>>()
+        g.judges
+            .iter()
+            .map(|e| e.marginal_information)
+            .collect::<Vec<_>>()
     );
 }
 
@@ -77,11 +80,7 @@ fn a_noisier_independent_judge_still_adds_information() {
     // Diversification: the noisy judge's marginal information is strictly
     // positive — an independent mind pays even when it is worse.
     let f = consensus(60);
-    let latents = vec![
-        judge(&f, 0.25, 7),
-        judge(&f, 0.25, 11),
-        judge(&f, 0.9, 13),
-    ];
+    let latents = vec![judge(&f, 0.25, 7), judge(&f, 0.25, 11), judge(&f, 0.9, 13)];
     let names: Vec<String> = ["a", "b", "noisy"].iter().map(|s| s.to_string()).collect();
     let g = judge_geometry(&names, &latents, None).unwrap();
     assert!(

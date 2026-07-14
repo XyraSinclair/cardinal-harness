@@ -48,11 +48,8 @@ fn all_pairs(n: usize) -> Vec<(usize, usize)> {
 #[test]
 fn recovers_planted_variance_components() {
     let latents = [0.0, 0.4, 0.9, 1.5, 2.2, 2.6];
-    let pooled = pool_repeats(
-        6,
-        &planted(&latents, &all_pairs(6), 40, 0.30, 0.25, 7),
-    )
-    .expect("solve");
+    let pooled =
+        pool_repeats(6, &planted(&latents, &all_pairs(6), 40, 0.30, 0.25, 7)).expect("solve");
     assert!(
         (pooled.sigma_w2.sqrt() - 0.30).abs() < 0.03,
         "sigma_w recovered: {}",
@@ -68,11 +65,8 @@ fn recovers_planted_variance_components() {
 #[test]
 fn no_heterogeneity_means_no_phantom_floor() {
     let latents = [0.0, 0.5, 1.1, 1.8, 2.3];
-    let pooled = pool_repeats(
-        5,
-        &planted(&latents, &all_pairs(5), 30, 0.30, 0.0, 11),
-    )
-    .expect("solve");
+    let pooled =
+        pool_repeats(5, &planted(&latents, &all_pairs(5), 30, 0.30, 0.0, 11)).expect("solve");
     assert!(
         pooled.sigma_b2.sqrt() < 0.08,
         "no planted heterogeneity, no invented floor: {}",
@@ -92,10 +86,8 @@ fn oversampled_frustrated_pair_misranks_naive_but_not_floored() {
     // is sampled 8 times. Naive pooling gives the frustrated pair 25x
     // the weight and flips the 1-vs-2 order; the DL floor caps it.
     let latents = [0.0, 0.6, 0.9, 1.5];
-    let honest_pairs: Vec<(usize, usize)> = all_pairs(4)
-        .into_iter()
-        .filter(|&p| p != (0, 2))
-        .collect();
+    let honest_pairs: Vec<(usize, usize)> =
+        all_pairs(4).into_iter().filter(|&p| p != (0, 2)).collect();
     let mut draws = planted(&latents, &honest_pairs, 8, 0.25, 0.0, 13);
     let mut rng = Lcg(17);
     let frustrated: Vec<f64> = (0..200)

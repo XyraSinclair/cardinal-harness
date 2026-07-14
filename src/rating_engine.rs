@@ -35,7 +35,7 @@ const MAX_CANDIDATES: usize = 50_000;
 /// Maximum reps per observation to prevent ranking manipulation via extreme weights.
 const MAX_REPS: f64 = 1000.0;
 
-const ENGINE_SPEC_DOMAIN: &str = "cardinal.engine-spec.v1";
+const ENGINE_SPEC_DOMAIN: &str = "cardinal.engine-spec.v2";
 
 /// When the reduced system is small, compute exact diag(L^-1) via Cholesky solves.
 const EXACT_DIAG_MAX_DIM: usize = 256;
@@ -68,15 +68,6 @@ type FuseBuckets = std::collections::BTreeMap<FuseBucketKey, Vec<FuseBucketEntry
 /// See `docs/ALGORITHM.md` for rationale behind these defaults.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Config {
-    // -- Confidence mapping --------------------------------------------------
-    // Maps LLM confidence (0..1) to observation weight via g(c) = eps + (1-eps)*c^gamma.
-    // Higher gamma = more aggressive discounting of low-confidence judgments.
-    /// Floor for confidence weight — even confidence=0 observations get this much weight.
-    pub eps_confidence: f64,
-    /// Exponent for confidence curve. 2.0 means the LLM must be quite confident
-    /// before an observation gets substantial weight in the solver.
-    pub gamma_confidence: f64,
-
     // -- Robust IRLS (Huber loss) --------------------------------------------
     // Huber loss downweights outlier comparisons where the LLM was inconsistent.
     /// Huber loss threshold: residuals beyond k standard deviations are downweighted.
@@ -133,8 +124,6 @@ pub struct Config {
 impl Default for Config {
     fn default() -> Self {
         Self {
-            eps_confidence: 1e-3,
-            gamma_confidence: 2.0,
             huber_k: 1.5,
             irls_max_iters: 12,
             irls_tol: 1e-8,
@@ -176,8 +165,6 @@ pub struct RaterParams {
     pub beta: f64,
     /// Cost used by planner.
     pub cost_per_edge: f64,
-    /// Default confidence used by planner.
-    pub default_confidence: f64,
 }
 
 impl Default for RaterParams {
@@ -185,7 +172,6 @@ impl Default for RaterParams {
         Self {
             beta: 1.0,
             cost_per_edge: 1.0,
-            default_confidence: 0.75,
         }
     }
 }
@@ -235,8 +221,6 @@ impl EngineSpec {
         let mut raters: Vec<_> = self.raters.iter().collect();
         raters.sort_by(|left, right| left.0.cmp(&right.0));
         let Config {
-            eps_confidence,
-            gamma_confidence,
             huber_k,
             irls_max_iters,
             irls_tol,
@@ -262,16 +246,12 @@ impl EngineSpec {
             let RaterParams {
                 beta,
                 cost_per_edge,
-                default_confidence,
             } = params;
             put_str(&mut out, id);
             put_f64(&mut out, *beta);
             put_f64(&mut out, *cost_per_edge);
-            put_f64(&mut out, *default_confidence);
         }
 
-        put_f64(&mut out, *eps_confidence);
-        put_f64(&mut out, *gamma_confidence);
         put_f64(&mut out, *huber_k);
         put_usize(&mut out, *irls_max_iters);
         put_f64(&mut out, *irls_tol);
@@ -306,12 +286,12 @@ pub struct Observation {
     pub rater_id: String,
     pub reps: f64,
     /// Explicit information weight (1/variance in log-ratio space) for this
-    /// observation. When set, it REPLACES the confidence mapping `g(c)` in
-    /// the precision computation — this is the channel by which PMF-derived
-    /// evidence (e.g. answer-token logprob distributions, via seriate)
-    /// enters the solver with its measured variance instead of a stated
-    /// self-assessment. Rater reliability (beta) and attribute temperature
-    /// still scale it; they are orthogonal to per-judgement precision.
+    /// observation. Point observations without this field receive unit
+    /// precision. This is the channel by which PMF-derived evidence (for
+    /// example answer-token logprob distributions via seriate) enters the
+    /// solver with measured variance rather than uncalibrated self-assessment.
+    /// Rater reliability (beta) and attribute temperature still scale it;
+    /// they are orthogonal to per-judgement precision.
     pub precision: Option<f64>,
 }
 
@@ -390,11 +370,11 @@ pub struct SolveSummary {
     /// Invariant: `hodge.local_curl_frac + hodge.harmonic_frac ≈ hcr`.
     pub hodge: HodgeSplit,
     /// Fiedler value + Foster's-theorem check (None above the dense-eigen
-    /// size cap). See [`SpectralReceipts`].
-    pub spectral: Option<SpectralReceipts>,
+    /// size cap). See [`SpectralDiagnostics`].
+    pub spectral: Option<SpectralDiagnostics>,
     /// Leave-one-out consistency: each judgement vs the rest of the
-    /// graph, correctly studentized. See [`LooReceipts`].
-    pub loo: Option<LooReceipts>,
+    /// graph, correctly studentized. See [`LooDiagnostics`].
+    pub loo: Option<LooDiagnostics>,
     pub pcr: f64,
     pub total_info: f64,
     pub expected_rank_reversals: f64,
@@ -419,11 +399,6 @@ pub struct PlanProposal {
 // ---------------------------------------------------------------------
 //  Utilities
 // ---------------------------------------------------------------------
-
-fn g_of_c(c: f64, cfg: &Config) -> f64 {
-    let c = c.clamp(0.0, 1.0);
-    cfg.eps_confidence + (1.0 - cfg.eps_confidence) * c.powf(cfg.gamma_confidence)
-}
 
 fn median(mut v: Vec<f64>) -> f64 {
     if v.is_empty() {
@@ -955,7 +930,7 @@ fn solve_irls_huber(
 /// post-Huber λ, so already-downweighted outliers do not double-count.
 /// Note: repeat judgements of the SAME pair fuse into one edge before this
 /// is computed — intra-pair disagreement shows up in counterbalance
-/// receipts (order flips, order-residual nats), not here; this measures
+/// diagnostics (order flips, order-residual nats), not here; this measures
 /// inter-pair (cyclic) incoherence specifically.
 fn compute_hcr(mu: &[f64], residuals: &[f64], lam_eff: &[f64], cfg: &Config) -> f64 {
     if mu.is_empty() || lam_eff.is_empty() {
@@ -981,7 +956,7 @@ fn compute_hcr(mu: &[f64], residuals: &[f64], lam_eff: &[f64], cfg: &Config) -> 
     hcr.clamp(0.0, 1.0)
 }
 
-/// Spectral identifiability receipts for a solved comparison graph.
+/// Spectral identifiability diagnostics for a solved comparison graph.
 ///
 /// - `fiedler_value`: smallest nonzero eigenvalue of the weighted graph
 ///   Laplacian (algebraic connectivity). It lower-bounds how well the
@@ -994,7 +969,7 @@ fn compute_hcr(mu: &[f64], residuals: &[f64], lam_eff: &[f64], cfg: &Config) -> 
 ///   resistances the planner optimizes; a nonzero residual means the
 ///   linear algebra, not the judge, is broken.
 #[derive(Debug, Clone, PartialEq)]
-pub struct SpectralReceipts {
+pub struct SpectralDiagnostics {
     pub fiedler_value: f64,
     pub foster_residual: f64,
     /// Σ_e w_e·R_eff(e), reported alongside its theorem-exact target.
@@ -1006,15 +981,15 @@ pub struct SpectralReceipts {
     pub edge_leverage: Vec<f64>,
 }
 
-/// Compute spectral receipts from fused edge endpoints and weights.
+/// Compute spectral diagnostics from fused edge endpoints and weights.
 /// Dense eigen-decomposition: intended for graphs up to a few hundred
 /// touched vertices (returns `None` above `max_dim` or on empty input).
-pub fn spectral_receipts(
+pub fn spectral_diagnostics(
     endpoints: &[(usize, usize)],
     lam_eff: &[f64],
     n_vertices: usize,
     max_dim: usize,
-) -> Option<SpectralReceipts> {
+) -> Option<SpectralDiagnostics> {
     use nalgebra::DMatrix;
     if endpoints.is_empty() || endpoints.len() != lam_eff.len() {
         return None;
@@ -1091,7 +1066,7 @@ pub fn spectral_receipts(
         edge_leverage.push((w * r).clamp(0.0, 1.0));
     }
     let expected = (touched - components) as f64;
-    Some(SpectralReceipts {
+    Some(SpectralDiagnostics {
         fiedler_value,
         foster_residual: (resistance_sum - expected).abs(),
         resistance_sum,
@@ -1100,7 +1075,7 @@ pub fn spectral_receipts(
     })
 }
 
-/// Leave-one-out consistency receipts: each judgement tested against the
+/// Leave-one-out consistency diagnostics: each judgement tested against the
 /// prediction of the REST of the graph.
 ///
 /// The sum-over-histories reading of a comparison graph: the fitted value
@@ -1114,12 +1089,12 @@ pub fn spectral_receipts(
 ///
 /// so |z| > 3 flags a judgement the whole rest of the graph disagrees
 /// with (an outlier, a corruption, or a genuinely held minority belief —
-/// the receipt locates the disagreement, it does not adjudicate it).
+/// the diagnostic locates the disagreement, it does not adjudicate it).
 ///
 /// Studentization subtlety with teeth (the first implementation failed
 /// its own planted test): the IRLS robustifier CRUSHES an outlier's
 /// effective weight, so scaling by post-Huber λ_eff hides exactly the
-/// judgements the solver quietly downweighted. The receipt therefore
+/// judgements the solver quietly downweighted. The diagnostic therefore
 /// scales by the judgement's CLAIMED precision (raw λ) against a robust
 /// MAD estimate of the weighted residual scale — it must see what the
 /// robustifier saw, not what it left behind. Bridges (h_e ≈ 1) carry no
@@ -1127,7 +1102,7 @@ pub fn spectral_receipts(
 /// not scored: a judgement only one edge supports is unaudited, which is
 /// itself worth knowing.
 #[derive(Debug, Clone, PartialEq)]
-pub struct LooReceipts {
+pub struct LooDiagnostics {
     /// Studentized leave-one-out residual per edge (None for bridges).
     pub z: Vec<Option<f64>>,
     /// Largest |z| observed (0 when none scoreable).
@@ -1141,9 +1116,9 @@ pub struct LooReceipts {
     pub sigma_hat: f64,
 }
 
-fn compute_loo(residuals: &[f64], lam_raw: &[f64], leverage: &[f64]) -> LooReceipts {
+fn compute_loo(residuals: &[f64], lam_raw: &[f64], leverage: &[f64]) -> LooDiagnostics {
     // Robust scale of weighted residuals, immune to the very outliers
-    // this receipt exists to find.
+    // this diagnostic exists to find.
     let mut weighted: Vec<f64> = residuals
         .iter()
         .zip(lam_raw.iter())
@@ -1181,7 +1156,7 @@ fn compute_loo(residuals: &[f64], lam_raw: &[f64], leverage: &[f64]) -> LooRecei
         }
         z.push(Some(zk));
     }
-    LooReceipts {
+    LooDiagnostics {
         z,
         max_abs_z,
         flagged,
@@ -1206,7 +1181,7 @@ fn compute_loo(residuals: &[f64], lam_raw: &[f64], leverage: &[f64]) -> LooRecei
 /// No triad spot-check can see it, by construction. Sparse (cheap)
 /// comparison graphs are exactly the graphs whose cycles are mostly long —
 /// elicitation efficiency and triad-auditability are in tension, and this
-/// receipt measures which kind of frustration a run actually has.
+/// diagnostic measures which kind of frustration a run actually has.
 ///
 /// Invariant (Pythagoras in the w-inner product):
 /// `local_curl_frac + harmonic_frac == hcr` up to the same clamping.
@@ -2000,15 +1975,14 @@ impl RatingEngine {
                 Some(r) => r.beta.max(self.cfg.tiny),
                 None => continue, // skip unknown raters
             };
-            let c = ob.confidence.clamp(0.0, 1.0);
             let reps = ob.reps.clamp(0.0, MAX_REPS);
 
-            // Same precision channel as add_observations: explicit
-            // PMF-derived precision replaces the confidence map.
+            // Explicit measured precision takes precedence. Point observations
+            // receive unit precision: stated confidence is not calibrated.
             let per_judgement_weight = match ob.precision {
                 Some(p) if p.is_finite() && p > 0.0 => p,
                 Some(_) => continue,
-                None => g_of_c(c, &self.cfg),
+                None => 1.0,
             };
             let lam = (beta_r * per_judgement_weight * reps) / t;
             if !lam.is_finite() || lam <= 0.0 {
@@ -2090,15 +2064,13 @@ impl RatingEngine {
                 Some(r) => r.beta.max(self.cfg.tiny),
                 None => continue, // skip unknown raters
             };
-            let c = ob.confidence.clamp(0.0, 1.0);
             let reps = ob.reps.clamp(0.0, MAX_REPS);
-            // Explicit PMF-derived precision replaces the confidence map;
-            // stated confidence is a self-assessment, measured variance is
-            // a measurement.
+            // Explicit measured precision takes precedence. Point observations
+            // receive unit precision: stated confidence is not calibrated.
             let per_judgement_weight = match ob.precision {
                 Some(p) if p.is_finite() && p > 0.0 => p,
                 Some(_) => continue,
-                None => g_of_c(c, &self.cfg),
+                None => 1.0,
             };
             let lam_new = (beta_r * per_judgement_weight * reps) / t;
             if !lam_new.is_finite() || lam_new <= 0.0 {
@@ -2216,7 +2188,7 @@ impl RatingEngine {
         let hcr = compute_hcr(&mu, &residuals, &lam_eff, &self.cfg);
         let endpoints: Vec<(usize, usize)> = self.edges.iter().map(|e| (e.i, e.j)).collect();
         let hodge = compute_hodge_split(&endpoints, &mu, &residuals, &lam_eff, self.n, &self.cfg);
-        let spectral = spectral_receipts(&endpoints, &lam_eff, self.n, EXACT_DIAG_MAX_DIM);
+        let spectral = spectral_diagnostics(&endpoints, &lam_eff, self.n, EXACT_DIAG_MAX_DIM);
         let lam_raw: Vec<f64> = self.edges.iter().map(|e| e.lam).collect();
         let loo = spectral
             .as_ref()
@@ -2369,10 +2341,9 @@ pub fn plan_edges_for_rater(
 
     let beta_r = r.beta.max(cfg.tiny);
     let cost = r.cost_per_edge.max(cfg.tiny);
-    let c_def = r.default_confidence.clamp(0.0, 1.0);
     let t = engine.attr.temperature.max(cfg.tiny);
 
-    let lam_new = (beta_r * g_of_c(c_def, cfg)) / t;
+    let lam_new = beta_r / t;
 
     // Pre-compute Cholesky and position map once (O(N³)), not per-candidate.
     let mut er_pos: Option<Vec<Option<usize>>> = None;

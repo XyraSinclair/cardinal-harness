@@ -7,7 +7,7 @@
 //! the residual shows up as Hodge curl. A constant-log-step ladder
 //! (r_k = 26^(k/16), step ≈ 0.204) makes rung arithmetic exact whenever
 //! the true log-ratios sit near rungs. This test measures both floors on
-//! the same planted-transitive judge. Receipt printed either way.
+//! the same planted-transitive judge. Diagnostics printed either way.
 
 use std::collections::HashMap;
 
@@ -45,8 +45,13 @@ fn hcr_with_ladder(ladder: &[f64]) -> f64 {
     let n = latents.len();
     let mut raters = HashMap::new();
     raters.insert("sim".to_string(), RaterParams::default());
-    let mut engine =
-        RatingEngine::new(n, AttributeParams::default(), raters, Some(Config::default())).unwrap();
+    let mut engine = RatingEngine::new(
+        n,
+        AttributeParams::default(),
+        raters,
+        Some(Config::default()),
+    )
+    .unwrap();
     let mut obs = Vec::new();
     for i in 0..n {
         for j in (i + 1)..n {
@@ -69,7 +74,7 @@ fn geometric_ladder_reduces_quantization_curl() {
     let repo_hcr = hcr_with_ladder(&REPO_LADDER);
     let geo = geometric_ladder();
     let geo_hcr = hcr_with_ladder(&geo);
-    // The receipt, either way:
+    // The diagnostics, either way:
     eprintln!("LADDER-CURL repo_ladder hcr = {repo_hcr:.5}");
     eprintln!("LADDER-CURL geometric     hcr = {geo_hcr:.5}");
     eprintln!(

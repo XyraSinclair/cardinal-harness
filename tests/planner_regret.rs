@@ -1,7 +1,7 @@
 //! The efficiency question, answered empirically: does the active planner
 //! actually save comparisons versus a random-pair baseline on the SAME
 //! judge? "We built an effective-resistance planner" is a claim; this file
-//! is the receipt. Planted truth, simulated judge, comparisons counted
+//! is the evidence. Planted truth, simulated judge, comparisons counted
 //! until the recovered order reaches a target Kendall tau.
 
 use std::collections::HashMap;
@@ -343,7 +343,7 @@ fn fixed_budget_accuracy_planner_vs_random() {
         );
         // Pin: at every measured budget the planner's mean tau must be at
         // least random's minus a small tolerance (and the printed numbers
-        // are the receipt for the top-5 rates).
+        // are the evidence for the top-5 rates).
         assert!(
             planner_tau >= random_tau - 0.02 * n,
             "planner tau fell below random at budget {budget}"

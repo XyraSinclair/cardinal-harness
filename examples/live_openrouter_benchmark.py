@@ -2,7 +2,7 @@
 """Run a real OpenRouter-backed cardinal-harness benchmark suite.
 
 This is intentionally not a synthetic evaluator. It shells out to the cardinal
-CLI with OPENROUTER_API_KEY set, records provider-backed rerank receipts, exports
+CLI with OPENROUTER_API_KEY set, records provider-backed rerank studies, exports
 cache rows, and writes a compact summary across runs.
 """
 
@@ -40,7 +40,7 @@ LIVE_CASES: tuple[LiveCase, ...] = (
             },
             {
                 "id": "evaluation_doc",
-                "text": "docs/EVALUATION.md: checked-in evidence receipt. Separates synthetic/offline receipts from live LLM claims, lists reproducible commands, metric definitions, current cardinal-vs-Likert table, known gaps, and next empirical proof target.",
+                "text": "docs/EVALUATION.md: checked-in evidence surface. Separates synthetic/offline studies from live LLM claims, lists reproducible commands, metric definitions, current cardinal-vs-Likert table, known gaps, and next empirical proof target.",
             },
             {
                 "id": "prompts_doc",
@@ -48,7 +48,7 @@ LIVE_CASES: tuple[LiveCase, ...] = (
             },
             {
                 "id": "worked_example",
-                "text": "docs/WORKED_EXAMPLE.md: concrete walkthrough. Shows request JSON, command lines, response interpretation, trace/report/cache receipts, replay, and what files to preserve for auditability.",
+                "text": "docs/WORKED_EXAMPLE.md: concrete walkthrough. Shows request JSON, command lines, response interpretation, trace/report/cache evidence, replay, and what files to preserve for auditability.",
             },
             {
                 "id": "model_doc",
@@ -56,7 +56,7 @@ LIVE_CASES: tuple[LiveCase, ...] = (
             },
             {
                 "id": "benchmarks_doc",
-                "text": "docs/BENCHMARKS.md: scaling receipt. Reports local solver scaling, machine metadata, benchmark command, dense solver caveats, and what the numbers do and do not prove.",
+                "text": "docs/BENCHMARKS.md: scaling study. Reports local solver scaling, machine metadata, benchmark command, dense solver caveats, and what the numbers do and do not prove.",
             },
         ],
         attributes=[
@@ -90,7 +90,7 @@ LIVE_CASES: tuple[LiveCase, ...] = (
         entities=[
             {
                 "id": "quality_only_opus_46",
-                "text": "Fixed policy: anthropic/claude-opus-4.6. Highest-cost, high-quality judge path for public receipts where answer quality and careful comparative reasoning matter more than cost.",
+                "text": "Fixed policy: anthropic/claude-opus-4.6. Highest-cost, high-quality judge path for public studies where answer quality and careful comparative reasoning matter more than cost.",
             },
             {
                 "id": "frontier_ladder_2026_06",
@@ -116,7 +116,7 @@ LIVE_CASES: tuple[LiveCase, ...] = (
         attributes=[
             {
                 "id": "public_benchmark_reliability",
-                "prompt": "reliability as a judge for public benchmark receipts where brittle or unserious judgments would damage credibility",
+                "prompt": "reliability as a judge for public benchmark studies where brittle or unserious judgments would damage credibility",
                 "prompt_template_slug": "canonical_v2",
                 "weight": 0.45,
             },
@@ -144,7 +144,7 @@ LIVE_CASES: tuple[LiveCase, ...] = (
         entities=[
             {
                 "id": "no_large_live_receipt",
-                "text": "Risk: the repo has strong synthetic/offline receipts but still needs a larger preserved live-LLM benchmark pack across task families, models, costs, and traces before making broad empirical claims.",
+                "text": "Risk: the repo has strong synthetic/offline studies but still needs a larger preserved live-LLM benchmark pack across task families, models, costs, and traces before making broad empirical claims.",
             },
             {
                 "id": "dependency_audit_warnings",
@@ -160,7 +160,7 @@ LIVE_CASES: tuple[LiveCase, ...] = (
             },
             {
                 "id": "cache_provenance",
-                "text": "Risk: cached comparisons improve reproducibility and cost, but a public receipt must make cache hits, model IDs, prompt hashes, and request hashes obvious enough to audit.",
+                "text": "Risk: cached comparisons improve reproducibility and cost, but a public study must make cache hits, model IDs, prompt hashes, and request hashes obvious enough to audit.",
             },
             {
                 "id": "baseline_breadth",
@@ -311,9 +311,9 @@ def summarize_case(case: LiveCase, case_dir: Path, policy: str) -> dict[str, Any
 
 def write_markdown_summary(path: Path, summary: dict[str, Any]) -> None:
     lines = [
-        "# Live OpenRouter Benchmark Receipt",
+        "# Live OpenRouter Benchmark Study",
         "",
-        "This receipt is generated from real OpenRouter calls through `cardinal rerank`.",
+        "This study record is generated from real OpenRouter calls through `cardinal rerank`.",
         "It is not produced by the synthetic evaluator.",
         "",
         f"Policy: `{summary['policy']}`",
@@ -353,8 +353,8 @@ def write_markdown_summary(path: Path, summary: dict[str, Any]) -> None:
             "",
             "## Interpretation guardrails",
             "",
-            "- `comparisons_cached = 0` means this run made fresh provider calls for every comparison in the receipt.",
-            "- A budget-exhausted stop is still a valid receipt; it means the run spent the configured live-call budget before proving the tolerated top-k error bound.",
+            "- `comparisons_cached = 0` means this run made fresh provider calls for every comparison in the study.",
+            "- A budget-exhausted stop is still a valid study result; it means the run spent the configured live-call budget before proving the tolerated top-k error bound.",
             "- This suite tests real provider integration, parsing, trace/cost accounting, and project-relevant ranking surfaces. It does not by itself prove global superiority over every scalar or ordinal baseline.",
             "",
         ]
@@ -363,7 +363,7 @@ def write_markdown_summary(path: Path, summary: dict[str, Any]) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run real OpenRouter-backed cardinal benchmark receipts.")
+    parser = argparse.ArgumentParser(description="Run real OpenRouter-backed cardinal benchmark studies.")
     parser.add_argument("--out-dir", required=True, type=Path)
     parser.add_argument("--policy-config", required=True, type=Path)
     parser.add_argument("--case", action="append", choices=[case.name for case in LIVE_CASES])

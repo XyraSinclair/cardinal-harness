@@ -37,14 +37,14 @@ are in tension** — sparse O(n) comparison graphs have mostly-long cycles,
 exactly where frustration hides from triad spot-checks. And a design
 fact computed before building (exact rational rank): the JCB stride
 graph has harmonic_dim = 0 — its triangles span the whole cycle space,
-so harmonic receipts there are zero by construction, not by judge
+so harmonic diagnostics there are zero by construction, not by judge
 virtue. Pinned in `tests/hodge_split.rs`; any pair-design change that
 alters this surfaces. Measuring harmonic structure in real judges needs
 a mixed design (triangle-rich block + chordless-cycle block).
 
-## 2. Spectral identifiability receipts — SHIPPED (2026-07-05)
+## 2. Spectral identifiability diagnostics — SHIPPED (2026-07-05)
 
-`spectral_receipts` in `rating_engine.rs`, populated in every solve up to
+`spectral_diagnostics` in `rating_engine.rs`, populated in every solve up to
 the dense-eigen cap: the **Fiedler value** (algebraic connectivity — the
 standing "how well-posed was this solve" number; posterior variance along
 the worst-identified direction scales as 1/fiedler) and the **Foster
@@ -72,7 +72,7 @@ under active Huber clipping** — the notes claimed a boundary there, but
 fusion is per-pair BEFORE IRLS and the λ-weighted mean is linear, so the
 monoid theorem is stronger at pair granularity than claimed. The real
 equivalence boundary is re-ROUTING evidence across distinct edges (a
-different program, not a re-partition). Rejected-claim receipt: the
+different program, not a re-partition). Rejected-claim evidence: the
 theory's deliberate counterexample failed to be one.
 
 ## 3½. The orbit transform — SHIPPED (2026-07-05)
@@ -96,9 +96,9 @@ Two instruments in the classical styles:
   tested against the prediction of the rest of the graph — leverage
   h_e = λ_e·R_eff(e) from the spectral pass (trace identity Σh = n − c,
   Foster again), externally-robust studentization with the judgement's
-  CLAIMED precision against a MAD scale. Its own first implementation
+  pre-Huber precision against a MAD scale. Its own first implementation
   failed the planted test: post-Huber weights hide exactly the outliers
-  the robustifier crushed — the receipt must see what the robustifier
+  the robustifier crushed — the diagnostic must see what the robustifier
   saw. Pinned: planted corruption flagged at |z| > 3 and nothing else;
   clean data unflagged; bridges counted as unaudited, never scored.
 - **Enumerated designs, not intuited ones** (`examples/design_atlas.rs`,
@@ -119,7 +119,7 @@ cone; minimum-variance weights Ψ⁻¹l; total precision lᵀΨ⁻¹l; marginal
 information I − I₋ᵢ per dollar as the budgeted-roster ranking; effective
 error sources = PR of normalized Ψ. Diversification theorem pinned: a
 noisier-but-independent judge strictly adds information; a clone shares
-one error channel and one weight. Live zero-spend receipt from the
+one error channel and one weight. Live zero-spend study from the
 retest pack: six frontier models carry **2.89 effective error channels**
 (the labs share failure modes); deepseek buys ~10× sonnet's marginal
 information per dollar; negative GLS weights appear exactly where shared
@@ -159,7 +159,7 @@ and the two-party live demo from the pilot map's cache.
 Weak/moderate/strong stochastic transitivity (WST ⊂ MST ⊂ SST) on
 repeat-sampled choice probabilities catches inconsistency that Hodge
 curl structurally cannot (probabilistic intransitivity with zero mean
-curl). Requires repeat sampling; design the receipt with §6 below.
+curl). Requires repeat sampling; design the diagnostic with §6 below.
 
 ## 5. Pooling across judges: log-pooling is forced, not chosen
 
@@ -167,7 +167,7 @@ For Gaussian log-ratio posteriors, logarithmic opinion pooling =
 precision-weighted averaging — already what evidence fusion does. The
 theory adds: log-pooling is the unique pooling operator that is
 externally Bayesian AND commutes with the ratio-scale invariance group
-(the receipt: verify our fusion commutes with reflection/gain
+(the check: verify our fusion commutes with reflection/gain
 transformations — a property test, not a live run). Cooke's classical
 model transfers as calibration-weighted pooling where our null pairs and
 known-order anchor pairs play the role of calibration questions — the
@@ -206,7 +206,7 @@ the WST/MST/SST probe built on top.
 ## 7. Time as a change-point problem, not a trend
 
 Provider model updates are step changes on unknown dates; a linear drift
-test has poor power against steps. The time-drift receipt is CUSUM on
+test has poor power against steps. The time-drift diagnostic is CUSUM on
 partial sums of (m_t − m̄) with change-point location, alongside the
 cheap linear slope — the two disagreeing (slope ≈ 0, CUSUM large) is
 itself the diagnostic signature of a step. Fills the last ✗ row of the

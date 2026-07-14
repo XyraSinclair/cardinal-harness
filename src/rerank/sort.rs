@@ -2,7 +2,7 @@
 //!
 //! This is the list-in, list-out convenience surface over the single-attribute
 //! rerank path in [`super::simple`]. Same planner, same solver, same stopping
-//! semantics, same receipts — with none of the request-shape ceremony.
+//! semantics, same run accounting — with none of the request-shape ceremony.
 //!
 //! ```no_run
 //! use std::sync::Arc;
@@ -71,7 +71,7 @@ pub struct SortOptions {
     pub counterbalance: bool,
     /// Also judge the OPPOSITE of the criterion (`lack of <criterion>`,
     /// weight −1) and fold it into the ranking, reporting cross-side rank
-    /// consistency as a probe receipt. An attribute whose two sides disagree
+    /// consistency as a probe diagnostic. An attribute whose two sides disagree
     /// is incoherent for this judge — better to learn that than to ship it.
     pub two_sided: bool,
     /// Alternate phrasings of the criterion, each judged as an additional
@@ -115,7 +115,7 @@ pub enum SortProbeKind {
     Paraphrase,
 }
 
-/// Consistency receipt for one probe attribute.
+/// Consistency diagnostics for one probe attribute.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SortProbe {
     /// Attribute id used in traces and cache keys.
@@ -152,7 +152,7 @@ pub struct SortedItem {
 }
 
 /// Result of [`sort_texts`]: items sorted best-first, plus the full run
-/// receipts (comparisons, tokens, cost, stop reason, probe consistency).
+/// accounting (comparisons, tokens, cost, stop reason, probe consistency).
 #[derive(Debug, Serialize)]
 pub struct SortedTexts {
     /// Items in rank order (best first). When probes are active, the ranking
@@ -162,7 +162,7 @@ pub struct SortedTexts {
     /// Run metadata: comparisons attempted/used/cached/refused, provider
     /// tokens and cost, counterbalancing flips, stop reason.
     pub meta: RerankMeta,
-    /// Consistency receipts for `two_sided` / `also_by` probes; empty when
+    /// Consistency diagnostics for `two_sided` / `also_by` probes; empty when
     /// no probes were requested.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub probes: Vec<SortProbe>,
@@ -221,7 +221,7 @@ pub async fn sort_documents(
     }
     if documents.len() == 1 {
         // A single item is already sorted; the rerank path requires >= 2
-        // entities, so return the trivial answer with an all-zero receipt.
+        // entities, so return the trivial answer with all-zero run accounting.
         let doc = documents.into_iter().next().expect("len checked above");
         return Ok(SortedTexts {
             items: vec![SortedItem {
@@ -309,7 +309,7 @@ pub async fn sort_documents(
 /// Probe-mode sort: the criterion plus its opposite side and/or alternate
 /// phrasings run as parallel attributes of one multi-rerank; the ranking is
 /// the signed-weight combined utility, and each probe yields a consistency
-/// receipt against the primary criterion.
+/// diagnostic against the primary criterion.
 async fn sort_with_probes(
     documents: Vec<RerankDocument>,
     texts: std::collections::HashMap<String, String>,

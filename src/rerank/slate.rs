@@ -214,7 +214,9 @@ pub async fn propose_slate(
     }) {
         a
     } else {
-        return Err(SlateError::Parse(format!("merge: expected array in {value}")));
+        return Err(SlateError::Parse(format!(
+            "merge: expected array in {value}"
+        )));
     };
     let mut slate: Vec<SlateEntry> = merged
         .iter()
@@ -225,7 +227,9 @@ pub async fn propose_slate(
                 .iter()
                 .find_map(|k| v[*k].as_str())
                 .or_else(|| v.as_object()?.values().find_map(serde_json::Value::as_str))
-                .ok_or_else(|| SlateError::Parse(format!("merge: no attribute in {v} (full: {value})")))?
+                .ok_or_else(|| {
+                    SlateError::Parse(format!("merge: no attribute in {v} (full: {value})"))
+                })?
                 .to_string();
             let backers = ["backers", "stakeholders", "supporters"]
                 .iter()

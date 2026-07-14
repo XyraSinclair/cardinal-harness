@@ -3,7 +3,7 @@
 //! These tests pin *today's measured* relationships between cardinal ratio
 //! mode, cardinal ordinal mode, and the per-item Likert baseline, using the
 //! built-in synthetic evaluation harness (`src/rerank/evaluation.rs`). They
-//! are receipts, not universal-superiority claims: several tests below
+//! are evidence, not universal-superiority claims: several tests below
 //! *also* pin regimes where ratio mode loses, because the repo's culture is
 //! honest evidence over marketing. If a number here drifts, that is either a
 //! regression or a genuine improvement in the solver -- either way, it
@@ -17,18 +17,15 @@
 //!    mode must beat the Likert baseline on Kendall tau.
 //! 2. RATIO vs ORDINAL INFORMATION: averaged across the whole built-in
 //!    suite, ratio mode's mean Kendall tau must be at least ordinal mode's
-//!    (magnitude information must not hurt *in aggregate*). This is
-//!    explicitly not a per-case claim: a companion test pins an adversarial
-//!    high-noise/high-outlier regime where ordinal mode wins, because ratio
-//!    magnitudes amplify outlier damage that ordinal's fixed small ratio
-//!    dilutes.
-//! 3. BUDGET EFFICIENCY: search the checked-in cases for one where ratio
-//!    mode at half budget matches or beats Likert at full budget on tau.
-//!    Exactly one built-in case clears this bar today
-//!    (`clean_ordering_10`, a near-noiseless linear order where both methods
-//!    saturate at tau ~= 1.0) -- pin that case by name, and pin that it is
-//!    the *only* one, since the honest result is that the query-efficiency
-//!    win is narrow, not general.
+//!    (magnitude information must not hurt *in aggregate*). The companion
+//!    high-noise/high-outlier fixture marks wrong edges as highly confident;
+//!    it now pins that ignoring that uncalibrated label restores ratio mode's
+//!    advantage under robust fitting.
+//! 3. BUDGET EFFICIENCY: search the checked-in cases where ratio mode at half
+//!    budget matches or beats Likert at full budget on tau. Three cases clear
+//!    this bar after removing the confidence transform: `clean_ordering_10`,
+//!    `inconsistent_cycle_12`, and `outlier_robustness_25`. Pin the exact set
+//!    so future losses and gains both require an explicit accounting.
 //! 4. TRAJECTORY MONOTONICITY: `estimate_topk_error` trajectories emitted by
 //!    the harness must be weakly improving in aggregate: final error <=
 //!    initial error, for every built-in case in ratio mode, and (via a
@@ -300,36 +297,32 @@ fn ratio_mode_beats_ordinal_mode_on_average_tau_across_built_in_suite() {
         ratio_avg >= 0.5 && ordinal_avg >= 0.5,
         "both modes should be well above chance on this suite: ratio {ratio_avg}, ordinal {ordinal_avg}"
     );
-    // MEASUREMENT HISTORY, honestly kept: before the exploration
-    // anchor-diversity fix (2026-07-04, issue #43) this suite measured
-    // ratio 0.703 vs ordinal 0.650 and the pin asserted ratio > ordinal.
-    // The anchor fix FLIPPED the relationship: with better exploration
-    // geometry, direction-only observations at fixed modest magnitude
-    // aggregate better than noisy synthetic ratio magnitudes (measured
-    // 2026-07-04: ratio 0.648 vs ordinal 0.726). Note the scope: this is
-    // the SYNTHETIC magnitude-noise model; the live PMF evidence path
-    // (logprob-mode ratio letters) measured ~3x separation per dollar on a
-    // real judge — synthetic point-ratio noise is not logprob evidence.
-    // The pin below asserts the currently measured direction with a band;
-    // if it flips again, update this history rather than deleting it.
+    // MEASUREMENT HISTORY: before the exploration anchor-diversity fix
+    // (2026-07-04, issue #43), ratio measured 0.703 vs ordinal 0.650.
+    // The anchor fix flipped the relationship to ratio 0.648 vs ordinal
+    // 0.726 under the old confidence transform. Removing that
+    // anti-calibrated transform restores the expected direction without
+    // changing the observations: ratio 0.808 vs ordinal 0.726 on this
+    // deterministic suite. The pin below would fail under either the old
+    // confidence-weighted path or a regression that discards magnitudes.
     assert!(
-        ordinal_avg - ratio_avg >= 0.02,
-        "measured relationship (post anchor fix): ordinal above ratio on this synthetic suite: ratio {ratio_avg}, ordinal {ordinal_avg}"
+        ratio_avg - ordinal_avg >= 0.02,
+        "ratio magnitude should beat direction-only observations on this suite: ratio {ratio_avg}, ordinal {ordinal_avg}"
     );
     assert!(
-        ordinal_avg - ratio_avg <= 0.3,
-        "the ordinal/ratio gap should be a real but bounded effect, got {}",
-        ordinal_avg - ratio_avg
+        ratio_avg - ordinal_avg <= 0.3,
+        "the ratio/ordinal gap should be a real but bounded effect, got {}",
+        ratio_avg - ordinal_avg
     );
 }
 
-/// Honest counter-evidence: under heavy noise plus a flipped high-confidence
-/// outlier rate, magnitude information *does* hurt. Ratio observations carry
-/// a badly-wrong magnitude when an outlier flips a comparison; ordinal mode's
-/// fixed small ratio dilutes the same event. This is not a bug to fix -- it
-/// is why claim 2 above is phrased as a suite average, not a universal.
+/// Regression for the deleted confidence transform: this fixture marks
+/// flipped outliers as highly confident. The former solver amplified those
+/// wrong edges and ratio mode lost almost every seed. Confidence is now
+/// metadata, so robust fitting—not uncalibrated self-assessment—controls the
+/// damage, and ratio magnitude should recover a majority of seeds.
 #[test]
-fn ratio_information_underperforms_ordinal_in_adversarial_noise_regime() {
+fn ratio_information_survives_high_confidence_outlier_labels() {
     let seeds: Vec<u64> = (6_000..6_030).collect();
 
     let mut ratio_taus = Vec::with_capacity(seeds.len());
@@ -355,13 +348,13 @@ fn ratio_information_underperforms_ordinal_in_adversarial_noise_regime() {
     let ordinal_avg = mean(&ordinal_taus);
 
     assert!(
-        ratio_wins <= 3,
-        "ratio mode should lose to ordinal on almost every seed in this adversarial regime, won {ratio_wins}/{}",
+        ratio_wins >= 20,
+        "ratio mode should recover most seeds once stated confidence is metadata, won {ratio_wins}/{}",
         seeds.len()
     );
     assert!(
-        ordinal_avg - ratio_avg >= 0.2,
-        "ordinal mode should materially beat ratio mode here: ordinal {ordinal_avg}, ratio {ratio_avg}"
+        ratio_avg > ordinal_avg,
+        "ratio mode should beat ordinal on average here: ordinal {ordinal_avg}, ratio {ratio_avg}"
     );
 }
 
@@ -370,14 +363,12 @@ fn ratio_information_underperforms_ordinal_in_adversarial_noise_regime() {
 // =============================================================================
 
 /// Search the checked-in suite for cases where cardinal ratio mode at half
-/// budget matches or beats Likert at full budget on Kendall tau. Today
-/// exactly one case clears this bar: `clean_ordering_10`, a near-noiseless
-/// linear order where both methods saturate at tau ~= 1.0 -- ratio mode just
-/// gets there with half the queries. Pin the case by name *and* pin that the
-/// set is a singleton, since the honest result is that this efficiency win
-/// is narrow rather than general across the suite.
+/// budget matches or beats Likert at full budget on Kendall tau. Removing
+/// the anti-calibrated confidence transform expands the measured set from
+/// only `clean_ordering_10` to three named cases. Pin the exact set so either
+/// a regression or another real efficiency gain demands an explicit update.
 #[test]
-fn budget_efficiency_half_budget_pin_is_exactly_clean_ordering_10() {
+fn budget_efficiency_half_budget_pin_matches_measured_cases() {
     const TIE_EPS: f64 = 1e-9;
     let cases = synthetic_cases();
 
@@ -413,10 +404,12 @@ fn budget_efficiency_half_budget_pin_is_exactly_clean_ordering_10() {
     let qualifying_set: HashSet<&'static str> = qualifying.into_iter().collect();
     assert_eq!(
         qualifying_set,
-        HashSet::from(["clean_ordering_10"]),
-        "the half-budget-matches-full-budget-Likert bar should today be cleared by exactly clean_ordering_10; \
-         if this changed, either a regression made another case worse, or an improvement made ratio mode more \
-         query-efficient elsewhere -- update the pin either way"
+        HashSet::from([
+            "clean_ordering_10",
+            "inconsistent_cycle_12",
+            "outlier_robustness_25",
+        ]),
+        "the half-budget-matches-full-budget-Likert cases changed; inspect whether this is a regression or a real efficiency change"
     );
 
     let ratio_half_attempted =
@@ -429,7 +422,7 @@ fn budget_efficiency_half_budget_pin_is_exactly_clean_ordering_10() {
     );
 }
 
-/// Receipts sanity: at the suite's stock configuration, the main planning
+/// Budget sanity: at the suite's stock configuration, the main planning
 /// loop's budget accounting must never overrun. This is what makes the
 /// efficiency claim above meaningful rather than an artifact of a leaky stop
 /// condition.
@@ -458,10 +451,9 @@ fn comparisons_attempted_never_exceeds_configured_budget() {
     }
 }
 
-/// Halving the budget must not overrun it either -- *except* for cases whose
-/// gate-prewarm phase (`prewarm_pairs_per_attr`) alone exceeds the halved
-/// budget. See `prewarm_ignores_comparison_budget_and_can_overrun_it` below
-/// for that carve-out pinned as a known bug rather than silently excluded.
+/// Halving the budget must not overrun it. Cases without gate prewarm are
+/// checked here to isolate the planner loop; the dedicated regression below
+/// checks that gate prewarm also stops exactly at the same budget.
 #[test]
 fn comparisons_attempted_never_exceeds_half_budget_for_non_prewarm_cases() {
     for case in &synthetic_cases() {
@@ -485,28 +477,21 @@ fn comparisons_attempted_never_exceeds_half_budget_for_non_prewarm_cases() {
     }
 }
 
-/// KNOWN BUG (src/rerank/evaluation.rs, `run_synthetic_case_with_config`'s
-/// gate-prewarm phase, roughly lines 921-963): the prewarm loop runs
-/// `prewarm_pairs_per_attr * n_attributes` pairwise comparisons unconditionally,
-/// incrementing `comparisons_attempted` on every draw, *before* the main
-/// planning loop's `comparisons_attempted >= comparison_budget` check ever
-/// runs. If the caller supplies (or this harness derives, e.g. via a halved
-/// budget) a `comparison_budget` smaller than the prewarm total, the prewarm
-/// phase alone blows through it -- the harness's own budget promise is
-/// violated before planning even starts.
+/// Regression for a fixed bug in `run_synthetic_case_with_config`'s gate
+/// prewarm: the old loop ran `prewarm_pairs_per_attr * n_attributes`
+/// comparisons before the planner's budget check. A caller-supplied budget
+/// smaller than that total was already overrun before planning began.
 ///
-/// Repro: `gated_feasibility_30` has `prewarm_pairs_per_attr: 80` on a single
-/// attribute (prewarm total = 80). Its default budget is 120, so the bug is
-/// silent at the suite's stock configuration. Halve the budget to 60 (a
-/// perfectly ordinary thing to do with this public, mutable `SyntheticCase`
-/// field) and the prewarm phase alone attempts 80 comparisons against a
-/// budget of 60 -- a 33% overrun -- before a single planned comparison runs.
+/// `gated_feasibility_30` has `prewarm_pairs_per_attr: 80` on one attribute.
+/// Its default budget is 120, so the defect was silent at stock settings.
+/// With budget 60, the prewarm phase must stop at 60 rather than attempting
+/// all 80 comparisons.
 ///
 /// Regression test: found by this suite and FIXED — the prewarm loop now
 /// checks `comparisons_attempted >= comparison_budget` before every prewarm
 /// comparison and stops when the budget is spent.
 #[test]
-fn prewarm_ignores_comparison_budget_and_can_overrun_it() {
+fn prewarm_respects_comparison_budget() {
     let mut case = synthetic_cases()
         .into_iter()
         .find(|c| c.name == "gated_feasibility_30")
@@ -524,7 +509,7 @@ fn prewarm_ignores_comparison_budget_and_can_overrun_it() {
     case.comparison_budget = Some(small_budget);
 
     let result = run_synthetic_case_with_config(&case, ratio_cfg())
-        .expect("run should still complete despite the budget overrun");
+        .expect("budget-limited prewarm should complete");
 
     assert!(
         result.metrics.comparisons_attempted <= small_budget,

@@ -433,7 +433,7 @@ async fn cli_sort_counterbalance_measures_pure_position_bias() {
     let flips = parsed["meta"]["position_flips"].as_u64().unwrap();
     assert!(pairs > 0, "expected counterbalanced pairs, got 0");
     // A judge that always answers "A" disagrees with itself on every
-    // counterbalanced pair: the receipt catches 100% position bias.
+    // counterbalanced pair: the diagnostic catches 100% position bias.
     assert_eq!(
         flips, pairs,
         "pure position bias must flip every counterbalanced pair"
@@ -596,7 +596,7 @@ async fn library_sort_accepts_prune_option_end_to_end() {
     // Small lists blanket every pair in the first batch, so nothing needs
     // pruning here (the deterministic pruning behavior is covered at the
     // engine level in tests/trait_search_prune.rs). The option must still
-    // round-trip and the receipt field must be present.
+    // round-trip and the accounting field must be present.
     assert_eq!(sorted.items[0].text, "shiny GOLD ring");
     assert_eq!(sorted.items[1].text, "bright SILVER fork");
     let json = serde_json::to_value(&sorted.meta).unwrap();

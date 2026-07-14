@@ -5,8 +5,8 @@ before attacking: README.md, AGENTS.md, docs/PRINCIPLES.md,
 notes/ideation-2026-07-05/differentiation.md,
 artifacts/live/corpus-map-500-2026-07-08/README.md,
 artifacts/live/slate-2026-07-07/README.md,
-artifacts/live/receipt-viewer-2026-07-08/README.md, issues #46/#49/#50,
-the artifacts/live/ directory (28 dated receipt packs since 2026-06-30),
+artifacts/live/evidence-viewer-2026-07-08/README.md, issues #46/#49/#50,
+the artifacts/live/ directory (28 dated evidence packs since 2026-06-30),
 and the repo's external footprint: **1 star, 1 fork, 0 watchers**
 (gh repo view, 2026-07-09; crates.io download API refused the query, but a
 repo announced nowhere has downloads from nowhere).
