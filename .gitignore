@@ -30,3 +30,6 @@ scorecard.png
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+
+# Manifund campaign raw + derived data (rebuild: scripts/manifund_fetch.py + scripts/manifund_prep.py)
+data/manifund/
