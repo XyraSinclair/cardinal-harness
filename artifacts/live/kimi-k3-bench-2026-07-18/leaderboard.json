@@ -1,0 +1,20 @@
+[
+  {
+    "coherence": 0.9230436963008807,
+    "coherence_harmonic": 0.9147277968586973,
+    "cost_nanodollars": 1493476800,
+    "frustration": 0.01790343617077206,
+    "judge_score": 0.6258089689220959,
+    "model": "moonshotai/kimi-k3",
+    "nuisance_drift_nats": 0.2141863259292959,
+    "null_bias_nats": 0.0,
+    "order_flip_rate": 0.0,
+    "order_residual_nats": 0.14381322022432785,
+    "paraphrase_spearman": 0.9761904761904762,
+    "polarity_spearman": -0.8571428571428571,
+    "refusals": 0,
+    "signal_nats": 1.1331544204539203,
+    "spin_survival": 1.0,
+    "susceptibility_nats": 0.14593653278121047
+  }
+]

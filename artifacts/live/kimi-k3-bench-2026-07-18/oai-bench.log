@@ -1,0 +1,40 @@
+benchmarking openai/gpt-5.4-mini ...
+model: openai/gpt-5.4-mini · template: canonical_v2
+  signal           +0.655 [+0.429, +0.880] nats (n=20)  → 0.480
+  order-flip       +0.200 [+0.081, +0.416] rate (n=20)  → 0.800
+  order-residual   +0.292 [+0.107, +0.476] nats (n=20)  → 0.747
+  frustration      +0.076 curl fraction (n=13)  → 0.924
+  spin-survival    +0.667 [+0.208, +0.939] rate (n=3)  → 0.667
+  susceptibility   +0.552 [+0.112, +0.993] nats/spin (n=5)
+  polarity         -0.619 spearman (n=8)  → 0.810
+  paraphrase       +0.929 spearman (n=8)  → 0.964
+  null-bias        +0.000 [+0.000, +0.000] nats (n=4)  → 1.000
+  nuisance         +0.548 [+0.278, +0.819] nats (n=24)  → 0.578
+  orbit-coherence  +0.093 [+0.020, +0.166] energy fraction (n=6)  → 0.093
+  interaction      +0.477 [+0.282, +0.673] energy fraction (n=6)
+  harmonic         +0.004 energy fraction (n=1)  → 0.996
+    nuisance:whitespace   +0.267 nats (n=6)
+    nuisance:markdown     +0.701 nats (n=6)
+    nuisance:bullet       +0.250 nats (n=6)
+    nuisance:halo         +0.976 nats (n=6)
+  coherence 0.756 (harmonic 0.437) · JUDGE SCORE 0.363 · 194 comparisons (0 cached) · 0 refusals · $0.0765
+benchmarking openai/gpt-5.4-nano ...
+model: openai/gpt-5.4-nano · template: canonical_v2
+  signal           +0.522 [+0.352, +0.692] nats (n=20)  → 0.407
+  order-flip       +0.400 [+0.219, +0.613] rate (n=20)  → 0.600
+  order-residual   +0.238 [+0.135, +0.342] nats (n=20)  → 0.788
+  frustration      +0.217 curl fraction (n=13)  → 0.783
+  spin-survival    +0.000 [+0.000, +0.658] rate (n=2)  → 0.000
+  susceptibility   +0.960 [+0.710, +1.210] nats/spin (n=5)
+  polarity         -0.024 spearman (n=8)  → 0.512
+  paraphrase       +0.929 spearman (n=8)  → 0.964
+  null-bias        +0.000 [+0.000, +0.000] nats (n=4)  → 1.000
+  nuisance         +0.827 [+0.514, +1.139] nats (n=24)  → 0.437
+  orbit-coherence  +0.069 [+0.041, +0.098] energy fraction (n=6)  → 0.069
+  interaction      +0.389 [+0.200, +0.577] energy fraction (n=6)
+  harmonic         +0.019 energy fraction (n=1)  → 0.981
+    nuisance:whitespace   +0.689 nats (n=6)
+    nuisance:markdown     +0.907 nats (n=6)
+    nuisance:bullet       +0.800 nats (n=6)
+    nuisance:halo         +0.910 nats (n=6)
+  coherence 0.605 (harmonic 0.000) · JUDGE SCORE 0.246 · 194 comparisons (0 cached) · 0 refusals · $0.0205

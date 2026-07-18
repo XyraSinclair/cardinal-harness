@@ -118,6 +118,7 @@ const GPT_5_MINI: ModelPricing = ModelPricing::new("openrouter", 250, 2_000);
 const GEMINI_3_1_PRO: ModelPricing = ModelPricing::new("openrouter", 2_000, 12_000);
 
 // Moonshot
+const KIMI_K3: ModelPricing = ModelPricing::new("openrouter", 3_000, 15_000);
 const KIMI_K2_0905: ModelPricing = ModelPricing::new("openrouter", 600, 2_500);
 const KIMI_K2_THINKING: ModelPricing = ModelPricing::new("openrouter", 600, 2_500);
 
@@ -164,6 +165,7 @@ fn init_pricing() -> HashMap<&'static str, ModelPricing> {
     map.insert("google/gemini-3.1-pro-preview", GEMINI_3_1_PRO);
 
     // Moonshot
+    map.insert("moonshotai/kimi-k3", KIMI_K3);
     map.insert("moonshotai/kimi-k2-0905", KIMI_K2_0905);
     map.insert("moonshotai/kimi-k2-thinking", KIMI_K2_THINKING);
 

@@ -1,0 +1,20 @@
+benchmarking deepseek/deepseek-v4-flash ...
+model: deepseek/deepseek-v4-flash · template: canonical_v2
+  signal           +0.865 [+0.478, +1.252] nats (n=20)  → 0.579
+  order-flip       +0.150 [+0.052, +0.360] rate (n=20)  → 0.850
+  order-residual   +0.154 [+0.069, +0.239] nats (n=20)  → 0.857
+  frustration      +0.143 curl fraction (n=13)  → 0.857
+  spin-survival    +0.667 [+0.208, +0.939] rate (n=3)  → 0.667
+  susceptibility   +0.469 [+0.137, +0.802] nats/spin (n=5)
+  polarity         -0.548 spearman (n=8)  → 0.774
+  paraphrase       +0.976 spearman (n=8)  → 0.988
+  null-bias        +0.000 [+0.000, +0.000] nats (n=4)  → 1.000
+  nuisance         +0.505 [+0.261, +0.750] nats (n=24)  → 0.603
+  orbit-coherence  +0.336 [+0.140, +0.533] energy fraction (n=6)  → 0.336
+  interaction      +0.338 [+0.230, +0.446] energy fraction (n=6)
+  harmonic         +0.090 energy fraction (n=1)  → 0.910
+    nuisance:whitespace   +0.374 nats (n=6)
+    nuisance:markdown     +0.603 nats (n=6)
+    nuisance:bullet       +0.760 nats (n=6)
+    nuisance:halo         +0.284 nats (n=6)
+  coherence 0.776 (harmonic 0.699) · JUDGE SCORE 0.450 · 194 comparisons (118 cached) · 0 refusals · $0.0101
