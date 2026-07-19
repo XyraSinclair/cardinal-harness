@@ -1131,8 +1131,10 @@ async fn canonize_ranks_wordings_by_cross_judge_transmissibility() {
             "test/judge-a,test/judge-b",
             "--accepted",
             "metallic magnificence",
+            // --budget is TOTAL across sorts: 7 sorts here (1 accepted +
+            // 3 candidates × 2 judges) × 24 comparisons each.
             "--budget",
-            "24",
+            "168",
             "--cache",
             dir.join("canonize.sqlite").to_str().unwrap(),
             "--json",

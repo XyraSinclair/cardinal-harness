@@ -368,35 +368,45 @@ async fn propose_via_chat(
 ) -> Result<(Vec<String>, ProposalUsage), ExplainError> {
     use crate::gateway::{ChatModel, ChatRequest, Message};
 
-    let response = gateway
-        .chat(ChatRequest {
-            model: ChatModel::openrouter(model),
-            messages: vec![Message::system(system), Message::user(user)],
-            temperature: 0.4,
-            max_tokens: Some(600),
-            json_mode: true,
-            attribution,
-            logprobs: false,
-            top_logprobs: None,
-            reasoning: None,
-            prompt_cache_key: None,
-        })
-        .await?;
-
-    let content = response.content.trim();
-    let start = content.find('[').unwrap_or(0);
-    let end = content.rfind(']').map(|e| e + 1).unwrap_or(content.len());
-    let parsed: Vec<String> = serde_json::from_str(&content[start..end])
-        .map_err(|err| ExplainError::ProposalParse(format!("{err}: {content}")))?;
-    if parsed.is_empty() {
-        return Err(ExplainError::ProposalParse("empty candidate list".into()));
-    }
-    let usage = ProposalUsage {
-        input_tokens: response.input_tokens,
-        output_tokens: response.output_tokens,
-        cost_nanodollars: response.cost_nanodollars,
+    // Some model families intermittently return an empty completion or a
+    // decorated envelope (measured on the Manifund P1 run: deepseek empty,
+    // gpt-5.4-mini `{"[]": [...]}`). Extraction is lenient; a completion
+    // with no extractable strings earns exactly one retry before failing.
+    let mut usage = ProposalUsage {
+        input_tokens: 0,
+        output_tokens: 0,
+        cost_nanodollars: 0,
     };
-    Ok((parsed, usage))
+    let mut last_content = String::new();
+    for _attempt in 0..2 {
+        let response = gateway
+            .chat(ChatRequest {
+                model: ChatModel::openrouter(model),
+                messages: vec![
+                    Message::system(system),
+                    Message::user(user.clone()),
+                ],
+                temperature: 0.4,
+                max_tokens: Some(600),
+                json_mode: true,
+                attribution: attribution.clone(),
+                logprobs: false,
+                top_logprobs: None,
+                reasoning: None,
+                prompt_cache_key: None,
+            })
+            .await?;
+        usage.input_tokens += response.input_tokens;
+        usage.output_tokens += response.output_tokens;
+        usage.cost_nanodollars += response.cost_nanodollars;
+        if let Some(parsed) = super::proposal_json::lenient_string_array(&response.content) {
+            return Ok((parsed, usage));
+        }
+        last_content = response.content;
+    }
+    Err(ExplainError::ProposalParse(format!(
+        "no string array in completion after retry: {last_content:?}"
+    )))
 }
 
 /// One attribute's measured differentiation result for a focal item.

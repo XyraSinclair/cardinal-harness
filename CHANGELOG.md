@@ -8,6 +8,15 @@ Versioning once it reaches `1.0.0`.
 ## [Unreleased]
 
 ### Added
+- `cardinal judge --consortium m1,m2,...`: the consortium verdict primitive.
+  Each judge measures the full Z₂³ orbit; complete orbits become judgment
+  packets (`--packets-out`) and the belief is computed by fusing them —
+  composition of the orbit transform, the judgment packet, and the robust
+  solver into one operation with an explicit error budget (within-judge
+  orbit-bias rms, cross-judge spread, direction unanimity, shared-bias
+  residual correlation). Live smoke on a Manifund ACX pair: 3 judges,
+  24 comparisons, $0.021, unanimous direction with per-judge coherence
+  0.049–0.572.
 - An experimental ordered-probit module for ladder-valued judgements, with
   symmetric cut construction, interval-censored likelihood fitting, a declared
   weak prior, gauge-projected covariance, and zero-spend synthetic comparison
@@ -15,6 +24,19 @@ Versioning once it reaches `1.0.0`.
   until contaminated-channel and calibration gates pass.
 
 ### Changed
+- `cardinal canonize --budget` is now the TOTAL comparison budget across
+  every sort the protocol runs (accepted + candidates × judges), divided
+  evenly, with the projected sort count printed before any spend and a loud
+  error when the budget cannot cover the sorts. The old per-(candidate,
+  judge) reading was a measured footgun: the Manifund P1 run turned
+  `--budget 240` into ~1,900 comparisons and a 20-minute silent run.
+- Proposal-JSON parsing (`slate`, `weigh --propose`, `canonize --propose`,
+  `explain --propose`, `distinguish --propose`) is now lenient — whole
+  completion parsed first, then the first balanced JSON span — and an
+  empty or unparseable completion earns exactly one retry. Both failure
+  modes were measured on the Manifund P1 run (deepseek intermittent empty
+  completions; gpt-5.4-mini's valid-but-decorated `{"[]": [...]}` envelope,
+  which the old first-bracket slice turned into a parse error).
 - Point observations now use explicit measured `precision` when present and
   unit precision otherwise. Removed the anti-calibrated
   `eps_confidence`/`gamma_confidence` transform and planner

@@ -1,5 +1,11 @@
 # P1 — attribute layer results (2026-07-14)
 
+> **Update 2026-07-19**: both robustness findings below are now patched in
+> cardinal (approved follow-up): `canonize --budget` is total across sorts
+> with a pre-spend projection log, and the proposal-JSON path is lenient
+> (whole-parse first, balanced-span fallback) with one retry on empty
+> completions. The findings stand as the evidence that motivated the fixes.
+
 Total spend: **~$0.09** (weigh $0.011 + slate $0.007 + canonize runs ~$0.07,
 most of it the two abandoned over-budgeted attempts). Ceiling was $5.
 

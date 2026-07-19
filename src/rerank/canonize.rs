@@ -35,10 +35,22 @@ use crate::gateway::{Attribution, ChatGateway};
 pub struct CanonizeOptions {
     /// Judge models (≥ 2 for transmissibility to be defined).
     pub judges: Vec<String>,
-    /// Comparison budget per (candidate, judge) sort.
+    /// TOTAL comparison budget across every sort the protocol runs
+    /// (accepted attributes + candidates × judges), divided evenly per
+    /// sort. `None` leaves each sort on its own default budget. The old
+    /// per-(candidate, judge) reading was a measured footgun: P1 turned
+    /// `--budget 240` into ~1,900 comparisons and a 20-minute silent run.
     pub comparison_budget: Option<usize>,
     /// RNG seed.
     pub seed: u64,
+}
+
+/// Number of sorts [`canonize`] will run: one per accepted attribute
+/// (first judge only) plus one per (candidate, judge). The CLI prints
+/// this projection before spending.
+#[must_use]
+pub fn planned_sorts(accepted: usize, candidates: usize, judges: usize) -> usize {
+    accepted + candidates * judges
 }
 
 /// One candidate wording's measured canonicality.
@@ -79,6 +91,8 @@ pub enum CanonizeError {
     TooFewEntities(usize),
     #[error("no candidate wordings")]
     NoCandidates,
+    #[error("total budget {budget} cannot cover {sorts} sorts (needs at least 1 comparison each)")]
+    BudgetTooSmall { budget: usize, sorts: usize },
     #[error(transparent)]
     Sort(#[from] SortError),
 }
@@ -119,6 +133,20 @@ pub async fn canonize(
     if candidates.is_empty() {
         return Err(CanonizeError::NoCandidates);
     }
+    let sorts = planned_sorts(accepted.len(), candidates.len(), opts.judges.len());
+    let per_sort_budget = match opts.comparison_budget {
+        Some(total) => {
+            let per_sort = total / sorts;
+            if per_sort == 0 {
+                return Err(CanonizeError::BudgetTooSmall {
+                    budget: total,
+                    sorts,
+                });
+            }
+            Some(per_sort)
+        }
+        None => None,
+    };
     let mut comparisons = 0usize;
     let mut cost = 0i64;
 
@@ -130,7 +158,7 @@ pub async fn canonize(
             execution(gateway.clone(), cache, opts.seed),
             SortOptions {
                 model: Some(judge.to_string()),
-                comparison_budget: opts.comparison_budget,
+                comparison_budget: per_sort_budget,
                 ..Default::default()
             },
         )

@@ -48,7 +48,7 @@ this list, and every row is labeled **covered** / **named-gap** /
 |---|---|
 | One voice; every sentence load-bearing; no self-grading superlatives | **named-gap** pending sweep + scrape pass |
 | Target verb surface ~5 (`sort`, `believe`, `bench`, `weigh`, `cache`); probe flags folded behind the battery | **named-gap** — council-sanctioned, staged behind the validation gate |
-| No parallel implementations of one statistic (transmissibility → `judge_geometry`) | **named-gap** — gated on next canonize touch |
+| No parallel implementations of one statistic (transmissibility → `judge_geometry`) | **named-gap** — the 2026-07-19 canonize touch (budget semantics) deliberately deferred it; still open |
 
 ## Stewardship
 

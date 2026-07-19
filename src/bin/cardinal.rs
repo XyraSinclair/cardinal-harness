@@ -275,7 +275,9 @@ enum Commands {
         /// are scored for redundancy against these
         #[arg(long = "accepted")]
         accepted: Vec<String>,
-        /// Comparison budget per (candidate, judge) sort
+        /// TOTAL comparison budget across all sorts (accepted + candidates
+        /// × judges), divided evenly; omit to leave each sort on its own
+        /// default budget
         #[arg(long)]
         budget: Option<usize>,
         /// RNG seed
@@ -449,6 +451,17 @@ enum Commands {
         /// from numerical framing bias
         #[arg(long)]
         wordings: bool,
+        /// Consortium verdict: judge models, comma-separated (≥ 2). Each
+        /// judge measures the full Z₂³ orbit (8 comparisons); complete
+        /// orbits become judgment packets and the belief is computed by
+        /// FUSING them — one number, an explicit error budget (within-judge
+        /// orbit bias + cross-judge spread), and portable evidence
+        #[arg(long)]
+        consortium: Option<String>,
+        /// Write one judgment packet JSON per usable judge to this
+        /// directory (with --consortium)
+        #[arg(long)]
+        packets_out: Option<PathBuf>,
     },
     /// Expand a terse criterion into a precise judging rubric (one LLM call)
     ///
@@ -1303,6 +1316,28 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
 
+            let sorts = cardinal_harness::rerank::planned_sorts(
+                accepted.len(),
+                candidates.len(),
+                judge_list.len(),
+            );
+            match budget {
+                Some(total) => eprintln!(
+                    "canonize: {sorts} sorts ({} accepted + {} candidates × {} judges) · \
+                     budget {total} total → {} comparisons per sort",
+                    accepted.len(),
+                    candidates.len(),
+                    judge_list.len(),
+                    total / sorts.max(1),
+                ),
+                None => eprintln!(
+                    "canonize: {sorts} sorts ({} accepted + {} candidates × {} judges) · \
+                     per-sort default budget (4·n each)",
+                    accepted.len(),
+                    candidates.len(),
+                    judge_list.len(),
+                ),
+            }
             let cache_path = cache.unwrap_or_else(SqlitePairwiseCache::default_path);
             let cache_store = SqlitePairwiseCache::new(cache_path)?;
             let report = cardinal_harness::rerank::canonize(
@@ -1725,6 +1760,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             wordings,
             draws,
             temperature,
+            consortium,
+            packets_out,
         } => {
             let text_a = read_item_arg(&item_a)?;
             let text_b = read_item_arg(&item_b)?;
@@ -1732,6 +1769,145 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .as_deref()
                 .unwrap_or("openai/gpt-5.4-mini")
                 .to_string();
+
+            if let Some(consortium) = consortium {
+                let models: Vec<String> = consortium
+                    .split(',')
+                    .map(|m| m.trim().to_string())
+                    .filter(|m| !m.is_empty())
+                    .collect();
+                if std::env::var("OPENROUTER_API_KEY").is_err() {
+                    return Err("OPENROUTER_API_KEY is not set. Create a key at \
+                         https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
+                        .into());
+                }
+                let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
+                let cache_store = if no_cache {
+                    None
+                } else {
+                    let cache_path = cache.unwrap_or_else(SqlitePairwiseCache::default_path);
+                    Some(SqlitePairwiseCache::new(cache_path)?)
+                };
+                let cache_ref = cache_store
+                    .as_ref()
+                    .map(|c| c as &dyn cardinal_harness::cache::PairwiseCache);
+                // Stable entity labels: packets accrete across runs by
+                // id + content hash, so @path items keep their file stem
+                // and literals get a content-derived label.
+                let label = |arg: &str, text: &str| -> String {
+                    arg.strip_prefix('@')
+                        .and_then(|p| {
+                            std::path::Path::new(p)
+                                .file_stem()
+                                .map(|s| s.to_string_lossy().into_owned())
+                        })
+                        .unwrap_or_else(|| {
+                            cardinal_harness::packet::entity_text_hash(text)[..12].to_string()
+                        })
+                };
+                let id_a = label(&item_a, &text_a);
+                let id_b = label(&item_b, &text_b);
+                let created = chrono::Utc::now().to_rfc3339();
+                let report = cardinal_harness::rerank::consortium_verdict(
+                    &gateway,
+                    cache_ref,
+                    &models,
+                    &by,
+                    (&id_a, &text_a),
+                    (&id_b, &text_b),
+                    &template,
+                    &created,
+                    Attribution::new("cardinal::judge::consortium"),
+                )
+                .await?;
+                let written = if let Some(dir) = packets_out.as_ref() {
+                    std::fs::create_dir_all(dir)?;
+                    let mut paths = Vec::new();
+                    for packet in &report.packets {
+                        let path = dir.join(format!(
+                            "packet-{}-{}.json",
+                            packet.judge.replace('/', "-"),
+                            &packet.id().0[..12],
+                        ));
+                        std::fs::write(&path, serde_json::to_string_pretty(packet)?)?;
+                        paths.push(path);
+                    }
+                    paths
+                } else {
+                    Vec::new()
+                };
+                if json {
+                    println!("{}", serde_json::to_string_pretty(&report)?);
+                } else {
+                    println!("{:<34} {:>8} {:>9}  top bias", "judge", "belief", "coherence");
+                    for j in &report.judges {
+                        match (j.belief, j.coherence, &j.top_bias) {
+                            (Some(b), Some(c), Some((name, coef))) => println!(
+                                "{:<34} {b:+8.3} {c:9.3}  {name} {coef:+.3}",
+                                j.model
+                            ),
+                            _ => println!(
+                                "{:<34} orbit incomplete ({} refusals) — excluded",
+                                j.model, j.refusals
+                            ),
+                        }
+                    }
+                    match (report.belief, report.ratio) {
+                        (Some(b), Some(r)) => {
+                            let toward = if b >= 0.0 { &id_a } else { &id_b };
+                            println!(
+                                "belief (fused, toward {toward}): {:+.3} nats · ratio {r:.2}×",
+                                b
+                            );
+                            let spread = report
+                                .judge_spread_nats
+                                .map(|s| format!("{s:.3}"))
+                                .unwrap_or_else(|| "n/a (1 judge)".into());
+                            let bias = report
+                                .orbit_bias_rms
+                                .map(|s| format!("{s:.3}"))
+                                .unwrap_or_else(|| "n/a".into());
+                            let unanimity = match report.direction_unanimous {
+                                Some(true) => format!("unanimous ({}/{})", report.usable_judges, report.usable_judges),
+                                Some(false) => "SPLIT".into(),
+                                None => "n/a".into(),
+                            };
+                            println!(
+                                "error budget: syst orbit-bias rms {bias} · syst judge spread \
+                                 {spread} (nats) · direction {unanimity}"
+                            );
+                        }
+                        _ => println!("no usable judge completed its orbit — no verdict"),
+                    }
+                    if let Some(matrix) = &report.residual_correlation {
+                        let rows: Vec<String> = matrix
+                            .iter()
+                            .map(|row| {
+                                row.iter()
+                                    .map(|v| format!("{v:+.2}"))
+                                    .collect::<Vec<_>>()
+                                    .join(" ")
+                            })
+                            .collect();
+                        println!(
+                            "shared-bias correlation (orbit residuals, n = 8 cells): [{}]",
+                            rows.join(" | ")
+                        );
+                    }
+                    for path in &written {
+                        println!("packet: {}", path.display());
+                    }
+                }
+                eprintln!(
+                    "{} judges ({} usable) · {} comparisons ({} cached) · ${:.4}",
+                    report.judges.len(),
+                    report.usable_judges,
+                    report.comparisons,
+                    report.comparisons_cached,
+                    report.cost_nanodollars as f64 / 1e9,
+                );
+                return Ok(());
+            }
 
             if let Some(k) = draws {
                 if std::env::var("OPENROUTER_API_KEY").is_err() {

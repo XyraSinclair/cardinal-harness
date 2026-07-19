@@ -13,6 +13,7 @@ pub mod anp;
 pub mod bench;
 pub mod canonize;
 pub mod comparison;
+pub mod consortium;
 pub mod elaborate;
 pub mod ensemble;
 pub mod evaluation;
@@ -25,6 +26,7 @@ pub mod multi;
 pub mod options;
 pub mod orbit;
 pub mod policy_registry;
+pub(crate) mod proposal_json;
 pub mod report;
 pub mod sampling;
 pub mod simple;
@@ -45,12 +47,13 @@ pub use bench::{
     HARMONIC_CYCLE, OPPOSITE_ATTRIBUTE, PARAPHRASE_ATTRIBUTE, PRIMARY_ATTRIBUTE,
 };
 pub use canonize::{
-    canonize, CandidateCanonicality, CanonizeError, CanonizeOptions, CanonizeReport,
+    canonize, planned_sorts, CandidateCanonicality, CanonizeError, CanonizeOptions, CanonizeReport,
 };
 pub use comparison::{
     compare_pair, ComparisonError, PairwiseComparisonAttribute, PairwiseComparisonEntity,
     PairwiseComparisonRequest, PairwiseComparisonSpec,
 };
+pub use consortium::{consortium_verdict, ConsortiumError, ConsortiumJudge, ConsortiumReport};
 pub use elaborate::{elaborate_criterion, ElaborateError, ElaboratedCriterion};
 pub use ensemble::{judge_geometry, JudgeGeometry, JudgePortfolioEntry};
 pub use experiments::{

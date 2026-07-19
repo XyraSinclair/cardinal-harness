@@ -175,6 +175,13 @@ there, from most magic to most manual:
   reporting how far the judgement moves when the asker leans — and whether
   the belief survives the spin at all. A judgement only deserves the name
   *belief* if it is a fixed point of framings that shouldn't matter.
+  Add **`--consortium m1,m2,m3`** for the robust form of the same
+  primitive: every judge measures the full Z₂³ orbit (order × polarity ×
+  wording, 8 comparisons each), each complete orbit becomes a judgment
+  packet, and the verdict is computed by FUSING the packets — one belief
+  with an explicit error budget (within-judge orbit bias, cross-judge
+  spread, direction unanimity) and per-judge coherence so you see which
+  mind is mostly bias. `--packets-out dir/` keeps the evidence portable.
 - **`cardinal explain ranking.txt --candidate "clarity" --propose 3`** — the
   inverse problem: you already HAVE a ranking you believe in. Explain
   measures candidate attributes (yours, plus LLM-proposed ones) with the

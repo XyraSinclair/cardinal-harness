@@ -54,65 +54,42 @@ async fn chat_json(
     user: String,
     attribution: &Attribution,
 ) -> Result<(serde_json::Value, i64), SlateError> {
-    let response = gateway
-        .chat(ChatRequest {
-            model: ChatModel::openrouter(model),
-            messages: vec![Message::system(system), Message::user(user)],
-            temperature: 0.6,
-            max_tokens: Some(900),
-            json_mode: true,
-            attribution: attribution.clone(),
-            logprobs: false,
-            top_logprobs: None,
-            reasoning: None,
-            prompt_cache_key: None,
-        })
-        .await?;
-    let content = response.content.trim();
-    let start = content.find(['[', '{']).unwrap_or(0);
-    let end = content
-        .rfind([']', '}'])
-        .map(|e| e + 1)
-        .unwrap_or(content.len());
-    let value: serde_json::Value = serde_json::from_str(&content[start..end])
-        .map_err(|err| SlateError::Parse(format!("{err}: {content}")))?;
-    Ok((value, response.cost_nanodollars))
+    // Lenient parse (whole completion first, then the first balanced JSON
+    // span); an unparseable or empty completion earns exactly one retry —
+    // deepseek intermittently returned empty completions on the Manifund
+    // P1 run and killed the whole slate.
+    let mut cost = 0i64;
+    let mut last_content = String::new();
+    for _attempt in 0..2 {
+        let response = gateway
+            .chat(ChatRequest {
+                model: ChatModel::openrouter(model),
+                messages: vec![Message::system(system), Message::user(user.clone())],
+                temperature: 0.6,
+                max_tokens: Some(900),
+                json_mode: true,
+                attribution: attribution.clone(),
+                logprobs: false,
+                top_logprobs: None,
+                reasoning: None,
+                prompt_cache_key: None,
+            })
+            .await?;
+        cost += response.cost_nanodollars;
+        if let Some(value) = super::proposal_json::lenient_value(&response.content) {
+            return Ok((value, cost));
+        }
+        last_content = response.content;
+    }
+    Err(SlateError::Parse(format!(
+        "no JSON in completion after retry: {last_content:?}"
+    )))
 }
 
 fn string_array(value: &serde_json::Value) -> Result<Vec<String>, SlateError> {
-    // json_mode output varies: a bare array, an object wrapping one, or an
-    // object whose VALUES are the strings. Accept all three; strings may
-    // also arrive as objects with a single string value.
-    let element = |v: &serde_json::Value| -> Option<String> {
-        v.as_str().map(str::to_string).or_else(|| {
-            v.as_object()
-                .and_then(|o| o.values().find_map(serde_json::Value::as_str))
-                .map(str::to_string)
-        })
-    };
-    if let Some(array) = value.as_array().or_else(|| {
-        value
-            .as_object()
-            .and_then(|o| o.values().find_map(serde_json::Value::as_array))
-    }) {
-        return array
-            .iter()
-            .map(|v| {
-                element(v)
-                    .ok_or_else(|| SlateError::Parse(format!("non-string element in {value}")))
-            })
-            .collect();
-    }
-    if let Some(object) = value.as_object() {
-        let strings: Vec<String> = object
-            .values()
-            .filter_map(|v| v.as_str().map(str::to_string))
-            .collect();
-        if !strings.is_empty() {
-            return Ok(strings);
-        }
-    }
-    Err(SlateError::Parse(format!("no string array in {value}")))
+    super::proposal_json::value_string_array(value)
+        .filter(|s| !s.is_empty())
+        .ok_or_else(|| SlateError::Parse(format!("no string array in {value}")))
 }
 
 /// Build an attribute slate for one item.
