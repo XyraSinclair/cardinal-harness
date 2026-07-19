@@ -89,3 +89,8 @@ rule. It is the standing answer to "are we still doing deep work?".
 - Avoid broad prompt churn unless it is deliberate and benchmark-motivated.
 - When changing public request/response shapes or CLI behavior, update examples,
   tests, and docs in the same change.
+- GitHub issues are public executable contracts: each needs a current
+  source-linked discrepancy, one bounded tranche, behavioral acceptance, and
+  a closure rule. Unscheduled research branches, candidate schemas, and
+  internal review process stay in local notes until a frozen fixture earns
+  promotion.
