@@ -946,7 +946,9 @@ fn model_supports_logprobs(model: &str) -> bool {
 
     // GPT-5.4 family: logprobs request causes OpenAI backend 502 via OpenRouter.
     // The upstream API crashes rather than returning logprobs for these models.
-    if model_lower.starts_with("openai/gpt-5.4") {
+    // GPT-5.6 family (sol/terra/luna): OpenRouter does not list logprobs in
+    // supported_parameters and the provider 400s on the request (2026-07-18).
+    if model_lower.starts_with("openai/gpt-5.4") || model_lower.starts_with("openai/gpt-5.6") {
         return false;
     }
     // Gemini 3.1 Pro Preview is reasoning-mandatory on OpenRouter and does not

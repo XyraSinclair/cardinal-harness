@@ -98,6 +98,7 @@ const OPENAI_EMBED_3_SMALL_BATCH: ModelPricing = ModelPricing::new("openai", 10,
 // Verify periodically because provider model IDs and preview prices change.
 
 // Anthropic
+const CLAUDE_FABLE_5: ModelPricing = ModelPricing::new("openrouter", 10_000, 50_000);
 const CLAUDE_OPUS_4_6: ModelPricing = ModelPricing::new("openrouter", 5_000, 25_000);
 const CLAUDE_OPUS_4_5: ModelPricing = ModelPricing::new("openrouter", 5_000, 25_000);
 const CLAUDE_SONNET_4_6: ModelPricing = ModelPricing::new("openrouter", 3_000, 15_000);
@@ -106,6 +107,9 @@ const CLAUDE_SONNET_4: ModelPricing = ModelPricing::new("openrouter", 3_000, 15_
 const CLAUDE_HAIKU_4_5: ModelPricing = ModelPricing::new("openrouter", 1_000, 5_000);
 
 // OpenAI
+const GPT_5_6_SOL: ModelPricing = ModelPricing::new("openrouter", 5_000, 30_000);
+const GPT_5_6_TERRA: ModelPricing = ModelPricing::new("openrouter", 2_500, 15_000);
+const GPT_5_6_LUNA: ModelPricing = ModelPricing::new("openrouter", 1_000, 6_000);
 const GPT_5_4_PRO: ModelPricing = ModelPricing::new("openrouter", 30_000, 180_000);
 const GPT_5_4: ModelPricing = ModelPricing::new("openrouter", 2_500, 15_000);
 const GPT_5_4_MINI: ModelPricing = ModelPricing::new("openrouter", 750, 4_500);
@@ -119,6 +123,7 @@ const GEMINI_3_1_PRO: ModelPricing = ModelPricing::new("openrouter", 2_000, 12_0
 
 // Moonshot
 const KIMI_K3: ModelPricing = ModelPricing::new("openrouter", 3_000, 15_000);
+const KIMI_K2_6: ModelPricing = ModelPricing::new("openrouter", 950, 4_000);
 const KIMI_K2_0905: ModelPricing = ModelPricing::new("openrouter", 600, 2_500);
 const KIMI_K2_THINKING: ModelPricing = ModelPricing::new("openrouter", 600, 2_500);
 
@@ -145,6 +150,7 @@ fn init_pricing() -> HashMap<&'static str, ModelPricing> {
     map.insert("text-embedding-3-small:batch", OPENAI_EMBED_3_SMALL_BATCH);
 
     // Anthropic
+    map.insert("anthropic/claude-fable-5", CLAUDE_FABLE_5);
     map.insert("anthropic/claude-opus-4.6", CLAUDE_OPUS_4_6);
     map.insert("anthropic/claude-opus-4.5", CLAUDE_OPUS_4_5);
     map.insert("anthropic/claude-sonnet-4.6", CLAUDE_SONNET_4_6);
@@ -153,6 +159,9 @@ fn init_pricing() -> HashMap<&'static str, ModelPricing> {
     map.insert("anthropic/claude-haiku-4.5", CLAUDE_HAIKU_4_5);
 
     // OpenAI
+    map.insert("openai/gpt-5.6-sol", GPT_5_6_SOL);
+    map.insert("openai/gpt-5.6-terra", GPT_5_6_TERRA);
+    map.insert("openai/gpt-5.6-luna", GPT_5_6_LUNA);
     map.insert("openai/gpt-5.4-pro", GPT_5_4_PRO);
     map.insert("openai/gpt-5.4", GPT_5_4);
     map.insert("openai/gpt-5.4-mini", GPT_5_4_MINI);
@@ -166,6 +175,7 @@ fn init_pricing() -> HashMap<&'static str, ModelPricing> {
 
     // Moonshot
     map.insert("moonshotai/kimi-k3", KIMI_K3);
+    map.insert("moonshotai/kimi-k2.6", KIMI_K2_6);
     map.insert("moonshotai/kimi-k2-0905", KIMI_K2_0905);
     map.insert("moonshotai/kimi-k2-thinking", KIMI_K2_THINKING);
 

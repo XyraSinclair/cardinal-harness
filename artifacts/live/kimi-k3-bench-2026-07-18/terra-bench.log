@@ -1,0 +1,20 @@
+benchmarking openai/gpt-5.6-terra ...
+model: openai/gpt-5.6-terra · template: canonical_v2
+  signal           +0.959 [+0.604, +1.314] nats (n=20)  → 0.617
+  order-flip       +0.150 [+0.052, +0.360] rate (n=20)  → 0.850
+  order-residual   +0.165 [+0.102, +0.227] nats (n=20)  → 0.848
+  frustration      +0.019 curl fraction (n=13)  → 0.981
+  spin-survival    +1.000 [+0.438, +1.000] rate (n=3)  → 1.000
+  susceptibility   +0.173 [-0.020, +0.367] nats/spin (n=5)
+  polarity         -0.905 spearman (n=8)  → 0.952
+  paraphrase       +0.952 spearman (n=8)  → 0.976
+  null-bias        +0.000 [+0.000, +0.000] nats (n=4)  → 1.000
+  nuisance         +0.210 [+0.116, +0.303] nats (n=24)  → 0.811
+  orbit-coherence  +0.864 [+0.702, +1.025] energy fraction (n=6)  → 0.864
+  interaction      +0.069 [-0.016, +0.153] energy fraction (n=6)
+  harmonic         +0.020 energy fraction (n=1)  → 0.980
+    nuisance:whitespace   +0.101 nats (n=6)
+    nuisance:markdown     +0.200 nats (n=6)
+    nuisance:bullet       +0.322 nats (n=6)
+    nuisance:halo         +0.216 nats (n=6)
+  coherence 0.935 (harmonic 0.929) · JUDGE SCORE 0.576 · 194 comparisons (0 cached) · 0 refusals · $0.3847

@@ -1,0 +1,20 @@
+benchmarking openai/gpt-5.6-sol ...
+model: openai/gpt-5.6-sol · template: canonical_v2
+  signal           +0.833 [+0.528, +1.138] nats (n=20)  → 0.565
+  order-flip       +0.100 [+0.028, +0.301] rate (n=20)  → 0.900
+  order-residual   +0.088 [+0.043, +0.133] nats (n=20)  → 0.916
+  frustration      +0.009 curl fraction (n=13)  → 0.991
+  spin-survival    +1.000 [+0.438, +1.000] rate (n=3)  → 1.000
+  susceptibility   +0.089 [+0.015, +0.163] nats/spin (n=5)
+  polarity         -0.952 spearman (n=8)  → 0.976
+  paraphrase       +0.905 spearman (n=8)  → 0.952
+  null-bias        +0.000 [+0.000, +0.000] nats (n=4)  → 1.000
+  nuisance         +0.180 [+0.083, +0.276] nats (n=24)  → 0.835
+  orbit-coherence  +0.731 [+0.442, +1.020] energy fraction (n=6)  → 0.731
+  interaction      +0.071 [-0.015, +0.156] energy fraction (n=6)
+  harmonic         +0.000 energy fraction (n=1)  → 1.000
+    nuisance:whitespace   +0.195 nats (n=6)
+    nuisance:markdown     +0.258 nats (n=6)
+    nuisance:bullet       +0.128 nats (n=6)
+    nuisance:halo         +0.138 nats (n=6)
+  coherence 0.933 (harmonic 0.923) · JUDGE SCORE 0.527 · 194 comparisons (0 cached) · 0 refusals · $0.8392

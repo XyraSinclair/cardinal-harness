@@ -1,0 +1,20 @@
+benchmarking openai/gpt-5.6-luna ...
+model: openai/gpt-5.6-luna · template: canonical_v2
+  signal           +0.631 [+0.390, +0.871] nats (n=20)  → 0.468
+  order-flip       +0.050 [+0.009, +0.236] rate (n=20)  → 0.950
+  order-residual   +0.124 [+0.044, +0.205] nats (n=20)  → 0.883
+  frustration      +0.025 curl fraction (n=13)  → 0.975
+  spin-survival    +1.000 [+0.438, +1.000] rate (n=3)  → 1.000
+  susceptibility   +0.190 [+0.102, +0.278] nats/spin (n=5)
+  polarity         -0.905 spearman (n=8)  → 0.952
+  paraphrase       +0.929 spearman (n=8)  → 0.964
+  null-bias        +0.000 [+0.000, +0.000] nats (n=4)  → 1.000
+  nuisance         +0.154 [+0.081, +0.227] nats (n=24)  → 0.857
+  orbit-coherence  +0.638 [+0.383, +0.893] energy fraction (n=6)  → 0.638
+  interaction      +0.214 [-0.019, +0.446] energy fraction (n=6)
+  harmonic         +0.002 energy fraction (n=1)  → 0.998
+    nuisance:whitespace   +0.104 nats (n=6)
+    nuisance:markdown     +0.178 nats (n=6)
+    nuisance:bullet       +0.117 nats (n=6)
+    nuisance:halo         +0.218 nats (n=6)
+  coherence 0.922 (harmonic 0.906) · JUDGE SCORE 0.431 · 194 comparisons (0 cached) · 0 refusals · $0.1831

@@ -1,0 +1,20 @@
+benchmarking anthropic/claude-fable-5 ...
+model: anthropic/claude-fable-5 · template: canonical_v2
+  signal           +1.194 [+0.808, +1.581] nats (n=20)  → 0.697
+  order-flip       +0.000 [+0.000, +0.161] rate (n=20)  → 1.000
+  order-residual   +0.090 [+0.047, +0.133] nats (n=20)  → 0.914
+  frustration      +0.023 curl fraction (n=13)  → 0.977
+  spin-survival    +1.000 [+0.438, +1.000] rate (n=3)  → 1.000
+  susceptibility   +0.075 [+0.031, +0.119] nats/spin (n=5)
+  polarity         -0.905 spearman (n=8)  → 0.952
+  paraphrase       +0.976 spearman (n=8)  → 0.988
+  null-bias        +0.000 [+0.000, +0.000] nats (n=4)  → 1.000
+  nuisance         +0.141 [+0.069, +0.213] nats (n=24)  → 0.869
+  orbit-coherence  +0.958 [+0.921, +0.994] energy fraction (n=6)  → 0.958
+  interaction      +0.018 [-0.002, +0.038] energy fraction (n=6)
+  harmonic         +0.014 energy fraction (n=1)  → 0.986
+    nuisance:whitespace   +0.145 nats (n=6)
+    nuisance:markdown     +0.133 nats (n=6)
+    nuisance:bullet       +0.178 nats (n=6)
+    nuisance:halo         +0.108 nats (n=6)
+  coherence 0.965 (harmonic 0.963) · JUDGE SCORE 0.673 · 194 comparisons (0 cached) · 0 refusals · $2.2528

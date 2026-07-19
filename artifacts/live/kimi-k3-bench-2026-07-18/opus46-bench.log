@@ -1,0 +1,20 @@
+benchmarking anthropic/claude-opus-4.6 ...
+model: anthropic/claude-opus-4.6 · template: canonical_v2
+  signal           +1.003 [+0.605, +1.400] nats (n=20)  → 0.633
+  order-flip       +0.150 [+0.052, +0.360] rate (n=20)  → 0.850
+  order-residual   +0.154 [+0.095, +0.212] nats (n=20)  → 0.858
+  frustration      +0.011 curl fraction (n=13)  → 0.989
+  spin-survival    +1.000 [+0.438, +1.000] rate (n=3)  → 1.000
+  susceptibility   +0.168 [+0.056, +0.279] nats/spin (n=5)
+  polarity         -0.976 spearman (n=8)  → 0.988
+  paraphrase       +0.929 spearman (n=8)  → 0.964
+  null-bias        +0.000 [+0.000, +0.000] nats (n=4)  → 1.000
+  nuisance         +0.083 [+0.024, +0.143] nats (n=24)  → 0.920
+  orbit-coherence  +0.771 [+0.570, +0.972] energy fraction (n=6)  → 0.771
+  interaction      +0.039 [-0.005, +0.083] energy fraction (n=6)
+  harmonic         +0.002 energy fraction (n=1)  → 0.998
+    nuisance:whitespace   +0.000 nats (n=6)
+    nuisance:markdown     +0.045 nats (n=6)
+    nuisance:bullet       +0.071 nats (n=6)
+    nuisance:halo         +0.217 nats (n=6)
+  coherence 0.943 (harmonic 0.936) · JUDGE SCORE 0.597 · 194 comparisons (0 cached) · 0 refusals · $0.5548
