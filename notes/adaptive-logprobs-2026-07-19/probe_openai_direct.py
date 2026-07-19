@@ -6,13 +6,9 @@ Paths tried per model:
   chat:  top_logprobs=1 (min ask)
   resp:  Responses API include=["message.output_text.logprobs"], top_logprobs=5, effort none & absent
 """
-import json, urllib.request, urllib.error
+import json, os, urllib.error, urllib.request
 
-KEY = None
-for l in open('/Users/xyra/projects/voice-notes/pipeline/.env'):
-    if l.startswith('OPENAI_API_KEY='):
-        KEY = l.strip().split('=', 1)[1].strip('"\''); break
-assert KEY
+KEY = os.environ["OPENAI_API_KEY"]
 
 SYS = "You compare two entities by an attribute. Output only JSON {\"higher_ranked\": \"A\"|\"B\", \"ratio\": number}."
 USR = "Compare by mass.\n<entity_A>a chicken egg</entity_A>\n<entity_B>a bowling ball</entity_B>\nJSON:"

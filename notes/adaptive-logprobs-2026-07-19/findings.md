@@ -142,3 +142,26 @@ for `visible_mass < 1`. Wiring it stays a separate tranche gated on its own benc
 - Multi-token ratio atoms under decimal ladders: the strict-schema numeric PMF observed
   above is rich; continuation rescoring remains the known blocker
   (`gateway/types.rs:220-224`).
+
+## 6. Addendum (same day): elicitation-shape and cache probes
+
+Probes `probe_twophase.py` and `probe_cache.py`, direct OpenAI API. Full numbers in
+`docs/LOGPROBS.md` (which these probes seeded). Headlines:
+
+- **Two-phase works on Chat Completions.** effort=medium analysis (no verdict) → new
+  effort=none request with the analysis as assistant context → verdict logprobs keep
+  full top-5 spread (0.81/0.19 on ladder-adjacent tokens) and shift vs one-shot
+  (130-cluster → 113/110 on egg-vs-bowling). Reasoning-informed PMFs exist; cost is
+  one extra cheap call.
+- **Responses continuation is sparse.** previous_response_id from an effort=medium
+  response into effort=none + logprobs is accepted, but returned 1 alternative per
+  position (n=1) where a fresh call returns 5. Chosen-token confidence only. Open.
+- **Visible scratchpad collapses the PMF** (analysis field before answer: top-1 mass
+  1.0). Deliberation must be hidden (reasoning tokens) or prior-turn context, never
+  same-turn visible prefix, if the PMF is the observable.
+- **Cache + nonce instrument confirmed.** 1562-token prompt, nonce suffix: 12/12 warm
+  calls cached 1280 tokens (`prompt_cache_key` honored), cached input at 10% price.
+  gpt-5.4-mini numeric ratio token: top-5 visible mass ≈ 0.23, answers 20→5000 —
+  the numeric-field pathology in vivo. Same-nonce repeats varied as much as
+  cross-nonce (top-1 0.12–0.26): server noise ≈ nonce sensitivity at n=13; stability
+  attribution needs repeat-averaging.
