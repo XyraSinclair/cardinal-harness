@@ -1,0 +1,3065 @@
+{
+  "entities": [
+    {
+      "id": "lightcone-infrastructure",
+      "rank": 1,
+      "feasible": true,
+      "u_mean": 8.178645305976719,
+      "u_std": 0.825928854937341,
+      "p_flip": 0.008077246371603342,
+      "attribute_scores": {
+        "team_evidence": {
+          "latent_mean": 3.835848410126143,
+          "latent_std": 0.5513544344834677,
+          "z_score": 1.5347340971057435,
+          "min_normalized": 4.835848410126143,
+          "percentile": 0.9551282051282052
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.9430042512404526,
+          "latent_std": 0.7547673298750196,
+          "z_score": 2.4076669977426346,
+          "min_normalized": 3.9430042512404526,
+          "percentile": 0.967948717948718
+        },
+        "impact_per_dollar": {
+          "latent_mean": 2.616583770795378,
+          "latent_std": 0.7556922271552758,
+          "z_score": 1.6671291444915872,
+          "min_normalized": 3.616583770795378,
+          "percentile": 0.9935897435897436
+        },
+        "theory_of_change": {
+          "latent_mean": 2.718766506320326,
+          "latent_std": 0.3994193710925689,
+          "z_score": 1.2822810118058598,
+          "min_normalized": 3.718766506320326,
+          "percentile": 0.9166666666666666
+        }
+      }
+    },
+    {
+      "id": "80000-hours",
+      "rank": 2,
+      "feasible": true,
+      "u_mean": 8.15382852081574,
+      "u_std": 0.8199294993110783,
+      "p_flip": 0.008342348301676239,
+      "attribute_scores": {
+        "impact_per_dollar": {
+          "latent_mean": 2.0369882755929325,
+          "latent_std": 0.56984726133426,
+          "z_score": 0.7854031224835694,
+          "min_normalized": 3.0369882755929325,
+          "percentile": 0.7628205128205128
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.3980392968901425,
+          "latent_std": 0.7642901356778504,
+          "z_score": 1.029838398765618,
+          "min_normalized": 3.3980392968901425,
+          "percentile": 0.8782051282051282
+        },
+        "theory_of_change": {
+          "latent_mean": 2.9702613411004153,
+          "latent_std": 0.4549897923485281,
+          "z_score": 1.812094993946318,
+          "min_normalized": 3.9702613411004153,
+          "percentile": 0.9807692307692307
+        },
+        "team_evidence": {
+          "latent_mean": 4.597686726417802,
+          "latent_std": 0.689411743193469,
+          "z_score": 2.7167709352490412,
+          "min_normalized": 5.597686726417802,
+          "percentile": 0.9935897435897436
+        }
+      }
+    },
+    {
+      "id": "animal-advocacy-strategy-forum",
+      "rank": 3,
+      "feasible": true,
+      "u_mean": 7.660916112973975,
+      "u_std": 1.2450844108525367,
+      "p_flip": 0.06344230982059451,
+      "attribute_scores": {
+        "team_evidence": {
+          "latent_mean": 3.858920357096234,
+          "latent_std": 0.7701273676715209,
+          "z_score": 1.5705315762599623,
+          "min_normalized": 4.858920357096234,
+          "percentile": 0.967948717948718
+        },
+        "impact_per_dollar": {
+          "latent_mean": 2.2608725594448513,
+          "latent_std": 1.465631952605051,
+          "z_score": 1.125993414549099,
+          "min_normalized": 3.2608725594448513,
+          "percentile": 0.9038461538461539
+        },
+        "theory_of_change": {
+          "latent_mean": 2.705728484986916,
+          "latent_std": 0.48854015435790077,
+          "z_score": 1.2548143403415077,
+          "min_normalized": 3.705728484986916,
+          "percentile": 0.9038461538461539
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.4484082435161603,
+          "latent_std": 0.713795721137557,
+          "z_score": 1.1571856246884489,
+          "min_normalized": 3.4484082435161603,
+          "percentile": 0.9038461538461539
+        }
+      }
+    },
+    {
+      "id": "impact-accelerator-program-biggest-career-program-for-experienced-professionals-u20ul2jdzhq",
+      "rank": 4,
+      "feasible": true,
+      "u_mean": 7.651474971453813,
+      "u_std": 1.089660632827353,
+      "p_flip": 0.047287820340530806,
+      "attribute_scores": {
+        "team_evidence": {
+          "latent_mean": 3.866161494528968,
+          "latent_std": 1.1483810070422042,
+          "z_score": 1.5817666257612968,
+          "min_normalized": 4.866161494528968,
+          "percentile": 0.9807692307692307
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.0887189535846757,
+          "latent_std": 0.5131150824871349,
+          "z_score": 0.24778734786868115,
+          "min_normalized": 3.0887189535846757,
+          "percentile": 0.6217948717948718
+        },
+        "theory_of_change": {
+          "latent_mean": 2.650825800348079,
+          "latent_std": 0.42953244696280724,
+          "z_score": 1.1391530783353154,
+          "min_normalized": 3.650825800348079,
+          "percentile": 0.8782051282051282
+        },
+        "impact_per_dollar": {
+          "latent_mean": 2.6156868848007946,
+          "latent_std": 1.0512764561700325,
+          "z_score": 1.6657647313331954,
+          "min_normalized": 3.6156868848007946,
+          "percentile": 0.9807692307692307
+        }
+      }
+    },
+    {
+      "id": "using-monitoring--evaluation-to-enhance-impact-in-the-animal-cause-area",
+      "rank": 5,
+      "feasible": true,
+      "u_mean": 7.636338610488254,
+      "u_std": 0.8577630255739077,
+      "p_flip": 0.02592816544618426,
+      "attribute_scores": {
+        "theory_of_change": {
+          "latent_mean": 2.508444428376971,
+          "latent_std": 0.4779720233383647,
+          "z_score": 0.8392040088739223,
+          "min_normalized": 3.508444428376971,
+          "percentile": 0.8012820512820513
+        },
+        "team_evidence": {
+          "latent_mean": 3.430404289664435,
+          "latent_std": 0.4442085661099772,
+          "z_score": 0.9056637603351337,
+          "min_normalized": 4.430404289664435,
+          "percentile": 0.8269230769230769
+        },
+        "impact_per_dollar": {
+          "latent_mean": 2.1557767961080856,
+          "latent_std": 0.6048894301778304,
+          "z_score": 0.966113515371388,
+          "min_normalized": 3.1557767961080856,
+          "percentile": 0.8525641025641025
+        },
+        "epistemic_integrity": {
+          "latent_mean": 3.2982235274099505,
+          "latent_std": 0.9780277121099312,
+          "z_score": 3.305763790402878,
+          "min_normalized": 4.2982235274099505,
+          "percentile": 0.9935897435897436
+        }
+      }
+    },
+    {
+      "id": "mats-funding",
+      "rank": 6,
+      "feasible": true,
+      "u_mean": 7.473994657184875,
+      "u_std": 1.1567287026860404,
+      "p_flip": 0.06689499650539155,
+      "attribute_scores": {
+        "epistemic_integrity": {
+          "latent_mean": 2.4848361387725264,
+          "latent_std": 0.7675719422928475,
+          "z_score": 1.249285851472017,
+          "min_normalized": 3.4848361387725264,
+          "percentile": 0.9166666666666666
+        },
+        "team_evidence": {
+          "latent_mean": 3.5303908753669226,
+          "latent_std": 0.6067373004364964,
+          "z_score": 1.0607988133944315,
+          "min_normalized": 4.530390875366923,
+          "percentile": 0.8653846153846154
+        },
+        "theory_of_change": {
+          "latent_mean": 2.5923327694407696,
+          "latent_std": 1.0403604539798488,
+          "z_score": 1.015928179265062,
+          "min_normalized": 3.5923327694407696,
+          "percentile": 0.8653846153846154
+        },
+        "impact_per_dollar": {
+          "latent_mean": 2.3906038347783722,
+          "latent_std": 0.41733840145772316,
+          "z_score": 1.323350782362833,
+          "min_normalized": 3.3906038347783722,
+          "percentile": 0.9551282051282052
+        }
+      }
+    },
+    {
+      "id": "putting-animal-advocacy-research-into-action",
+      "rank": 7,
+      "feasible": true,
+      "u_mean": 7.457839825561892,
+      "u_std": 1.0458547411426522,
+      "p_flip": 0.05702170575921772,
+      "attribute_scores": {
+        "team_evidence": {
+          "latent_mean": 3.737927206415284,
+          "latent_std": 0.4405896986663281,
+          "z_score": 1.382803605364425,
+          "min_normalized": 4.737927206415284,
+          "percentile": 0.9166666666666666
+        },
+        "theory_of_change": {
+          "latent_mean": 2.6792699495785346,
+          "latent_std": 0.6392621036866661,
+          "z_score": 1.1990752154462527,
+          "min_normalized": 3.6792699495785346,
+          "percentile": 0.8910256410256411
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.1316808362820603,
+          "latent_std": 0.7166624327602921,
+          "z_score": 0.3564073796226893,
+          "min_normalized": 3.1316808362820603,
+          "percentile": 0.6474358974358975
+        },
+        "impact_per_dollar": {
+          "latent_mean": 2.363412178242302,
+          "latent_std": 1.0538316426951904,
+          "z_score": 1.2819847066293026,
+          "min_normalized": 3.363412178242302,
+          "percentile": 0.9423076923076923
+        }
+      }
+    },
+    {
+      "id": "ai-safety-camp-south-africa-condor-camp",
+      "rank": 8,
+      "feasible": true,
+      "u_mean": 7.341369740549165,
+      "u_std": 1.180574013426201,
+      "p_flip": 0.08370399021229535,
+      "attribute_scores": {
+        "impact_per_dollar": {
+          "latent_mean": 1.9985082965479783,
+          "latent_std": 1.0714835620731886,
+          "z_score": 0.7268643672118287,
+          "min_normalized": 2.9985082965479783,
+          "percentile": 0.7371794871794872
+        },
+        "theory_of_change": {
+          "latent_mean": 2.793337040629673,
+          "latent_std": 0.6158220567476159,
+          "z_score": 1.4393757361063555,
+          "min_normalized": 3.793337040629673,
+          "percentile": 0.967948717948718
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.347321274246106,
+          "latent_std": 1.1875263728136511,
+          "z_score": 0.9016086079787455,
+          "min_normalized": 3.347321274246106,
+          "percentile": 0.8525641025641025
+        },
+        "team_evidence": {
+          "latent_mean": 3.568053552606952,
+          "latent_std": 0.5197379699662927,
+          "z_score": 1.1192346664734891,
+          "min_normalized": 4.568053552606952,
+          "percentile": 0.8782051282051282
+        }
+      }
+    },
+    {
+      "id": "ceealar",
+      "rank": 9,
+      "feasible": true,
+      "u_mean": 7.235764009929326,
+      "u_std": 0.8225449868405191,
+      "p_flip": 0.04703150340487694,
+      "attribute_scores": {
+        "team_evidence": {
+          "latent_mean": 3.489951493091975,
+          "latent_std": 0.6714343633244652,
+          "z_score": 0.9980547395686046,
+          "min_normalized": 4.489951493091975,
+          "percentile": 0.8397435897435898
+        },
+        "theory_of_change": {
+          "latent_mean": 2.743079692301775,
+          "latent_std": 0.5404384839555578,
+          "z_score": 1.3335006159564449,
+          "min_normalized": 3.743079692301775,
+          "percentile": 0.9294871794871795
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.613989886986555,
+          "latent_std": 0.7032606957823405,
+          "z_score": 1.575823781175247,
+          "min_normalized": 3.613989886986555,
+          "percentile": 0.9551282051282052
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.7568149541473137,
+          "latent_std": 0.5005141625153191,
+          "z_score": 0.35918154168137134,
+          "min_normalized": 2.7568149541473135,
+          "percentile": 0.6474358974358975
+        }
+      }
+    },
+    {
+      "id": "building-bridges-effective-animal-advocacy-in-the-global-south",
+      "rank": 10,
+      "feasible": true,
+      "u_mean": 7.216953833421834,
+      "u_std": 1.0452715899475342,
+      "p_flip": 0.07659310938282338,
+      "attribute_scores": {
+        "theory_of_change": {
+          "latent_mean": 2.5642348495766014,
+          "latent_std": 0.4432035775860399,
+          "z_score": 0.9567354295367602,
+          "min_normalized": 3.5642348495766014,
+          "percentile": 0.8269230769230769
+        },
+        "impact_per_dollar": {
+          "latent_mean": 2.084393840234471,
+          "latent_std": 0.6046854631221555,
+          "z_score": 0.8575201770128282,
+          "min_normalized": 3.084393840234471,
+          "percentile": 0.8269230769230769
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.298956999688559,
+          "latent_std": 1.0543196222831446,
+          "z_score": 0.7793297712898657,
+          "min_normalized": 3.298956999688559,
+          "percentile": 0.7884615384615384
+        },
+        "team_evidence": {
+          "latent_mean": 3.671226692864268,
+          "latent_std": 1.1015561181330176,
+          "z_score": 1.2793138458519968,
+          "min_normalized": 4.671226692864268,
+          "percentile": 0.8910256410256411
+        }
+      }
+    },
+    {
+      "id": "hive-highlights-newsletter---farmed-animal-advocacy-upd-with-7kmonth-views",
+      "rank": 11,
+      "feasible": true,
+      "u_mean": 7.1522873961483295,
+      "u_std": 0.8240520013441046,
+      "p_flip": 0.05343490585954891,
+      "attribute_scores": {
+        "epistemic_integrity": {
+          "latent_mean": 2.5065506501630637,
+          "latent_std": 0.8078192228108836,
+          "z_score": 1.3041863997877574,
+          "min_normalized": 3.5065506501630637,
+          "percentile": 0.9294871794871795
+        },
+        "theory_of_change": {
+          "latent_mean": 2.7646385775674744,
+          "latent_std": 0.45200965796558545,
+          "z_score": 1.3789178463465532,
+          "min_normalized": 3.7646385775674744,
+          "percentile": 0.9551282051282052
+        },
+        "impact_per_dollar": {
+          "latent_mean": 2.0631554931378107,
+          "latent_std": 0.49095003673963156,
+          "z_score": 0.8252107414589462,
+          "min_normalized": 3.0631554931378107,
+          "percentile": 0.8012820512820513
+        },
+        "team_evidence": {
+          "latent_mean": 3.0542798535044975,
+          "latent_std": 0.7439099345689165,
+          "z_score": 0.32208463368916285,
+          "min_normalized": 4.0542798535044975,
+          "percentile": 0.5961538461538461
+        }
+      }
+    },
+    {
+      "id": "aquatic-animal-alliance-a-global-movement-for-neglected-species",
+      "rank": 12,
+      "feasible": true,
+      "u_mean": 7.151218932397756,
+      "u_std": 0.8656326299699334,
+      "p_flip": 0.05964311101634345,
+      "attribute_scores": {
+        "impact_per_dollar": {
+          "latent_mean": 2.2751861710377383,
+          "latent_std": 0.6074036018451897,
+          "z_score": 1.1477684005778568,
+          "min_normalized": 3.2751861710377383,
+          "percentile": 0.9166666666666666
+        },
+        "team_evidence": {
+          "latent_mean": 3.2162545923529464,
+          "latent_std": 0.4866056090806217,
+          "z_score": 0.5733979426593161,
+          "min_normalized": 4.216254592352946,
+          "percentile": 0.7371794871794872
+        },
+        "epistemic_integrity": {
+          "latent_mean": 1.6118457279667697,
+          "latent_std": 0.827687096584452,
+          "z_score": -0.9578857199088311,
+          "min_normalized": 2.6118457279667697,
+          "percentile": 0.1858974358974359
+        },
+        "theory_of_change": {
+          "latent_mean": 3.0478587250775413,
+          "latent_std": 0.5702654846893784,
+          "z_score": 1.9755662598454862,
+          "min_normalized": 4.047858725077541,
+          "percentile": 0.9935897435897436
+        }
+      }
+    },
+    {
+      "id": "testing-and-spreading-messages-to-reduce-ai-x-risk",
+      "rank": 13,
+      "feasible": true,
+      "u_mean": 7.016123867102769,
+      "u_std": 0.9686392477792948,
+      "p_flip": 0.08775932458868496,
+      "attribute_scores": {
+        "theory_of_change": {
+          "latent_mean": 2.4896997014555367,
+          "latent_std": 0.5083412434067179,
+          "z_score": 0.7997152518858726,
+          "min_normalized": 3.4896997014555367,
+          "percentile": 0.7628205128205128
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.0752194561629613,
+          "latent_std": 0.9999999995,
+          "z_score": 0.2136567244754229,
+          "min_normalized": 3.0752194561629613,
+          "percentile": 0.5833333333333334
+        },
+        "impact_per_dollar": {
+          "latent_mean": 2.3097270167148523,
+          "latent_std": 0.602462784495876,
+          "z_score": 1.2003146379240195,
+          "min_normalized": 3.3097270167148523,
+          "percentile": 0.9294871794871795
+        },
+        "team_evidence": {
+          "latent_mean": 3.3970784131572977,
+          "latent_std": 0.8322394208396444,
+          "z_score": 0.8539567079954749,
+          "min_normalized": 4.397078413157297,
+          "percentile": 0.7884615384615384
+        }
+      }
+    },
+    {
+      "id": "whitebox-researchs-ai-interpretability-fellowship",
+      "rank": 14,
+      "feasible": true,
+      "u_mean": 6.996628875857896,
+      "u_std": 0.8496195538993321,
+      "p_flip": 0.07268296321233014,
+      "attribute_scores": {
+        "epistemic_integrity": {
+          "latent_mean": 2.9987313707677963,
+          "latent_std": 0.7614687120785373,
+          "z_score": 2.5485612303175023,
+          "min_normalized": 3.9987313707677963,
+          "percentile": 0.9807692307692307
+        },
+        "impact_per_dollar": {
+          "latent_mean": 2.2472482119002652,
+          "latent_std": 0.6368988375918639,
+          "z_score": 1.1052669909271442,
+          "min_normalized": 3.2472482119002652,
+          "percentile": 0.8910256410256411
+        },
+        "theory_of_change": {
+          "latent_mean": 2.583101769285509,
+          "latent_std": 0.47806894165994146,
+          "z_score": 0.9964816051210075,
+          "min_normalized": 3.583101769285509,
+          "percentile": 0.8525641025641025
+        },
+        "team_evidence": {
+          "latent_mean": 2.3815822181979036,
+          "latent_std": 0.6783100926776147,
+          "z_score": -0.721645208798658,
+          "min_normalized": 3.3815822181979036,
+          "percentile": 0.21153846153846154
+        }
+      }
+    },
+    {
+      "id": "2024-version-of-the-ea-survey",
+      "rank": 15,
+      "feasible": true,
+      "u_mean": 6.836129498917005,
+      "u_std": 0.9113855074071319,
+      "p_flip": 0.09777501295552882,
+      "attribute_scores": {
+        "impact_per_dollar": {
+          "latent_mean": 1.5139090204948604,
+          "latent_std": 0.5054858423384325,
+          "z_score": -0.010345972549414634,
+          "min_normalized": 2.5139090204948604,
+          "percentile": 0.4935897435897436
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.5991889904692114,
+          "latent_std": 0.8665759051121856,
+          "z_score": 1.5384028454814878,
+          "min_normalized": 3.5991889904692114,
+          "percentile": 0.9423076923076923
+        },
+        "theory_of_change": {
+          "latent_mean": 2.537831914701667,
+          "latent_std": 0.3452259361051378,
+          "z_score": 0.9011134360333307,
+          "min_normalized": 3.537831914701667,
+          "percentile": 0.8141025641025641
+        },
+        "team_evidence": {
+          "latent_mean": 3.429722416800055,
+          "latent_std": 1.0599904217646516,
+          "z_score": 0.9046057945865077,
+          "min_normalized": 4.429722416800055,
+          "percentile": 0.8141025641025641
+        }
+      }
+    },
+    {
+      "id": "leah-coworking-space",
+      "rank": 16,
+      "feasible": true,
+      "u_mean": 6.779889200894347,
+      "u_std": 0.8676181303322349,
+      "p_flip": 0.10122371429704069,
+      "attribute_scores": {
+        "epistemic_integrity": {
+          "latent_mean": 2.0220189924598357,
+          "latent_std": 0.7842351610959681,
+          "z_score": 0.07915060663451982,
+          "min_normalized": 3.0220189924598357,
+          "percentile": 0.5448717948717948
+        },
+        "team_evidence": {
+          "latent_mean": 3.699233993249462,
+          "latent_std": 0.6604750752199952,
+          "z_score": 1.3227688153439354,
+          "min_normalized": 4.699233993249462,
+          "percentile": 0.9038461538461539
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.8528234482340231,
+          "latent_std": 0.717814550035131,
+          "z_score": 0.5052371757757776,
+          "min_normalized": 2.852823448234023,
+          "percentile": 0.6987179487179487
+        },
+        "theory_of_change": {
+          "latent_mean": 2.4140001242974103,
+          "latent_std": 0.45046021444239853,
+          "z_score": 0.6402420187454557,
+          "min_normalized": 3.4140001242974103,
+          "percentile": 0.7243589743589743
+        }
+      }
+    },
+    {
+      "id": "hive-slack---an-active-community-space-for-engaged-farmed-animal-advocates",
+      "rank": 17,
+      "feasible": true,
+      "u_mean": 6.717590935140386,
+      "u_std": 0.8469709619474869,
+      "p_flip": 0.10606033776383017,
+      "attribute_scores": {
+        "impact_per_dollar": {
+          "latent_mean": 1.6980637803659302,
+          "latent_std": 0.5758903580711041,
+          "z_score": 0.26980465870807097,
+          "min_normalized": 2.6980637803659304,
+          "percentile": 0.5961538461538461
+        },
+        "theory_of_change": {
+          "latent_mean": 2.747697223373809,
+          "latent_std": 0.6110512035524179,
+          "z_score": 1.343228181642121,
+          "min_normalized": 3.747697223373809,
+          "percentile": 0.9423076923076923
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.1563941685707344,
+          "latent_std": 0.6960504974502177,
+          "z_score": 0.4188898121746165,
+          "min_normalized": 3.1563941685707344,
+          "percentile": 0.6730769230769231
+        },
+        "team_evidence": {
+          "latent_mean": 3.097912019464575,
+          "latent_std": 0.505570043282049,
+          "z_score": 0.38978249869527104,
+          "min_normalized": 4.097912019464575,
+          "percentile": 0.6602564102564102
+        }
+      }
+    },
+    {
+      "id": "giving-what-we-can",
+      "rank": 18,
+      "feasible": true,
+      "u_mean": 6.714989512917568,
+      "u_std": 1.0203433968563127,
+      "p_flip": 0.13597620122933018,
+      "attribute_scores": {
+        "impact_per_dollar": {
+          "latent_mean": 2.163034306274703,
+          "latent_std": 0.7999571371323921,
+          "z_score": 0.9771542077540285,
+          "min_normalized": 3.163034306274703,
+          "percentile": 0.8653846153846154
+        },
+        "theory_of_change": {
+          "latent_mean": 2.1522849337672865,
+          "latent_std": 0.609707625961417,
+          "z_score": 0.08889722710128405,
+          "min_normalized": 3.1522849337672865,
+          "percentile": 0.5576923076923077
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.154757454000444,
+          "latent_std": 0.9082101769522979,
+          "z_score": 0.4147517256328919,
+          "min_normalized": 3.154757454000444,
+          "percentile": 0.6602564102564102
+        },
+        "team_evidence": {
+          "latent_mean": 3.518032775308041,
+          "latent_std": 0.6976541755090631,
+          "z_score": 1.0416244962110115,
+          "min_normalized": 4.518032775308042,
+          "percentile": 0.8525641025641025
+        }
+      }
+    },
+    {
+      "id": "new-roots-institute--empowering-the-next-generation-to-end-factory-farming",
+      "rank": 19,
+      "feasible": true,
+      "u_mean": 6.597660280074411,
+      "u_std": 0.6882942555435362,
+      "p_flip": 0.09402071320952232,
+      "attribute_scores": {
+        "impact_per_dollar": {
+          "latent_mean": 2.033316869326866,
+          "latent_std": 0.5616425764524274,
+          "z_score": 0.7798178919754832,
+          "min_normalized": 3.033316869326866,
+          "percentile": 0.75
+        },
+        "team_evidence": {
+          "latent_mean": 3.242582308819787,
+          "latent_std": 0.4667538162091107,
+          "z_score": 0.6142469391753743,
+          "min_normalized": 4.242582308819787,
+          "percentile": 0.75
+        },
+        "theory_of_change": {
+          "latent_mean": 2.2828364472288913,
+          "latent_std": 0.4983697560264488,
+          "z_score": 0.3639248127852527,
+          "min_normalized": 3.2828364472288913,
+          "percentile": 0.6474358974358975
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.1663582530061287,
+          "latent_std": 0.35219360222567014,
+          "z_score": 0.4440818917535228,
+          "min_normalized": 3.1663582530061287,
+          "percentile": 0.6987179487179487
+        }
+      }
+    },
+    {
+      "id": "farmkind",
+      "rank": 20,
+      "feasible": true,
+      "u_mean": 6.580486245117587,
+      "u_std": 0.8136314236683856,
+      "p_flip": 0.12026651560138801,
+      "attribute_scores": {
+        "team_evidence": {
+          "latent_mean": 2.7279212688564414,
+          "latent_std": 0.5103107232921352,
+          "z_score": -0.18427985500718216,
+          "min_normalized": 3.7279212688564414,
+          "percentile": 0.4166666666666667
+        },
+        "impact_per_dollar": {
+          "latent_mean": 2.178129858118342,
+          "latent_std": 0.5190835655429046,
+          "z_score": 1.0001187424808873,
+          "min_normalized": 3.178129858118342,
+          "percentile": 0.8782051282051282
+        },
+        "theory_of_change": {
+          "latent_mean": 2.309081217367437,
+          "latent_std": 0.5555016204956731,
+          "z_score": 0.41921360704467514,
+          "min_normalized": 3.309081217367437,
+          "percentile": 0.6602564102564102
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.444203863787166,
+          "latent_std": 0.7578705641665887,
+          "z_score": 1.1465557399860948,
+          "min_normalized": 3.444203863787166,
+          "percentile": 0.8910256410256411
+        }
+      }
+    },
+    {
+      "id": "thrive-philanthropy",
+      "rank": 21,
+      "feasible": true,
+      "u_mean": 6.558444090289868,
+      "u_std": 0.8428049733862888,
+      "p_flip": 0.12810048034076837,
+      "attribute_scores": {
+        "team_evidence": {
+          "latent_mean": 2.8533873054905876,
+          "latent_std": 0.7614858225224503,
+          "z_score": 0.010388060829989797,
+          "min_normalized": 3.8533873054905876,
+          "percentile": 0.5064102564102564
+        },
+        "impact_per_dollar": {
+          "latent_mean": 2.3956411500562385,
+          "latent_std": 0.4270065089939402,
+          "z_score": 1.331013940545251,
+          "min_normalized": 3.3956411500562385,
+          "percentile": 0.967948717948718
+        },
+        "theory_of_change": {
+          "latent_mean": 2.4341426596203313,
+          "latent_std": 0.4933409465104321,
+          "z_score": 0.6826754820775085,
+          "min_normalized": 3.4341426596203313,
+          "percentile": 0.7371794871794872
+        },
+        "epistemic_integrity": {
+          "latent_mean": 1.806509403535768,
+          "latent_std": 0.8368171157174921,
+          "z_score": -0.4657197976052497,
+          "min_normalized": 2.806509403535768,
+          "percentile": 0.33974358974358976
+        }
+      }
+    },
+    {
+      "id": "kickstarting-for-good---high-impact-nonprofit-incubation-program-4ok48hn4wc3",
+      "rank": 22,
+      "feasible": true,
+      "u_mean": 6.536937723150245,
+      "u_std": 0.8122871334262661,
+      "p_flip": 0.12719800854758434,
+      "attribute_scores": {
+        "impact_per_dollar": {
+          "latent_mean": 2.038130476604606,
+          "latent_std": 0.5799057237890551,
+          "z_score": 0.7871407280424332,
+          "min_normalized": 3.038130476604606,
+          "percentile": 0.7756410256410257
+        },
+        "team_evidence": {
+          "latent_mean": 3.1942575025721185,
+          "latent_std": 0.6260002661730596,
+          "z_score": 0.5392681674867454,
+          "min_normalized": 4.1942575025721185,
+          "percentile": 0.7243589743589743
+        },
+        "theory_of_change": {
+          "latent_mean": 2.5805840561093243,
+          "latent_std": 0.588543195404497,
+          "z_score": 0.9911776407476302,
+          "min_normalized": 3.5805840561093243,
+          "percentile": 0.8397435897435898
+        },
+        "epistemic_integrity": {
+          "latent_mean": 1.6058082626459251,
+          "latent_std": 0.47765372797384037,
+          "z_score": -0.97315017373836,
+          "min_normalized": 2.605808262645925,
+          "percentile": 0.17307692307692307
+        }
+      }
+    },
+    {
+      "id": "free-marketing-and-campaign-support-from-ea-agency-user-friendly",
+      "rank": 23,
+      "feasible": true,
+      "u_mean": 6.514071968386659,
+      "u_std": 0.7971880088070726,
+      "p_flip": 0.12819474789121177,
+      "attribute_scores": {
+        "impact_per_dollar": {
+          "latent_mean": 1.5905105243427489,
+          "latent_std": 0.6876228011942619,
+          "z_score": 0.10618622935122146,
+          "min_normalized": 2.590510524342749,
+          "percentile": 0.5448717948717948
+        },
+        "epistemic_integrity": {
+          "latent_mean": 1.7029828943774774,
+          "latent_std": 0.6591092695855156,
+          "z_score": -0.7274646748342853,
+          "min_normalized": 2.7029828943774774,
+          "percentile": 0.23717948717948717
+        },
+        "theory_of_change": {
+          "latent_mean": 2.4771716953808833,
+          "latent_std": 0.4030458183267217,
+          "z_score": 0.7733230089100045,
+          "min_normalized": 3.4771716953808833,
+          "percentile": 0.75
+        },
+        "team_evidence": {
+          "latent_mean": 3.754641533031183,
+          "latent_std": 0.6484630021343476,
+          "z_score": 1.4087368635929178,
+          "min_normalized": 4.754641533031183,
+          "percentile": 0.9294871794871795
+        }
+      }
+    },
+    {
+      "id": "pandemic-interventions-course---introductory-biosecurity-syllabus",
+      "rank": 24,
+      "feasible": true,
+      "u_mean": 6.507751310236716,
+      "u_std": 0.9192983278717489,
+      "p_flip": 0.15155276681993746,
+      "attribute_scores": {
+        "impact_per_dollar": {
+          "latent_mean": 2.099637765838407,
+          "latent_std": 0.688617604782136,
+          "z_score": 0.8807104295144457,
+          "min_normalized": 3.099637765838407,
+          "percentile": 0.8397435897435898
+        },
+        "theory_of_change": {
+          "latent_mean": 2.254128997280793,
+          "latent_std": 0.6590020560457419,
+          "z_score": 0.30344799071692163,
+          "min_normalized": 3.254128997280793,
+          "percentile": 0.6217948717948718
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.3436820412373622,
+          "latent_std": 0.6740753419493984,
+          "z_score": 0.8924075772009666,
+          "min_normalized": 3.3436820412373622,
+          "percentile": 0.8397435897435898
+        },
+        "team_evidence": {
+          "latent_mean": 2.881612813301855,
+          "latent_std": 0.5582602311471503,
+          "z_score": 0.05418159194381012,
+          "min_normalized": 3.881612813301855,
+          "percentile": 0.5192307692307693
+        }
+      }
+    },
+    {
+      "id": "building-an-organizational-experts-network",
+      "rank": 25,
+      "feasible": true,
+      "u_mean": 6.507647233359998,
+      "u_std": 0.6581446344848172,
+      "p_flip": 0.10069256885256228,
+      "attribute_scores": {
+        "theory_of_change": {
+          "latent_mean": 2.4971398624266046,
+          "latent_std": 0.48002457920250197,
+          "z_score": 0.8153891376549158,
+          "min_normalized": 3.4971398624266046,
+          "percentile": 0.7756410256410257
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.973624564403655,
+          "latent_std": 0.3230383916949838,
+          "z_score": 0.6890092866635168,
+          "min_normalized": 2.973624564403655,
+          "percentile": 0.7243589743589743
+        },
+        "team_evidence": {
+          "latent_mean": 3.1199147042556103,
+          "latent_std": 0.6224495667143123,
+          "z_score": 0.42392095485438924,
+          "min_normalized": 4.11991470425561,
+          "percentile": 0.6858974358974359
+        },
+        "epistemic_integrity": {
+          "latent_mean": 1.846436454802189,
+          "latent_std": 0.4168581515695129,
+          "z_score": -0.3647726951016023,
+          "min_normalized": 2.846436454802189,
+          "percentile": 0.3782051282051282
+        }
+      }
+    },
+    {
+      "id": "teamwork---professional-ea-co-working-space-in-berlin",
+      "rank": 26,
+      "feasible": true,
+      "u_mean": 6.390515755845282,
+      "u_std": 0.8056639981516485,
+      "p_flip": 0.1517909010006362,
+      "attribute_scores": {
+        "theory_of_change": {
+          "latent_mean": 2.5030352798133797,
+          "latent_std": 0.4823388220281294,
+          "z_score": 0.8278087746816509,
+          "min_normalized": 3.5030352798133797,
+          "percentile": 0.7884615384615384
+        },
+        "epistemic_integrity": {
+          "latent_mean": 1.9838559115555126,
+          "latent_std": 0.6009658133934169,
+          "z_score": -0.017336669978958875,
+          "min_normalized": 2.9838559115555126,
+          "percentile": 0.4807692307692308
+        },
+        "team_evidence": {
+          "latent_mean": 3.07570081779592,
+          "latent_std": 0.5309196028242816,
+          "z_score": 0.3553205163686581,
+          "min_normalized": 4.07570081779592,
+          "percentile": 0.6346153846153846
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.7157377417022899,
+          "latent_std": 0.7201400415833461,
+          "z_score": 0.29669167172184324,
+          "min_normalized": 2.7157377417022897,
+          "percentile": 0.6346153846153846
+        }
+      }
+    },
+    {
+      "id": "effective-altruism-nz",
+      "rank": 27,
+      "feasible": true,
+      "u_mean": 6.282109904767569,
+      "u_std": 0.6770669158682001,
+      "p_flip": 0.14683462716740747,
+      "attribute_scores": {
+        "team_evidence": {
+          "latent_mean": 3.4145851449481714,
+          "latent_std": 0.5214050275255112,
+          "z_score": 0.8811194293364488,
+          "min_normalized": 4.4145851449481714,
+          "percentile": 0.8012820512820513
+        },
+        "epistemic_integrity": {
+          "latent_mean": 1.729531386520774,
+          "latent_std": 0.6189077280007081,
+          "z_score": -0.6603424288205773,
+          "min_normalized": 2.729531386520774,
+          "percentile": 0.26282051282051283
+        },
+        "theory_of_change": {
+          "latent_mean": 2.358333504881008,
+          "latent_std": 0.3946710724547198,
+          "z_score": 0.5229714062850032,
+          "min_normalized": 3.358333504881008,
+          "percentile": 0.6987179487179487
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.6792193320553506,
+          "latent_std": 0.49161904954092195,
+          "z_score": 0.241137009315766,
+          "min_normalized": 2.6792193320553506,
+          "percentile": 0.5705128205128205
+        }
+      }
+    },
+    {
+      "id": "global-health-policy-training-program",
+      "rank": 28,
+      "feasible": true,
+      "u_mean": 6.238576884585134,
+      "u_std": 0.6905727414324453,
+      "p_flip": 0.1584586819389202,
+      "attribute_scores": {
+        "epistemic_integrity": {
+          "latent_mean": 2.3312735866425944,
+          "latent_std": 0.5862785689958736,
+          "z_score": 0.861035424784008,
+          "min_normalized": 3.3312735866425944,
+          "percentile": 0.8141025641025641
+        },
+        "theory_of_change": {
+          "latent_mean": 2.329403439150753,
+          "latent_std": 0.3548761702155402,
+          "z_score": 0.4620256085650054,
+          "min_normalized": 3.329403439150753,
+          "percentile": 0.6730769230769231
+        },
+        "team_evidence": {
+          "latent_mean": 2.9366088782051225,
+          "latent_std": 0.5787574573359938,
+          "z_score": 0.13951121278122547,
+          "min_normalized": 3.9366088782051225,
+          "percentile": 0.5576923076923077
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.5611530406585825,
+          "latent_std": 0.5664001927583928,
+          "z_score": 0.06152532787895608,
+          "min_normalized": 2.5611530406585823,
+          "percentile": 0.5192307692307693
+        }
+      }
+    },
+    {
+      "id": "making-52-ai-alignment-video-explainers-and-podcasts",
+      "rank": 29,
+      "feasible": true,
+      "u_mean": 6.237252233716252,
+      "u_std": 0.7627542794318939,
+      "p_flip": 0.17376748083247362,
+      "attribute_scores": {
+        "theory_of_change": {
+          "latent_mean": 1.8065797898407734,
+          "latent_std": 0.4637160949309382,
+          "z_score": -0.6393857975194938,
+          "min_normalized": 2.8065797898407734,
+          "percentile": 0.26282051282051283
+        },
+        "team_evidence": {
+          "latent_mean": 3.3353076741014793,
+          "latent_std": 0.6276864071104954,
+          "z_score": 0.7581157827992663,
+          "min_normalized": 4.335307674101479,
+          "percentile": 0.7756410256410257
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.2081151812369395,
+          "latent_std": 0.5332157417758289,
+          "z_score": 0.5496554510486007,
+          "min_normalized": 3.2081151812369395,
+          "percentile": 0.7243589743589743
+        },
+        "impact_per_dollar": {
+          "latent_mean": 2.046678530531193,
+          "latent_std": 0.6143795888021859,
+          "z_score": 0.8001446965808142,
+          "min_normalized": 3.046678530531193,
+          "percentile": 0.7884615384615384
+        }
+      }
+    },
+    {
+      "id": "budget-for-events-aiming-to-mainstream-ea-in-sweden",
+      "rank": 30,
+      "feasible": true,
+      "u_mean": 6.163317311767989,
+      "u_std": 0.704290927802915,
+      "p_flip": 0.17736023532462708,
+      "attribute_scores": {
+        "team_evidence": {
+          "latent_mean": 2.8941161956746884,
+          "latent_std": 0.40130857238263185,
+          "z_score": 0.07358132315977421,
+          "min_normalized": 3.8941161956746884,
+          "percentile": 0.532051282051282
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.2409129761599274,
+          "latent_std": 0.604610749887971,
+          "z_score": 0.6325777370920209,
+          "min_normalized": 3.2409129761599274,
+          "percentile": 0.7371794871794872
+        },
+        "theory_of_change": {
+          "latent_mean": 2.2565603510748717,
+          "latent_std": 0.5008878497329664,
+          "z_score": 0.30857002527782806,
+          "min_normalized": 3.2565603510748717,
+          "percentile": 0.6346153846153846
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.6620022531483158,
+          "latent_std": 0.4832617048933542,
+          "z_score": 0.2149450416056039,
+          "min_normalized": 2.662002253148316,
+          "percentile": 0.5576923076923077
+        }
+      }
+    },
+    {
+      "id": "yes-on-ip28",
+      "rank": 31,
+      "feasible": true,
+      "u_mean": 6.080867715156223,
+      "u_std": 0.7599710601740539,
+      "p_flip": 0.2076237372768026,
+      "attribute_scores": {
+        "theory_of_change": {
+          "latent_mean": 2.114867350182549,
+          "latent_std": 0.45670073862918115,
+          "z_score": 0.010071119287030502,
+          "min_normalized": 3.114867350182549,
+          "percentile": 0.532051282051282
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.8278255933938812,
+          "latent_std": 0.5236342696614426,
+          "z_score": 0.46720848285221805,
+          "min_normalized": 2.8278255933938814,
+          "percentile": 0.6858974358974359
+        },
+        "team_evidence": {
+          "latent_mean": 2.9389856514380517,
+          "latent_std": 0.6487894724644199,
+          "z_score": 0.14319891587669392,
+          "min_normalized": 3.9389856514380517,
+          "percentile": 0.5705128205128205
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.084957010967007,
+          "latent_std": 0.6404833237082641,
+          "z_score": 0.23827607180412433,
+          "min_normalized": 3.084957010967007,
+          "percentile": 0.6089743589743589
+        }
+      }
+    },
+    {
+      "id": "coworking-space-for-eaai-safety-initiatives-in-chile",
+      "rank": 32,
+      "feasible": true,
+      "u_mean": 6.070274606798705,
+      "u_std": 0.7514392693545622,
+      "p_flip": 0.20873440790995057,
+      "attribute_scores": {
+        "theory_of_change": {
+          "latent_mean": 2.205435115685527,
+          "latent_std": 0.4934225184198925,
+          "z_score": 0.200866562607582,
+          "min_normalized": 3.205435115685527,
+          "percentile": 0.5961538461538461
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.3186222930177327,
+          "latent_std": 0.5491763102317705,
+          "z_score": -0.30743142403179385,
+          "min_normalized": 2.3186222930177327,
+          "percentile": 0.3782051282051282
+        },
+        "team_evidence": {
+          "latent_mean": 3.124224151969866,
+          "latent_std": 0.5646051177352411,
+          "z_score": 0.43060731578080974,
+          "min_normalized": 4.124224151969866,
+          "percentile": 0.6987179487179487
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.3385047827672887,
+          "latent_std": 0.5828487698218622,
+          "z_score": 0.8793179744156507,
+          "min_normalized": 3.3385047827672887,
+          "percentile": 0.8269230769230769
+        }
+      }
+    },
+    {
+      "id": "pauseai-local-communities---volunteer-stipends",
+      "rank": 33,
+      "feasible": true,
+      "u_mean": 6.069177931037381,
+      "u_std": 0.7225109133996519,
+      "p_flip": 0.2033062554237669,
+      "attribute_scores": {
+        "epistemic_integrity": {
+          "latent_mean": 2.29893065512379,
+          "latent_std": 0.5486984414212309,
+          "z_score": 0.7792631646310761,
+          "min_normalized": 3.29893065512379,
+          "percentile": 0.7756410256410257
+        },
+        "theory_of_change": {
+          "latent_mean": 2.1475205865015594,
+          "latent_std": 0.44836899756694987,
+          "z_score": 0.07886036968684822,
+          "min_normalized": 3.1475205865015594,
+          "percentile": 0.5448717948717948
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.70435452538149,
+          "latent_std": 0.5278241217952367,
+          "z_score": 0.2793746322912834,
+          "min_normalized": 2.70435452538149,
+          "percentile": 0.6217948717948718
+        },
+        "team_evidence": {
+          "latent_mean": 2.8015255951102187,
+          "latent_std": 0.6093175160494277,
+          "z_score": -0.0700784250998751,
+          "min_normalized": 3.8015255951102187,
+          "percentile": 0.4551282051282051
+        }
+      }
+    },
+    {
+      "id": "animal-advocacy-africa-",
+      "rank": 34,
+      "feasible": true,
+      "u_mean": 5.961301116400788,
+      "u_std": 0.6871071651788205,
+      "p_flip": 0.22321384525165167,
+      "attribute_scores": {
+        "theory_of_change": {
+          "latent_mean": 2.3457290379996643,
+          "latent_std": 0.42458913589472297,
+          "z_score": 0.4964180864245707,
+          "min_normalized": 3.3457290379996643,
+          "percentile": 0.6858974358974359
+        },
+        "impact_per_dollar": {
+          "latent_mean": 2.0813707949856846,
+          "latent_std": 0.546230023432317,
+          "z_score": 0.8529212840199979,
+          "min_normalized": 3.0813707949856846,
+          "percentile": 0.8141025641025641
+        },
+        "team_evidence": {
+          "latent_mean": 2.305194054958314,
+          "latent_std": 0.5430739509390663,
+          "z_score": -0.8401659250929155,
+          "min_normalized": 3.305194054958314,
+          "percentile": 0.1987179487179487
+        },
+        "epistemic_integrity": {
+          "latent_mean": 1.8307052033061564,
+          "latent_std": 0.5020873620749947,
+          "z_score": -0.40454583654108056,
+          "min_normalized": 2.8307052033061564,
+          "percentile": 0.3525641025641026
+        }
+      }
+    },
+    {
+      "id": "fatebook-and-quantified-intuitions",
+      "rank": 35,
+      "feasible": true,
+      "u_mean": 5.952467871710813,
+      "u_std": 0.6571505915596793,
+      "p_flip": 0.21803573804380538,
+      "attribute_scores": {
+        "team_evidence": {
+          "latent_mean": 3.062038976802418,
+          "latent_std": 0.6787270902391591,
+          "z_score": 0.3341233686460518,
+          "min_normalized": 4.062038976802418,
+          "percentile": 0.6217948717948718
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.2557669298802936,
+          "latent_std": 0.5505362678686974,
+          "z_score": 0.6701328166992974,
+          "min_normalized": 3.2557669298802936,
+          "percentile": 0.75
+        },
+        "theory_of_change": {
+          "latent_mean": 2.3840492247777103,
+          "latent_std": 0.3634209784081252,
+          "z_score": 0.5771456718280465,
+          "min_normalized": 3.3840492247777103,
+          "percentile": 0.7115384615384616
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.0187768037939229,
+          "latent_std": 0.38458194126866063,
+          "z_score": -0.7635798458514158,
+          "min_normalized": 2.018776803793923,
+          "percentile": 0.1858974358974359
+        }
+      }
+    },
+    {
+      "id": "moral-parliament-tool-extensions-for-donor-advising",
+      "rank": 36,
+      "feasible": true,
+      "u_mean": 5.918733816524539,
+      "u_std": 0.667465013475405,
+      "p_flip": 0.2299794755660457,
+      "attribute_scores": {
+        "impact_per_dollar": {
+          "latent_mean": 0.8072251212017818,
+          "latent_std": 0.46256013179335903,
+          "z_score": -1.0854088198256158,
+          "min_normalized": 1.8072251212017818,
+          "percentile": 0.12179487179487179
+        },
+        "team_evidence": {
+          "latent_mean": 3.802716342026857,
+          "latent_std": 0.643946026570845,
+          "z_score": 1.483327749879916,
+          "min_normalized": 4.802716342026857,
+          "percentile": 0.9423076923076923
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.053193070204399,
+          "latent_std": 0.466039863476907,
+          "z_score": 0.15796766729193193,
+          "min_normalized": 3.053193070204399,
+          "percentile": 0.5705128205128205
+        },
+        "theory_of_change": {
+          "latent_mean": 2.167781179876312,
+          "latent_std": 0.4018064342574122,
+          "z_score": 0.12154254113499115,
+          "min_normalized": 3.167781179876312,
+          "percentile": 0.5705128205128205
+        }
+      }
+    },
+    {
+      "id": "calibration-city",
+      "rank": 37,
+      "feasible": true,
+      "u_mean": 5.797889442508763,
+      "u_std": 0.5912936142812663,
+      "p_flip": 0.24900656351346262,
+      "attribute_scores": {
+        "team_evidence": {
+          "latent_mean": 2.5763525249749915,
+          "latent_std": 0.549978200335303,
+          "z_score": -0.41944765235697007,
+          "min_normalized": 3.5763525249749915,
+          "percentile": 0.3269230769230769
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.5032675890554006,
+          "latent_std": 0.3780531320656659,
+          "z_score": -0.02653455077207434,
+          "min_normalized": 2.5032675890554006,
+          "percentile": 0.4807692307692308
+        },
+        "theory_of_change": {
+          "latent_mean": 2.0925442726530896,
+          "latent_std": 0.37959376281453167,
+          "z_score": -0.036956003993075165,
+          "min_normalized": 3.0925442726530896,
+          "percentile": 0.4807692307692308
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.3803517318721092,
+          "latent_std": 0.4270258532659997,
+          "z_score": 0.9851191324466206,
+          "min_normalized": 3.3803517318721092,
+          "percentile": 0.8653846153846154
+        }
+      }
+    },
+    {
+      "id": "support-a-thriving-and-talented-community-of-ea-filipinos-",
+      "rank": 38,
+      "feasible": true,
+      "u_mean": 5.787402339795205,
+      "u_std": 0.6312918793217109,
+      "p_flip": 0.26032919307892133,
+      "attribute_scores": {
+        "team_evidence": {
+          "latent_mean": 3.084577549945843,
+          "latent_std": 0.5531632192962126,
+          "z_score": 0.3690932870198034,
+          "min_normalized": 4.084577549945843,
+          "percentile": 0.6474358974358975
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.4744997654202465,
+          "latent_std": 0.492102832206319,
+          "z_score": -0.07029841523550125,
+          "min_normalized": 2.4744997654202465,
+          "percentile": 0.4423076923076923
+        },
+        "theory_of_change": {
+          "latent_mean": 2.1147359269833172,
+          "latent_std": 0.39141635349344023,
+          "z_score": 0.009794255356240416,
+          "min_normalized": 3.1147359269833172,
+          "percentile": 0.5192307692307693
+        },
+        "epistemic_integrity": {
+          "latent_mean": 1.8395257637557045,
+          "latent_std": 0.4053672349795639,
+          "z_score": -0.3822449154462889,
+          "min_normalized": 2.8395257637557045,
+          "percentile": 0.36538461538461536
+        }
+      }
+    },
+    {
+      "id": "automate-social-science-and-produce-free-open-standardized-data",
+      "rank": 39,
+      "feasible": true,
+      "u_mean": 5.771925089798772,
+      "u_std": 0.7054752048396754,
+      "p_flip": 0.2780229021063798,
+      "attribute_scores": {
+        "theory_of_change": {
+          "latent_mean": 1.9401971433799874,
+          "latent_std": 0.4614547658999209,
+          "z_score": -0.35789953071969133,
+          "min_normalized": 2.9401971433799874,
+          "percentile": 0.36538461538461536
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.1597518224159353,
+          "latent_std": 0.5463445548156661,
+          "z_score": 0.4273789296058434,
+          "min_normalized": 3.1597518224159353,
+          "percentile": 0.6858974358974359
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.7016503621652983,
+          "latent_std": 0.45687406421321286,
+          "z_score": 0.27526084759970243,
+          "min_normalized": 2.7016503621652985,
+          "percentile": 0.6089743589743589
+        },
+        "team_evidence": {
+          "latent_mean": 2.7616958310262474,
+          "latent_std": 0.6043886281514772,
+          "z_score": -0.1318766405414137,
+          "min_normalized": 3.7616958310262474,
+          "percentile": 0.4423076923076923
+        }
+      }
+    },
+    {
+      "id": "athena-20",
+      "rank": 40,
+      "feasible": true,
+      "u_mean": 5.7700767330169365,
+      "u_std": 0.6054925777369041,
+      "p_flip": 0.2606408484782117,
+      "attribute_scores": {
+        "team_evidence": {
+          "latent_mean": 3.0560857992995123,
+          "latent_std": 0.5037494547587783,
+          "z_score": 0.3248866645292345,
+          "min_normalized": 4.056085799299512,
+          "percentile": 0.6089743589743589
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.4686153834212368,
+          "latent_std": 0.45240790048675966,
+          "z_score": -0.07925019759907917,
+          "min_normalized": 2.4686153834212368,
+          "percentile": 0.42948717948717946
+        },
+        "theory_of_change": {
+          "latent_mean": 2.247048886503611,
+          "latent_std": 0.3967030585168749,
+          "z_score": 0.2885326081082308,
+          "min_normalized": 3.247048886503611,
+          "percentile": 0.6089743589743589
+        },
+        "epistemic_integrity": {
+          "latent_mean": 1.6244388150777302,
+          "latent_std": 0.4009393896059269,
+          "z_score": -0.926046763233946,
+          "min_normalized": 2.6244388150777302,
+          "percentile": 0.1987179487179487
+        }
+      }
+    },
+    {
+      "id": "connect-for-animals",
+      "rank": 41,
+      "feasible": true,
+      "u_mean": 5.684858154003097,
+      "u_std": 0.5472151540359084,
+      "p_flip": 0.27626481500292865,
+      "attribute_scores": {
+        "impact_per_dollar": {
+          "latent_mean": 1.2682958358607919,
+          "latent_std": 0.4018762053461948,
+          "z_score": -0.3839919688221688,
+          "min_normalized": 2.268295835860792,
+          "percentile": 0.3269230769230769
+        },
+        "team_evidence": {
+          "latent_mean": 2.9292893501102313,
+          "latent_std": 0.4619803922496432,
+          "z_score": 0.128154535569057,
+          "min_normalized": 3.9292893501102313,
+          "percentile": 0.5448717948717948
+        },
+        "epistemic_integrity": {
+          "latent_mean": 1.943392751757068,
+          "latent_std": 0.3915816135688576,
+          "z_score": -0.11963920949131894,
+          "min_normalized": 2.943392751757068,
+          "percentile": 0.4551282051282051
+        },
+        "theory_of_change": {
+          "latent_mean": 2.1871836297016483,
+          "latent_std": 0.34818918384825387,
+          "z_score": 0.16241689632495224,
+          "min_normalized": 3.1871836297016483,
+          "percentile": 0.5833333333333334
+        }
+      }
+    },
+    {
+      "id": "voicedeck",
+      "rank": 42,
+      "feasible": true,
+      "u_mean": 5.66664454615429,
+      "u_std": 0.646117084429275,
+      "p_flip": 0.2997847876888131,
+      "attribute_scores": {
+        "theory_of_change": {
+          "latent_mean": 1.7593943024396825,
+          "latent_std": 0.386902446737588,
+          "z_score": -0.7387895526744269,
+          "min_normalized": 2.7593943024396825,
+          "percentile": 0.1987179487179487
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.2592142760719094,
+          "latent_std": 0.49141431626578075,
+          "z_score": 0.678848702253893,
+          "min_normalized": 3.2592142760719094,
+          "percentile": 0.7628205128205128
+        },
+        "team_evidence": {
+          "latent_mean": 3.300569621418349,
+          "latent_std": 0.5737805998498672,
+          "z_score": 0.7042176562824809,
+          "min_normalized": 4.300569621418349,
+          "percentile": 0.7628205128205128
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.2557801714356631,
+          "latent_std": 0.4692529644752483,
+          "z_score": -0.4030317769257523,
+          "min_normalized": 2.255780171435663,
+          "percentile": 0.3141025641025641
+        }
+      }
+    },
+    {
+      "id": "the-ea-nordics-career-course",
+      "rank": 43,
+      "feasible": true,
+      "u_mean": 5.5867571190353615,
+      "u_std": 0.59097537838512,
+      "p_flip": 0.3167562610465827,
+      "attribute_scores": {
+        "team_evidence": {
+          "latent_mean": 2.609638920765197,
+          "latent_std": 0.5299357236403097,
+          "z_score": -0.36780185666562043,
+          "min_normalized": 3.609638920765197,
+          "percentile": 0.36538461538461536
+        },
+        "theory_of_change": {
+          "latent_mean": 2.1058380020749166,
+          "latent_std": 0.3571921127784695,
+          "z_score": -0.008950642655795286,
+          "min_normalized": 3.1058380020749166,
+          "percentile": 0.4935897435897436
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.000281642270865,
+          "latent_std": 0.4341670303751782,
+          "z_score": 0.024192315248520502,
+          "min_normalized": 3.000281642270865,
+          "percentile": 0.5192307692307693
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.4603632399797288,
+          "latent_std": 0.4302814127398807,
+          "z_score": -0.09180400395186815,
+          "min_normalized": 2.4603632399797286,
+          "percentile": 0.4166666666666667
+        }
+      }
+    },
+    {
+      "id": "ai-animals-and-digital-minds-2025",
+      "rank": 44,
+      "feasible": true,
+      "u_mean": 5.546789920018433,
+      "u_std": 0.5330955473083872,
+      "p_flip": 0.32138775269984654,
+      "attribute_scores": {
+        "impact_per_dollar": {
+          "latent_mean": 1.184654452131339,
+          "latent_std": 0.4289340777981343,
+          "z_score": -0.5112337868857428,
+          "min_normalized": 2.1846544521313387,
+          "percentile": 0.25
+        },
+        "team_evidence": {
+          "latent_mean": 3.11159405912134,
+          "latent_std": 0.37559229823864976,
+          "z_score": 0.4110109858288093,
+          "min_normalized": 4.11159405912134,
+          "percentile": 0.6730769230769231
+        },
+        "epistemic_integrity": {
+          "latent_mean": 1.9931022202493245,
+          "latent_std": 0.413389549071863,
+          "z_score": 0.0060406654838176714,
+          "min_normalized": 2.9931022202493245,
+          "percentile": 0.5064102564102564
+        },
+        "theory_of_change": {
+          "latent_mean": 1.9585130786916887,
+          "latent_std": 0.33626504703786136,
+          "z_score": -0.3193140916485277,
+          "min_normalized": 2.9585130786916887,
+          "percentile": 0.391025641025641
+        }
+      }
+    },
+    {
+      "id": "ai-safety-serbia-hub---office-space-for-frugal-ai-safety-researchers",
+      "rank": 45,
+      "feasible": true,
+      "u_mean": 5.503628813194797,
+      "u_std": 0.5693533164803135,
+      "p_flip": 0.34222052420133797,
+      "attribute_scores": {
+        "theory_of_change": {
+          "latent_mean": 1.9758197613307737,
+          "latent_std": 0.32658434798135444,
+          "z_score": -0.28285480430502186,
+          "min_normalized": 2.975819761330774,
+          "percentile": 0.42948717948717946
+        },
+        "team_evidence": {
+          "latent_mean": 2.595537414236261,
+          "latent_std": 0.5054329732193431,
+          "z_score": -0.3896811712577984,
+          "min_normalized": 3.595537414236261,
+          "percentile": 0.3525641025641026
+        },
+        "epistemic_integrity": {
+          "latent_mean": 1.7138420811102355,
+          "latent_std": 0.45358808801474493,
+          "z_score": -0.7000095184566367,
+          "min_normalized": 2.7138420811102355,
+          "percentile": 0.25
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.7675655939697779,
+          "latent_std": 0.42059294130223807,
+          "z_score": 0.37553625624206916,
+          "min_normalized": 2.7675655939697776,
+          "percentile": 0.6602564102564102
+        }
+      }
+    },
+    {
+      "id": "social-media-strategy-for-ea-orgs",
+      "rank": 46,
+      "feasible": true,
+      "u_mean": 5.37441237679902,
+      "u_std": 0.5345555872302,
+      "p_flip": 0.3855297795598158,
+      "attribute_scores": {
+        "epistemic_integrity": {
+          "latent_mean": 1.1924591716907664,
+          "latent_std": 0.3955735426951444,
+          "z_score": -2.0182159056405857,
+          "min_normalized": 2.1924591716907664,
+          "percentile": 0.07051282051282051
+        },
+        "team_evidence": {
+          "latent_mean": 2.9714594036421254,
+          "latent_std": 0.4419852351868547,
+          "z_score": 0.19358384737344078,
+          "min_normalized": 3.9714594036421254,
+          "percentile": 0.5833333333333334
+        },
+        "theory_of_change": {
+          "latent_mean": 1.885834947853847,
+          "latent_std": 0.3417635413577682,
+          "z_score": -0.4724221662035867,
+          "min_normalized": 2.885834947853847,
+          "percentile": 0.3141025641025641
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.8149591145931472,
+          "latent_std": 0.38856281105161233,
+          "z_score": 0.44763498846841665,
+          "min_normalized": 2.8149591145931474,
+          "percentile": 0.6730769230769231
+        }
+      }
+    },
+    {
+      "id": "act-i-exploring-emergent-behavior-from-multi-ai-multi-human-interaction",
+      "rank": 47,
+      "feasible": true,
+      "u_mean": 5.366072441154052,
+      "u_std": 0.547977754085782,
+      "p_flip": 0.39016336651043615,
+      "attribute_scores": {
+        "team_evidence": {
+          "latent_mean": 2.7475260638655774,
+          "latent_std": 0.4341463278944269,
+          "z_score": -0.15386186550798375,
+          "min_normalized": 3.7475260638655774,
+          "percentile": 0.42948717948717946
+        },
+        "epistemic_integrity": {
+          "latent_mean": 1.9151439097031393,
+          "latent_std": 0.42359244460787987,
+          "z_score": -0.19106043054266006,
+          "min_normalized": 2.915143909703139,
+          "percentile": 0.4423076923076923
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.6936253204868248,
+          "latent_std": 0.3917385606035464,
+          "z_score": 0.2630525262200867,
+          "min_normalized": 2.6936253204868246,
+          "percentile": 0.5833333333333334
+        },
+        "theory_of_change": {
+          "latent_mean": 1.6683304672744108,
+          "latent_std": 0.3555024078429621,
+          "z_score": -0.9306300458602321,
+          "min_normalized": 2.668330467274411,
+          "percentile": 0.16025641025641027
+        }
+      }
+    },
+    {
+      "id": "journal-of-animal-rights-law---publication-and-global-conference-costs",
+      "rank": 48,
+      "feasible": true,
+      "u_mean": 5.356433448319695,
+      "u_std": 0.551327087139523,
+      "p_flip": 0.39417509367066184,
+      "attribute_scores": {
+        "theory_of_change": {
+          "latent_mean": 1.9675674238263734,
+          "latent_std": 0.3333139395125834,
+          "z_score": -0.300239669481265,
+          "min_normalized": 2.9675674238263734,
+          "percentile": 0.4166666666666667
+        },
+        "team_evidence": {
+          "latent_mean": 2.6708955086577513,
+          "latent_std": 0.44732392031114226,
+          "z_score": -0.2727586671599854,
+          "min_normalized": 3.6708955086577513,
+          "percentile": 0.391025641025641
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.2954686247770362,
+          "latent_std": 0.44648113877091716,
+          "z_score": -0.3426545959883529,
+          "min_normalized": 2.295468624777036,
+          "percentile": 0.3525641025641026
+        },
+        "epistemic_integrity": {
+          "latent_mean": 1.9568527913859262,
+          "latent_std": 0.39359718439610486,
+          "z_score": -0.08560834677994632,
+          "min_normalized": 2.956852791385926,
+          "percentile": 0.46794871794871795
+        }
+      }
+    },
+    {
+      "id": "the-ai-governance-archive-taiga-t9r8c28q3r",
+      "rank": 49,
+      "feasible": true,
+      "u_mean": 5.3552994884124825,
+      "u_std": 0.5293937045485119,
+      "p_flip": 0.3922813245053315,
+      "attribute_scores": {
+        "theory_of_change": {
+          "latent_mean": 1.8795210056687979,
+          "latent_std": 0.3242072012075744,
+          "z_score": -0.4857234924713432,
+          "min_normalized": 2.879521005668798,
+          "percentile": 0.30128205128205127
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.904082406528359,
+          "latent_std": 0.3950644268674858,
+          "z_score": 0.5832163142667577,
+          "min_normalized": 2.9040824065283593,
+          "percentile": 0.7115384615384616
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.01290364554847,
+          "latent_std": 0.38091929723680457,
+          "z_score": 0.05610438033351011,
+          "min_normalized": 3.01290364554847,
+          "percentile": 0.532051282051282
+        },
+        "team_evidence": {
+          "latent_mean": 2.0414951854423555,
+          "latent_std": 0.4621774163834996,
+          "z_score": -1.2493101900622234,
+          "min_normalized": 3.0414951854423555,
+          "percentile": 0.12179487179487179
+        }
+      }
+    },
+    {
+      "id": "an-online-platform-to-solve-collective-action-and-coordination-problems",
+      "rank": 50,
+      "feasible": true,
+      "u_mean": 5.341148086257328,
+      "u_std": 0.5510103081715253,
+      "p_flip": 0.39991559970035817,
+      "attribute_scores": {
+        "theory_of_change": {
+          "latent_mean": 2.0555380350674706,
+          "latent_std": 0.33702845900171197,
+          "z_score": -0.11491554585172555,
+          "min_normalized": 3.0555380350674706,
+          "percentile": 0.4551282051282051
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.4753064666355509,
+          "latent_std": 0.4110654092466313,
+          "z_score": -0.06907119822051928,
+          "min_normalized": 2.475306466635551,
+          "percentile": 0.4551282051282051
+        },
+        "team_evidence": {
+          "latent_mean": 2.594261912560678,
+          "latent_std": 0.4087411531438723,
+          "z_score": -0.39166018693003635,
+          "min_normalized": 3.594261912560678,
+          "percentile": 0.33974358974358976
+        },
+        "epistemic_integrity": {
+          "latent_mean": 1.6450299532695154,
+          "latent_std": 0.4747989641154921,
+          "z_score": -0.8739864264000802,
+          "min_normalized": 2.6450299532695154,
+          "percentile": 0.21153846153846154
+        }
+      }
+    },
+    {
+      "id": "future-proofing-forecasting-easy-open-source-solution",
+      "rank": 51,
+      "feasible": true,
+      "u_mean": 5.315346267797732,
+      "u_std": 0.5251158440170928,
+      "p_flip": 0.4074175055629994,
+      "attribute_scores": {
+        "team_evidence": {
+          "latent_mean": 2.462322723859661,
+          "latent_std": 0.4531082802978777,
+          "z_score": -0.5963715779223953,
+          "min_normalized": 3.462322723859661,
+          "percentile": 0.30128205128205127
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.5848194915930849,
+          "latent_std": 0.3951397684001231,
+          "z_score": 0.0975285849957803,
+          "min_normalized": 2.584819491593085,
+          "percentile": 0.532051282051282
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.077543069573835,
+          "latent_std": 0.40171485858223377,
+          "z_score": 0.21953148942115253,
+          "min_normalized": 3.077543069573835,
+          "percentile": 0.5961538461538461
+        },
+        "theory_of_change": {
+          "latent_mean": 1.7703584842607825,
+          "latent_std": 0.31178130561613715,
+          "z_score": -0.7156917549139742,
+          "min_normalized": 2.7703584842607825,
+          "percentile": 0.21153846153846154
+        }
+      }
+    },
+    {
+      "id": "ai-animals-and-digital-minds-conference-and-retreat",
+      "rank": 52,
+      "feasible": true,
+      "u_mean": 5.295261829176166,
+      "u_std": 0.5258881307369239,
+      "p_flip": 0.4153975863346565,
+      "attribute_scores": {
+        "epistemic_integrity": {
+          "latent_mean": 1.7672166794212234,
+          "latent_std": 0.37442201174114953,
+          "z_score": -0.5650631380981734,
+          "min_normalized": 2.7672166794212236,
+          "percentile": 0.28846153846153844
+        },
+        "team_evidence": {
+          "latent_mean": 3.179694970422068,
+          "latent_std": 0.4412388967001893,
+          "z_score": 0.5166735445990515,
+          "min_normalized": 4.179694970422068,
+          "percentile": 0.7115384615384616
+        },
+        "theory_of_change": {
+          "latent_mean": 2.1143354765537916,
+          "latent_std": 0.324525327067799,
+          "z_score": 0.008950642655795286,
+          "min_normalized": 3.1143354765537916,
+          "percentile": 0.5064102564102564
+        },
+        "impact_per_dollar": {
+          "latent_mean": 0.7269628975749154,
+          "latent_std": 0.4057748384833483,
+          "z_score": -1.2075099951139365,
+          "min_normalized": 1.7269628975749154,
+          "percentile": 0.07051282051282051
+        }
+      }
+    },
+    {
+      "id": "ai-safety-reading-group-at-metauni",
+      "rank": 53,
+      "feasible": true,
+      "u_mean": 5.187639492454692,
+      "u_std": 0.4944749555354862,
+      "p_flip": 0.45677912570800194,
+      "attribute_scores": {
+        "impact_per_dollar": {
+          "latent_mean": 1.3122358626090436,
+          "latent_std": 0.3897113083613857,
+          "z_score": -0.3171469617226409,
+          "min_normalized": 2.3122358626090436,
+          "percentile": 0.36538461538461536
+        },
+        "team_evidence": {
+          "latent_mean": 2.41496771485269,
+          "latent_std": 0.4028667322724138,
+          "z_score": -0.669845652302527,
+          "min_normalized": 3.41496771485269,
+          "percentile": 0.27564102564102566
+        },
+        "epistemic_integrity": {
+          "latent_mean": 1.9127317813089721,
+          "latent_std": 0.37437315111792646,
+          "z_score": -0.1971589868981787,
+          "min_normalized": 2.912731781308972,
+          "percentile": 0.42948717948717946
+        },
+        "theory_of_change": {
+          "latent_mean": 1.9588681672219872,
+          "latent_std": 0.29611905711510383,
+          "z_score": -0.31856604102389213,
+          "min_normalized": 2.958868167221987,
+          "percentile": 0.40384615384615385
+        }
+      }
+    },
+    {
+      "id": "litigating-and-legislating-for-animal-rights",
+      "rank": 54,
+      "feasible": true,
+      "u_mean": 5.13565292123222,
+      "u_std": 0.503846472423458,
+      "p_flip": 0.47851529497045653,
+      "attribute_scores": {
+        "epistemic_integrity": {
+          "latent_mean": 1.8538343530580976,
+          "latent_std": 0.3831433718537396,
+          "z_score": -0.34606867439725275,
+          "min_normalized": 2.8538343530580974,
+          "percentile": 0.391025641025641
+        },
+        "theory_of_change": {
+          "latent_mean": 1.851408813898237,
+          "latent_std": 0.31374126233170974,
+          "z_score": -0.5449463082467878,
+          "min_normalized": 2.851408813898237,
+          "percentile": 0.28846153846153844
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.0822175675526964,
+          "latent_std": 0.384807778488634,
+          "z_score": -0.6670687916331018,
+          "min_normalized": 2.0822175675526964,
+          "percentile": 0.22435897435897437
+        },
+        "team_evidence": {
+          "latent_mean": 2.827875391125774,
+          "latent_std": 0.40120706443943804,
+          "z_score": -0.029195170868771228,
+          "min_normalized": 3.827875391125774,
+          "percentile": 0.46794871794871795
+        }
+      }
+    },
+    {
+      "id": "adjacent-news",
+      "rank": 55,
+      "feasible": true,
+      "u_mean": 5.131898940645623,
+      "u_std": 0.472545145210795,
+      "p_flip": 0.47939409053307935,
+      "attribute_scores": {
+        "theory_of_change": {
+          "latent_mean": 1.9238721841778599,
+          "latent_std": 0.2917097264689296,
+          "z_score": -0.3922906610612853,
+          "min_normalized": 2.92387218417786,
+          "percentile": 0.33974358974358976
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.1797701039347834,
+          "latent_std": 0.3641448078899317,
+          "z_score": -0.5186642395740383,
+          "min_normalized": 2.1797701039347834,
+          "percentile": 0.23717948717948717
+        },
+        "team_evidence": {
+          "latent_mean": 2.6426802609592106,
+          "latent_std": 0.3680499465150406,
+          "z_score": -0.3165362791070391,
+          "min_normalized": 3.6426802609592106,
+          "percentile": 0.3782051282051282
+        },
+        "epistemic_integrity": {
+          "latent_mean": 1.7984218784191546,
+          "latent_std": 0.36914034394539624,
+          "z_score": -0.48616739393536523,
+          "min_normalized": 2.7984218784191546,
+          "percentile": 0.3269230769230769
+        }
+      }
+    },
+    {
+      "id": "kickstarting-ea-latvia-community",
+      "rank": 56,
+      "feasible": true,
+      "u_mean": 5.105721935713913,
+      "u_std": 0.4617154057227615,
+      "p_flip": 0.4903985387286979,
+      "attribute_scores": {
+        "theory_of_change": {
+          "latent_mean": 1.991162951530693,
+          "latent_std": 0.2851995148527198,
+          "z_score": -0.2505319269558078,
+          "min_normalized": 2.991162951530693,
+          "percentile": 0.4423076923076923
+        },
+        "team_evidence": {
+          "latent_mean": 2.2393118839913524,
+          "latent_std": 0.38954228042118544,
+          "z_score": -0.9423859780811538,
+          "min_normalized": 3.2393118839913524,
+          "percentile": 0.16025641025641027
+        },
+        "epistemic_integrity": {
+          "latent_mean": 1.9883237579760369,
+          "latent_std": 0.3333881115304921,
+          "z_score": -0.0060406654838176714,
+          "min_normalized": 2.988323757976037,
+          "percentile": 0.4935897435897436
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.2329263828065422,
+          "latent_std": 0.3511216345833363,
+          "z_score": -0.4377987485509,
+          "min_normalized": 2.232926382806542,
+          "percentile": 0.27564102564102566
+        }
+      }
+    },
+    {
+      "id": "each--cfi-community",
+      "rank": 57,
+      "feasible": true,
+      "u_mean": 5.083402313864617,
+      "u_std": 0.4660595925443264,
+      "p_flip": 0.5,
+      "attribute_scores": {
+        "team_evidence": {
+          "latent_mean": 2.4293483912411324,
+          "latent_std": 0.34769144193963847,
+          "z_score": -0.6475331892968607,
+          "min_normalized": 3.4293483912411324,
+          "percentile": 0.28846153846153844
+        },
+        "theory_of_change": {
+          "latent_mean": 2.077611163672983,
+          "latent_std": 0.29273909284318395,
+          "z_score": -0.06841497984602257,
+          "min_normalized": 3.077611163672983,
+          "percentile": 0.46794871794871795
+        },
+        "epistemic_integrity": {
+          "latent_mean": 1.542701212064974,
+          "latent_std": 0.35340658118501583,
+          "z_score": -1.1327030007475456,
+          "min_normalized": 2.5427012120649737,
+          "percentile": 0.16025641025641027
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.2890123097318096,
+          "latent_std": 0.3694965497819638,
+          "z_score": -0.3524764476569373,
+          "min_normalized": 2.2890123097318096,
+          "percentile": 0.33974358974358976
+        }
+      }
+    },
+    {
+      "id": "play-money-prediction-markets",
+      "rank": 58,
+      "feasible": true,
+      "u_mean": 5.071058860177937,
+      "u_std": 0.42743085978618867,
+      "p_flip": 0.5055121147256115,
+      "attribute_scores": {
+        "impact_per_dollar": {
+          "latent_mean": 1.050182118510452,
+          "latent_std": 0.32095866317025484,
+          "z_score": -0.7158036235651417,
+          "min_normalized": 2.050182118510452,
+          "percentile": 0.1987179487179487
+        },
+        "theory_of_change": {
+          "latent_mean": 1.780884797649215,
+          "latent_std": 0.2686509286715341,
+          "z_score": -0.6935163968456446,
+          "min_normalized": 2.780884797649215,
+          "percentile": 0.22435897435897437
+        },
+        "team_evidence": {
+          "latent_mean": 2.829379746613993,
+          "latent_std": 0.3339782469423135,
+          "z_score": -0.026861075081369028,
+          "min_normalized": 3.829379746613993,
+          "percentile": 0.4807692307692308
+        },
+        "epistemic_integrity": {
+          "latent_mean": 1.8934918927204234,
+          "latent_std": 0.33405069548565886,
+          "z_score": -0.24580297496900344,
+          "min_normalized": 2.8934918927204234,
+          "percentile": 0.40384615384615385
+        }
+      }
+    },
+    {
+      "id": "toward-a-regenerative-world-nvda-and-storytelling-to-stop-the-ecocide",
+      "rank": 59,
+      "feasible": true,
+      "u_mean": 5.067380528594776,
+      "u_std": 0.4541832646725339,
+      "p_flip": 0.5069506920654062,
+      "attribute_scores": {
+        "impact_per_dollar": {
+          "latent_mean": 0.7931822099824881,
+          "latent_std": 0.3427896375989073,
+          "z_score": -1.1067719952631245,
+          "min_normalized": 1.7931822099824881,
+          "percentile": 0.09615384615384616
+        },
+        "theory_of_change": {
+          "latent_mean": 1.9480616439758431,
+          "latent_std": 0.27299355100391853,
+          "z_score": -0.34133170585012773,
+          "min_normalized": 2.9480616439758434,
+          "percentile": 0.3782051282051282
+        },
+        "epistemic_integrity": {
+          "latent_mean": 1.9067705727105606,
+          "latent_std": 0.3372310138686387,
+          "z_score": -0.21223064173725184,
+          "min_normalized": 2.9067705727105606,
+          "percentile": 0.4166666666666667
+        },
+        "team_evidence": {
+          "latent_mean": 2.8399968213417415,
+          "latent_std": 0.39307924864335964,
+          "z_score": -0.010388060829990485,
+          "min_normalized": 3.8399968213417415,
+          "percentile": 0.4935897435897436
+        }
+      }
+    },
+    {
+      "id": "doom-debates---podcast--debate-show-to-help-ai-x-risk-discourse-go-mainstream",
+      "rank": 60,
+      "feasible": true,
+      "u_mean": 4.95963123593701,
+      "u_std": 0.4476437026744632,
+      "p_flip": 0.5538903661005223,
+      "attribute_scores": {
+        "theory_of_change": {
+          "latent_mean": 1.8906790591075229,
+          "latent_std": 0.29179596381982803,
+          "z_score": -0.4622172732264184,
+          "min_normalized": 2.890679059107523,
+          "percentile": 0.3269230769230769
+        },
+        "team_evidence": {
+          "latent_mean": 2.116855809621358,
+          "latent_std": 0.35049072170364287,
+          "z_score": -1.1323837608972311,
+          "min_normalized": 3.116855809621358,
+          "percentile": 0.14743589743589744
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.0323670973414365,
+          "latent_std": 0.3244892431745032,
+          "z_score": 0.10531360067159702,
+          "min_normalized": 3.0323670973414365,
+          "percentile": 0.5576923076923077
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.223647086757151,
+          "latent_std": 0.3360900747545648,
+          "z_score": -0.4519151398279003,
+          "min_normalized": 2.223647086757151,
+          "percentile": 0.26282051282051283
+        }
+      }
+    },
+    {
+      "id": "effective-altruism-meetup-abuja",
+      "rank": 61,
+      "feasible": true,
+      "u_mean": 4.957480551477863,
+      "u_std": 0.4388104901702576,
+      "p_flip": 0.555357384436326,
+      "attribute_scores": {
+        "theory_of_change": {
+          "latent_mean": 1.9284424620876324,
+          "latent_std": 0.2791046714904991,
+          "z_score": -0.38266264169865133,
+          "min_normalized": 2.9284424620876326,
+          "percentile": 0.3525641025641026
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.4336908623270244,
+          "latent_std": 0.3255688432313252,
+          "z_score": -0.13238011201323294,
+          "min_normalized": 2.4336908623270244,
+          "percentile": 0.391025641025641
+        },
+        "team_evidence": {
+          "latent_mean": 2.4113908152384695,
+          "latent_std": 0.3567020011981412,
+          "z_score": -0.6753954218795277,
+          "min_normalized": 3.4113908152384695,
+          "percentile": 0.25
+        },
+        "epistemic_integrity": {
+          "latent_mean": 1.411592466235978,
+          "latent_std": 0.32578085309302063,
+          "z_score": -1.4641837283377426,
+          "min_normalized": 2.411592466235978,
+          "percentile": 0.10897435897435898
+        }
+      }
+    },
+    {
+      "id": "forecasting-meetup-network---washington-dc-pilot-4-meetups",
+      "rank": 62,
+      "feasible": true,
+      "u_mean": 4.91859955843595,
+      "u_std": 0.44523403428818686,
+      "p_flip": 0.571791313591844,
+      "attribute_scores": {
+        "team_evidence": {
+          "latent_mean": 2.4019337368429152,
+          "latent_std": 0.35811429816844126,
+          "z_score": -0.6900686337746285,
+          "min_normalized": 3.4019337368429152,
+          "percentile": 0.23717948717948717
+        },
+        "theory_of_change": {
+          "latent_mean": 1.5626338509598596,
+          "latent_std": 0.283824782767329,
+          "z_score": -1.1532968264219534,
+          "min_normalized": 2.56263385095986,
+          "percentile": 0.1346153846153846
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.2526539472671319,
+          "latent_std": 0.3190926125101371,
+          "z_score": -0.4077876337652911,
+          "min_normalized": 2.252653947267132,
+          "percentile": 0.30128205128205127
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.1795848592752107,
+          "latent_std": 0.3488646903598236,
+          "z_score": 0.4775225675978548,
+          "min_normalized": 3.1795848592752107,
+          "percentile": 0.7115384615384616
+        }
+      }
+    },
+    {
+      "id": "digital-animal-effective-animal-rights-news-for-global-impact",
+      "rank": 63,
+      "feasible": true,
+      "u_mean": 4.840196813847363,
+      "u_std": 0.470914299055263,
+      "p_flip": 0.6024314331730884,
+      "attribute_scores": {
+        "epistemic_integrity": {
+          "latent_mean": 1.4512145510253984,
+          "latent_std": 0.36791098722831456,
+          "z_score": -1.3640076690551064,
+          "min_normalized": 2.4512145510253984,
+          "percentile": 0.14743589743589744
+        },
+        "team_evidence": {
+          "latent_mean": 2.277698124731532,
+          "latent_std": 0.3813644887722593,
+          "z_score": -0.8828274737864461,
+          "min_normalized": 3.277698124731532,
+          "percentile": 0.1858974358974359
+        },
+        "theory_of_change": {
+          "latent_mean": 1.7938011517199506,
+          "latent_std": 0.2807997664381441,
+          "z_score": -0.6663060368756819,
+          "min_normalized": 2.7938011517199506,
+          "percentile": 0.23717948717948717
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.5275107038601141,
+          "latent_std": 0.3669283299127737,
+          "z_score": 0.010345972549414634,
+          "min_normalized": 2.527510703860114,
+          "percentile": 0.5064102564102564
+        }
+      }
+    },
+    {
+      "id": "democratising-charity-evaluations",
+      "rank": 64,
+      "feasible": true,
+      "u_mean": 4.755946049616727,
+      "u_std": 0.46759027166634676,
+      "p_flip": 0.6371198220738057,
+      "attribute_scores": {
+        "theory_of_change": {
+          "latent_mean": 1.5615984398791598,
+          "latent_std": 0.30181433857618745,
+          "z_score": -1.1554780850084274,
+          "min_normalized": 2.56159843987916,
+          "percentile": 0.12179487179487179
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.3185264069742226,
+          "latent_std": 0.3595329264941868,
+          "z_score": 0.8288068776762043,
+          "min_normalized": 3.3185264069742226,
+          "percentile": 0.8012820512820513
+        },
+        "team_evidence": {
+          "latent_mean": 2.513431686659736,
+          "latent_std": 0.35153903834419836,
+          "z_score": -0.517073024020499,
+          "min_normalized": 3.513431686659736,
+          "percentile": 0.3141025641025641
+        },
+        "impact_per_dollar": {
+          "latent_mean": 0.8034802348458008,
+          "latent_std": 0.35262249029814546,
+          "z_score": -1.0911058339964694,
+          "min_normalized": 1.8034802348458008,
+          "percentile": 0.10897435897435898
+        }
+      }
+    },
+    {
+      "id": "the-milestone-olympics-by-forkinwisdom",
+      "rank": 65,
+      "feasible": true,
+      "u_mean": 4.746944168651758,
+      "u_std": 0.44678470233917433,
+      "p_flip": 0.6438119484403186,
+      "attribute_scores": {
+        "team_evidence": {
+          "latent_mean": 2.0874110232529106,
+          "latent_std": 0.3518509734161932,
+          "z_score": -1.178069074216967,
+          "min_normalized": 3.0874110232529106,
+          "percentile": 0.1346153846153846
+        },
+        "theory_of_change": {
+          "latent_mean": 1.6760420388729615,
+          "latent_std": 0.2869666798948213,
+          "z_score": -0.9143843903152106,
+          "min_normalized": 2.6760420388729615,
+          "percentile": 0.1858974358974359
+        },
+        "epistemic_integrity": {
+          "latent_mean": 1.772971579198716,
+          "latent_std": 0.3362954886382586,
+          "z_score": -0.5505130914678745,
+          "min_normalized": 2.7729715791987157,
+          "percentile": 0.30128205128205127
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.447121448041305,
+          "latent_std": 0.33250734182385466,
+          "z_score": -0.11194845404985604,
+          "min_normalized": 2.447121448041305,
+          "percentile": 0.40384615384615385
+        }
+      }
+    },
+    {
+      "id": "charlies-forecasting-tools",
+      "rank": 66,
+      "feasible": true,
+      "u_mean": 4.698092067333782,
+      "u_std": 0.47055410305548073,
+      "p_flip": 0.6596824277190211,
+      "attribute_scores": {
+        "team_evidence": {
+          "latent_mean": 2.397075518892355,
+          "latent_std": 0.37576610690315937,
+          "z_score": -0.6976064439142445,
+          "min_normalized": 3.397075518892355,
+          "percentile": 0.22435897435897437
+        },
+        "impact_per_dollar": {
+          "latent_mean": 0.9185727143700759,
+          "latent_std": 0.3430813494240881,
+          "z_score": -0.9160181478878452,
+          "min_normalized": 1.918572714370076,
+          "percentile": 0.16025641025641027
+        },
+        "epistemic_integrity": {
+          "latent_mean": 2.1199741757017403,
+          "latent_std": 0.3856393260854953,
+          "z_score": 0.32680956490575735,
+          "min_normalized": 3.1199741757017403,
+          "percentile": 0.6346153846153846
+        },
+        "theory_of_change": {
+          "latent_mean": 1.6073021865747112,
+          "latent_std": 0.28996172783821306,
+          "z_score": -1.059195852982937,
+          "min_normalized": 2.607302186574711,
+          "percentile": 0.14743589743589744
+        }
+      }
+    },
+    {
+      "id": "journal-of-animal-rights-law",
+      "rank": 67,
+      "feasible": true,
+      "u_mean": 4.361150391837214,
+      "u_std": 0.4514658573312823,
+      "p_flip": 0.7845025397603351,
+      "attribute_scores": {
+        "team_evidence": {
+          "latent_mean": 1.5964950236588333,
+          "latent_std": 0.33455235288566504,
+          "z_score": -1.9397540453519548,
+          "min_normalized": 2.596495023658833,
+          "percentile": 0.04487179487179487
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.0724600260482968,
+          "latent_std": 0.33125069765446113,
+          "z_score": -0.6819127273200886,
+          "min_normalized": 2.072460026048297,
+          "percentile": 0.21153846153846154
+        },
+        "epistemic_integrity": {
+          "latent_mean": 1.7859934599660305,
+          "latent_std": 0.3740265907574442,
+          "z_score": -0.5175900207447955,
+          "min_normalized": 2.7859934599660305,
+          "percentile": 0.3141025641025641
+        },
+        "theory_of_change": {
+          "latent_mean": 1.8283490867017163,
+          "latent_std": 0.2870473507417116,
+          "z_score": -0.5935253015439834,
+          "min_normalized": 2.8283490867017163,
+          "percentile": 0.27564102564102566
+        }
+      }
+    },
+    {
+      "id": "covid-work-by-elizabeth-vnaceso-under-glass",
+      "rank": 68,
+      "feasible": true,
+      "u_mean": 4.172003620393382,
+      "u_std": 0.470147346878005,
+      "p_flip": 0.8351103022701382,
+      "attribute_scores": {
+        "epistemic_integrity": {
+          "latent_mean": 1.6910636475027145,
+          "latent_std": 0.3622261340811413,
+          "z_score": -0.7575999690237883,
+          "min_normalized": 2.6910636475027143,
+          "percentile": 0.22435897435897437
+        },
+        "theory_of_change": {
+          "latent_mean": 1.5222476651855923,
+          "latent_std": 0.3257114908327485,
+          "z_score": -1.2383767682316487,
+          "min_normalized": 2.522247665185592,
+          "percentile": 0.10897435897435898
+        },
+        "impact_per_dollar": {
+          "latent_mean": 0.38170991315538283,
+          "latent_std": 0.3247722083179727,
+          "z_score": -1.7327358518682252,
+          "min_normalized": 1.3817099131553827,
+          "percentile": 0.03205128205128205
+        },
+        "team_evidence": {
+          "latent_mean": 2.671868144885603,
+          "latent_std": 0.3395266898336402,
+          "z_score": -0.2712495649963797,
+          "min_normalized": 3.671868144885603,
+          "percentile": 0.40384615384615385
+        }
+      }
+    },
+    {
+      "id": "funding-for-brigada-animal-mexico-a-pillar-of-the-latinx-vegan-community",
+      "rank": 69,
+      "feasible": true,
+      "u_mean": 4.135767086657602,
+      "u_std": 0.4343725823078585,
+      "p_flip": 0.8537610413209916,
+      "attribute_scores": {
+        "theory_of_change": {
+          "latent_mean": 1.4106521184620697,
+          "latent_std": 0.2768178502677628,
+          "z_score": -1.4734705865616782,
+          "min_normalized": 2.4106521184620697,
+          "percentile": 0.07051282051282051
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.4842847752351278,
+          "latent_std": 0.32431803605070586,
+          "z_score": -0.05541269260514999,
+          "min_normalized": 2.484284775235128,
+          "percentile": 0.46794871794871795
+        },
+        "team_evidence": {
+          "latent_mean": 1.9926144743289973,
+          "latent_std": 0.3481602407020529,
+          "z_score": -1.325151480760065,
+          "min_normalized": 2.992614474328997,
+          "percentile": 0.10897435897435898
+        },
+        "epistemic_integrity": {
+          "latent_mean": 1.1804823209501567,
+          "latent_std": 0.32385475754074916,
+          "z_score": -2.0484968390187044,
+          "min_normalized": 2.1804823209501567,
+          "percentile": 0.057692307692307696
+        }
+      }
+    },
+    {
+      "id": "catalyzing-impact-and-cost-effective-change-in-nepal",
+      "rank": 70,
+      "feasible": true,
+      "u_mean": 4.096715057546689,
+      "u_std": 0.42558525617017207,
+      "p_flip": 0.8659256344190469,
+      "attribute_scores": {
+        "epistemic_integrity": {
+          "latent_mean": 1.4353270932525979,
+          "latent_std": 0.3367298873720172,
+          "z_score": -1.4041757450197363,
+          "min_normalized": 2.4353270932525977,
+          "percentile": 0.12179487179487179
+        },
+        "theory_of_change": {
+          "latent_mean": 1.4312266719533107,
+          "latent_std": 0.2771196986012096,
+          "z_score": -1.4301270080524497,
+          "min_normalized": 2.4312266719533104,
+          "percentile": 0.09615384615384616
+        },
+        "team_evidence": {
+          "latent_mean": 1.9314627136422449,
+          "latent_std": 0.3356438855767772,
+          "z_score": -1.4200320247065994,
+          "min_normalized": 2.9314627136422446,
+          "percentile": 0.09615384615384616
+        },
+        "impact_per_dollar": {
+          "latent_mean": 1.2382825853725004,
+          "latent_std": 0.2977679093108957,
+          "z_score": -0.4296504740721589,
+          "min_normalized": 2.2382825853725006,
+          "percentile": 0.28846153846153844
+        }
+      }
+    },
+    {
+      "id": "ai-governance-youtube-channel",
+      "rank": 71,
+      "feasible": true,
+      "u_mean": 3.9914254329819503,
+      "u_std": 0.44970449671786195,
+      "p_flip": 0.8834971676882699,
+      "attribute_scores": {
+        "impact_per_dollar": {
+          "latent_mean": 0.9664481085885006,
+          "latent_std": 0.33850922075493595,
+          "z_score": -0.8431863518409612,
+          "min_normalized": 1.9664481085885006,
+          "percentile": 0.17307692307692307
+        },
+        "theory_of_change": {
+          "latent_mean": 1.4152381097415492,
+          "latent_std": 0.29523638615316417,
+          "z_score": -1.4638094644795208,
+          "min_normalized": 2.415238109741549,
+          "percentile": 0.08333333333333333
+        },
+        "team_evidence": {
+          "latent_mean": 1.8040318088950262,
+          "latent_std": 0.3284333392041638,
+          "z_score": -1.6177485486828973,
+          "min_normalized": 2.8040318088950262,
+          "percentile": 0.08333333333333333
+        },
+        "epistemic_integrity": {
+          "latent_mean": 1.732175480883876,
+          "latent_std": 0.34472660313240977,
+          "z_score": -0.6536573955853316,
+          "min_normalized": 2.732175480883876,
+          "percentile": 0.27564102564102566
+        }
+      }
+    },
+    {
+      "id": "middlebury-effective-altruism-2024",
+      "rank": 72,
+      "feasible": true,
+      "u_mean": 3.9431129953565485,
+      "u_std": 0.4834647320785008,
+      "p_flip": 0.885210740509131,
+      "attribute_scores": {
+        "team_evidence": {
+          "latent_mean": 1.7843960517728328,
+          "latent_std": 0.40498735991013424,
+          "z_score": -1.6482145777167816,
+          "min_normalized": 2.784396051772833,
+          "percentile": 0.07051282051282051
+        },
+        "theory_of_change": {
+          "latent_mean": 1.796149994638144,
+          "latent_std": 0.292417530394896,
+          "z_score": -0.661357824635066,
+          "min_normalized": 2.796149994638144,
+          "percentile": 0.25
+        },
+        "impact_per_dollar": {
+          "latent_mean": 0.8295660805763928,
+          "latent_std": 0.37060810610090245,
+          "z_score": -1.0514220041925197,
+          "min_normalized": 1.829566080576393,
+          "percentile": 0.1346153846153846
+        },
+        "epistemic_integrity": {
+          "latent_mean": 1.1962804518498613,
+          "latent_std": 0.3624759472402089,
+          "z_score": -2.0085546071554727,
+          "min_normalized": 2.1962804518498613,
+          "percentile": 0.08333333333333333
+        }
+      }
+    },
+    {
+      "id": "school-vegan-clubs",
+      "rank": 73,
+      "feasible": true,
+      "u_mean": 3.7881536659871022,
+      "u_std": 0.496793488268986,
+      "p_flip": 0.9108917126787808,
+      "attribute_scores": {
+        "team_evidence": {
+          "latent_mean": 2.412556948914887,
+          "latent_std": 0.3986542649502365,
+          "z_score": -0.6735860970736627,
+          "min_normalized": 3.412556948914887,
+          "percentile": 0.26282051282051283
+        },
+        "epistemic_integrity": {
+          "latent_mean": 0.940406164284367,
+          "latent_std": 0.3741623481587953,
+          "z_score": -2.6554786127016774,
+          "min_normalized": 1.9404061642843669,
+          "percentile": 0.03205128205128205
+        },
+        "impact_per_dollar": {
+          "latent_mean": 0.8918460643740375,
+          "latent_std": 0.3465655120262073,
+          "z_score": -0.9566768192848277,
+          "min_normalized": 1.8918460643740374,
+          "percentile": 0.14743589743589744
+        },
+        "theory_of_change": {
+          "latent_mean": 1.3538055927525148,
+          "latent_std": 0.3289354661315994,
+          "z_score": -1.5932268598201924,
+          "min_normalized": 2.353805592752515,
+          "percentile": 0.057692307692307696
+        }
+      }
+    },
+    {
+      "id": "lost-ones-meetups",
+      "rank": 74,
+      "feasible": true,
+      "u_mean": 3.7811003754544,
+      "u_std": 0.5007538747095579,
+      "p_flip": 0.9113586763043875,
+      "attribute_scores": {
+        "epistemic_integrity": {
+          "latent_mean": 1.4491669163189138,
+          "latent_std": 0.3905644144509354,
+          "z_score": -1.3691846802304688,
+          "min_normalized": 2.449166916318914,
+          "percentile": 0.1346153846153846
+        },
+        "theory_of_change": {
+          "latent_mean": 1.6688273592766658,
+          "latent_std": 0.3387096635659822,
+          "z_score": -0.9295832636046893,
+          "min_normalized": 2.6688273592766656,
+          "percentile": 0.17307692307692307
+        },
+        "impact_per_dollar": {
+          "latent_mean": 0.7318024676229679,
+          "latent_std": 0.32466773009197397,
+          "z_score": -1.200147662449139,
+          "min_normalized": 1.731802467622968,
+          "percentile": 0.08333333333333333
+        },
+        "team_evidence": {
+          "latent_mean": 1.5779038915679806,
+          "latent_std": 0.40237381918708476,
+          "z_score": -1.9685992773706644,
+          "min_normalized": 2.5779038915679804,
+          "percentile": 0.03205128205128205
+        }
+      }
+    },
+    {
+      "id": "commissions-for-a-cause",
+      "rank": 75,
+      "feasible": true,
+      "u_mean": 3.7443063993229653,
+      "u_std": 0.5192130665869349,
+      "p_flip": 0.9130630397586665,
+      "attribute_scores": {
+        "epistemic_integrity": {
+          "latent_mean": 1.3626780631511322,
+          "latent_std": 0.40902531962285105,
+          "z_score": -1.5878534486274394,
+          "min_normalized": 2.362678063151132,
+          "percentile": 0.09615384615384616
+        },
+        "impact_per_dollar": {
+          "latent_mean": 0.7113334532506428,
+          "latent_std": 0.3686899245961287,
+          "z_score": -1.2312867288606735,
+          "min_normalized": 1.7113334532506428,
+          "percentile": 0.057692307692307696
+        },
+        "team_evidence": {
+          "latent_mean": 2.2579877757413245,
+          "latent_std": 0.39220134597447137,
+          "z_score": -0.9134092364792098,
+          "min_normalized": 3.2579877757413245,
+          "percentile": 0.17307692307692307
+        },
+        "theory_of_change": {
+          "latent_mean": 1.2788376270429362,
+          "latent_std": 0.34348435401644767,
+          "z_score": -1.7511588367543989,
+          "min_normalized": 2.278837627042936,
+          "percentile": 0.03205128205128205
+        }
+      }
+    },
+    {
+      "id": "web3-in-service-of-mother-earth",
+      "rank": 76,
+      "feasible": true,
+      "u_mean": 3.2989233617373728,
+      "u_std": 1.678008757822422,
+      "p_flip": 0.7974782772435676,
+      "attribute_scores": {
+        "epistemic_integrity": {
+          "latent_mean": 1.1589287252050973,
+          "latent_std": 1.1875263728136511,
+          "z_score": -2.1029905461667835,
+          "min_normalized": 2.1589287252050973,
+          "percentile": 0.04487179487179487
+        },
+        "theory_of_change": {
+          "latent_mean": 1.285985189107914,
+          "latent_std": 1.0403604539798488,
+          "z_score": -1.7361013572496877,
+          "min_normalized": 2.285985189107914,
+          "percentile": 0.04487179487179487
+        },
+        "team_evidence": {
+          "latent_mean": 1.6958866384653744,
+          "latent_std": 1.1483810070422042,
+          "z_score": -1.7855421245394774,
+          "min_normalized": 2.6958866384653746,
+          "percentile": 0.057692307692307696
+        },
+        "impact_per_dollar": {
+          "latent_mean": 0.6902542490359829,
+          "latent_std": 1.465631952605051,
+          "z_score": -1.263354063809153,
+          "min_normalized": 1.6902542490359829,
+          "percentile": 0.04487179487179487
+        }
+      }
+    },
+    {
+      "id": "mafia-creativa",
+      "rank": 77,
+      "feasible": true,
+      "u_mean": 1.5830329905220388,
+      "u_std": 0.6028254617303158,
+      "p_flip": 0.9994778879810291,
+      "attribute_scores": {
+        "team_evidence": {
+          "latent_mean": 1.1116244146137362,
+          "latent_std": 0.415278254700599,
+          "z_score": -2.6920592384198043,
+          "min_normalized": 2.111624414613736,
+          "percentile": 0.019230769230769232
+        },
+        "theory_of_change": {
+          "latent_mean": 0.6452774507399638,
+          "latent_std": 0.3413289910395855,
+          "z_score": -3.085854399095481,
+          "min_normalized": 1.6452774507399637,
+          "percentile": 0.019230769230769232
+        },
+        "impact_per_dollar": {
+          "latent_mean": 0.0,
+          "latent_std": 0.5136371152677511,
+          "z_score": -2.313422841455617,
+          "min_normalized": 1.0,
+          "percentile": 0.00641025641025641
+        },
+        "epistemic_integrity": {
+          "latent_mean": 0.6031472690231128,
+          "latent_std": 0.5132742213047842,
+          "z_score": -3.5081663817791093,
+          "min_normalized": 1.6031472690231128,
+          "percentile": 0.019230769230769232
+        }
+      }
+    },
+    {
+      "id": "eusaybia-kairos---a-long-term-natural-and-non-linear-probabilistic-calendar",
+      "rank": 78,
+      "feasible": true,
+      "u_mean": 0.13531883472779213,
+      "u_std": 1.026559174050935,
+      "p_flip": 0.9995745070206257,
+      "attribute_scores": {
+        "impact_per_dollar": {
+          "latent_mean": 0.19998818639611377,
+          "latent_std": 0.6558508941077913,
+          "z_score": -2.0091851627654957,
+          "min_normalized": 1.1999881863961137,
+          "percentile": 0.019230769230769232
+        },
+        "team_evidence": {
+          "latent_mean": 0.0,
+          "latent_std": 0.940930363098743,
+          "z_score": -4.416809727012815,
+          "min_normalized": 1.0,
+          "percentile": 0.00641025641025641
+        },
+        "theory_of_change": {
+          "latent_mean": 0.0,
+          "latent_std": 0.5037936553805977,
+          "z_score": -4.445234268908417,
+          "min_normalized": 1.0,
+          "percentile": 0.00641025641025641
+        },
+        "epistemic_integrity": {
+          "latent_mean": 0.0,
+          "latent_std": 1.038949147107906,
+          "z_score": -5.0330966548563225,
+          "min_normalized": 1.0,
+          "percentile": 0.00641025641025641
+        }
+      }
+    }
+  ],
+  "meta": {
+    "global_topk_error": 11.06500005998949,
+    "tolerated_error": 0.15,
+    "k": 57,
+    "band_size": 5,
+    "comparisons_attempted": 1296,
+    "comparisons_used": 1296,
+    "comparisons_refused": 0,
+    "comparisons_cached": 0,
+    "comparison_budget": 1300,
+    "latency_ms": 2474745,
+    "model_used": "deepseek/deepseek-v4-flash",
+    "rater_id_used": "manifund-p2-eacc-2026-07-19",
+    "engine_spec": {
+      "n": 78,
+      "attribute": {
+        "temperature": 1.0
+      },
+      "raters": [
+        [
+          "manifund-p2-eacc-2026-07-19",
+          {
+            "beta": 1.0,
+            "cost_per_edge": 1.0
+          }
+        ]
+      ],
+      "config": {
+        "huber_k": 1.5,
+        "irls_max_iters": 12,
+        "irls_tol": 1e-8,
+        "ridge_lambda": 1e-9,
+        "tiny": 1e-18,
+        "max_log_ratio": 10.0,
+        "hutch_probes": 12,
+        "rank_weight_exponent": 1.0,
+        "rank_band_window": 5,
+        "small_gap_threshold": 0.5,
+        "max_rank_pairs": 200000,
+        "top_k": 57,
+        "tail_weight": 0.05,
+        "lambda_risk": 1.0,
+        "rng_seed": 7
+      }
+    },
+    "warm_start_observations": 0,
+    "provider_input_tokens": 3067612,
+    "provider_output_tokens": 752669,
+    "provider_cost_nanodollars": 607567132,
+    "provider_cost_is_estimate": false,
+    "entities_pruned": 0,
+    "pairs_counterbalanced": 0,
+    "position_flips": 0,
+    "evidence_judgements": 0,
+    "logprob_mode_judgements": 0,
+    "evidence_visible_mass_mean": null,
+    "evidence_order_residual_mean_abs": null,
+    "judgement_frustration_mean": 0.2808148407917715,
+    "stop_reason": "no_new_pairs"
+  },
+  "pareto_front": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    8,
+    10,
+    11,
+    13
+  ],
+  "attribute_correlations": [
+    [
+      0.9999999999999998,
+      0.7737140846702604,
+      0.8217035054656232,
+      0.6995339220869076
+    ],
+    [
+      0.7737140846702604,
+      1.0,
+      0.6337799208600121,
+      0.5879529785960469
+    ],
+    [
+      0.8217035054656232,
+      0.6337799208600121,
+      1.0,
+      0.6486452091073602
+    ],
+    [
+      0.6995339220869076,
+      0.5879529785960469,
+      0.6486452091073602,
+      0.9999999999999998
+    ]
+  ]
+}
