@@ -1,0 +1,8 @@
+matched 78 of 78 scored items to EA CC ground truth
+cohort: n=78, funded=57
+AUC (combined score vs funded): 0.682
+Spearman (combined score vs dollars raised): +0.420
+  AUC[theory_of_change]: 0.666
+  AUC[impact_per_dollar]: 0.682
+  AUC[team_evidence]: 0.625
+  AUC[epistemic_integrity]: 0.657
