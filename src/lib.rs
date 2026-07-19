@@ -18,6 +18,7 @@ pub mod censored_likelihood;
 pub mod discrete;
 pub mod gain_calibration;
 pub mod gateway;
+pub mod judgement_run;
 pub mod packet;
 pub mod prompts;
 pub mod rating_engine;

@@ -425,6 +425,52 @@ impl<'a> RerankExecution<'a> {
         self.cancel_flag = Some(cancel_flag);
         self
     }
+
+    pub(crate) fn judgement_run_instrumentation(
+        &self,
+    ) -> Result<
+        (
+            Arc<dyn ChatGateway>,
+            Option<&'a dyn TraceSink>,
+            RerankRunOptions,
+            bool,
+        ),
+        &'static str,
+    > {
+        if self.model_policy.is_some() {
+            return Err("model policies have no portable v1 specification");
+        }
+        if self.warm_start.is_some() {
+            return Err("warm starts have no complete comparison trace");
+        }
+        Ok((
+            Arc::clone(&self.gateway),
+            self.trace,
+            self.run_options.clone(),
+            self.cache.is_some(),
+        ))
+    }
+
+    pub(crate) fn with_judgement_run_instrumentation<'b>(
+        self,
+        gateway: Arc<dyn ChatGateway>,
+        trace: &'b dyn TraceSink,
+    ) -> RerankExecution<'b>
+    where
+        'a: 'b,
+    {
+        RerankExecution {
+            gateway,
+            cache: self.cache,
+            model_policy: self.model_policy,
+            run_options: self.run_options,
+            attribution: self.attribution,
+            warm_start: self.warm_start,
+            observer: self.observer,
+            trace: Some(trace),
+            cancel_flag: self.cancel_flag,
+        }
+    }
 }
 
 fn build_trait_search_config(req: &MultiRerankRequest) -> (TraitSearchConfig, TopKConfig) {

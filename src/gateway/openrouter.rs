@@ -190,6 +190,8 @@ struct ResponseFormat {
 
 #[derive(Deserialize)]
 struct ChatApiResponse {
+    #[serde(default)]
+    id: Option<String>,
     choices: Option<Vec<Choice>>,
     usage: Option<Usage>,
     error: Option<ApiError>,
@@ -408,6 +410,8 @@ impl OpenRouterAdapter {
             ProviderError::provider("openrouter", format!("Invalid JSON: {e}"), false)
         })?;
 
+        let provider_call_id = parsed.id;
+
         // Check for API-level error
         if let Some(error) = parsed.error {
             let message = error.message.unwrap_or_default();
@@ -492,6 +496,8 @@ impl OpenRouterAdapter {
         let cost_is_estimate = upstream_cost_nanodollars.is_none() && cost_status.is_estimate();
 
         Ok(ChatResponse {
+            provider_call_id,
+            provider_request_id: request_id,
             content,
             reasoning,
             reasoning_tokens,

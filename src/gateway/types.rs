@@ -789,6 +789,10 @@ impl PairwiseLogprobPosterior {
 /// Response from chat completion.
 #[derive(Debug, Clone)]
 pub struct ChatResponse {
+    /// Provider-native completion identifier, when returned in the response body.
+    pub provider_call_id: Option<String>,
+    /// Provider request identifier, when returned in response headers.
+    pub provider_request_id: Option<String>,
     /// Generated content.
     pub content: String,
     /// Provider-returned reasoning text, if available.

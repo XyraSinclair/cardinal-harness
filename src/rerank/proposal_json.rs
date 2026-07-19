@@ -86,10 +86,11 @@ pub(crate) fn value_string_array(value: &Value) -> Option<Vec<String>> {
                 .map(str::to_string)
         })
     };
-    if let Some(array) = value
-        .as_array()
-        .or_else(|| value.as_object().and_then(|o| o.values().find_map(Value::as_array)))
-    {
+    if let Some(array) = value.as_array().or_else(|| {
+        value
+            .as_object()
+            .and_then(|o| o.values().find_map(Value::as_array))
+    }) {
         return array.iter().map(element).collect();
     }
     if let Some(object) = value.as_object() {

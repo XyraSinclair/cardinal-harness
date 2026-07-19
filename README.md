@@ -327,10 +327,12 @@ posteriors plus evidence. “Nearest,” “relevant,” “well-prioritized,”
 retrieval, query relevance, multi-criteria prioritization, and classification
 have different denominators and failure modes.
 
-The judgment engine and packet-fusion core exist today. A portable run bundle,
-recipient-side offline reweighting and contestation, generic evidence rendering,
-and incremental lane generations do not. Until those contracts exist, this is
-honestly a batch judgment compiler for shortlists—not a feed product.
+The judgment engine, packet-fusion core, and a narrow portable
+`cardinal.judgement-run.v1` atom for finite-candidate, single-axis runs exist
+today. Recipient-side offline reweighting and contestation, generic evidence
+rendering, incremental lane generations, and hosted run custody do not. Until
+those contracts exist, this is honestly a batch judgment compiler for
+shortlists—not a feed product.
 
 ## Scope
 

@@ -195,8 +195,8 @@ pub async fn consortium_verdict(
 
     let usable: Vec<&ConsortiumJudge> = judges.iter().filter(|j| j.belief.is_some()).collect();
     let beliefs: Vec<f64> = usable.iter().filter_map(|j| j.belief).collect();
-    let judge_mean = (!beliefs.is_empty())
-        .then(|| beliefs.iter().sum::<f64>() / beliefs.len() as f64);
+    let judge_mean =
+        (!beliefs.is_empty()).then(|| beliefs.iter().sum::<f64>() / beliefs.len() as f64);
     let judge_spread_nats = (beliefs.len() >= 2).then(|| {
         let mean = judge_mean.expect("nonempty");
         (beliefs.iter().map(|b| (b - mean).powi(2)).sum::<f64>() / beliefs.len() as f64).sqrt()

@@ -19,24 +19,29 @@ async fn openrouter_parses_success_content_and_usage() {
 
     Mock::given(method("POST"))
         .and(path("/chat/completions"))
-        .respond_with(ResponseTemplate::new(200).set_body_json(json!({
-            "choices": [{
-                "message": { "content": "hello", "reasoning": "think first" },
-                "finish_reason": "stop"
-            }],
-            "usage": {
-                "prompt_tokens": 10,
-                "completion_tokens": 20,
-                "prompt_tokens_details": {
-                    "cached_tokens": 4,
-                    "cache_write_tokens": 6
-                },
-                "completion_tokens_details": {
-                    "reasoning_tokens": 7
-                },
-                "cost_details": { "upstream_inference_cost": 0.000001 }
-            }
-        })))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .insert_header("x-request-id", "request-123")
+                .set_body_json(json!({
+                    "id": "completion-123",
+                    "choices": [{
+                        "message": { "content": "hello", "reasoning": "think first" },
+                        "finish_reason": "stop"
+                    }],
+                    "usage": {
+                        "prompt_tokens": 10,
+                        "completion_tokens": 20,
+                        "prompt_tokens_details": {
+                            "cached_tokens": 4,
+                            "cache_write_tokens": 6
+                        },
+                        "completion_tokens_details": {
+                            "reasoning_tokens": 7
+                        },
+                        "cost_details": { "upstream_inference_cost": 0.000001 }
+                    }
+                })),
+        )
         .mount(&server)
         .await;
 
@@ -51,6 +56,8 @@ async fn openrouter_parses_success_content_and_usage() {
     );
 
     let resp = adapter.chat(&req).await.unwrap();
+    assert_eq!(resp.provider_call_id.as_deref(), Some("completion-123"));
+    assert_eq!(resp.provider_request_id.as_deref(), Some("request-123"));
     assert_eq!(resp.content, "hello");
     assert_eq!(resp.reasoning.as_deref(), Some("think first"));
     assert_eq!(resp.reasoning_tokens, Some(7));
@@ -346,13 +353,15 @@ async fn provider_gateway_records_usage_for_retry_then_success() {
     let first = ResponseTemplate::new(500).set_body_json(json!({
         "error": { "message": "transient error", "code": "internal" }
     }));
-    let second = ResponseTemplate::new(200).set_body_json(json!({
+    let second = ResponseTemplate::new(200)
+        .insert_header("x-request-id", "usage-success")
+        .set_body_json(json!({
         "choices": [{
             "message": { "content": "ok" },
             "finish_reason": "stop"
         }],
         "usage": { "prompt_tokens": 3, "completion_tokens": 5 }
-    }));
+        }));
 
     Mock::given(method("POST"))
         .and(path("/chat/completions"))
@@ -416,6 +425,7 @@ async fn provider_gateway_records_usage_for_retry_then_success() {
     assert_eq!(second.job_id, Some(job_id));
     assert_eq!(second.input_tokens, 3);
     assert_eq!(second.output_tokens, 5);
+    assert_eq!(second.request_id.as_deref(), Some("usage-success"));
     assert_eq!(
         second.cost_nanodollars,
         cardinal_harness::gateway::chat_cost("openai/gpt-5-mini", 3, 5)

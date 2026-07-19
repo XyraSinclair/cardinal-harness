@@ -108,7 +108,7 @@ impl<U: UsageSinkTrait> ProviderGateway<U> {
         status: CallStatus,
         error_code: Option<String>,
     ) {
-        let record = ProviderCallRecord::new(
+        let mut record = ProviderCallRecord::new(
             req.model.provider(),
             "chat/completions",
             req.model.model_id(),
@@ -122,6 +122,9 @@ impl<U: UsageSinkTrait> ProviderGateway<U> {
         .api_key(req.attribution.api_key_id)
         .job(req.attribution.job_id)
         .latency(resp.latency.as_millis() as i32);
+        if let Some(request_id) = resp.provider_request_id.as_deref() {
+            record = record.request_id(request_id);
+        }
 
         let record = if status == CallStatus::Error {
             record.error(error_code.unwrap_or_else(|| "provider_error".to_string()))
@@ -141,6 +144,8 @@ fn backoff_delay(base: Duration, attempt: u32) -> Duration {
 impl ChatResponse {
     fn empty() -> Self {
         Self {
+            provider_call_id: None,
+            provider_request_id: None,
             content: String::new(),
             reasoning: None,
             reasoning_tokens: None,

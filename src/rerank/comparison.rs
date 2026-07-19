@@ -1237,6 +1237,8 @@ mod tests {
 
     fn response(content: &str, output_logprobs: Option<Vec<TokenLogprob>>) -> ChatResponse {
         ChatResponse {
+            provider_call_id: None,
+            provider_request_id: None,
             content: content.to_string(),
             reasoning: None,
             reasoning_tokens: None,

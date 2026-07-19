@@ -1839,13 +1839,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 if json {
                     println!("{}", serde_json::to_string_pretty(&report)?);
                 } else {
-                    println!("{:<34} {:>8} {:>9}  top bias", "judge", "belief", "coherence");
+                    println!(
+                        "{:<34} {:>8} {:>9}  top bias",
+                        "judge", "belief", "coherence"
+                    );
                     for j in &report.judges {
                         match (j.belief, j.coherence, &j.top_bias) {
-                            (Some(b), Some(c), Some((name, coef))) => println!(
-                                "{:<34} {b:+8.3} {c:9.3}  {name} {coef:+.3}",
-                                j.model
-                            ),
+                            (Some(b), Some(c), Some((name, coef))) => {
+                                println!("{:<34} {b:+8.3} {c:9.3}  {name} {coef:+.3}", j.model)
+                            }
                             _ => println!(
                                 "{:<34} orbit incomplete ({} refusals) — excluded",
                                 j.model, j.refusals
@@ -1868,7 +1870,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 .map(|s| format!("{s:.3}"))
                                 .unwrap_or_else(|| "n/a".into());
                             let unanimity = match report.direction_unanimous {
-                                Some(true) => format!("unanimous ({}/{})", report.usable_judges, report.usable_judges),
+                                Some(true) => format!(
+                                    "unanimous ({}/{})",
+                                    report.usable_judges, report.usable_judges
+                                ),
                                 Some(false) => "SPLIT".into(),
                                 None => "n/a".into(),
                             };
