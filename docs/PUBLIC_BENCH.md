@@ -134,7 +134,7 @@ wild and one aligned default:
 
 Do not paywall the leaderboard or the harness; credibility is the asset.
 
-## Website: pairwiseratio.com
+## Website: pairwiseratio.org
 
 **v1 shipped 2026-07-19**: `site/index.html` — a single self-contained
 static page (committed HTML, no build step, no framework; claude.ai
@@ -179,8 +179,8 @@ Ops note: Caddy reloads on that box hung until `grace_period 5s` was added
 to the Caddyfile global options (reload drains eternally otherwise and
 systemd kills it, silently keeping the old config); log files under
 `/var/log/caddy/` must be pre-created `chown caddy:caddy` before a vhost
-referencing them loads. `pairwiseratio.com` remains unregistered (verified
-2026-07-19); optional at Cloudflare Registrar if the .com is wanted.
+referencing them loads. The .org is the only domain; the .com is out of
+scope (operator, 2026-07-19).
 
 ### Naming (resolves the open question below)
 
