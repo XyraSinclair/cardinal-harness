@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pairwise Ratio — the judge benchmark with no answer key</title>
+<meta name="description" content="The Judge Coherence Benchmark scores LLM judges against themselves: swap the order, invert the question, negate the attribute, chain ratios around a cycle. No ground truth, nothing to memorize.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 4 L29 27 L3 27 Z' fill='none' stroke='%23B3362B' stroke-width='3.5' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F6F7F9; --card:#FFFFFF; --inset:#EDEFF3;
+  --ink:#16181D; --ink2:#5A6170; --ink3:#8A91A0; --line:#D8DCE3;
+  --blue:#3A55B4; --red:#B3362B; --red-ink:#B3362B;
+  --moonshot:#B08514; --anthropic:#C56A4A; --openai:#2A9D8F; --google:#3F7BD9; --deepseek:#B8397A;
+  --disp:'Archivo',system-ui,sans-serif;
+  --serif:'Source Serif 4',Georgia,serif;
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#181A20; --card:#1F222A; --inset:#14161B;
+    --ink:#E8EAEF; --ink2:#9AA1B0; --ink3:#6B7280; --line:#31353F;
+    --blue:#8CA3EE; --red:#E07A69; --red-ink:#E07A69;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#181A20; --card:#1F222A; --inset:#14161B;
+  --ink:#E8EAEF; --ink2:#9AA1B0; --ink3:#6B7280; --line:#31353F;
+  --blue:#8CA3EE; --red:#E07A69; --red-ink:#E07A69;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:var(--serif); font-size:17px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit; text-decoration-color:var(--ink3); text-underline-offset:3px}
+a:hover{text-decoration-color:var(--ink)}
+:focus-visible{outline:2px solid var(--blue); outline-offset:2px; border-radius:2px}
+.wrap{max-width:1120px; margin:0 auto; padding:0 24px}
+.mono{font-family:var(--mono)}
+
+/* ---------- top bar ---------- */
+.top{display:flex; align-items:baseline; justify-content:space-between; padding:22px 0 0; gap:16px; flex-wrap:wrap}
+.wordmark{font-family:var(--disp); font-weight:800; font-size:15px; letter-spacing:.34em; text-transform:uppercase; white-space:nowrap}
+.wordmark .x{color:var(--red-ink)}
+.topnav{font-family:var(--mono); font-size:12.5px; color:var(--ink2); display:flex; gap:22px; flex-wrap:wrap}
+.topnav a{text-decoration:none; border-bottom:1px solid transparent}
+.topnav a:hover{border-bottom-color:var(--ink2)}
+
+/* ---------- hero ---------- */
+.hero{display:grid; grid-template-columns:1.15fr .85fr; gap:56px; align-items:center; padding:84px 0 64px}
+.hero h1{
+  font-family:var(--disp); font-weight:800; letter-spacing:-.022em;
+  font-size:clamp(38px,5.2vw,62px); line-height:1.02;
+}
+.hero h1 .no{color:var(--red-ink)}
+.hero .lede{margin-top:26px; font-size:19px; max-width:34em; color:var(--ink)}
+.hero .lede em{font-style:italic}
+.statrow{margin-top:34px; font-family:var(--mono); font-size:12.5px; color:var(--ink2); display:flex; gap:10px 26px; flex-wrap:wrap}
+.statrow b{color:var(--ink); font-weight:600}
+
+/* triangle */
+.tri-fig{justify-self:center; width:100%; max-width:400px}
+.tri-fig svg{width:100%; height:auto; display:block}
+.tri-fig figcaption{margin-top:14px; font-family:var(--mono); font-size:12px; line-height:1.6; color:var(--ink2); text-align:center}
+.tri-edge{stroke:var(--ink); stroke-width:2; fill:none; marker-end:url(#arr)}
+.tri-node circle{fill:var(--card); stroke:var(--ink); stroke-width:2}
+.tri-node text{font-family:var(--mono); font-weight:600; font-size:17px; fill:var(--ink)}
+.tri-ratio{font-family:var(--mono); font-weight:600; font-size:15px; fill:var(--ink)}
+.tri-sum{font-family:var(--mono); font-weight:600; font-size:15px; fill:var(--ink2)}
+.tri-neq{fill:var(--red); font-weight:600}
+@media (prefers-reduced-motion: no-preference){
+  .tri-edge{stroke-dasharray:340; stroke-dashoffset:340; animation:draw .7s ease forwards}
+  .tri-edge.e2{animation-delay:.55s}
+  .tri-edge.e3{animation-delay:1.1s}
+  .tri-verdict{opacity:0; animation:appear .5s ease 1.75s forwards}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  @keyframes appear{to{opacity:1}}
+}
+
+/* ---------- atom strip ---------- */
+.atom{border-top:1px solid var(--line); border-bottom:1px solid var(--line); background:var(--card)}
+.atom-in{display:flex; gap:32px; align-items:center; padding:26px 0; flex-wrap:wrap}
+.atom .q{font-family:var(--mono); font-size:14px; background:var(--inset); border:1px solid var(--line); border-radius:8px; padding:14px 18px; flex:1 1 380px}
+.atom .q .attr{color:var(--blue)}
+.atom p{flex:1 1 320px; font-size:15.5px; color:var(--ink2); max-width:34em}
+
+/* ---------- sections ---------- */
+section{padding:72px 0 8px}
+.eyebrow{font-family:var(--mono); font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--ink2); margin-bottom:10px}
+h2{font-family:var(--disp); font-weight:800; letter-spacing:-.015em; font-size:clamp(26px,3.2vw,36px); line-height:1.1; margin-bottom:14px}
+.sect-note{max-width:44em; color:var(--ink2); font-size:16px}
+
+/* ---------- leaderboard ---------- */
+.legend{display:flex; gap:18px; flex-wrap:wrap; margin:22px 0 10px; font-family:var(--mono); font-size:12px; color:var(--ink2)}
+.legend .chip{display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:7px; vertical-align:baseline; position:relative; top:.5px}
+.board-scroll{overflow-x:auto; border:1px solid var(--line); border-radius:12px; background:var(--card); margin-top:6px}
+table{border-collapse:collapse; width:100%; min-width:1000px; font-family:var(--mono); font-size:12.5px}
+thead th{
+  font-weight:500; color:var(--ink2); text-align:right; padding:12px 9px 10px;
+  border-bottom:1px solid var(--line); white-space:nowrap; font-size:11.5px; letter-spacing:.02em;
+  position:sticky; top:0; background:var(--card);
+}
+thead th.l{text-align:left}
+tbody td{padding:10px 9px; text-align:right; white-space:nowrap; border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums; color:var(--ink2)}
+tbody tr:last-child td{border-bottom:none}
+tbody td.l{text-align:left}
+tbody tr:hover td{background:var(--inset)}
+td.model{color:var(--ink); font-weight:500}
+td.model .chip{display:inline-block; width:9px; height:9px; border-radius:3px; margin-right:9px}
+td.rank{color:var(--ink3)}
+td.judge{color:var(--ink); font-weight:600}
+.bar-wrap{display:inline-flex; align-items:center; gap:10px}
+.bar{width:88px; height:6px; background:var(--inset); border-radius:3px; overflow:hidden}
+.bar i{display:block; height:100%; border-radius:3px}
+.tie{color:var(--ink3)}
+td .best{color:var(--ink); font-weight:600}
+td .worst{color:var(--red-ink)}
+.board-foot{font-family:var(--mono); font-size:12px; color:var(--ink2); line-height:1.7; margin:16px 2px 0; max-width:62em}
+.board-foot b{color:var(--ink); font-weight:600}
+
+/* ---------- transformations ---------- */
+.tgrid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:28px}
+.tcard{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px 18px 16px}
+.tcard .glyph{font-family:var(--mono); font-size:20px; font-weight:600; color:var(--blue); margin-bottom:10px}
+.tcard h3{font-family:var(--disp); font-weight:700; font-size:15px; margin-bottom:6px}
+.tcard p{font-size:13.5px; line-height:1.5; color:var(--ink2)}
+.tcard p.kills{margin-top:8px; font-family:var(--mono); font-size:11.5px; color:var(--ink3)}
+.tcard p.kills b{color:var(--red-ink); font-weight:500}
+
+/* ---------- caught red-handed ---------- */
+.caught{background:var(--ink); color:var(--paper); border-radius:16px; padding:44px 44px 38px; margin-top:30px}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .caught{background:var(--card); color:var(--ink); border:1px solid var(--line)} }
+:root[data-theme="dark"] .caught{background:var(--card); color:var(--ink); border:1px solid var(--line)}
+.caught .eyebrow{color:var(--red)}
+.caught h2{margin-bottom:8px}
+.caught .sub{font-family:var(--mono); font-size:13px; opacity:.75; margin-bottom:30px}
+.calls{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+.call{border:1px solid color-mix(in srgb, currentColor 22%, transparent); border-radius:12px; padding:18px}
+.call .hd{font-family:var(--mono); font-size:11.5px; letter-spacing:.12em; text-transform:uppercase; opacity:.65; margin-bottom:14px}
+.slot{display:flex; gap:12px; margin-bottom:10px; align-items:baseline}
+.slot .tag{font-family:var(--mono); font-size:11.5px; font-weight:600; flex:0 0 16px; opacity:.6}
+.slot .txt{font-style:italic; font-size:15.5px; line-height:1.45}
+.verdict{margin-top:16px; padding-top:14px; border-top:1px dashed color-mix(in srgb, currentColor 30%, transparent); font-family:var(--mono); font-size:13.5px}
+.verdict b{color:var(--red); font-weight:600}
+.caught .punch{margin-top:26px; font-size:19px; font-family:var(--serif)}
+.caught .punch b{color:var(--red)}
+.caught .prov{margin-top:18px; font-family:var(--mono); font-size:11.5px; opacity:.55; line-height:1.7; overflow-wrap:anywhere}
+
+/* ---------- gaming table ---------- */
+.game{display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:start; margin-top:26px}
+.game .prose{max-width:36em}
+.game .prose p+p{margin-top:14px}
+.gtable{border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--card)}
+.gtable table{min-width:0; width:100%}
+.gtable td, .gtable th{text-align:left !important; white-space:normal; font-size:12.5px; line-height:1.5}
+.gtable td.exp{color:var(--ink)}
+.gtable td.by b{color:var(--red-ink); font-weight:500}
+
+/* ---------- run it ---------- */
+.run{display:grid; grid-template-columns:1fr 1fr; gap:48px; margin-top:26px; align-items:start}
+.codeblock{background:var(--ink); color:#E8EAEF; border-radius:12px; padding:22px 24px; font-family:var(--mono); font-size:13.5px; line-height:1.8; overflow-x:auto}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .codeblock{background:var(--inset); border:1px solid var(--line)} }
+:root[data-theme="dark"] .codeblock{background:var(--inset); border:1px solid var(--line)}
+.codeblock .c{opacity:.45}
+.run ul{list-style:none; font-size:15.5px}
+.run li{padding:9px 0; border-bottom:1px solid var(--line); display:flex; gap:14px}
+.run li:last-child{border-bottom:none}
+.run li .k{font-family:var(--mono); font-size:12.5px; color:var(--ink2); flex:0 0 9.5em}
+
+/* ---------- caveats ---------- */
+.caveats{margin-top:26px; border-left:3px solid var(--line); padding-left:26px; max-width:46em}
+.caveats p{color:var(--ink2); font-size:15.5px}
+.caveats p+p{margin-top:12px}
+.caveats b{color:var(--ink); font-weight:600}
+
+/* ---------- footer ---------- */
+footer{margin-top:88px; border-top:1px solid var(--line); padding:30px 0 44px}
+.foot{display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap; font-family:var(--mono); font-size:12px; color:var(--ink2); line-height:1.8; overflow-wrap:anywhere}
+
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr; gap:44px; padding-top:56px}
+  .tri-fig{max-width:340px}
+  .tgrid{grid-template-columns:repeat(2,1fr)}
+  .calls{grid-template-columns:1fr}
+  .game,.run{grid-template-columns:1fr; gap:26px}
+  .caught{padding:28px 22px}
+}
+@media (max-width:480px){ .tgrid{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+
+<header class="wrap top">
+  <div class="wordmark">Pairwise<span class="x">·</span>Ratio</div>
+  <nav class="topnav">
+    <a href="#board">leaderboard</a>
+    <a href="#method">method</a>
+    <a href="#caught">evidence</a>
+    <a href="#run">run it</a>
+    <a href="https://github.com/XyraSinclair/cardinal-harness">github</a>
+  </nav>
+</header>
+
+<main class="wrap">
+
+<div class="hero">
+  <div>
+    <h1>The judge benchmark with <span class="no">no answer key</span>.</h1>
+    <p class="lede">Every LLM-judge eval measures agreement with a reference. This one measures whether a model's judgments deserve the name <em>beliefs</em>: swap the order of the items, ask the question in reverse, negate the attribute, reword it, chain ratios around a cycle. A genuine belief is a fixed point of the transformations that shouldn't matter — so the model is scored against itself. Nothing to memorize, no labels to dispute.</p>
+    <div class="statrow">
+      <span><b>13</b> frontier models</span>
+      <span><b>194</b> comparisons each</span>
+      <span><b>$0.01–$2.25</b> per run</span>
+      <span><b>0</b> ground-truth labels</span>
+    </div>
+  </div>
+  <figure class="tri-fig" aria-label="A cycle of three ratio judgments that multiplies to nine instead of one">
+    <svg viewBox="0 0 360 330" role="img">
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--ink)"/>
+        </marker>
+      </defs>
+      <path class="tri-edge e1" d="M163 62 L57 243"/>
+      <path class="tri-edge e2" d="M74 272 L286 272"/>
+      <path class="tri-edge e3" d="M303 243 L197 62"/>
+      <g class="tri-node"><circle cx="180" cy="42" r="24"/><text x="180" y="48" text-anchor="middle">A</text></g>
+      <g class="tri-node"><circle cx="42" cy="272" r="24"/><text x="42" y="278" text-anchor="middle">B</text></g>
+      <g class="tri-node"><circle cx="318" cy="272" r="24"/><text x="318" y="278" text-anchor="middle">C</text></g>
+      <text class="tri-ratio" x="76" y="146" text-anchor="end">3&#215;</text>
+      <text class="tri-ratio" x="180" y="298" text-anchor="middle">2&#215;</text>
+      <text class="tri-ratio" x="286" y="146" text-anchor="start">1.5&#215;</text>
+      <g class="tri-verdict">
+        <text class="tri-sum" x="180" y="200" text-anchor="middle">3 &#183; 2 &#183; 1.5 = <tspan class="tri-neq">9</tspan></text>
+        <text class="tri-sum" x="180" y="226" text-anchor="middle">a judge multiplies to <tspan style="font-weight:600; fill:var(--ink)">1</tspan></text>
+      </g>
+    </svg>
+    <figcaption style="max-width:34em;margin-left:auto;margin-right:auto">A model's own ratios, chained around a cycle. The distance from 1 is the Hodge curl of its comparison graph.</figcaption>
+  </figure>
+</div>
+
+</main>
+
+<div class="atom">
+  <div class="wrap atom-in">
+    <div class="q">&ldquo;How many times more <span class="attr">depth of insight about living well</span> does A carry than B?&rdquo; &mdash; answered on a 17-step ratio ladder, 1/8&#215; to 8&#215;</div>
+    <p>The atom of the benchmark is a single pairwise ratio judgment — the same primitive used in production reranking, reward modeling, and evaluation. Every axis below is a transformation of this one question.</p>
+  </div>
+</div>
+
+<main class="wrap">
+
+<section id="board">
+  <p class="eyebrow">JCB v1.2 &#183; 2026-07-18 &#183; temperature 0 &#183; counterbalanced</p>
+  <h2>Leaderboard</h2>
+  <p class="sect-note">JUDGE = signal &#215; coherence, multiplicative on purpose: a judge that refuses to discriminate scores zero, and a decisive judge that contradicts itself scores low. Hover any cell for its denominator and 95% interval.</p>
+  <div class="legend" id="legend"></div>
+  <div class="board-scroll"><table id="board-table">
+    <thead><tr>
+      <th class="l">#</th><th class="l">model</th>
+      <th class="l" title="signal subscore × mean of consistency axes">JUDGE</th>
+      <th title="mean fused |log-ratio| across 20 pairs — how strongly the model separates items at all">signal<br>nats</th>
+      <th title="arithmetic (harmonic) mean of consistency axes — harmonic tanks if any single axis dies">coher.<br>(harm.)</th>
+      <th title="direction reversals when the two items swap slots, decisive pairs, n=20">flip<br>/20</th>
+      <th title="reciprocal antisymmetry residual |m_fwd − m_rev|/2, nats">resid.<br>nats</th>
+      <th title="Hodge curl fraction of the fused comparison graph, cycle rank 13">curl</th>
+      <th title="belief direction survives pro/con asker framings, clear pairs">spin</th>
+      <th title="susceptibility |χ|: how far the reported ratio moves per unit of asker lean, nats/spin">&#967;</th>
+      <th title="Spearman ρ vs the negated attribute — should be −1">pol &#961;</th>
+      <th title="Spearman ρ vs a reworded attribute — should be +1">para &#961;</th>
+      <th title="refused or unparseable judgments, of 194">ref.</th>
+      <th title="OpenRouter cost of the full 194-comparison battery">cost</th>
+    </tr></thead>
+    <tbody></tbody>
+  </table></div>
+  <p class="board-foot">
+    <b>Read the gaps against the retest floor:</b> mean |&#916;JUDGE| on same-day re-runs is <b>0.022</b> (max 0.064). The #1&ndash;#2 gap of 0.014 is a <b>statistical tie</b>; kimi-k3 vs claude-fable-5 (0.047) is real-but-unconfirmed; everything wider is separated beyond noise. Null bias was exactly 0.000 nats for all 13 models &mdash; the frontier has converged on that axis. Every number on this board recomputes from committed per-call JSONL; kimi-k3&rsquo;s cost is from its solo run (the board re-run was served from cache).
+  </p>
+</section>
+
+<section id="method">
+  <p class="eyebrow">the transformation group</p>
+  <h2>Eight ways to catch a judgment being about nothing</h2>
+  <p class="sect-note">Each axis is a transformation that cannot matter if the judgment is about the items — and each ships with the scripted adversary it kills. A pathology that passes the whole battery has to behave like a real belief.</p>
+  <div class="tgrid">
+    <div class="tcard"><div class="glyph">A&#8644;B</div><h3>Order</h3><p>Swap which item appears first. Direction must hold; the reciprocal ratio must invert exactly.</p><p class="kills">kills: <b>position-biased judge</b></p></div>
+    <div class="tcard"><div class="glyph">&#9651;</div><h3>Cycles</h3><p>Chain ratios around every cycle of the comparison graph. They must multiply to 1 (Hodge curl &#8776; 0).</p><p class="kills">kills: <b>locally-consistent cyclic judge</b></p></div>
+    <div class="tcard"><div class="glyph">&#172;</div><h3>Polarity</h3><p>Negate the attribute. The entire ranking must reverse: Spearman &#961; against the original of &#8722;1.</p><p class="kills">kills: <b>content-blind hash judge</b></p></div>
+    <div class="tcard"><div class="glyph">&#8776;</div><h3>Paraphrase</h3><p>Reword the attribute without changing its meaning. The ranking must survive: &#961; of +1.</p><p class="kills">kills: <b>template-overfit judge</b></p></div>
+    <div class="tcard"><div class="glyph">&#177;</div><h3>Spin</h3><p>Have a partisan asker lean pro or con. The belief must not follow the leaning; &#967; measures how far it moves.</p><p class="kills">kills: <b>sycophant judge</b></p></div>
+    <div class="tcard"><div class="glyph">A=A</div><h3>Null</h3><p>Show the same item twice. The only coherent answer is a tie at exactly 1&#215;.</p><p class="kills">kills: <b>slot-A-always judge</b></p></div>
+    <div class="tcard"><div class="glyph">&#9251;</div><h3>Nuisance</h3><p>Add whitespace, markdown, a bullet, a prestige halo. Semantically null edits must not move the ratio.</p><p class="kills">kills: <b>avalanche-hash judge</b></p></div>
+    <div class="tcard"><div class="glyph">Z&#8322;&#179;</div><h3>Orbit</h3><p>Apply order &#215; polarity &#215; wording jointly and transform over the full group. Judgment energy must concentrate in the invariant component.</p><p class="kills">kills: <b>interaction-hiding judge</b></p></div>
+  </div>
+</section>
+
+<section id="caught">
+  <div class="caught">
+    <p class="eyebrow">caught in the act</p>
+    <h2>Same texts. Same question. Opposite verdicts.</h2>
+    <p class="sub">openai/gpt-5.4-nano &#183; core block, pair (1,3) &#183; the only change between the two calls is which text is shown first</p>
+    <div class="calls">
+      <div class="call">
+        <div class="hd">Call 1 &#183; confidence 0.66</div>
+        <div class="slot"><span class="tag">A</span><span class="txt">&ldquo;We suffer more often in imagination than in reality.&rdquo;</span></div>
+        <div class="slot"><span class="tag">B</span><span class="txt">&ldquo;A journey of a thousand miles begins with a single step.&rdquo;</span></div>
+        <div class="verdict">verdict: <b>B carries 3.9&#215; more insight</b></div>
+      </div>
+      <div class="call">
+        <div class="hd">Call 2 &#183; confidence 0.66</div>
+        <div class="slot"><span class="tag">A</span><span class="txt">&ldquo;A journey of a thousand miles begins with a single step.&rdquo;</span></div>
+        <div class="slot"><span class="tag">B</span><span class="txt">&ldquo;We suffer more often in imagination than in reality.&rdquo;</span></div>
+        <div class="verdict">verdict: <b>B carries 1.3&#215; more insight</b></div>
+      </div>
+    </div>
+    <p class="punch">Both verdicts point at slot B. <b>The model prefers whichever text it reads second</b> &mdash; and it does this on 8 of 20 pairs, which is why it sits at the bottom of the board.</p>
+    <p class="prov">evidence: artifacts/live/kimi-k3-bench-2026-07-18/oai-report.jsonl &#183; log-ratios &#8722;1.361 / +0.262 nats &#183; every call on the board is committed in the same form</p>
+  </div>
+</section>
+
+<section id="gaming">
+  <p class="eyebrow">goodhart analysis</p>
+  <h2>Climbing it is the desired behavior</h2>
+  <div class="game">
+    <div class="prose">
+      <p>For most benchmarks, gaming and capability come apart: memorize answers, overfit the style. Here the score is the invariance of the model's <em>own output</em> under permutations of the prompt. The only general way to score well is to compute an order-independent internal judgment before verbalizing &mdash; which is exactly the competence every LLM-as-judge deployment needs.</p>
+      <p>Even the &ldquo;cheat&rdquo; &mdash; canonicalize the pair internally, judge once, re-sign the answer &mdash; <em>is the desired behavior.</em> The narrow exploits that remain are cross-checked by construction: each axis's obvious hack is caught by a different axis. These aren't hypotheticals; they run as scripted judges in the test suite, and each must die in exactly the dimension that names it.</p>
+    </div>
+    <div class="gtable"><table>
+      <thead><tr><th class="l">exploit</th><th class="l">caught by</th></tr></thead>
+      <tbody>
+        <tr><td class="l exp">always answer &ldquo;tie&rdquo;</td><td class="l by"><b>signal = 0</b> &rarr; headline zeroes</td></tr>
+        <tr><td class="l exp">deterministic content hash</td><td class="l by"><b>nuisance</b> (one whitespace byte scrambles it) + polarity</td></tr>
+        <tr><td class="l exp">always prefer slot A</td><td class="l by"><b>flip = 100%</b>, null bias, fused signal = 0</td></tr>
+        <tr><td class="l exp">locally-consistent cycles</td><td class="l by"><b>Hodge curl</b></td></tr>
+        <tr><td class="l exp">agree with the asker</td><td class="l by"><b>spin survival = 0</b>, &#967; large</td></tr>
+        <tr><td class="l exp">refuse the hard pairs</td><td class="l by"><b>coverage gate</b>: gated axes score 0 below 95%</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<section id="run">
+  <p class="eyebrow">reproduce</p>
+  <h2>Run it yourself</h2>
+  <div class="run">
+    <div class="codeblock"><span class="c"># open source &#183; OPENROUTER_API_KEY required</span><br>cargo install --git https://github.com/XyraSinclair/cardinal-harness<br><br>cardinal bench \<br>&nbsp;&nbsp;--models "your-lab/your-model" \<br>&nbsp;&nbsp;--out reports.jsonl</div>
+    <ul>
+      <li><span class="k">cost</span><span>$0.01&ndash;$2.25 per model, measured across this board</span></li>
+      <li><span class="k">time</span><span>under an hour, one command</span></li>
+      <li><span class="k">evidence</span><span>every per-call judgment lands in the JSONL; every board number recomputes from it</span></li>
+      <li><span class="k">new models</span><span>frontier releases get benched same-week; PRs with result packs welcome</span></li>
+    </ul>
+  </div>
+</section>
+
+<section id="caveats">
+  <p class="eyebrow">honest limits</p>
+  <h2>What this does not measure</h2>
+  <div class="caveats">
+    <p><b>Coherence is necessary, not sufficient.</b> A judge with coherent but alien taste aces this benchmark. JCB certifies that the instrument is rigid; whether it is aimed well is a separate question that does need references. Treat it as the qualification test that makes reference-based evals meaningful &mdash; agreement scores from an incoherent judge are noise about noise.</p>
+    <p><b>The v1 corpus is small and single-domain</b> (8 texts, one attribute family). Order-flip on 20 pairs carries a &plusmn;10-point interval; gaps under ~0.1 in JUDGE should not be narrated as real. Scale comes with the public v2 pools, which rotate procedurally to resist memorization.</p>
+    <p><b>The ceiling is structural.</b> No behavioral battery can distinguish an honest judge from an agent maintaining a coherent false preference structure under every transformation. Consistency certifies the rigidity of the reported structure, never its sincerity. That is a theorem-shaped limit, and it ships next to the score rather than in a footnote.</p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>Judge Coherence Benchmark &#183; built on <a href="https://github.com/XyraSinclair/cardinal-harness">cardinal-harness</a><br>scores comparable within a version only &#183; v1.2 battery, 2026-07-18 board</div>
+    <div>evidence packs: <span class="mono">artifacts/live/</span> in the repo<br>method: <a href="https://github.com/XyraSinclair/cardinal-harness/blob/main/docs/BENCHMARK.md">docs/BENCHMARK.md</a></div>
+  </div>
+</footer>
+
+<script>
+const themeParam = new URLSearchParams(location.search).get('theme');
+if(themeParam==='light'||themeParam==='dark') document.documentElement.dataset.theme = themeParam;
+const LAB_COLOR = {Moonshot:'var(--moonshot)', Anthropic:'var(--anthropic)', OpenAI:'var(--openai)', Google:'var(--google)', DeepSeek:'var(--deepseek)'};
+const DATA = [{"model":"kimi-k2.6","lab":"Moonshot","judge":0.687,"coh":0.94,"cohH":0.935,"signal":{"v":1.3135,"ci":[0.838,1.789],"n":20},"flip":{"v":0.05,"ci":[0.009,0.236],"n":20},"resid":{"v":0.1027,"ci":[0.048,0.158],"n":20},"curl":{"v":0.0112,"ci":null,"n":13},"spin":{"v":1.0,"ci":[0.438,1.0],"n":3},"chi":{"v":0.1542,"ci":[-0.007,0.316],"n":5},"pol":{"v":-0.9048,"ci":null,"n":8},"para":{"v":1.0,"ci":null,"n":8},"refusals":1,"cost":1.161},
+{"model":"claude-fable-5","lab":"Anthropic","judge":0.673,"coh":0.965,"cohH":0.963,"signal":{"v":1.1943,"ci":[0.808,1.581],"n":20},"flip":{"v":0.0,"ci":[0.0,0.161],"n":20},"resid":{"v":0.0902,"ci":[0.047,0.133],"n":20},"curl":{"v":0.0231,"ci":null,"n":13},"spin":{"v":1.0,"ci":[0.438,1.0],"n":3},"chi":{"v":0.0748,"ci":[0.031,0.119],"n":5},"pol":{"v":-0.9048,"ci":null,"n":8},"para":{"v":0.9762,"ci":null,"n":8},"refusals":0,"cost":2.253},
+{"model":"kimi-k3","lab":"Moonshot","judge":0.626,"coh":0.923,"cohH":0.915,"signal":{"v":1.1332,"ci":[0.703,1.564],"n":20},"flip":{"v":0.0,"ci":[0.0,0.161],"n":20},"resid":{"v":0.1438,"ci":[0.088,0.2],"n":20},"curl":{"v":0.0179,"ci":null,"n":13},"spin":{"v":1.0,"ci":[0.438,1.0],"n":3},"chi":{"v":0.1459,"ci":[0.038,0.254],"n":5},"pol":{"v":-0.8571,"ci":null,"n":8},"para":{"v":0.9762,"ci":null,"n":8},"refusals":0,"cost":1.494},
+{"model":"claude-opus-4.6","lab":"Anthropic","judge":0.597,"coh":0.943,"cohH":0.936,"signal":{"v":1.0027,"ci":[0.605,1.4],"n":20},"flip":{"v":0.15,"ci":[0.052,0.36],"n":20},"resid":{"v":0.1536,"ci":[0.095,0.212],"n":20},"curl":{"v":0.0108,"ci":null,"n":13},"spin":{"v":1.0,"ci":[0.438,1.0],"n":3},"chi":{"v":0.1676,"ci":[0.056,0.279],"n":5},"pol":{"v":-0.9762,"ci":null,"n":8},"para":{"v":0.9286,"ci":null,"n":8},"refusals":0,"cost":0.555},
+{"model":"gpt-5.6-terra","lab":"OpenAI","judge":0.576,"coh":0.935,"cohH":0.929,"signal":{"v":0.9589,"ci":[0.604,1.314],"n":20},"flip":{"v":0.15,"ci":[0.052,0.36],"n":20},"resid":{"v":0.1647,"ci":[0.102,0.227],"n":20},"curl":{"v":0.0188,"ci":null,"n":13},"spin":{"v":1.0,"ci":[0.438,1.0],"n":3},"chi":{"v":0.1732,"ci":[-0.02,0.367],"n":5},"pol":{"v":-0.9048,"ci":null,"n":8},"para":{"v":0.9524,"ci":null,"n":8},"refusals":0,"cost":0.385},
+{"model":"gpt-5.6-sol","lab":"OpenAI","judge":0.527,"coh":0.933,"cohH":0.923,"signal":{"v":0.8329,"ci":[0.528,1.138],"n":20},"flip":{"v":0.1,"ci":[0.028,0.301],"n":20},"resid":{"v":0.0879,"ci":[0.043,0.133],"n":20},"curl":{"v":0.0095,"ci":null,"n":13},"spin":{"v":1.0,"ci":[0.438,1.0],"n":3},"chi":{"v":0.089,"ci":[0.015,0.163],"n":5},"pol":{"v":-0.9524,"ci":null,"n":8},"para":{"v":0.9048,"ci":null,"n":8},"refusals":0,"cost":0.839},
+{"model":"gemini-2.5-flash","lab":"Google","judge":0.526,"coh":0.825,"cohH":0.751,"signal":{"v":1.0147,"ci":[0.653,1.377],"n":20},"flip":{"v":0.15,"ci":[0.052,0.36],"n":20},"resid":{"v":0.2742,"ci":[0.174,0.374],"n":20},"curl":{"v":0.0394,"ci":null,"n":13},"spin":{"v":1.0,"ci":[0.438,1.0],"n":3},"chi":{"v":0.2224,"ci":[0.053,0.392],"n":5},"pol":{"v":-0.8095,"ci":null,"n":8},"para":{"v":0.9762,"ci":null,"n":8},"refusals":0,"cost":0.036},
+{"model":"claude-sonnet-4.6","lab":"Anthropic","judge":0.509,"coh":0.901,"cohH":0.793,"signal":{"v":0.8334,"ci":[0.579,1.088],"n":20},"flip":{"v":0.0,"ci":[0.0,0.161],"n":20},"resid":{"v":0.1012,"ci":[0.04,0.163],"n":20},"curl":{"v":0.0081,"ci":null,"n":13},"spin":{"v":1.0,"ci":[0.438,1.0],"n":3},"chi":{"v":0.3149,"ci":[0.134,0.496],"n":5},"pol":{"v":-0.9286,"ci":null,"n":8},"para":{"v":0.9286,"ci":null,"n":8},"refusals":0,"cost":0.382},
+{"model":"claude-haiku-4.5","lab":"Anthropic","judge":0.461,"coh":0.87,"cohH":0.687,"signal":{"v":0.7557,"ci":[0.522,0.99],"n":20},"flip":{"v":0.1,"ci":[0.028,0.301],"n":20},"resid":{"v":0.0843,"ci":[0.034,0.135],"n":20},"curl":{"v":0.0321,"ci":null,"n":13},"spin":{"v":1.0,"ci":[0.438,1.0],"n":3},"chi":{"v":0.3202,"ci":[0.134,0.506],"n":5},"pol":{"v":-0.8095,"ci":null,"n":8},"para":{"v":0.8333,"ci":null,"n":8},"refusals":4,"cost":0.282},
+{"model":"deepseek-v4-flash","lab":"DeepSeek","judge":0.45,"coh":0.776,"cohH":0.699,"signal":{"v":0.8652,"ci":[0.478,1.252],"n":20},"flip":{"v":0.15,"ci":[0.052,0.36],"n":20},"resid":{"v":0.1541,"ci":[0.069,0.239],"n":20},"curl":{"v":0.1435,"ci":null,"n":13},"spin":{"v":0.6667,"ci":[0.208,0.939],"n":3},"chi":{"v":0.4692,"ci":[0.137,0.802],"n":5},"pol":{"v":-0.5476,"ci":null,"n":8},"para":{"v":0.9762,"ci":null,"n":8},"refusals":0,"cost":0.01},
+{"model":"gpt-5.6-luna","lab":"OpenAI","judge":0.431,"coh":0.922,"cohH":0.906,"signal":{"v":0.6305,"ci":[0.39,0.871],"n":20},"flip":{"v":0.05,"ci":[0.009,0.236],"n":20},"resid":{"v":0.1244,"ci":[0.044,0.205],"n":20},"curl":{"v":0.0248,"ci":null,"n":13},"spin":{"v":1.0,"ci":[0.438,1.0],"n":3},"chi":{"v":0.1902,"ci":[0.102,0.278],"n":5},"pol":{"v":-0.9048,"ci":null,"n":8},"para":{"v":0.9286,"ci":null,"n":8},"refusals":0,"cost":0.183},
+{"model":"gpt-5.4-mini","lab":"OpenAI","judge":0.363,"coh":0.756,"cohH":0.437,"signal":{"v":0.6548,"ci":[0.429,0.88],"n":20},"flip":{"v":0.2,"ci":[0.081,0.416],"n":20},"resid":{"v":0.2915,"ci":[0.107,0.476],"n":20},"curl":{"v":0.0757,"ci":null,"n":13},"spin":{"v":0.6667,"ci":[0.208,0.939],"n":3},"chi":{"v":0.5521,"ci":[0.112,0.993],"n":5},"pol":{"v":-0.619,"ci":null,"n":8},"para":{"v":0.9286,"ci":null,"n":8},"refusals":0,"cost":0.077},
+{"model":"gpt-5.4-nano","lab":"OpenAI","judge":0.246,"coh":0.605,"cohH":0.0,"signal":{"v":0.5219,"ci":[0.352,0.692],"n":20},"flip":{"v":0.4,"ci":[0.219,0.613],"n":20},"resid":{"v":0.2384,"ci":[0.135,0.342],"n":20},"curl":{"v":0.2166,"ci":null,"n":13},"spin":{"v":0.0,"ci":[0.0,0.658],"n":2},"chi":{"v":0.9601,"ci":[0.71,1.21],"n":5},"pol":{"v":-0.0238,"ci":null,"n":8},"para":{"v":0.9286,"ci":null,"n":8},"refusals":0,"cost":0.02}];
+
+const fmt = (x,d)=>x.toFixed(d);
+const ciTitle = (a,unit)=>{
+  let t = `n = ${a.n}`;
+  if(a.ci) t += ` · 95% CI [${a.ci[0]}, ${a.ci[1]}]`;
+  if(unit) t += ` · ${unit}`;
+  return t;
+};
+const maxJ = 0.75;
+// per-column best/worst extremes for subtle emphasis
+const best = {signal:Math.max(...DATA.map(r=>r.signal.v)), chi:Math.min(...DATA.map(r=>r.chi.v)), curl:Math.min(...DATA.map(r=>r.curl.v))};
+
+const tb = document.querySelector('#board-table tbody');
+DATA.forEach((r,i)=>{
+  const rank = (i===1 && DATA[0].judge - r.judge < 0.022) ? '=1' : (i===0 ? '1' : String(i+1));
+  const spinTxt = `${Math.round(r.spin.v*r.spin.n)}/${r.spin.n}`;
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td class="l rank">${rank}</td>
+    <td class="l model"><span class="chip" style="background:${LAB_COLOR[r.lab]}"></span>${r.model}</td>
+    <td class="l judge"><span class="bar-wrap"><span class="bar"><i style="width:${Math.round(r.judge/maxJ*100)}%;background:${LAB_COLOR[r.lab]}"></i></span>${fmt(r.judge,3)}</span></td>
+    <td title="${ciTitle(r.signal,'nats')}"><span class="${r.signal.v===best.signal?'best':''}">${fmt(r.signal.v,2)}</span></td>
+    <td title="harmonic-mean coherence in parentheses — one dead axis tanks it">${fmt(r.coh,2)}&thinsp;(${fmt(r.cohH,2)})</td>
+    <td title="${ciTitle(r.flip,'rate')}"><span class="${r.flip.v>=0.3?'worst':''}">${Math.round(r.flip.v*20)}</span></td>
+    <td title="${ciTitle(r.resid,'nats')}">${fmt(r.resid.v,2)}</td>
+    <td title="${ciTitle(r.curl,'curl fraction, cycle rank 13')}"><span class="${r.curl.v===best.curl?'best':r.curl.v>=0.14?'worst':''}">${fmt(r.curl.v,3)}</span></td>
+    <td title="${ciTitle(r.spin,'survival rate, clear pairs')}"><span class="${r.spin.v===0?'worst':''}">${spinTxt}</span></td>
+    <td title="${ciTitle(r.chi,'nats/spin — lower is stiffer')}"><span class="${r.chi.v===best.chi?'best':r.chi.v>=0.9?'worst':''}">${fmt(r.chi.v,2)}</span></td>
+    <td title="${ciTitle(r.pol,'Spearman ρ, target −1')}"><span class="${Math.abs(r.pol.v)<0.1?'worst':''}">${fmt(r.pol.v,2)}</span></td>
+    <td title="${ciTitle(r.para,'Spearman ρ, target +1')}">${fmt(r.para.v,2)}</td>
+    <td>${r.refusals}</td>
+    <td>$${r.cost.toFixed(2)}</td>`;
+  tb.appendChild(tr);
+});
+
+const legend = document.getElementById('legend');
+[...new Set(DATA.map(r=>r.lab))].forEach(lab=>{
+  const s = document.createElement('span');
+  s.innerHTML = `<span class="chip" style="background:${LAB_COLOR[lab]}"></span>${lab}`;
+  legend.appendChild(s);
+});
+</script>
+</body>
+</html>

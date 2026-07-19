@@ -134,22 +134,60 @@ wild and one aligned default:
 
 Do not paywall the leaderboard or the harness; credibility is the asset.
 
-## Website
+## Website: pairwiseratio.com
 
-Committed HTML under `artifacts/live/` (claude.ai Artifacts are banned),
-local static server for review, then a public deploy (e.g.
-`bench.openpriors.org`). Pages:
+**v1 shipped 2026-07-19**: `site/index.html` — a single self-contained
+static page (committed HTML, no build step, no framework; claude.ai
+Artifacts remain banned). Review locally with
+`python3 -m http.server <port> --bind 127.0.0.1` from `site/`.
 
-1. **Leaderboard** — composite + per-axis columns, PMF-mode badge,
-   test-retest error bars, cost-per-run column (everything denominated).
-2. **The format** — the pairwise-ratio explainer: why cardinal beats
-   ordinal, the 17-point ratio ladder, confidence, the invariance table as
-   the centerpiece diagram.
-3. **Model cards** — per-model axis radar, the "caught red-handed" panel
-   (real prompt bytes, real contradictory outputs), orbit character
-   decomposition for the initiated.
-4. **Run it yourself** — one command, expected cost, how to submit a PR
-   with results for a new model.
+Design system: cool-paper metrology register; physics coolwarm diverging
+poles as the only accent (blue = invariant, oxide red = contradiction);
+Archivo display / Source Serif 4 body / IBM Plex Mono data; categorical
+color follows lab (5 hues, CVD-validated for light and dark surfaces).
+Signature element: the non-commuting triangle (3× · 2× · 1.5× = 9 ≠ 1)
+as the hero diagram. Dark mode via `prefers-color-scheme` plus a
+`?theme=light|dark` override.
+
+v1 sections (all data inlined from the 2026-07-18 board evidence pack,
+ranking asserted equal to the pack README before inlining):
+
+1. **Leaderboard** — 13 models, JUDGE bars, per-axis columns with n and
+   95% CI in tooltips, refusal and cost columns, retest-floor reading
+   guide (#1–#2 shown as a statistical tie).
+2. **The format** — atom strip (the pairwise ratio question + 17-step
+   ladder) and the eight-transformation grid, each axis paired with the
+   scripted adversary it kills.
+3. **Caught in the act** — gpt-5.4-nano's real order flip on pair (1,3):
+   both verdicts point at slot B (−1.361/+0.262 nats, conf 0.66), sourced
+   from `artifacts/live/kimi-k3-bench-2026-07-18/oai-report.jsonl`.
+4. **Run it yourself** — one command, measured cost range, JSONL
+   evidence contract.
+
+v2 pages (not yet built): per-model cards with axis radar and orbit
+character decomposition; PMF-mode badge column.
+
+### Hosting
+
+`pairwiseratio.com` was **unregistered as of 2026-07-19** (verified: no
+Verisign whois match, no DNS). Plan:
+
+1. Register at Cloudflare Registrar (at-cost, ~$11/yr) — human step.
+2. `wrangler pages project create pairwiseratio && wrangler pages deploy
+   site/` — the site is one static file; deploys are a copy, not a build.
+3. Attach the custom domain to the Pages project (DNS is automatic when
+   the domain is on Cloudflare).
+
+Fallback with zero new infra: GitHub Pages from this public repo serving
+`site/`, DNS wherever the domain lands.
+
+### Naming (resolves the open question below)
+
+The domain brands the *format* — Pairwise Ratio — which is the right
+public surface: it names the atom every product shares. The benchmark
+keeps its technical name (JCB) in docs and packs; the site headline is
+"the judge benchmark with no answer key". "Cardinal Bench" is retired as
+a working title.
 
 ## Operations
 
