@@ -56,7 +56,8 @@ def main():
     gt = {}
     for row in csv.DictReader(open(ROOT / "data/manifund/ground_truth.csv")):
         if "acx2024" in row["cohorts"]:
-            gt[row["id"]] = {
+            # Judgment items carry the (possibly truncated) slug as their id.
+            gt[row["slug"]] = {
                 "funded": "funded" in row["cohorts"],
                 "raised": float(row["raised"] or 0),
             }

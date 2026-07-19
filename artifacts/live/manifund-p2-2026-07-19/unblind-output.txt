@@ -1,0 +1,22 @@
+matched 83 of 83 scored items to ACX 2024 ground truth
+cohort: n=83, funded=41
+AUC (combined score vs funded): 0.635
+Spearman (combined score vs dollars raised): +0.288
+Spearman among funded only (score vs dollars): +0.286 (n=41)
+  AUC[theory_of_change]: 0.633
+  AUC[impact_per_dollar]: 0.557
+  AUC[team_evidence]: 0.605
+  AUC[epistemic_integrity]: 0.655
+
+model-ranked HIGH but not funded (underrated by realized funding?):
+  # 4 run-a-self-help-  score +8.255 ± 1.183
+  #16 growing-human-bl  score +7.368 ± 1.383
+  #17 publish-a-daily-  score +7.337 ± 1.151
+  #18 build-software-t  score +7.312 ± 1.105
+  #19 support-of-fauna  score +7.256 ± 1.097
+model-ranked LOW but funded (overrated by realized funding?):
+  #79 conduct-field-re  score +4.478 ± 0.846  raised $13,000
+  #78 seed-fund-for-bo  score +4.698 ± 0.848  raised $40,000
+  #77 build-an-app-to-  score +4.815 ± 0.876  raised $1,000
+  #74 create-a-platfor  score +5.143 ± 0.862  raised $17,000
+  #73 the-first-public  score +5.215 ± 0.866  raised $50,020
