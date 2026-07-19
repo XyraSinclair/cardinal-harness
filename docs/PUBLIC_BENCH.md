@@ -167,19 +167,20 @@ ranking asserted equal to the pack README before inlining):
 v2 pages (not yet built): per-model cards with axis radar and orbit
 character decomposition; PMF-mode badge column.
 
-### Hosting
+### Hosting (live 2026-07-19)
 
-`pairwiseratio.com` was **unregistered as of 2026-07-19** (verified: no
-Verisign whois match, no DNS). Plan:
+**https://pairwiseratio.org** — Cloudflare-proxied DNS (already pointed at
+the pivotality box, 37.27.92.21) → Caddy vhost `pairwiseratio.org` (`tls
+internal`; Cloudflare terminates public TLS) → static root
+`/opt/pivotality/sites/pairwiseratio.org/public/`. Deploy = `scp
+site/index.html pivotality:/opt/pivotality/sites/pairwiseratio.org/public/`.
 
-1. Register at Cloudflare Registrar (at-cost, ~$11/yr) — human step.
-2. `wrangler pages project create pairwiseratio && wrangler pages deploy
-   site/` — the site is one static file; deploys are a copy, not a build.
-3. Attach the custom domain to the Pages project (DNS is automatic when
-   the domain is on Cloudflare).
-
-Fallback with zero new infra: GitHub Pages from this public repo serving
-`site/`, DNS wherever the domain lands.
+Ops note: Caddy reloads on that box hung until `grace_period 5s` was added
+to the Caddyfile global options (reload drains eternally otherwise and
+systemd kills it, silently keeping the old config); log files under
+`/var/log/caddy/` must be pre-created `chown caddy:caddy` before a vhost
+referencing them loads. `pairwiseratio.com` remains unregistered (verified
+2026-07-19); optional at Cloudflare Registrar if the .com is wanted.
 
 ### Naming (resolves the open question below)
 

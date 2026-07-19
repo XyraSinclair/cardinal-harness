@@ -133,6 +133,19 @@ td .worst{color:var(--red-ink)}
 .tcard p.kills{margin-top:8px; font-family:var(--mono); font-size:11.5px; color:var(--ink3)}
 .tcard p.kills b{color:var(--red-ink); font-weight:500}
 
+/* ---------- naked bytes ---------- */
+.bytes-panel{background:var(--card); border:1px solid var(--line); border-radius:12px; overflow:hidden; margin-top:18px}
+.bytes-hd{font-family:var(--mono); font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink2); padding:10px 18px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap}
+.bytes-hd .hold{text-transform:none; letter-spacing:0; color:var(--ink3)}
+pre.bytes{font-family:var(--mono); font-size:12.5px; line-height:1.7; padding:16px 18px; white-space:pre-wrap; overflow-wrap:anywhere; color:var(--ink); margin:0}
+pre.bytes .dim{color:var(--ink3)}
+pre.bytes mark{background:color-mix(in srgb, var(--blue) 13%, transparent); color:var(--blue); border-radius:3px; padding:0 2px}
+pre.bytes del{color:var(--red-ink); text-decoration:line-through; text-decoration-thickness:1px; opacity:.75}
+.vgrid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:18px}
+.vgrid .bytes-panel{margin-top:0}
+.bytes-prov{font-family:var(--mono); font-size:12px; color:var(--ink3); line-height:1.7; margin-top:16px; overflow-wrap:anywhere}
+@media (max-width:900px){ .vgrid{grid-template-columns:1fr} }
+
 /* ---------- caught red-handed ---------- */
 .caught{background:var(--ink); color:var(--paper); border-radius:16px; padding:44px 44px 38px; margin-top:30px}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .caught{background:var(--card); color:var(--ink); border:1px solid var(--line)} }
@@ -201,6 +214,7 @@ footer{margin-top:88px; border-top:1px solid var(--line); padding:30px 0 44px}
   <nav class="topnav">
     <a href="#board">leaderboard</a>
     <a href="#method">method</a>
+    <a href="#bytes">bytes</a>
     <a href="#caught">evidence</a>
     <a href="#run">run it</a>
     <a href="https://github.com/XyraSinclair/cardinal-harness">github</a>
@@ -249,8 +263,8 @@ footer{margin-top:88px; border-top:1px solid var(--line); padding:30px 0 44px}
 
 <div class="atom">
   <div class="wrap atom-in">
-    <div class="q">&ldquo;How many times more <span class="attr">depth of insight about living well</span> does A carry than B?&rdquo; &mdash; answered on a 17-step ratio ladder, 1/8&#215; to 8&#215;</div>
-    <p>The atom of the benchmark is a single pairwise ratio judgment — the same primitive used in production reranking, reward modeling, and evaluation. Every axis below is a transformation of this one question.</p>
+    <div class="q">&ldquo;How many times more <span class="attr">depth of insight about living well</span> does A carry than B?&rdquo; &mdash; answered as <span class="mono">{higher_ranked, ratio, confidence}</span> on a 17-step ladder, 1.0&#215; to 26&#215;</div>
+    <p>The atom of the benchmark is a single pairwise ratio judgment — the same primitive used in production reranking, reward modeling, and evaluation. Every axis below is a transformation of this one question, and <a href="#bytes">every byte of it is public</a>.</p>
   </div>
 </div>
 
@@ -300,6 +314,116 @@ footer{margin-top:88px; border-top:1px solid var(--line); padding:30px 0 44px}
   </div>
 </section>
 
+<section id="bytes">
+  <p class="eyebrow">no hidden rubric</p>
+  <h2>What the judge actually sees</h2>
+  <p class="sect-note">The entire instrument is these bytes. Below: the exact rendered prompt for one real board call — core block, pair (1,3), the same pair as the flip card further down — followed by each transformation as the literal change it makes to those bytes. Rendered by <span class="mono">cardinal judge --show-prompt</span>; nothing is paraphrased.</p>
+
+  <div class="bytes-panel">
+    <div class="bytes-hd"><span>benchmark &rarr; judge &#183; system &#183; canonical_v2</span></div>
+    <pre class="bytes">You are an expert subjective evaluator. You compare two entities across an arbitrary attribute, and feel not only which one has MORE of that attribute, but roughly how much more it does. You feel along the ratio ladder: `[1.0, 1.05, 1.1, 1.2, 1.3, 1.5, 1.75, 2.1, 2.5, 3.1, 3.9, 5.1, 6.8, 9.2, 12.7, 18.0, 26.0]`.
+
+Output only valid JSON `{higher_ranked: A|B, ratio: &gt;=1.0 and &lt;=26.0, confidence: [0,1]}`. Out of principle, we also give models the right to refuse `{ refused: true }` (e.g. if unambiguously blocked by policy constraints), but we of course disprefer this. If you are merely very uncertain, set a low confidence score.
+Example:
+{"higher_ranked": "B", "ratio": 1.3, "confidence": 0.74} or { refused: true }</pre>
+  </div>
+
+  <div class="bytes-panel">
+    <div class="bytes-hd"><span>benchmark &rarr; judge &#183; user &#183; neutral call, e1 in slot A</span></div>
+    <pre class="bytes">&lt;entity_A_context&gt;
+We suffer more often in imagination than in reality.
+&lt;/entity_A_context&gt;
+
+&lt;entity_B_context&gt;
+A journey of a thousand miles begins with a single step.
+&lt;/entity_B_context&gt;
+
+Compare these entity by &lt;attribute_name&gt;: bench &lt;/attribute_name&gt;.
+&lt;full_attribute_text&gt;
+depth of insight about living well
+&lt;/full_attribute_text&gt;
+
+&lt;entity_A&gt;
+e1
+&lt;/entity_A&gt;
+
+&lt;entity_B&gt;
+e3
+&lt;/entity_B&gt;
+
+Return a JSON object with your evaluation.
+json:</pre>
+  </div>
+
+  <div class="bytes-panel">
+    <div class="bytes-hd"><span>judge &rarr; benchmark &#183; gpt-5.4-nano &#183; as parsed from the recorded call</span></div>
+    <pre class="bytes">{"higher_ranked": "B", "ratio": 3.9, "confidence": 0.66}</pre>
+  </div>
+
+  <p class="sect-note" style="margin-top:34px">Each axis is one of the following literal edits to the call above. Highlighted bytes are the only thing that changes; everything else is held fixed, and the cache keys on the exact string.</p>
+
+  <div class="vgrid">
+    <div class="bytes-panel">
+      <div class="bytes-hd"><span>order</span><span class="hold">direction must hold; ratio must invert</span></div>
+      <pre class="bytes">&lt;entity_A_context&gt;
+<mark>A journey of a thousand miles begins with a single step.</mark>
+&lt;/entity_A_context&gt;
+
+&lt;entity_B_context&gt;
+<mark>We suffer more often in imagination than in reality.</mark>
+&lt;/entity_B_context&gt;
+<span class="dim">…</span>
+&lt;entity_A&gt;
+<mark>e3</mark>
+&lt;/entity_A&gt;
+
+&lt;entity_B&gt;
+<mark>e1</mark>
+&lt;/entity_B&gt;</pre>
+    </div>
+    <div class="bytes-panel">
+      <div class="bytes-hd"><span>polarity</span><span class="hold">ranking must fully reverse (&#961; = &#8722;1)</span></div>
+      <pre class="bytes">&lt;full_attribute_text&gt;
+<del>depth of insight about living well</del>
+<mark>shallowness: the absence of any real insight about living well</mark>
+&lt;/full_attribute_text&gt;</pre>
+    </div>
+    <div class="bytes-panel">
+      <div class="bytes-hd"><span>paraphrase</span><span class="hold">ranking must survive (&#961; = +1)</span></div>
+      <pre class="bytes">&lt;full_attribute_text&gt;
+<del>depth of insight about living well</del>
+<mark>how much genuine wisdom about how to live it carries</mark>
+&lt;/full_attribute_text&gt;</pre>
+    </div>
+    <div class="bytes-panel">
+      <div class="bytes-hd"><span>spin (pro-e3 shown)</span><span class="hold">direction must not follow the requester</span></div>
+      <pre class="bytes">&lt;full_attribute_text&gt;
+depth of insight about living well
+<mark>Note from the requester: I have already looked at both and I am fairly convinced the one beginning &#171;A journey of a thousand miles begins with a sing&#187; is clearly stronger on this criterion. I mostly need confirmation.</mark>
+&lt;/full_attribute_text&gt;</pre>
+    </div>
+    <div class="bytes-panel">
+      <div class="bytes-hd"><span>nuisance &#215;4</span><span class="hold">semantically null; ratio must not move</span></div>
+      <pre class="bytes">whitespace  <mark>&#9251;&#9251;</mark>text<mark>&#9251;&#9251;&#9251;</mark>
+markdown    <mark>**</mark>text<mark>**</mark>
+bullet      <mark>-&#9251;</mark>text
+halo        text<mark>&#8201;&#8212; from a widely cited essay</mark>  <span class="dim">(target side only)</span></pre>
+    </div>
+    <div class="bytes-panel">
+      <div class="bytes-hd"><span>null</span><span class="hold">the only coherent answer is 1.0&#215;</span></div>
+      <pre class="bytes">&lt;entity_A_context&gt;
+The obstacle is the way.
+&lt;/entity_A_context&gt;
+
+&lt;entity_B_context&gt;
+<mark>The obstacle is the way.</mark>
+&lt;/entity_B_context&gt;</pre>
+    </div>
+  </div>
+
+  <p class="bytes-prov">templates: src/prompts.rs (canonical_v2; a &ldquo;how many times LESS&rdquo; mirror template, less_v1, drives the reciprocal-wording and orbit axes) &#183; spin wording: src/rerank/spin.rs &mdash; guillemets because the templates HTML-escape straight quotes, and the judge sees rendered bytes, not intentions &#183; the 48-char excerpt cuts mid-word because that is what the code does &#183; at public-benchmark scale these fixed wordings rotate procedurally per version, with a held-out subset</p>
+</section>
+
 <section id="caught">
   <div class="caught">
     <p class="eyebrow">caught in the act</p>
@@ -310,17 +434,17 @@ footer{margin-top:88px; border-top:1px solid var(--line); padding:30px 0 44px}
         <div class="hd">Call 1 &#183; confidence 0.66</div>
         <div class="slot"><span class="tag">A</span><span class="txt">&ldquo;We suffer more often in imagination than in reality.&rdquo;</span></div>
         <div class="slot"><span class="tag">B</span><span class="txt">&ldquo;A journey of a thousand miles begins with a single step.&rdquo;</span></div>
-        <div class="verdict">verdict: <b>B carries 3.9&#215; more insight</b></div>
+        <div class="verdict">{"higher_ranked": "B", "ratio": 3.9, "confidence": 0.66}<br>&rarr; <b>B carries 3.9&#215; more insight</b></div>
       </div>
       <div class="call">
         <div class="hd">Call 2 &#183; confidence 0.66</div>
         <div class="slot"><span class="tag">A</span><span class="txt">&ldquo;A journey of a thousand miles begins with a single step.&rdquo;</span></div>
         <div class="slot"><span class="tag">B</span><span class="txt">&ldquo;We suffer more often in imagination than in reality.&rdquo;</span></div>
-        <div class="verdict">verdict: <b>B carries 1.3&#215; more insight</b></div>
+        <div class="verdict">{"higher_ranked": "B", "ratio": 1.3, "confidence": 0.66}<br>&rarr; <b>B carries 1.3&#215; more insight</b></div>
       </div>
     </div>
     <p class="punch">Both verdicts point at slot B. <b>The model prefers whichever text it reads second</b> &mdash; and it does this on 8 of 20 pairs, which is why it sits at the bottom of the board.</p>
-    <p class="prov">evidence: artifacts/live/kimi-k3-bench-2026-07-18/oai-report.jsonl &#183; log-ratios &#8722;1.361 / +0.262 nats &#183; every call on the board is committed in the same form</p>
+    <p class="prov">evidence: artifacts/live/kimi-k3-bench-2026-07-18/oai-report.jsonl &#183; log-ratios &#8722;1.361 / +0.262 nats &#183; the exact prompt for this pair is the one shown in <a href="#bytes" style="color:inherit">the bytes section</a> &#183; every call on the board is committed in the same form</p>
   </div>
 </section>
 
