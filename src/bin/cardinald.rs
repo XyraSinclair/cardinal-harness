@@ -29,6 +29,7 @@ use uuid::Uuid;
 
 const DEFAULT_ADDR: &str = "127.0.0.1:8093";
 const DEFAULT_MAX_CONCURRENT_RUNS: usize = 4;
+const DEFAULT_MAX_QUEUED_RUNS: usize = 32;
 const DEFAULT_RUN_DIR: &str = ".cardinald/runs";
 const MAX_ENTITIES: usize = 200;
 const MAX_ENTITY_TEXT_BYTES: usize = 8192;
@@ -38,6 +39,7 @@ const MAX_AXIS_PROMPT_BYTES: usize = 4096;
 struct AppState {
     store: JudgementRunStore,
     semaphore: Arc<Semaphore>,
+    admission: Arc<Semaphore>,
     clickhouse: Option<Arc<ClickHouseLanding>>,
 }
 
@@ -138,6 +140,13 @@ impl ApiError {
         }
     }
 
+    fn too_many_requests(message: impl Into<String>) -> Self {
+        Self {
+            status: StatusCode::TOO_MANY_REQUESTS,
+            message: message.into(),
+        }
+    }
+
     fn internal() -> Self {
         Self {
             status: StatusCode::INTERNAL_SERVER_ERROR,
@@ -163,6 +172,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .map_err(|error| format!("invalid CARDINALD_ADDR: {error}"))?;
     let max_concurrent =
         parse_positive_usize("CARDINALD_MAX_CONCURRENT_RUNS", DEFAULT_MAX_CONCURRENT_RUNS)?;
+    let max_queued = parse_positive_usize("CARDINALD_MAX_QUEUED_RUNS", DEFAULT_MAX_QUEUED_RUNS)?;
     let run_dir = PathBuf::from(env_or("CARDINALD_RUN_DIR", DEFAULT_RUN_DIR));
     fs::create_dir_all(&run_dir)?;
     let store = JudgementRunStore::new(run_dir);
@@ -176,10 +186,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     if let Some(client) = clickhouse.as_deref() {
         client.replay_pending(&store).await;
     }
+    recover_interrupted_runs(&store, clickhouse.as_deref()).await;
 
     let state = AppState {
         store,
         semaphore: Arc::new(Semaphore::new(max_concurrent)),
+        admission: Arc::new(Semaphore::new(max_queued)),
         clickhouse,
     };
     let app = Router::new()
@@ -196,6 +208,88 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 async fn healthz() -> &'static str {
     "ok"
+}
+
+async fn recover_interrupted_runs(
+    store: &JudgementRunStore,
+    clickhouse: Option<&ClickHouseLanding>,
+) {
+    let entries = match fs::read_dir(store.root()) {
+        Ok(entries) => entries,
+        Err(error) => {
+            eprintln!("cardinald: could not scan run metadata during startup: {error}");
+            return;
+        }
+    };
+    let mut run_refs = Vec::new();
+    for entry in entries {
+        let entry = match entry {
+            Ok(entry) => entry,
+            Err(error) => {
+                eprintln!("cardinald: could not read a run metadata entry: {error}");
+                continue;
+            }
+        };
+        let Some(file_name) = entry.file_name().to_str().map(str::to_string) else {
+            continue;
+        };
+        let Some(run_ref) = file_name.strip_suffix(".cardinald.json") else {
+            continue;
+        };
+        if valid_run_ref(run_ref) {
+            run_refs.push(run_ref.to_string());
+        }
+    }
+    run_refs.sort();
+
+    for run_ref in run_refs {
+        let metadata = match load_metadata(store.root(), &run_ref) {
+            Ok(metadata) => metadata,
+            Err(error) => {
+                eprintln!("cardinald: could not read run metadata for {run_ref}: {error}");
+                continue;
+            }
+        };
+        if metadata.status != "running" {
+            continue;
+        }
+
+        let record_path = store.root().join(format!("{run_ref}.json"));
+        if !record_path.is_file() {
+            mark_metadata_failed(
+                store,
+                metadata,
+                "daemon restarted before the run finished; resubmit",
+            );
+            continue;
+        }
+
+        let record = match store.load(&run_ref) {
+            Ok(record) => record,
+            Err(error) => {
+                eprintln!("cardinald: could not load terminal run {run_ref}: {error}");
+                continue;
+            }
+        };
+        let landing_preserved = if matches!(
+            record.terminal,
+            JudgementRunTerminal::Completed { .. }
+        ) {
+            land_completed_run(
+                clickhouse,
+                store,
+                &record,
+                &metadata.lens,
+                &metadata.owner_scope,
+            )
+            .await
+        } else {
+            true
+        };
+        if landing_preserved {
+            update_metadata_from_record(store, metadata, &record);
+        }
+    }
 }
 
 async fn create_run(
@@ -238,6 +332,9 @@ async fn create_run(
         .normalize()
         .map_err(|error| ApiError::bad_request(error.to_string()))?;
 
+    let admission_permit = Arc::clone(&state.admission)
+        .try_acquire_owned()
+        .map_err(|_| ApiError::too_many_requests("run queue is at capacity"))?;
     let provider_key = provider_key(&headers)?;
     let gateway = build_gateway(provider_key)
         .map_err(|_| ApiError::unauthorized("provider key is invalid"))?;
@@ -297,6 +394,7 @@ async fn create_run(
                 request,
                 gateway,
                 permit,
+                admission_permit,
             ));
         })
         .await;
@@ -326,6 +424,7 @@ async fn execute_queued_run(
     request: JudgementRunRequest,
     gateway: Arc<dyn ChatGateway>,
     permit: tokio::sync::OwnedSemaphorePermit,
+    admission_permit: tokio::sync::OwnedSemaphorePermit,
 ) {
     let seed = rand::random::<u64>();
     let execution = RerankExecution::new(gateway, Attribution::new("cardinald::run")).run_options(
@@ -337,11 +436,14 @@ async fn execute_queued_run(
     let result =
         execute_judgement_run_with_ref(request, run_ref.clone(), execution, &state.store).await;
     drop(permit);
+    drop(admission_permit);
 
     match result {
         Ok(record) => {
-            update_metadata_from_record(&state.store, metadata.clone(), &record);
-            if matches!(record.terminal, JudgementRunTerminal::Completed { .. }) {
+            let landing_preserved = if matches!(
+                record.terminal,
+                JudgementRunTerminal::Completed { .. }
+            ) {
                 land_completed_run(
                     state.clickhouse.as_deref(),
                     &state.store,
@@ -349,7 +451,12 @@ async fn execute_queued_run(
                     &metadata.lens,
                     &metadata.owner_scope,
                 )
-                .await;
+                .await
+            } else {
+                true
+            };
+            if landing_preserved {
+                update_metadata_from_record(&state.store, metadata, &record);
             }
         }
         Err(_) => match state.store.load(&run_ref) {

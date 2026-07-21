@@ -67,6 +67,51 @@ impl ClickHouseLanding {
         })
     }
 
+    async fn batch_exists(&self, table: &'static str, run_ref: &str) -> Result<bool, String> {
+        columns_for_table(table).ok_or_else(|| "unknown landing table".to_string())?;
+        let mut url = self.endpoint.clone();
+        let query =
+            format!("SELECT count() FROM {table} WHERE run_id = {{run_id:String}} FORMAT TabSeparated");
+        url.query_pairs_mut()
+            .append_pair("query", &query)
+            .append_pair("param_run_id", run_ref);
+
+        let mut request = self.client.post(url);
+        if let Some((username, password)) = &self.basic_auth {
+            request = request.basic_auth(username, password.as_ref());
+        }
+        let response = request
+            .send()
+            .await
+            .map_err(|error| format!("existence probe HTTP request failed: {error}"))?;
+        if !response.status().is_success() {
+            return Err(format!(
+                "ClickHouse existence probe returned HTTP {}",
+                response.status()
+            ));
+        }
+        let count = response
+            .text()
+            .await
+            .map_err(|error| format!("could not read existence probe response: {error}"))?
+            .trim()
+            .parse::<u64>()
+            .map_err(|_| "ClickHouse existence probe returned an invalid count".to_string())?;
+        Ok(count > 0)
+    }
+
+    async fn insert_if_missing(
+        &self,
+        table: &'static str,
+        run_ref: &str,
+        body: Vec<u8>,
+    ) -> Result<(), String> {
+        if self.batch_exists(table, run_ref).await? {
+            return Ok(());
+        }
+        self.insert(table, body).await
+    }
+
     async fn insert(&self, table: &'static str, body: Vec<u8>) -> Result<(), String> {
         let columns =
             columns_for_table(table).ok_or_else(|| "unknown landing table".to_string())?;
@@ -106,7 +151,7 @@ impl ClickHouseLanding {
         };
         pending.sort();
         for path in pending {
-            let Some(table) = pending_table(&path) else {
+            let Some((run_ref, table)) = pending_descriptor(&path) else {
                 continue;
             };
             let body = match fs::read(&path) {
@@ -119,7 +164,7 @@ impl ClickHouseLanding {
                     continue;
                 }
             };
-            match self.insert(table, body).await {
+            match self.insert_if_missing(table, run_ref, body).await {
                 Ok(()) => {
                     if let Err(error) = fs::remove_file(&path) {
                         eprintln!(
@@ -136,14 +181,14 @@ impl ClickHouseLanding {
     }
 }
 
-/// Land each successful table batch independently, preserving failed batches.
+/// Persist both table batches before landing either one, preserving failed batches.
 pub async fn land_completed_run(
     client: Option<&ClickHouseLanding>,
     store: &JudgementRunStore,
     record: &JudgementRunRecord,
     lens: &str,
     owner_scope: &str,
-) {
+) -> bool {
     let batches = match completed_batches(record, lens, owner_scope) {
         Ok(batches) => batches,
         Err(error) => {
@@ -151,14 +196,37 @@ pub async fn land_completed_run(
                 "cardinald: could not construct landing rows for {}: {error}",
                 record.run_ref
             );
-            return;
+            return false;
         }
     };
 
-    for batch in batches {
-        let pending = pending_path(store.root(), &record.run_ref, batch.table);
+    let pending_batches: Vec<_> = batches
+        .into_iter()
+        .map(|batch| {
+            let pending = pending_path(store.root(), &record.run_ref, batch.table);
+            (batch, pending)
+        })
+        .collect();
+    let mut all_preserved = true;
+    for (batch, pending) in &pending_batches {
+        if let Err(error) = write_pending(pending, &batch.body) {
+            eprintln!(
+                "cardinald: could not preserve pending batch {}: {error}",
+                pending.display()
+            );
+            all_preserved = false;
+        }
+    }
+    if !all_preserved {
+        return false;
+    }
+
+    for (batch, pending) in pending_batches {
         let landed = match client {
-            Some(client) => match client.insert(batch.table, batch.body.clone()).await {
+            Some(client) => match client
+                .insert_if_missing(batch.table, &record.run_ref, batch.body)
+                .await
+            {
                 Ok(()) => true,
                 Err(error) => {
                     eprintln!(
@@ -178,21 +246,15 @@ pub async fn land_completed_run(
         };
 
         if landed {
-            if pending.exists() {
-                if let Err(error) = fs::remove_file(&pending) {
-                    eprintln!(
-                        "cardinald: landed batch but could not remove {}: {error}",
-                        pending.display()
-                    );
-                }
+            if let Err(error) = fs::remove_file(&pending) {
+                eprintln!(
+                    "cardinald: landed batch but could not remove {}: {error}",
+                    pending.display()
+                );
             }
-        } else if let Err(error) = write_pending(&pending, &batch.body) {
-            eprintln!(
-                "cardinald: could not preserve pending batch {}: {error}",
-                pending.display()
-            );
         }
     }
+    true
 }
 
 struct LandingBatch {
@@ -454,19 +516,20 @@ fn pending_path(root: &Path, run_ref: &str, table: &str) -> PathBuf {
     ))
 }
 
-fn pending_table(path: &Path) -> Option<&'static str> {
+fn pending_descriptor(path: &Path) -> Option<(&str, &'static str)> {
     let file_name = path.file_name()?.to_str()?;
-    let encoded = file_name
-        .split_once(".landing_pending_")?
-        .1
-        .strip_suffix(".jsonl")?;
-    match encoded {
+    let (run_ref, encoded) = file_name.split_once(".landing_pending_")?;
+    if run_ref.is_empty() {
+        return None;
+    }
+    let table = match encoded.strip_suffix(".jsonl")? {
         "scry_judgements__comparisons" => Some(PUBLIC_COMPARISONS),
         "scry_judgements__scores" => Some(PUBLIC_SCORES),
         "scry_judgements_private__comparisons" => Some(PRIVATE_COMPARISONS),
         "scry_judgements_private__scores" => Some(PRIVATE_SCORES),
         _ => None,
-    }
+    }?;
+    Some((run_ref, table))
 }
 
 fn pending_files(root: &Path) -> io::Result<Vec<PathBuf>> {
@@ -478,7 +541,7 @@ fn pending_files(root: &Path) -> io::Result<Vec<PathBuf>> {
     Ok(entries
         .filter_map(Result::ok)
         .map(|entry| entry.path())
-        .filter(|path| pending_table(path).is_some())
+        .filter(|path| pending_descriptor(path).is_some())
         .collect())
 }
 
