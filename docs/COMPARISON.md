@@ -75,11 +75,11 @@ query→document relevance at scale, use one of those; if you need "sort my
 shortlist by how much of X each item has, and tell me how sure you are," use
 this.
 
-## The nearest tool: llm-sort
+## The nearest tools: llm-sort and gwern's seriate.py
 
 [`llm-sort`](https://github.com/vagos/llm-sort) (an `llm` CLI plugin,
 [reviewed by Simon Willison](https://simonwillison.net/2025/Feb/11/llm-sort/))
-is the only other general-purpose "sort an arbitrary list by a criterion" CLI
+is the closest other general-purpose "sort an arbitrary list by a criterion" CLI
 we know of. It feeds binary pairwise judgements into a comparison sort
 (`sorted(cmp_to_key(...))`). Same user intent, opposite engineering
 philosophy:
@@ -97,6 +97,33 @@ philosophy:
 If you just need a quick plausible ordering and don't care about auditability,
 llm-sort is less machinery. The moment "how much better?" or "how sure are
 we?" matters, the machinery is the point.
+
+[`seriate.py`](https://github.com/gwern/gwern.net/blob/master/build/seriate.py)
+(Gwern Branwen, CC-0, ~200 lines; used to order the "similar links"
+sections on gwern.net) solves an adjacent but distinct problem:
+**seriation**, not criterion sorting. There is no explicit criterion and no
+pairwise elicitation at all — the whole list is handed to the model, which
+rewrites it into "a best-effort context-dependent logical order" (cluster
+similar items, minimize item-to-item distance), iterated to a fixed point
+(max 5 passes, cycle detection), then gated by a word-multiset permutation
+check so the "sort" provably lost nothing. Sharp contrasts with `cardinal
+sort`:
+
+| | seriate.py | cardinal sort |
+|---|---|---|
+| Question | "what order is natural?" (criterion implicit, chosen by the model) | "how much X does each item have?" (criterion explicit, caller-owned) |
+| Elicitation | whole-list rewrite, one completion per pass | O(n·budget) pairwise ratio judgements |
+| Output scale | ordinal at best — no scores, no uncertainty | ratio scores, mean ± std, top-k certification |
+| Convergence | fixed point of a rewrite map (may cycle; errors out) | posterior uncertainty under a stated budget |
+| Integrity check | permutation-of-words gate (lossless reorder) | per-judgement trace, cost accounting, keyless replay |
+| Cost shape | cheap: ~passes × list tokens | linear in comparisons; priced per run |
+
+The two compose rather than compete: seriation is the right tool when the
+list's own structure should pick the order (link lists, notes, galleries)
+and any defensible clustering beats an arbitrary one; cardinal is the right
+tool when a caller-owned criterion, magnitudes, and audit trail matter.
+seriate's permutation gate is also a pattern worth stealing anywhere an LLM
+is trusted to reorder content it must not rewrite.
 
 ## Known pathologies and what this design does about them
 
