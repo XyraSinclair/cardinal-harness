@@ -35,6 +35,7 @@ sqlite-store = ["rusqlite", "fs2"]
 
 [dependencies]
 async-trait = "0.1"
+axum = "0.8"
 blake3 = "1"
 clap = { version = "4", features = ["derive"] }
 chrono = { version = "0.4", features = ["serde"] }
@@ -49,6 +50,7 @@ rusqlite = { version = "0.38", features = ["bundled"], optional = true }
 seriate = { git = "https://github.com/XyraSinclair/seriate", tag = "v0.1.1", default-features = false }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+sha2 = "0.10"
 statrs = "0.18"
 tempfile = "3"
 thiserror = "2"

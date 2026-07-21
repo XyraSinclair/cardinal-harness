@@ -27,9 +27,9 @@ use crate::rerank::{
 };
 
 pub const JUDGEMENT_RUN_SCHEMA: &str = "cardinal.judgement-run.v1";
+pub const JUDGEMENT_PROMPT_TEMPLATE_SLUG: &str = "canonical_v2";
 const RUN_REF_PREFIX: &str = "jrun_";
 const PROVIDER_CALL_REF_PREFIX: &str = "pcall_";
-const PROMPT_TEMPLATE_SLUG: &str = "canonical_v2";
 const COMPARISON_CONCURRENCY: usize = 8;
 const REQUEST_DIGEST_DOMAIN: &[u8] = b"cardinal.gateway-request.v1\0";
 
@@ -69,7 +69,7 @@ pub struct NormalizedJudgementRunRequest {
 }
 
 impl JudgementRunRequest {
-    fn normalize(mut self) -> Result<NormalizedJudgementRunRequest, JudgementRunError> {
+    pub fn normalize(mut self) -> Result<NormalizedJudgementRunRequest, JudgementRunError> {
         for entity in &mut self.entities {
             entity.id = entity.id.trim().to_string();
         }
@@ -161,12 +161,16 @@ pub struct JudgementRunUsage {
 pub struct JudgementAttributeScore {
     pub latent_mean: f64,
     pub latent_std: f64,
+    #[serde(default)]
+    pub z_score: f64,
     pub percentile: f64,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct JudgementEntityScore {
     pub id: String,
+    #[serde(default)]
+    pub rank: Option<usize>,
     pub feasible: bool,
     pub p_flip: f64,
     pub attribute_score: JudgementAttributeScore,
@@ -281,6 +285,12 @@ impl JudgementRunStore {
         &self.root
     }
 
+    /// Allocate an opaque run reference for work that will be persisted later.
+    #[must_use]
+    pub fn allocate_run_ref(&self) -> String {
+        new_opaque_ref(RUN_REF_PREFIX)
+    }
+
     pub fn persist(&self, record: &JudgementRunRecord) -> Result<(), JudgementRunError> {
         validate_record(record)?;
         fs::create_dir_all(&self.root)?;
@@ -358,6 +368,18 @@ pub async fn execute_judgement_run(
     execution: RerankExecution<'_>,
     store: &JudgementRunStore,
 ) -> Result<JudgementRunRecord, JudgementRunError> {
+    let run_ref = store.allocate_run_ref();
+    execute_judgement_run_with_ref(request, run_ref, execution, store).await
+}
+
+/// Execute a portable judgement run using a caller-preallocated run reference.
+pub async fn execute_judgement_run_with_ref(
+    request: JudgementRunRequest,
+    run_ref: String,
+    execution: RerankExecution<'_>,
+    store: &JudgementRunStore,
+) -> Result<JudgementRunRecord, JudgementRunError> {
+    validate_opaque_ref(&run_ref, RUN_REF_PREFIX).map_err(JudgementRunError::InvalidRunRef)?;
     let request = request.normalize()?;
     let rerank_request = build_rerank_request(&request);
     validate_multi_rerank_request(&rerank_request)
@@ -367,7 +389,6 @@ pub async fn execute_judgement_run(
         .judgement_run_instrumentation()
         .map_err(|reason| JudgementRunError::UnsupportedExecution(reason.to_string()))?;
 
-    let run_ref = new_opaque_ref(RUN_REF_PREFIX);
     let started_at = Utc::now();
     let trace = CapturingTraceSink::new(upstream_trace);
     let provider_calls = Arc::new(Mutex::new(Vec::new()));
@@ -468,7 +489,7 @@ fn build_rerank_request(request: &NormalizedJudgementRunRequest) -> MultiRerankR
         attributes: vec![MultiRerankAttributeSpec {
             id: request.axis_key.clone(),
             prompt: request.axis_prompt.clone(),
-            prompt_template_slug: Some(PROMPT_TEMPLATE_SLUG.to_string()),
+            prompt_template_slug: Some(JUDGEMENT_PROMPT_TEMPLATE_SLUG.to_string()),
             weight: 1.0,
         }],
         topk: MultiRerankTopKSpec {
@@ -519,6 +540,7 @@ fn project_response(axis_key: &str, response: MultiRerankResponse) -> Result<Pro
         let AttributeScoreSummary {
             latent_mean,
             latent_std,
+            z_score,
             percentile,
             ..
         } = entity
@@ -527,11 +549,13 @@ fn project_response(axis_key: &str, response: MultiRerankResponse) -> Result<Pro
             .ok_or_else(|| format!("entity {} omitted axis {axis_key}", entity.id))?;
         projected.push(JudgementEntityScore {
             id: entity.id,
+            rank: entity.rank,
             feasible: entity.feasible,
             p_flip: entity.p_flip,
             attribute_score: JudgementAttributeScore {
                 latent_mean,
                 latent_std,
+                z_score,
                 percentile,
             },
         });
