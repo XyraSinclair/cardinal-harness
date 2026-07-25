@@ -1,0 +1,137 @@
+{
+  "items": [
+    {
+      "id": "item-0010",
+      "text": "The sepsis deaths didn't cluster under any one physician; they clustered in the handoff hours between shifts. The union's understaffing story, management's bad-apple story, and the plaintiffs' negligence theory all require ignoring that the worst quarter had the best staffing ratios in five years.",
+      "rank": 1,
+      "latent_mean": 3.1343089701741103,
+      "latent_std": 1.1193829633098116,
+      "z_score": 1.0753555681141862,
+      "percentile": 0.9583333333333334
+    },
+    {
+      "id": "item-0006",
+      "text": "In our foundation's ten-year retrospective, the slickest applications underdelivered and the grants we approved reluctantly did best. Our committee scores predicted outcomes about as well as a coin flip. I sat on that committee for six of the ten years.",
+      "rank": 2,
+      "latent_mean": 2.7476152749887652,
+      "latent_std": 1.692388020393509,
+      "z_score": 0.645893333075712,
+      "percentile": 0.875
+    },
+    {
+      "id": "item-0002",
+      "text": "The post-mortem on the bridge found no villain. The collapse traced to forty years of small, individually defensible maintenance deferrals, each approved by people acting reasonably on the budgets they had. Every group now demanding accountability had signed off on at least one of them.",
+      "rank": 3,
+      "latent_mean": 2.605743465109575,
+      "latent_std": 1.504742585743795,
+      "z_score": 0.4883304213492435,
+      "percentile": 0.7916666666666666
+    },
+    {
+      "id": "item-0004",
+      "text": "Adjusted for changes in how stores report theft, shoplifting has been roughly flat for a decade. The losses that did rise were concentrated brutally in a few hundred locations, which fits neither a national crime wave nor a media invention.",
+      "rank": 4,
+      "latent_mean": 2.302077113992155,
+      "latent_std": 1.7220939124469825,
+      "z_score": 0.15107840126043035,
+      "percentile": 0.7083333333333334
+    },
+    {
+      "id": "item-0011",
+      "text": "The legacy Perl script everyone jokes about has had fewer production incidents than anything we've shipped since 2019. Nobody wants it on their resume, so it has no owner and no roadmap.",
+      "rank": 5,
+      "latent_mean": 2.273613307882639,
+      "latent_std": 0.8176971656017675,
+      "z_score": 0.11946648221004248,
+      "percentile": 0.625
+    },
+    {
+      "id": "item-0000",
+      "text": "Most of our churn traces to an onboarding email sequence nobody has owned since 2021. The competitor everyone blames in standup shows up in exit surveys less often than the broken password-reset link does.",
+      "rank": 6,
+      "latent_mean": 2.217636601915777,
+      "latent_std": 1.7289860986138397,
+      "z_score": 0.057298721126951606,
+      "percentile": 0.5416666666666666
+    },
+    {
+      "id": "item-0005",
+      "text": "The drug works, but about a third of the measured benefit in our trial came from patients sleeping better once they were enrolled in anything at all. It helps; it just helps less than the ads say and more than the critics say.",
+      "rank": 7,
+      "latent_mean": 2.114451490889703,
+      "latent_std": 1.7289860986138397,
+      "z_score": -0.05729872112695111,
+      "percentile": 0.4583333333333333
+    },
+    {
+      "id": "item-0008",
+      "text": "Honestly, most meetings could be emails, but the deeper problem is that most emails could be one person empowered to decide. We keep adding both instead of choosing either.",
+      "rank": 8,
+      "latent_mean": 1.5329737867703277,
+      "latent_std": 1.4727797126473778,
+      "z_score": -0.7030881858774783,
+      "percentile": 0.375
+    },
+    {
+      "id": "item-0007",
+      "text": "Nutrition science is just marketing with a p-value. Breakfast being \"the most important meal\" was invented by a cereal company, and your doctor repeats it because nobody audits the curriculum. Trust your grandmother, not the pyramid.",
+      "rank": 9,
+      "latent_mean": 1.05777615314043,
+      "latent_std": 1.595179541752008,
+      "z_score": -1.2308429446559301,
+      "percentile": 0.2916666666666667
+    },
+    {
+      "id": "item-0009",
+      "text": "The farmers market added a second cheese stall this spring. Get there before ten if you want the good sourdough, because the bakery table sells out fast.",
+      "rank": 10,
+      "latent_mean": 0.5371119088882628,
+      "latent_std": 1.324072764288026,
+      "z_score": -1.8090929467253407,
+      "percentile": 0.20833333333333334
+    },
+    {
+      "id": "item-0001",
+      "text": "Unpopular opinion: remote work didn't break productivity, it exposed the managers who never produced anything but meetings. The commercial real estate lobby is terrified you'll figure this out. Say it louder.",
+      "rank": 11,
+      "latent_mean": 0.4343300482252186,
+      "latent_std": 1.2103327357184437,
+      "z_score": -1.9232425388995986,
+      "percentile": 0.125
+    },
+    {
+      "id": "item-0003",
+      "text": "The offsite was at the lake this year and the weather held. We did the ropes course, ate too much barbecue, and drove back Sunday afternoon.",
+      "rank": 12,
+      "latent_mean": 0.0,
+      "latent_std": 1.6721306875499629,
+      "z_score": -2.4056097343765415,
+      "percentile": 0.041666666666666664
+    }
+  ],
+  "meta": {
+    "topk_error": 8.192713266372422,
+    "tolerated_error": 0.1,
+    "comparisons_attempted": 24,
+    "comparisons_used": 24,
+    "comparisons_refused": 0,
+    "comparisons_cached": 0,
+    "comparison_budget": 24,
+    "latency_ms": 14334,
+    "model_used": "openai/gpt-5.6-sol",
+    "rater_id_used": "openai/gpt-5.6-sol",
+    "provider_input_tokens": 11008,
+    "provider_output_tokens": 2623,
+    "provider_cost_nanodollars": 133730000,
+    "provider_cost_is_estimate": false,
+    "entities_pruned": 0,
+    "pairs_counterbalanced": 12,
+    "position_flips": 1,
+    "evidence_judgements": 0,
+    "logprob_mode_judgements": 0,
+    "evidence_visible_mass_mean": null,
+    "evidence_order_residual_mean_abs": 0.25562412390125766,
+    "judgement_frustration_mean": 0.0023393506852268835,
+    "stop_reason": "budget_exhausted"
+  }
+}

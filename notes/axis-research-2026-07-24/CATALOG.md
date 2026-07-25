@@ -18,8 +18,9 @@ unabridged definitions in `lens-*.md`.
   (Sandia-marker register). Confounder: rhetorical address to posterity. [paper]
 - `eschatological_seriousness` — ultimate outcomes as literal,
   action-guiding fact, not mood/genre/brand. Confounder: doom-keyword
-  density. [paper] **This is the slop-punishing form of end_of_time —
-  probe 1's miss, answered. Wave-2 lead.**
+  density. [probe] **PASS** (wave 2, T3): fr↔fr 0.90, decoy 7th frontier
+  vs 3rd mini. The slop-punishing form of end_of_time — probe 1's miss,
+  answered; the wording is the axis.
 - `one_way_door_gravity` — irreversibility does inferential work, not
   tonal work. Confounder: urgency vocabulary. [paper]
 - `copernican_vertigo` — scale metabolized into a moral instrument vs
@@ -42,7 +43,8 @@ unabridged definitions in `lens-*.md`.
 - `palimpsest_depth` — millennia of inherited text alive and load-bearing.
   Confounder: allusion counts. [paper]
 - `rosetta_load` — recovery key for a lost domain; reseeds its field from
-  one surviving copy. Confounder: textbook throat-clearing. [paper]
+  one surviving copy. Confounder: textbook throat-clearing. [probe]
+  **PASS** (wave 2, T2): largest tier gap of the wave, +0.42.
 - `ruin_value` — random fragments retain power out of context; burns as
   shards. Confounder: tweetable aphorism. [paper] Site-content standout.
 - `memento_mori_depth` — finitude integrated into the weighting function,
@@ -55,8 +57,10 @@ unabridged definitions in `lens-*.md`.
 decoy. See RESULTS.md.
 
 - `voltage_under_load` — intensity RISES at the hardest point of its own
-  material. Confounder: enthusiasm-word density. [paper] Wave-2: the
-  sharpest real-vs-performed instrument; judge must find the load point.
+  material. Confounder: enthusiasm-word density. [paper] Wave-2 WEAK —
+  decoy failure, not axis failure: its hand-wave was lexically explicit
+  ("skip the boring math") so every tier caught it. Needs a decoy that
+  APPEARS to engage the difficulty while saying nothing load-bearing.
 - `worldward_thrust` — sentences terminate in deeds taken, not stances
   held. Confounder: "we shipped" phrase density. [paper]
 - `irreversibility_appetite` — closes the author's own exits (dated
@@ -101,14 +105,17 @@ decoy. See RESULTS.md.
 - `retrospective_inevitability` — forced-once-seen yet unanticipated.
   Confounder: assertive tone. [paper]
 - `antimemetic_payload` — true claims structurally resistant to spreading.
-  Confounder: edginess. [paper] Wave-2: arresting top-10 by construction.
+  Confounder: edginess. [probe] **PASS** (wave 2, T2+T3): highest frontier
+  coherence of the wave (0.965); hot take 10th frontier vs 3rd mini.
 - `prescience_margin` — early against opposition, later consensus.
   Confounder: Nostradamus vagueness. [paper] Merge-candidate with
   preconsensus_prescience (D); needs dated corpus — Scry-native.
 - `seedbank_fertility` — extractable research programs beyond the headline
   claim. Confounder: future-work bullets. [paper]
 - `scar_tissue_density` — specifics only territory-contact produces.
-  Confounder: anecdote count. [paper] Wave-2: directly monetizable.
+  Confounder: anecdote count. [probe] **PASS** (wave 2, T2+T3): the
+  sharpest instrument in the program — confabulated war story 9th for
+  both frontiers, 1st for the mini. Directly monetizable.
 - `book_proximity` — nothing structural changes without loss (Erdős).
   Confounder: brevity-signaling. [paper]
 - `latent_theoremhood` — survives formalization nearly verbatim.
@@ -124,8 +131,9 @@ decoy. See RESULTS.md.
 - `worlds_forbidden` — Popperian content; observations ruled out.
   Confounder: unconstraining bold forecasts. [paper]
 - `hostile_paraphrase_invariance` — survives maximally uncharitable honest
-  restatement. Confounder: plain style. [paper] Wave-2: the invariance
-  battery's spirit as an axis.
+  restatement. Confounder: plain style. [probe] **PASS** (wave 2, T2):
+  frontiers credit the florid item for its quantified mechanism and dump
+  the sober-sounding nothing. The invariance battery's spirit as an axis.
 - `regeneration_potential` — the field regrows from this alone.
   Confounder: textbook comprehensiveness. [paper] Correlate vs rosetta_load
   (A) — likely the same latent.
@@ -138,7 +146,8 @@ decoy. See RESULTS.md.
 
 - `live_wire_prose` — arena-contact texture in founder prose. Buyer: seed
   investors triaging inbound (~$500/hr partner reading time). Confounder:
-  hustle register. [paper] Wave-2: clearest paid decision.
+  hustle register. [probe] **PASS** (wave 2, T2+T3): hustle update 10th
+  frontier vs 5th mini. Clearest paid decision of the admitted set.
 - `orphaned_importance` — importance relative to total serious attention
   received. Buyer: grantmakers, field selection. Confounder: obscurity
   read as neglectedness. [paper]
@@ -162,7 +171,11 @@ decoy. See RESULTS.md.
 - `authorial_irreducibility` — costly signal of its own provenance; could
   not be faked without the mind. Buyer: editors/admissions/investors in
   the LLM era. Confounder: voice-shaped tics (the easiest thing to
-  imitate). [paper] Wave-2: the axis 2023 created demand for.
+  imitate). [paper] Wave-2 WEAK — mini↔frontier agreement (0.92) EXCEEDED
+  frontier↔frontier (0.84); the quirky-blogger decoy is contentless at any
+  tier, and the frontiers' mutual disagreement hints at real internal
+  structure the wording doesn't pin down yet. The axis 2023 created
+  demand for; worth a second wording, not abandonment.
 - `unflinchingness` — volunteers specific facts against the author's own
   interest. Buyer: diligence on founder updates, LP letters. Confounder:
   performative humility. [paper]

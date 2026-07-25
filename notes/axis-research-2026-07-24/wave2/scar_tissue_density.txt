@@ -1,0 +1,12 @@
+Cap the reconnect backoff at 47 seconds, not the default 60: the load balancer recycles idle streams at 50, and a 60-second cap herds every client into the same retry slot.
+I'll never forget the night our main database crashed at 3 AM. We lost 10,000 records, traffic was up 500%, and I debugged for 48 hours straight before finding the missing index. That outage taught me more than any course ever did.
+We migrated the billing service to Postgres last quarter; the tricky part was the JSON columns, which took about two weeks longer than planned. Nothing dramatic, just a lot of careful backfills.
+Chunk the uploads at 97 MB, not 100: the proxy kills requests at 120 seconds, and the last few megabytes of a 100 MB part kept crossing that line on hotel wifi, which is exactly where sales runs the demo.
+Reliable systems come from good monitoring, thorough testing, and a culture of ownership. Invest in observability early and problems will surface before customers ever notice them.
+In fifteen years of consulting I've watched the same movie a hundred times: the startup that lost everything in one bad deploy, the bank that skipped code review, the team that never wrote tests. Every one of them paid ten times over for the shortcut.
+The re-embedding pass billed out at $6,140 against a back-of-envelope estimate of $600; tokenizer overhead on Japanese text runs close to three characters per token, and nobody had checked what fraction of the corpus was Japanese.
+The greenhouse fans run on a timer plus a humidity override; getting the override threshold right took a few tries because mornings behaved differently than the spec sheet suggested.
+Great bread starts with quality flour and patience. Respect the fermentation process, keep your tools clean, and the results will speak for themselves.
+Hold the bisque ramp for a soak at 573 degrees; quartz inversion sits right there, and the schedule printed in the kiln manual assumes a clay body we don't use — a full shelf of cracked ware established that before anyone reread the appendix.
+I spent an afternoon chasing a flaky test that turned out to be timezone-dependent; it only failed between 5 and 6 PM our time. Annoying, but a known class of bug once you've seen it.
+Switching the docs site to a static generator cut deploy times from around ten minutes to under two. Configuration was mostly straightforward; the search plugin needed some fiddling.
