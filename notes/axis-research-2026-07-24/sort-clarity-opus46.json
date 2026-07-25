@@ -1,0 +1,137 @@
+{
+  "items": [
+    {
+      "id": "item-0002",
+      "text": "No. The bug is not \"subtle\". You are taking a lock in an interrupt handler that can recurse. Here is the four-line fix, and a test that would have caught it in 1998.",
+      "rank": 1,
+      "latent_mean": 1.3612538238060812,
+      "latent_std": 1.968201754790641,
+      "z_score": 0.7168888330727181,
+      "percentile": 0.9583333333333334
+    },
+    {
+      "id": "item-0011",
+      "text": "She left the porch light on for the neighbor's kid every night for eleven years and never mentioned it to anyone.",
+      "rank": 2,
+      "latent_mean": 1.3109487141976501,
+      "latent_std": 1.3086232111405052,
+      "z_score": 0.6320926858804723,
+      "percentile": 0.875
+    },
+    {
+      "id": "item-0006",
+      "text": "There are infinitely many primes: if there were finitely many, multiply them all and add one; the result is divisible by none of them. Nothing in mathematics is more final.",
+      "rank": 3,
+      "latent_mean": 1.1263291449284714,
+      "latent_std": 2.6135056280135442,
+      "z_score": 0.3208911341459632,
+      "percentile": 0.7916666666666666
+    },
+    {
+      "id": "item-0005",
+      "text": "To remove the pump, first drain the loop, then unscrew the four M4 bolts in a cross pattern so the gasket seats evenly when you reinstall.",
+      "rank": 4,
+      "latent_mean": 1.0824782731921094,
+      "latent_std": 2.5809431374539007,
+      "z_score": 0.24697448823845394,
+      "percentile": 0.7083333333333334
+    },
+    {
+      "id": "item-0003",
+      "text": "I wake at 4:47am. Cold plunge. 900 pushups. While you sleep I am shipping. Intensity is a CHOICE. Most people never choose it.",
+      "rank": 5,
+      "latent_mean": 1.0817853608113381,
+      "latent_std": 2.27325118639268,
+      "z_score": 0.2458064895860593,
+      "percentile": 0.625
+    },
+    {
+      "id": "item-0007",
+      "text": "We sold our couch to make payroll in March. In April we rewrote the entire ingest pipeline in a weekend because a customer's data physically could not fit. I have never been more awake.",
+      "rank": 6,
+      "latent_mean": 1.043236972742789,
+      "latent_std": 2.5493639455196635,
+      "z_score": 0.18082790561858367,
+      "percentile": 0.5416666666666666
+    },
+    {
+      "id": "item-0000",
+      "text": "Every star that will ever burn has already been allotted its hydrogen; the universe's entire future output of light is a finite number you could in principle write down. What we do in the next century decides who is around to spend it.",
+      "rank": 7,
+      "latent_mean": 0.8286855358294453,
+      "latent_std": 2.6135056280135442,
+      "z_score": -0.1808279056185835,
+      "percentile": 0.4583333333333333
+    },
+    {
+      "id": "item-0010",
+      "text": "If the proton decays, every monument has a deadline; the only inheritance that survives is whatever physics lets you re-encode. Plan accordingly.",
+      "rank": 8,
+      "latent_mean": 0.3943807146817787,
+      "latent_std": 1.7827768909447257,
+      "z_score": -0.9129081222605789,
+      "percentile": 0.375
+    },
+    {
+      "id": "item-0004",
+      "text": "A Reed-Solomon code does not care whether the noise arrives this year or in ten thousand; the Voyager record's grooves and DNA in permafrost are the same bet, made at different temperatures.",
+      "rank": 9,
+      "latent_mean": 0.3402636565522127,
+      "latent_std": 2.499699414850635,
+      "z_score": -1.004129830402865,
+      "percentile": 0.2916666666666667
+    },
+    {
+      "id": "item-0009",
+      "text": "We are excited to leverage cutting-edge AI to unlock synergies and deliver best-in-class value for our stakeholders going forward.",
+      "rank": 10,
+      "latent_mean": 0.28253166957115483,
+      "latent_std": 2.096999685578592,
+      "z_score": -1.1014449958771517,
+      "percentile": 0.20833333333333334
+    },
+    {
+      "id": "item-0008",
+      "text": "The dead do not stop being spoken to; every archive is a seance that works.",
+      "rank": 11,
+      "latent_mean": 0.019890133371727403,
+      "latent_std": 2.317290556930789,
+      "z_score": -1.5441632512535723,
+      "percentile": 0.125
+    },
+    {
+      "id": "item-0001",
+      "text": "In the grand tapestry of the cosmos, humanity's journey is but a fleeting whisper among the stars, inviting us to ponder our place in the infinite dance of existence.",
+      "rank": 12,
+      "latent_mean": 0.0,
+      "latent_std": 1.5945415106078595,
+      "z_score": -1.5776907932903703,
+      "percentile": 0.041666666666666664
+    }
+  ],
+  "meta": {
+    "topk_error": 10.83695945178319,
+    "tolerated_error": 0.1,
+    "comparisons_attempted": 24,
+    "comparisons_used": 24,
+    "comparisons_refused": 0,
+    "comparisons_cached": 0,
+    "comparison_budget": 24,
+    "latency_ms": 8834,
+    "model_used": "anthropic/claude-opus-4.6",
+    "rater_id_used": "anthropic/claude-opus-4.6",
+    "provider_input_tokens": 11108,
+    "provider_output_tokens": 648,
+    "provider_cost_nanodollars": 71740000,
+    "provider_cost_is_estimate": false,
+    "entities_pruned": 0,
+    "pairs_counterbalanced": 12,
+    "position_flips": 4,
+    "evidence_judgements": 0,
+    "logprob_mode_judgements": 0,
+    "evidence_visible_mass_mean": null,
+    "evidence_order_residual_mean_abs": 0.22424726615704396,
+    "judgement_frustration_mean": 2.279295462685233e-7,
+    "stop_reason": "budget_exhausted"
+  }
+}

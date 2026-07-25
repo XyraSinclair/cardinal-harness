@@ -1,0 +1,137 @@
+{
+  "items": [
+    {
+      "id": "item-0002",
+      "text": "No. The bug is not \"subtle\". You are taking a lock in an interrupt handler that can recurse. Here is the four-line fix, and a test that would have caught it in 1998.",
+      "rank": 1,
+      "latent_mean": 2.828973493068553,
+      "latent_std": 2.3975378967698675,
+      "z_score": 1.1526768519543669,
+      "percentile": 0.9583333333333334
+    },
+    {
+      "id": "item-0007",
+      "text": "We sold our couch to make payroll in March. In April we rewrote the entire ingest pipeline in a weekend because a customer's data physically could not fit. I have never been more awake.",
+      "rank": 2,
+      "latent_mean": 2.3424178185614823,
+      "latent_std": 3.59747765690763,
+      "z_score": 0.6885682413291873,
+      "percentile": 0.875
+    },
+    {
+      "id": "item-0006",
+      "text": "There are infinitely many primes: if there were finitely many, multiply them all and add one; the result is divisible by none of them. Nothing in mathematics is more final.",
+      "rank": 3,
+      "latent_mean": 2.312901112681269,
+      "latent_std": 3.5397271895057383,
+      "z_score": 0.6604132776240031,
+      "percentile": 0.7916666666666666
+    },
+    {
+      "id": "item-0010",
+      "text": "If the proton decays, every monument has a deadline; the only inheritance that survives is whatever physics lets you re-encode. Plan accordingly.",
+      "rank": 4,
+      "latent_mean": 2.292798698766696,
+      "latent_std": 3.1384371031684717,
+      "z_score": 0.64123828104924,
+      "percentile": 0.7083333333333334
+    },
+    {
+      "id": "item-0000",
+      "text": "Every star that will ever burn has already been allotted its hydrogen; the universe's entire future output of light is a finite number you could in principle write down. What we do in the next century decides who is around to spend it.",
+      "rank": 5,
+      "latent_mean": 1.8778243335660112,
+      "latent_std": 3.59747765690763,
+      "z_score": 0.24540860282490987,
+      "percentile": 0.625
+    },
+    {
+      "id": "item-0003",
+      "text": "I wake at 4:47am. Cold plunge. 900 pushups. While you sleep I am shipping. Intensity is a CHOICE. Most people never choose it.",
+      "rank": 6,
+      "latent_mean": 1.6880116096736586,
+      "latent_std": 2.827412324957322,
+      "z_score": 0.06435281788537896,
+      "percentile": 0.5416666666666666
+    },
+    {
+      "id": "item-0008",
+      "text": "The dead do not stop being spoken to; every archive is a seance that works.",
+      "rank": 7,
+      "latent_mean": 1.553081000778153,
+      "latent_std": 3.577604575472773,
+      "z_score": -0.06435281788537917,
+      "percentile": 0.4583333333333333
+    },
+    {
+      "id": "item-0004",
+      "text": "A Reed-Solomon code does not care whether the noise arrives this year or in ten thousand; the Voyager record's grooves and DNA in permafrost are the same bet, made at different temperatures.",
+      "rank": 8,
+      "latent_mean": 1.4631404117972076,
+      "latent_std": 3.133951623663291,
+      "z_score": -0.15014403146652985,
+      "percentile": 0.375
+    },
+    {
+      "id": "item-0001",
+      "text": "In the grand tapestry of the cosmos, humanity's journey is but a fleeting whisper among the stars, inviting us to ponder our place in the infinite dance of existence.",
+      "rank": 9,
+      "latent_mean": 0.8074441963069834,
+      "latent_std": 1.7559707611556419,
+      "z_score": -0.7755899475411022,
+      "percentile": 0.2916666666666667
+    },
+    {
+      "id": "item-0011",
+      "text": "She left the porch light on for the neighbor's kid every night for eleven years and never mentioned it to anyone.",
+      "rank": 10,
+      "latent_mean": 0.31133216942551734,
+      "latent_std": 2.5602605977462938,
+      "z_score": -1.2488140318016854,
+      "percentile": 0.20833333333333334
+    },
+    {
+      "id": "item-0009",
+      "text": "We are excited to leverage cutting-edge AI to unlock synergies and deliver best-in-class value for our stakeholders going forward.",
+      "rank": 11,
+      "latent_mean": 0.11987131691286868,
+      "latent_std": 3.4824385582047466,
+      "z_score": -1.4314419095646576,
+      "percentile": 0.125
+    },
+    {
+      "id": "item-0005",
+      "text": "To remove the pump, first drain the loop, then unscrew the four M4 bolts in a cross pattern so the gasket seats evenly when you reinstall.",
+      "rank": 12,
+      "latent_mean": 0.0,
+      "latent_std": 3.3511736724921213,
+      "z_score": -1.545783008150352,
+      "percentile": 0.041666666666666664
+    }
+  ],
+  "meta": {
+    "topk_error": 10.367242579279239,
+    "tolerated_error": 0.1,
+    "comparisons_attempted": 24,
+    "comparisons_used": 24,
+    "comparisons_refused": 0,
+    "comparisons_cached": 0,
+    "comparison_budget": 24,
+    "latency_ms": 4264,
+    "model_used": "openai/gpt-5.4-mini",
+    "rater_id_used": "openai/gpt-5.4-mini",
+    "provider_input_tokens": 10060,
+    "provider_output_tokens": 642,
+    "provider_cost_nanodollars": 10434000,
+    "provider_cost_is_estimate": false,
+    "entities_pruned": 0,
+    "pairs_counterbalanced": 12,
+    "position_flips": 2,
+    "evidence_judgements": 0,
+    "logprob_mode_judgements": 0,
+    "evidence_visible_mass_mean": null,
+    "evidence_order_residual_mean_abs": 0.9054195028671893,
+    "judgement_frustration_mean": 0.0016387909639802173,
+    "stop_reason": "budget_exhausted"
+  }
+}
