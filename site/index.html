@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pairwise Ratio — the judge benchmark with no answer key</title>
 <meta name="description" content="The Judge Coherence Benchmark scores LLM judges against themselves: swap the order, invert the question, negate the attribute, chain ratios around a cycle. No ground truth, nothing to memorize.">
+<link rel="canonical" href="https://pairwiseratio.org/">
+<meta property="og:title" content="Pairwise Ratio — the judge benchmark with no answer key">
+<meta property="og:description" content="The Judge Coherence Benchmark scores LLM judges against themselves: swap the order, invert the question, negate the attribute, chain ratios around a cycle. No ground truth, nothing to memorize.">
+<meta property="og:url" content="https://pairwiseratio.org/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pairwise Ratio">
+<meta name="twitter:card" content="summary">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 4 L29 27 L3 27 Z' fill='none' stroke='%23B3362B' stroke-width='3.5' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -421,7 +428,7 @@ The obstacle is the way.
     </div>
   </div>
 
-  <p class="bytes-prov">templates: src/prompts.rs (canonical_v2; a &ldquo;how many times LESS&rdquo; mirror template, less_v1, drives the reciprocal-wording and orbit axes) &#183; spin wording: src/rerank/spin.rs &mdash; guillemets because the templates HTML-escape straight quotes, and the judge sees rendered bytes, not intentions &#183; the 48-char excerpt cuts mid-word because that is what the code does &#183; at public-benchmark scale these fixed wordings rotate procedurally per version, with a held-out subset</p>
+  <p class="bytes-prov">templates: src/prompts.rs (canonical_v2; a &ldquo;how many times LESS&rdquo; mirror template, less_v1, drives the reciprocal-wording and orbit axes) &#183; spin wording: src/rerank/spin.rs &mdash; guillemets because the templates HTML-escape straight quotes, and the judge sees rendered bytes, not intentions &#183; the 48-char excerpt cuts mid-word &#8212; and yes, &ldquo;Compare these entity&rdquo; is the template&rsquo;s real grammar &#8212; because faithfulness to the recorded bytes beats polish &#183; at public-benchmark scale these fixed wordings rotate procedurally per version, with a held-out subset</p>
 </section>
 
 <section id="caught">
@@ -500,6 +507,7 @@ The obstacle is the way.
   <div class="wrap foot">
     <div>Judge Coherence Benchmark &#183; built on <a href="https://github.com/XyraSinclair/cardinal-harness">cardinal-harness</a><br>scores comparable within a version only &#183; v1.2 battery, 2026-07-18 board</div>
     <div>evidence packs: <span class="mono">artifacts/live/</span> in the repo<br>method: <a href="https://github.com/XyraSinclair/cardinal-harness/blob/main/docs/BENCHMARK.md">docs/BENCHMARK.md</a></div>
+    <div>a project of <a href="https://exopriors.com">ExoPriors</a><br><a href="mailto:contact@exopriors.com">contact@exopriors.com</a></div>
   </div>
 </footer>
 
