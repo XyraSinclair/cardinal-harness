@@ -72,15 +72,14 @@ impl ClickHouseLanding {
         let mut url = self.endpoint.clone();
         let query =
             format!("SELECT count() FROM {table} WHERE run_id = {{run_id:String}} FORMAT TabSeparated");
-        url.query_pairs_mut()
-            .append_pair("query", &query)
-            .append_pair("param_run_id", run_ref);
+        url.query_pairs_mut().append_pair("param_run_id", run_ref);
 
-        // The empty body is load-bearing: without it reqwest sends no
-        // Content-Length header and ClickHouse 26.6+ rejects the bodyless
-        // POST with 411 Length Required (bit live 2026-07-26, four runs
-        // parked in landing_pending until the daemon was rebuilt).
-        let mut request = self.client.post(url).body(Vec::new());
+        // The SQL travels as the POST body, never as a bodyless POST with
+        // the query in the URL: ClickHouse rejects a POST carrying neither
+        // Content-Length nor Transfer-Encoding with 411 Length Required
+        // (bit live 2026-07-26 — four runs parked in landing_pending; an
+        // explicit empty Vec body still went out header-less).
+        let mut request = self.client.post(url).body(query.into_bytes());
         if let Some((username, password)) = &self.basic_auth {
             request = request.basic_auth(username, password.as_ref());
         }
