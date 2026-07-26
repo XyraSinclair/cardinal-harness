@@ -76,7 +76,11 @@ impl ClickHouseLanding {
             .append_pair("query", &query)
             .append_pair("param_run_id", run_ref);
 
-        let mut request = self.client.post(url);
+        // The empty body is load-bearing: without it reqwest sends no
+        // Content-Length header and ClickHouse 26.6+ rejects the bodyless
+        // POST with 411 Length Required (bit live 2026-07-26, four runs
+        // parked in landing_pending until the daemon was rebuilt).
+        let mut request = self.client.post(url).body(Vec::new());
         if let Some((username, password)) = &self.basic_auth {
             request = request.basic_auth(username, password.as_ref());
         }
