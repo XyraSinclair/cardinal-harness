@@ -951,6 +951,14 @@ fn model_supports_logprobs(model: &str) -> bool {
     if model_lower.starts_with("openai/gpt-5.4") || model_lower.starts_with("openai/gpt-5.6") {
         return false;
     }
+    // GPT-5 base family (gpt-5, gpt-5-mini, gpt-5-chat-latest): mandatory
+    // reasoning, "no path exists" per the docs/LOGPROBS.md census — the
+    // provider 400s with "logprobs are not supported with reasoning models"
+    // (measured live 2026-07-27; every wave-2 replication comparison failed).
+    // Exact-family match: gpt-5.4/gpt-5.6 use a dot, so `gpt-5-` is safe.
+    if model_lower == "openai/gpt-5" || model_lower.starts_with("openai/gpt-5-") {
+        return false;
+    }
     // Gemini 3.1 Pro Preview is reasoning-mandatory on OpenRouter and does not
     // advertise logprob/top_logprob support in live provider metadata. Treat
     // current and future Gemini Pro reasoning previews conservatively until a
@@ -1703,7 +1711,11 @@ That's my assessment."#;
         // Non-reasoning models: YES logprobs
         assert!(model_supports_logprobs("openai/gpt-4.1"));
         assert!(model_supports_logprobs("openai/gpt-4.1-mini"));
-        assert!(model_supports_logprobs("openai/gpt-5-mini"));
+        // GPT-5 base family: mandatory reasoning, no logprob path
+        // (docs/LOGPROBS.md census; provider 400 measured 2026-07-27)
+        assert!(!model_supports_logprobs("openai/gpt-5"));
+        assert!(!model_supports_logprobs("openai/gpt-5-mini"));
+        assert!(!model_supports_logprobs("openai/gpt-5-chat-latest"));
         assert!(model_supports_logprobs("openai/gpt-5.2-pro"));
         assert!(model_supports_logprobs("google/gemini-2.5-pro"));
         assert!(model_supports_logprobs("google/gemini-2.5-flash"));
