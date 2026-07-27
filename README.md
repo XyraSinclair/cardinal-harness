@@ -347,6 +347,14 @@ This repo is intentionally narrow. It contains:
 Research workflows, training/export code, agent orchestration, and other
 experimental layers belong in `openpriors-research`, not here.
 
+**Canonical vs research-grade surface.** The stability-promised consumable
+is deliberately small: `sort_texts`/`sort_documents` (library), the CLI
+`sort` and `judge` verbs, and the judgment-packet format (`src/packet.rs` —
+content-addressed evidence that fuses byte-identically). Consume those.
+Every other verb (`weigh`, `slate`, `anp`, `distinguish`, `canonize`,
+`explain`, `calibrate`, the eval verbs) is a research instrument: honest,
+provenanced, and free to change shape without notice.
+
 Use it for list work where "how much better?" carries information: prompts,
 research ideas, candidate plans, reviewer notes, backlog items — any shortlist
 where the top cluster matters more than a cheap total order. Do not use it for

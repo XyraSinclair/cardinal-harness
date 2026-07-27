@@ -79,6 +79,17 @@ discipline (refutability, scripted-pathology validation, denominators,
 mathematical register, errata-on-top) with the evidence that earned each
 rule. It is the standing answer to "are we still doing deep work?".
 
+Read **`notes/OPERATOR-QUEUE.md`** when work touches strategy, doctrine,
+or publication: the capped queue of decisions only the operator can close.
+Do not add a sixth open item; get one closed or dropped first. Update item
+states in the same commit as the work that changes them.
+
+**Canonical vs research-grade surface** (guardian panel 2026-07-26): the
+stability-promised consumable is `sort_texts`/`sort_documents`, CLI `sort`
++ `judge`, and the packet format. All other verbs are research instruments
+— do not promise their shapes to external consumers, and do not grant new
+experiments permanent public verbs by default.
+
 
 - Preserve the core contract: pairwise ratio judgments aggregate into globally
   consistent cardinal scores with uncertainty.
