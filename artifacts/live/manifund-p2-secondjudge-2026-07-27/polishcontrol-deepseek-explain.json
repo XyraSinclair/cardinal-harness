@@ -1,0 +1,60 @@
+{
+  "attributes": [
+    {
+      "attribute_id": "explain_0",
+      "prompt": "plausibility of the causal path from the proposed activities to the claimed impact",
+      "spearman_alone": -0.0027879421925238587,
+      "fitted_weight": 0.0
+    },
+    {
+      "attribute_id": "explain_1",
+      "prompt": "expected impact per marginal dollar at the stated minimum funding ask",
+      "spearman_alone": 0.012021429516172398,
+      "fitted_weight": 0.0
+    },
+    {
+      "attribute_id": "explain_2",
+      "prompt": "strength of verifiable track-record evidence that this team can execute this plan",
+      "spearman_alone": -0.036361506041777396,
+      "fitted_weight": 0.0
+    },
+    {
+      "attribute_id": "explain_3",
+      "prompt": "epistemic integrity of the write-up: honest failure modes, quantified claims, falsifiable milestones",
+      "spearman_alone": 0.2545296167247386,
+      "fitted_weight": 1.0
+    },
+    {
+      "attribute_id": "explain_4",
+      "prompt": "overall writing quality and polish of the prose",
+      "spearman_alone": 0.03449477351916376,
+      "fitted_weight": 0.0
+    }
+  ],
+  "combined_spearman": 0.2545296167247386,
+  "meta": {
+    "topk_error": 10.958264158121526,
+    "tolerated_error": 0.1,
+    "comparisons_attempted": 824,
+    "comparisons_used": 824,
+    "comparisons_refused": 0,
+    "comparisons_cached": 118,
+    "comparison_budget": 825,
+    "latency_ms": 1062783,
+    "model_used": "deepseek/deepseek-v4-flash",
+    "rater_id_used": "deepseek/deepseek-v4-flash",
+    "provider_input_tokens": 1944393,
+    "provider_output_tokens": 249446,
+    "provider_cost_nanodollars": 289103443,
+    "provider_cost_is_estimate": false,
+    "entities_pruned": 0,
+    "pairs_counterbalanced": 397,
+    "position_flips": 142,
+    "evidence_judgements": 0,
+    "logprob_mode_judgements": 0,
+    "evidence_visible_mass_mean": null,
+    "evidence_order_residual_mean_abs": 0.4967291346650136,
+    "judgement_frustration_mean": 0.06882947720251872,
+    "stop_reason": "budget_exhausted"
+  }
+}

@@ -35,13 +35,16 @@ eps/gamma knobs died by pre-named gate). Subsumes Q1's §10 line but is a
 standing constraint, not a doctrine edit.
 
 **Q4. Publish P2?** The professed-vs-revealed mechanism inversion
-(notes/manifund-campaign-2026-07-13/p2-results.md). GATED on the
-second-judge + polish-control runs registered 2026-07-27
-(artifacts/live/manifund-p2-secondjudge-2026-07-27/REGISTRATION.md,
-verdict rules pre-committed). If the gate passes, the decision is venue +
+(notes/manifund-campaign-2026-07-13/p2-results.md). **GATE PASSED
+2026-07-27**: kimi-k2.6 REPLICATED the inversion (EI weight 0.887, EV/$
+0.000, better reconstruction than the original judge) and the polish
+confound is EXCLUDED (EI 1.000 vs polish 0.000) —
+artifacts/live/manifund-p2-secondjudge-2026-07-27/RESULTS.md, verdicts
+mechanical from pre-committed rules; one honest spend overrun quoted
+($7.07 vs $5 registered abort line). The remaining decision is venue +
 framing — the post publicly characterizes a named community's funding
 decisions; mechanism-property framing (neither mechanism the villain) is
-the proposed mitigation. Drafting is agent work; SENDING is yours alone.
+the proposed mitigation. Draft in progress; SENDING is yours alone.
 
 **Q5. Axis wave 3 arrest gate.** Guardian panel Hamming M3 + Feynman M3:
 wave 3 does not run until (a) one smart stranger sees one admitted-axis
