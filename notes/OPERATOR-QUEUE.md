@@ -46,10 +46,13 @@ the proposed mitigation. Drafting is agent work; SENDING is yours alone.
 **Q5. Axis wave 3 arrest gate.** Guardian panel Hamming M3 + Feynman M3:
 wave 3 does not run until (a) one smart stranger sees one admitted-axis
 top-10 and the arrest (or non-arrest) is recorded, and (b) the small-tier
-replication + test-retest baseline runs on the frozen wave-2 probe sets
-(~$2–4). (b) is agent-executable on your word; (a) needs a stranger you
-pick. If strangers keep getting arrested, the axis program is vindicated
-as the public surface's content strategy and resumes at elevated priority.
+replication + test-retest baseline runs on the frozen wave-2 probe sets.
+**(b) DONE 2026-07-27** (RESULTS-REPLICATION.md: verdict UPGRADED TO
+FINDING per frozen rules — 3/6 axes tier-general, retest median +0.965;
+corrected headline: haiku-4.5 breaks the price-tier story, the divergence
+is a capability-class property). (a) still needs a stranger you pick;
+until then wave 3 stays gated. The author-family confound is the honest
+next kill before any public tier claim.
 
 ## DUE DATES
 
