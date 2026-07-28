@@ -94,6 +94,9 @@ const OPENAI_EMBED_3_SMALL: ModelPricing = ModelPricing::new("openai", 20, 0);
 const OPENAI_EMBED_3_LARGE_BATCH: ModelPricing = ModelPricing::new("openai", 65, 0);
 const OPENAI_EMBED_3_SMALL_BATCH: ModelPricing = ModelPricing::new("openai", 10, 0);
 
+/// Date of the OpenRouter price snapshot compiled into this registry.
+pub const OPENROUTER_PRICING_AS_OF: &str = "2026-06-29";
+
 // OpenRouter pricing — updated 2026-06-29 from https://openrouter.ai/api/v1/models.
 // Verify periodically because provider model IDs and preview prices change.
 

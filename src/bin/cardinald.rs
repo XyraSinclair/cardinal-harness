@@ -13,14 +13,18 @@ use axum::routing::{get, post};
 use axum::{Json, Router};
 use cardinal_harness::gateway::openrouter::OpenRouterAdapter;
 use cardinal_harness::gateway::{
-    Attribution, ChatGateway, ChatRequest, ChatResponse, ErrorContext, GatewayConfig,
-    NoopUsageSink, ProviderError, ProviderGateway,
+    Attribution, ChatGateway, ChatRequest, ChatResponse, ErrorContext, GatewayConfig, ModelPricing,
+    NoopUsageSink, ProviderError, ProviderGateway, OPENROUTER_PRICING_AS_OF,
 };
 use cardinal_harness::judgement_run::{
-    execute_judgement_run_with_ref, JudgementCandidate, JudgementPrivacy, JudgementRunRecord,
-    JudgementRunRequest, JudgementRunStore, JudgementRunTerminal, NormalizedJudgementRunRequest,
+    execute_judgement_run_with_ref, max_judgement_run_comparisons, JudgementCandidate,
+    JudgementPrivacy, JudgementRunRecord, JudgementRunRequest, JudgementRunStore,
+    JudgementRunTerminal, NormalizedJudgementRunRequest, JUDGEMENT_PROMPT_TEMPLATE_SLUG,
 };
 use cardinal_harness::landing::{land_completed_run, ClickHouseLanding};
+use cardinal_harness::rerank::comparison::{
+    estimate_pairwise_input_tokens, pairwise_max_output_tokens,
+};
 use cardinal_harness::rerank::{RerankExecution, RerankRunOptions, RerankStopReason};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -34,6 +38,8 @@ const DEFAULT_RUN_DIR: &str = ".cardinald/runs";
 const MAX_ENTITIES: usize = 200;
 const MAX_ENTITY_TEXT_BYTES: usize = 8192;
 const MAX_AXIS_PROMPT_BYTES: usize = 4096;
+const ESTIMATE_SAFETY_NUMERATOR: i64 = 5;
+const ESTIMATE_SAFETY_DENOMINATOR: i64 = 4;
 
 #[derive(Clone)]
 struct AppState {
@@ -44,12 +50,31 @@ struct AppState {
 }
 
 #[derive(Debug, Deserialize)]
-struct CreateRunRequest {
+struct JudgementRequestFields {
     entities: Vec<JudgementCandidate>,
     axis_key: String,
     axis_prompt: String,
     requested_k: usize,
     model: String,
+}
+
+impl JudgementRequestFields {
+    fn into_run_request(self, privacy: JudgementPrivacy) -> JudgementRunRequest {
+        JudgementRunRequest {
+            entities: self.entities,
+            axis_key: self.axis_key,
+            axis_prompt: self.axis_prompt,
+            requested_k: self.requested_k,
+            model: self.model,
+            privacy,
+        }
+    }
+}
+
+#[derive(Debug, Deserialize)]
+struct CreateRunRequest {
+    #[serde(flatten)]
+    judgement: JudgementRequestFields,
     privacy: JudgementPrivacy,
     #[serde(default)]
     owner_scope: Option<String>,
@@ -61,6 +86,22 @@ struct CreateRunRequest {
 struct AcceptedRun {
     run_ref: String,
     status: &'static str,
+}
+
+#[derive(Debug, Serialize)]
+struct EstimateResponse {
+    max_spend_nanodollars: i64,
+    planned_comparisons: usize,
+    price: EstimatePrice,
+    bound_method: String,
+}
+
+#[derive(Debug, Serialize)]
+struct EstimatePrice {
+    model: String,
+    prompt_nanodollars_per_token: i64,
+    completion_nanodollars_per_token: i64,
+    as_of: &'static str,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -133,6 +174,13 @@ impl ApiError {
         }
     }
 
+    fn conflict(message: impl Into<String>) -> Self {
+        Self {
+            status: StatusCode::CONFLICT,
+            message: message.into(),
+        }
+    }
+
     fn not_found() -> Self {
         Self {
             status: StatusCode::NOT_FOUND,
@@ -196,6 +244,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
     let app = Router::new()
         .route("/healthz", get(healthz))
+        .route("/v1/estimate", post(estimate_run))
         .route("/v1/runs", post(create_run))
         .route("/v1/runs/{run_ref}", get(get_run))
         .with_state(state);
@@ -208,6 +257,85 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 async fn healthz() -> &'static str {
     "ok"
+}
+
+async fn estimate_run(
+    payload: Result<Json<JudgementRequestFields>, JsonRejection>,
+) -> Result<Json<EstimateResponse>, ApiError> {
+    let Json(payload) = payload.map_err(|_| ApiError::bad_request("invalid JSON request body"))?;
+    validate_caps(&payload)?;
+
+    let normalized = payload
+        .into_run_request(JudgementPrivacy::Public)
+        .normalize()
+        .map_err(|error| ApiError::bad_request(error.to_string()))?;
+    let pricing = cardinal_harness::gateway::get_pricing(&normalized.model)
+        .filter(|pricing| pricing.provider == "openrouter")
+        .ok_or_else(|| ApiError::conflict("price_unknown"))?;
+    let planned_comparisons = max_judgement_run_comparisons(&normalized);
+
+    let mut entities_by_length: Vec<&JudgementCandidate> = normalized.entities.iter().collect();
+    entities_by_length.sort_unstable_by_key(|entity| std::cmp::Reverse(entity.text.len()));
+    let input_tokens = estimate_pairwise_input_tokens(
+        &normalized.axis_key,
+        &normalized.axis_prompt,
+        Some(JUDGEMENT_PROMPT_TEMPLATE_SLUG),
+        &entities_by_length[0].text,
+        &entities_by_length[1].text,
+    );
+    let output_tokens = pairwise_max_output_tokens(&normalized.model);
+    let max_spend_nanodollars =
+        checked_estimate_bound(planned_comparisons, input_tokens, output_tokens, pricing)?;
+
+    Ok(Json(EstimateResponse {
+        max_spend_nanodollars,
+        planned_comparisons,
+        price: EstimatePrice {
+            model: normalized.model,
+            prompt_nanodollars_per_token: pricing.input_nanos_per_token,
+            completion_nanodollars_per_token: pricing.output_nanos_per_token,
+            as_of: OPENROUTER_PRICING_AS_OF,
+        },
+        bound_method: format!(
+            "ceil(1.25 × {planned_comparisons} comparisons × \
+             ({input_tokens} canonical_v2 input tokens from the two longest texts × prompt price + \
+             {output_tokens} max-output tokens × completion price))"
+        ),
+    }))
+}
+
+fn checked_estimate_bound(
+    planned_comparisons: usize,
+    input_tokens: u32,
+    output_tokens: u32,
+    pricing: ModelPricing,
+) -> Result<i64, ApiError> {
+    if pricing.input_nanos_per_token < 0 || pricing.output_nanos_per_token < 0 {
+        return Err(ApiError::internal());
+    }
+    let comparisons = i64::try_from(planned_comparisons).map_err(|_| ApiError::internal())?;
+    let input_cost = i64::from(input_tokens)
+        .checked_mul(pricing.input_nanos_per_token)
+        .ok_or_else(ApiError::internal)?;
+    let output_cost = i64::from(output_tokens)
+        .checked_mul(pricing.output_nanos_per_token)
+        .ok_or_else(ApiError::internal)?;
+    let per_comparison = input_cost
+        .checked_add(output_cost)
+        .ok_or_else(ApiError::internal)?;
+    let subtotal = comparisons
+        .checked_mul(per_comparison)
+        .ok_or_else(ApiError::internal)?;
+    let rounding = ESTIMATE_SAFETY_DENOMINATOR
+        .checked_sub(1)
+        .ok_or_else(ApiError::internal)?;
+    let scaled = subtotal
+        .checked_mul(ESTIMATE_SAFETY_NUMERATOR)
+        .and_then(|value| value.checked_add(rounding))
+        .ok_or_else(ApiError::internal)?;
+    scaled
+        .checked_div(ESTIMATE_SAFETY_DENOMINATOR)
+        .ok_or_else(ApiError::internal)
 }
 
 async fn recover_interrupted_runs(
@@ -298,7 +426,7 @@ async fn create_run(
     payload: Result<Json<CreateRunRequest>, JsonRejection>,
 ) -> Result<(StatusCode, Json<AcceptedRun>), ApiError> {
     let Json(payload) = payload.map_err(|_| ApiError::bad_request("invalid JSON request body"))?;
-    validate_caps(&payload)?;
+    validate_caps(&payload.judgement)?;
 
     let owner_scope = payload.owner_scope.unwrap_or_default();
     match payload.privacy {
@@ -319,14 +447,7 @@ async fn create_run(
         return Err(ApiError::bad_request("lens must not be blank"));
     }
 
-    let request = JudgementRunRequest {
-        entities: payload.entities,
-        axis_key: payload.axis_key,
-        axis_prompt: payload.axis_prompt,
-        requested_k: payload.requested_k,
-        model: payload.model,
-        privacy: payload.privacy,
-    };
+    let request = payload.judgement.into_run_request(payload.privacy);
     let normalized = request
         .clone()
         .normalize()
@@ -584,7 +705,7 @@ fn project_completed(
     }
 }
 
-fn validate_caps(payload: &CreateRunRequest) -> Result<(), ApiError> {
+fn validate_caps(payload: &JudgementRequestFields) -> Result<(), ApiError> {
     if payload.entities.len() > MAX_ENTITIES {
         return Err(ApiError::bad_request(format!(
             "entities must contain at most {MAX_ENTITIES} items"

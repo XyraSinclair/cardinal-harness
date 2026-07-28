@@ -28,6 +28,7 @@ use crate::rerank::{
 
 pub const JUDGEMENT_RUN_SCHEMA: &str = "cardinal.judgement-run.v1";
 pub const JUDGEMENT_PROMPT_TEMPLATE_SLUG: &str = "canonical_v2";
+const COMPARISONS_PER_ENTITY: usize = 4;
 const RUN_REF_PREFIX: &str = "jrun_";
 const PROVIDER_CALL_REF_PREFIX: &str = "pcall_";
 const COMPARISON_CONCURRENCY: usize = 8;
@@ -137,6 +138,15 @@ impl NormalizedJudgementRunRequest {
         }
         Ok(())
     }
+}
+
+/// Maximum comparisons that the portable single-axis run planner may attempt.
+///
+/// `requested_k` affects proposal priority and early stopping, but the hard
+/// comparison budget is currently four attempts per entity for every valid
+/// normalized request.
+pub fn max_judgement_run_comparisons(request: &NormalizedJudgementRunRequest) -> usize {
+    COMPARISONS_PER_ENTITY.saturating_mul(request.entities.len())
 }
 
 /// Exact resolved rerank invocation plus the solver constructor spec it produced.
@@ -504,7 +514,7 @@ fn build_rerank_request(request: &NormalizedJudgementRunRequest) -> MultiRerankR
             prune_p_topk_below: None,
         },
         gates: Vec::new(),
-        comparison_budget: Some(4usize.saturating_mul(request.entities.len())),
+        comparison_budget: Some(max_judgement_run_comparisons(request)),
         latency_budget_ms: None,
         model: Some(request.model.clone()),
         rater_id: Some(request.model.clone()),
