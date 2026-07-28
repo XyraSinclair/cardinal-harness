@@ -503,7 +503,13 @@ fn build_rerank_request(request: &NormalizedJudgementRunRequest) -> MultiRerankR
             weight: 1.0,
         }],
         topk: MultiRerankTopKSpec {
-            k: request.requested_k,
+            // Clamp the engine's identification target to n-1: at k == n the
+            // top-k set is certain with zero comparisons, so the stop rule
+            // fires immediately and the run returns flat priors (observed
+            // live 2026-07-28: 0 comparisons, "tolerated_error_met", empty
+            // ClickHouse landing). A request for all n ranked still gets a
+            // real boundary to resolve and therefore real comparisons.
+            k: request.requested_k.min(request.entities.len().saturating_sub(1)).max(1),
             weight_exponent: 1.3,
             tolerated_error: 0.1,
             band_size: 5,
