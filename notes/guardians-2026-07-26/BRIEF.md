@@ -65,7 +65,8 @@ site/).
 10. **Axis research waves 1–2** (07-24→25): which judgment axes show
     tier-divergence (big models judge differently from small)?
     69-candidate catalog, decoy-planted probes, 6 axes admitted.
-    scar_tissue_density inverts 9th→1st between tiers;
+    scar_tissue_density inverts 10th/9th→1st between tiers
+    (per-frontier ranks corrected 2026-07-27, Fable audit);
     eschatological_seriousness vindicates a reworded end_of_time latent.
     Notes in notes/axis-research-2026-07-24/.
 

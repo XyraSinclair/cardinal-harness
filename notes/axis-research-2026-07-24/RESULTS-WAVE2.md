@@ -1,5 +1,12 @@
 # Wave 2 results — 8 axes, 24 runs, 576 comparisons, $1.74, 0 refusals
 
+**Erratum (2026-07-27, Fable audit of Opus-5-authored notes):** two prose
+passages overstated per-frontier agreement on decoy ranks; the table cells
+(best-frontier convention) were always correct. scar_tissue_density decoy:
+10th for opus-4.6, 9th for gpt-5.6-sol (was "9th for both frontiers");
+eschatological_seriousness decoy: 7th for opus-4.6, 9th for gpt-5.6-sol
+(was "7th for the frontiers"). Corrected in place below. Verdicts unchanged.
+
 Scored by `analyze_wave2.py` against the thresholds frozen in
 `WAVE2_SPEC.md` before any run. Evidence: `wave2/sort-*.json`.
 
@@ -24,8 +31,8 @@ keyword phrasing that produced probe 1's topic-detector.
 
 **scar_tissue_density** is the sharpest result in the program so far. The
 confabulated war story (round numbers, 3 AM, "48 hours straight") ranks
-**9th of 12 for both frontiers and 1st for the mini** — an 8-rank
-inversion on a single item. The frontiers instead top-rank the boring
+**10th of 12 for opus-4.6, 9th for gpt-5.6-sol, and 1st for the mini** —
+an 8–9-rank inversion on a single item. The frontiers instead top-rank the boring
 parameter values with mechanism (the $6,140-vs-$600 tokenizer bill, the
 97 MB chunk, the 573° quartz-inversion soak). This is precisely the
 "only contact with the territory produces this" latent, and the cheap
@@ -55,7 +62,8 @@ to the bottom — while giving the florid antibiotic-resistance item real
 credit for its quantified selection differential under the ornament.
 
 **eschatological_seriousness** — the probe-1 remedy WORKED, by T3. The
-apocalyptic mood-piece lands 7th for the frontiers and 3rd for the mini,
+apocalyptic mood-piece lands 7th for opus-4.6 (9th for gpt-5.6-sol) and
+3rd for the mini,
 and frontiers top-rank the items where ultimate stakes actually reprice
 something (the single-member launch veto, the abandoned tenure track, the
 perpetual-trust endowment). Bare `connection_to_the_end_of_time` was a

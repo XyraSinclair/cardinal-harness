@@ -18,8 +18,8 @@ unabridged definitions in `lens-*.md`.
   (Sandia-marker register). Confounder: rhetorical address to posterity. [paper]
 - `eschatological_seriousness` — ultimate outcomes as literal,
   action-guiding fact, not mood/genre/brand. Confounder: doom-keyword
-  density. [probe] **PASS** (wave 2, T3): fr↔fr 0.90, decoy 7th frontier
-  vs 3rd mini. The slop-punishing form of end_of_time — probe 1's miss,
+  density. [probe] **PASS** (wave 2, T3): fr↔fr 0.90, decoy 7th/9th for
+  the two frontiers vs 3rd mini. The slop-punishing form of end_of_time — probe 1's miss,
   answered; the wording is the axis.
 - `one_way_door_gravity` — irreversibility does inferential work, not
   tonal work. Confounder: urgency vocabulary. [paper]
@@ -114,8 +114,8 @@ decoy. See RESULTS.md.
   claim. Confounder: future-work bullets. [paper]
 - `scar_tissue_density` — specifics only territory-contact produces.
   Confounder: anecdote count. [probe] **PASS** (wave 2, T2+T3): the
-  sharpest instrument in the program — confabulated war story 9th for
-  both frontiers, 1st for the mini. Directly monetizable.
+  sharpest instrument in the program — confabulated war story 10th/9th
+  for the two frontiers, 1st for the mini. Directly monetizable.
 - `book_proximity` — nothing structural changes without loss (Erdős).
   Confounder: brevity-signaling. [paper]
 - `latent_theoremhood` — survives formalization nearly verbatim.

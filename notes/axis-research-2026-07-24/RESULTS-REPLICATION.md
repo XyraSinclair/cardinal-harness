@@ -7,6 +7,11 @@ the logprob gate requested logprobs from the mandatory-reasoning gpt-5 base
 family, 400-ing every gpt-5-mini comparison (fix `c242460`, code brought
 into agreement with the docs/LOGPROBS.md census).
 
+**Erratum (2026-07-27, Fable audit):** two lines below quoted the frontier
+scar-tissue decoy rank as 9; the replication runs place it 10th for both
+frontiers (wave-2 originals were 10th opus-4.6 / 9th gpt-5.6-sol).
+Corrected in place; verdicts unchanged.
+
 ## Program verdict (mechanical, per frozen rule 4)
 
 **UPGRADED TO FINDING** — power gate PASS (median retest ρ +0.965 across
@@ -23,7 +28,7 @@ prediction registered, miss reported).
 framing "cheap models cannot see scar tissue" is falsified as stated:
 claude-haiku-4.5 ($1/M, cheaper than gpt-5.4-mini on output) behaves
 frontier-like on nearly every axis (gaps −0.01 to +0.13, never a
-signature; scar-tissue decoy at rank 8 beside the frontiers' 9). The
+signature; scar-tissue decoy at rank 8 beside the frontiers' 10). The
 divergence separates deepseek-v4-flash / gpt-5-mini / gpt-5.4-mini from
 opus-4.6 / gpt-5.6-sol / haiku-4.5. The surviving claim is about a
 capability class that does not coincide with price or parameter count —
@@ -48,7 +53,7 @@ schedule variance — the conservative direction.)
 
 | axis | verdict | note |
 |---|---|---|
-| scar_tissue_density | **TIER-GENERAL** (2/3) | decoy rank 3 for dsflash AND gpt5mini vs 9/9 frontiers; haiku holds at 8 |
+| scar_tissue_density | **TIER-GENERAL** (2/3) | decoy rank 3 for dsflash AND gpt5mini vs 10/10 frontiers; haiku holds at 8 |
 | antimemetic_payload | **TIER-GENERAL** (2/3) | hot-take decoy at 7/5 for dsflash/gpt5mini vs 10 frontier; haiku 10 |
 | hostile_paraphrase_invariance | **TIER-GENERAL** (2/3) | via T2-analog: gaps +0.46/+0.35; note the mini54 retest floor caveat above |
 | eschatological_seriousness | MINI-SPECIFIC (0/3) | prediction miss; dsflash gap +0.26 but axis was T3-admitted and no small model moved the decoy ≥3 ranks |
