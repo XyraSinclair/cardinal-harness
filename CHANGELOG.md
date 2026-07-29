@@ -8,6 +8,13 @@ Versioning once it reaches `1.0.0`.
 ## [Unreleased]
 
 ### Added
+- `scripts/claude_code_judge.py`: subscription-billed structured-judgment
+  elicitation through Claude Code print mode (`--json-schema` →
+  server-validated `structured_output`, zero marginal API cost). `--pure`
+  runs each judgment in a scratch `CLAUDE_CONFIG_DIR` (Keychain mirror
+  keyed by config-dir hash) so no user memory/rules/hooks contaminate the
+  judge — probe-verified context reduction ~40k → ~18k tokens. Quota-aware
+  exit codes for battery pause/resume; served-model provenance on stderr.
 - `cardinal judge --consortium m1,m2,...`: the consortium verdict primitive.
   Each judge measures the full Z₂³ orbit; complete orbits become judgment
   packets (`--packets-out`) and the belief is computed by fusing them —
