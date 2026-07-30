@@ -192,6 +192,8 @@ struct ResponseFormat {
 struct ChatApiResponse {
     #[serde(default)]
     id: Option<String>,
+    #[serde(default)]
+    model: Option<String>,
     choices: Option<Vec<Choice>>,
     usage: Option<Usage>,
     error: Option<ApiError>,
@@ -411,6 +413,7 @@ impl OpenRouterAdapter {
         })?;
 
         let provider_call_id = parsed.id;
+        let served_model = parsed.model;
 
         // Check for API-level error
         if let Some(error) = parsed.error {
@@ -498,6 +501,7 @@ impl OpenRouterAdapter {
         Ok(ChatResponse {
             provider_call_id,
             provider_request_id: request_id,
+            served_model,
             content,
             reasoning,
             reasoning_tokens,

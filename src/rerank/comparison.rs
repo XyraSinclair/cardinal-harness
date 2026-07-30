@@ -1247,6 +1247,7 @@ mod tests {
         ChatResponse {
             provider_call_id: None,
             provider_request_id: None,
+            served_model: None,
             content: content.to_string(),
             reasoning: None,
             reasoning_tokens: None,

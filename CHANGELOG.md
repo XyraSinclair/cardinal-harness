@@ -8,6 +8,21 @@ Versioning once it reaches `1.0.0`.
 ## [Unreleased]
 
 ### Added
+- Native Claude Code gateway adapter (`gateway::claude_code`): chat
+  completions through local `claude -p` print mode, billed to the operator's
+  subscription at zero marginal API cost. `ChatModel::ClaudeCode` routes
+  through the same `ProviderGateway::chat` entry point as OpenRouter;
+  subscription quota errors are a non-retryable rate-limit class
+  (`RateLimitSource::Subscription`) so callers control rescheduling around
+  the CLI-named reset. `ClaudeCodeConfig::config_dir` points calls at a
+  scratch `CLAUDE_CONFIG_DIR` (prepared by `scripts/claude_code_judge.py
+  --pure`) for isolated judging context. Live smoke in
+  `examples/claude_code_chat.rs`: fable served, cost 0 nanodollars,
+  ~7s latency.
+- `ChatResponse::served_model`: the model the provider reports it actually
+  served (OpenRouter response `model`; Claude Code `modelUsage`), so
+  measurement runs can assert served-vs-requested instead of trusting the
+  request.
 - `scripts/claude_code_judge.py`: subscription-billed structured-judgment
   elicitation through Claude Code print mode (`--json-schema` →
   server-validated `structured_output`, zero marginal API cost). `--pure`

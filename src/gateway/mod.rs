@@ -1,5 +1,6 @@
-//! Provider gateway for OpenRouter chat completions.
+//! Provider gateway for chat completions.
 
+pub mod claude_code;
 pub mod error;
 pub mod openrouter;
 pub mod pricing;
@@ -11,6 +12,7 @@ use std::time::Duration;
 
 use tokio::time::sleep;
 
+use claude_code::ClaudeCodeAdapter;
 use openrouter::OpenRouterAdapter;
 use usage::{CallStatus, ProviderCallRecord, UsageSink as UsageSinkTrait};
 
@@ -40,7 +42,8 @@ impl Default for GatewayConfig {
 }
 
 pub struct ProviderGateway<U: UsageSinkTrait> {
-    openrouter: OpenRouterAdapter,
+    openrouter: Option<OpenRouterAdapter>,
+    claude_code: ClaudeCodeAdapter,
     usage_sink: Arc<U>,
     config: GatewayConfig,
 }
@@ -56,7 +59,8 @@ impl<U: UsageSinkTrait> ProviderGateway<U> {
     pub fn from_env(usage_sink: Arc<U>) -> Result<Self, ProviderError> {
         let openrouter = OpenRouterAdapter::from_env()?;
         Ok(Self {
-            openrouter,
+            openrouter: Some(openrouter),
+            claude_code: ClaudeCodeAdapter::default(),
             usage_sink,
             config: GatewayConfig::default(),
         })
@@ -68,7 +72,31 @@ impl<U: UsageSinkTrait> ProviderGateway<U> {
         config: GatewayConfig,
     ) -> Self {
         Self {
-            openrouter,
+            openrouter: Some(openrouter),
+            claude_code: ClaudeCodeAdapter::default(),
+            usage_sink,
+            config,
+        }
+    }
+
+    pub fn claude_code(claude_code: ClaudeCodeAdapter, usage_sink: Arc<U>) -> Self {
+        Self {
+            openrouter: None,
+            claude_code,
+            usage_sink,
+            config: GatewayConfig::default(),
+        }
+    }
+
+    pub fn with_adapters(
+        openrouter: OpenRouterAdapter,
+        claude_code: ClaudeCodeAdapter,
+        usage_sink: Arc<U>,
+        config: GatewayConfig,
+    ) -> Self {
+        Self {
+            openrouter: Some(openrouter),
+            claude_code,
             usage_sink,
             config,
         }
@@ -76,7 +104,15 @@ impl<U: UsageSinkTrait> ProviderGateway<U> {
 
     pub async fn chat(&self, req: ChatRequest) -> Result<ChatResponse, ProviderError> {
         for attempt in 0..=self.config.max_retries {
-            let result = self.openrouter.chat(&req).await;
+            let result = match &req.model {
+                ChatModel::OpenRouter(_) => match self.openrouter.as_ref() {
+                    Some(openrouter) => openrouter.chat(&req).await,
+                    None => Err(ProviderError::config(
+                        "OpenRouter adapter is not configured",
+                    )),
+                },
+                ChatModel::ClaudeCode(_) => self.claude_code.chat(&req).await,
+            };
             match result {
                 Ok(resp) => {
                     self.record_usage(&req, &resp, CallStatus::Success, None)
@@ -146,6 +182,7 @@ impl ChatResponse {
         Self {
             provider_call_id: None,
             provider_request_id: None,
+            served_model: None,
             content: String::new(),
             reasoning: None,
             reasoning_tokens: None,

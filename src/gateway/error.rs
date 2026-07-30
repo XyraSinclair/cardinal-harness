@@ -3,13 +3,15 @@
 use std::time::Duration;
 use thiserror::Error;
 
-/// Source of a rate limit: local (our limiter) or remote (provider 429).
+/// Source of a rate limit.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RateLimitSource {
     /// Our local rate limiter blocked the request.
     Local,
-    /// The provider returned a 429 response.
+    /// The provider returned a retryable rate limit.
     Remote,
+    /// A subscription quota requires caller-controlled rescheduling.
+    Subscription,
 }
 
 /// Additional context from provider errors for debugging.
@@ -55,7 +57,7 @@ pub enum ProviderError {
         retry_after: Duration,
     },
 
-    /// Rate limited - caller should retry after the specified duration.
+    /// Rate limited. Check `is_retryable` before scheduling `retry_after`.
     #[error("rate limited ({limit_source:?}), retry after {retry_after:?}")]
     RateLimited {
         retry_after: Duration,
@@ -127,6 +129,15 @@ impl ProviderError {
         }
     }
 
+    /// Create a non-retryable subscription quota error.
+    pub fn rate_limited_subscription(context: ErrorContext) -> Self {
+        Self::RateLimited {
+            retry_after: Duration::ZERO,
+            limit_source: RateLimitSource::Subscription,
+            context: Some(context),
+        }
+    }
+
     /// Create an invalid request error.
     pub fn invalid_request(message: impl Into<String>) -> Self {
         Self::InvalidRequest {
@@ -177,7 +188,9 @@ impl ProviderError {
     pub fn is_retryable(&self) -> bool {
         match self {
             Self::BudgetExceeded { .. } => false,
-            Self::RateLimited { .. } => true,
+            Self::RateLimited { limit_source, .. } => {
+                *limit_source != RateLimitSource::Subscription
+            }
             Self::Timeout(_, _) => true,
             Self::Provider { retryable, .. } => *retryable,
             Self::Http(e) => e.is_timeout() || e.is_connect(),
@@ -199,6 +212,10 @@ impl ProviderError {
                 limit_source: RateLimitSource::Remote,
                 ..
             } => "rate_limited_remote",
+            Self::RateLimited {
+                limit_source: RateLimitSource::Subscription,
+                ..
+            } => "rate_limited_subscription",
             Self::InvalidRequest { .. } => "invalid_request",
             Self::Refused { .. } => "refused",
             Self::Provider { .. } => "provider_error",

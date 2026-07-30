@@ -24,6 +24,7 @@ impl ChatGateway for CountingGateway {
         Ok(ChatResponse {
             provider_call_id: Some(format!("mock-completion-{call}")),
             provider_request_id: Some(format!("mock-request-{call}")),
+            served_model: None,
             content: r#"{"higher_ranked":"A","ratio":1.3,"confidence":0.9}"#.to_string(),
             reasoning: None,
             reasoning_tokens: None,

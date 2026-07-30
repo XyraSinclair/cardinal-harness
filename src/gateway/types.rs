@@ -174,6 +174,8 @@ impl Message {
 pub enum ChatModel {
     /// OpenRouter model, e.g. "anthropic/claude-3-5-haiku"
     OpenRouter(String),
+    /// Claude Code model or alias, e.g. "fable".
+    ClaudeCode(String),
 }
 
 impl ChatModel {
@@ -181,15 +183,21 @@ impl ChatModel {
         ChatModel::OpenRouter(model_id.into())
     }
 
+    pub fn claude_code(model_id: impl Into<String>) -> Self {
+        ChatModel::ClaudeCode(model_id.into())
+    }
+
     pub fn model_id(&self) -> &str {
         match self {
             ChatModel::OpenRouter(id) => id,
+            ChatModel::ClaudeCode(id) => id,
         }
     }
 
     pub fn provider(&self) -> &'static str {
         match self {
             ChatModel::OpenRouter(_) => "openrouter",
+            ChatModel::ClaudeCode(_) => "claude-code",
         }
     }
 
@@ -197,6 +205,7 @@ impl ChatModel {
     pub fn route(&self) -> &str {
         match self {
             ChatModel::OpenRouter(id) => id.split('/').next().unwrap_or(id),
+            ChatModel::ClaudeCode(_) => "claude-code",
         }
     }
 }
@@ -793,6 +802,12 @@ pub struct ChatResponse {
     pub provider_call_id: Option<String>,
     /// Provider request identifier, when returned in response headers.
     pub provider_request_id: Option<String>,
+    /// Model identifier the provider reports it actually served, when available.
+    ///
+    /// Measurement runs should assert this against the requested model; routed
+    /// channels (OpenRouter variants, Claude Code aliases) can serve a
+    /// different concrete model than the one named in the request.
+    pub served_model: Option<String>,
     /// Generated content.
     pub content: String,
     /// Provider-returned reasoning text, if available.
