@@ -216,7 +216,7 @@ pub async fn propose_slate(
             Ok(SlateEntry { attribute, backers })
         })
         .collect::<Result<_, SlateError>>()?;
-    slate.sort_by(|a, b| b.backers.len().cmp(&a.backers.len()));
+    slate.sort_by_key(|entry| std::cmp::Reverse(entry.backers.len()));
 
     Ok(SlateReport {
         stakeholders,
