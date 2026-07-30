@@ -399,10 +399,8 @@ async fn recover_interrupted_runs(
                 continue;
             }
         };
-        let landing_preserved = if matches!(
-            record.terminal,
-            JudgementRunTerminal::Completed { .. }
-        ) {
+        let landing_preserved = if matches!(record.terminal, JudgementRunTerminal::Completed { .. })
+        {
             land_completed_run(
                 clickhouse,
                 store,
@@ -561,21 +559,19 @@ async fn execute_queued_run(
 
     match result {
         Ok(record) => {
-            let landing_preserved = if matches!(
-                record.terminal,
-                JudgementRunTerminal::Completed { .. }
-            ) {
-                land_completed_run(
-                    state.clickhouse.as_deref(),
-                    &state.store,
-                    &record,
-                    &metadata.lens,
-                    &metadata.owner_scope,
-                )
-                .await
-            } else {
-                true
-            };
+            let landing_preserved =
+                if matches!(record.terminal, JudgementRunTerminal::Completed { .. }) {
+                    land_completed_run(
+                        state.clickhouse.as_deref(),
+                        &state.store,
+                        &record,
+                        &metadata.lens,
+                        &metadata.owner_scope,
+                    )
+                    .await
+                } else {
+                    true
+                };
             if landing_preserved {
                 update_metadata_from_record(&state.store, metadata, &record);
             }

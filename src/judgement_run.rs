@@ -509,7 +509,10 @@ fn build_rerank_request(request: &NormalizedJudgementRunRequest) -> MultiRerankR
             // live 2026-07-28: 0 comparisons, "tolerated_error_met", empty
             // ClickHouse landing). A request for all n ranked still gets a
             // real boundary to resolve and therefore real comparisons.
-            k: request.requested_k.min(request.entities.len().saturating_sub(1)).max(1),
+            k: request
+                .requested_k
+                .min(request.entities.len().saturating_sub(1))
+                .max(1),
             weight_exponent: 1.3,
             tolerated_error: 0.1,
             band_size: 5,

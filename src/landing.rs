@@ -70,8 +70,9 @@ impl ClickHouseLanding {
     async fn batch_exists(&self, table: &'static str, run_ref: &str) -> Result<bool, String> {
         columns_for_table(table).ok_or_else(|| "unknown landing table".to_string())?;
         let mut url = self.endpoint.clone();
-        let query =
-            format!("SELECT count() FROM {table} WHERE run_id = {{run_id:String}} FORMAT TabSeparated");
+        let query = format!(
+            "SELECT count() FROM {table} WHERE run_id = {{run_id:String}} FORMAT TabSeparated"
+        );
         url.query_pairs_mut().append_pair("param_run_id", run_ref);
 
         // The SQL travels as the POST body, never as a bodyless POST with
