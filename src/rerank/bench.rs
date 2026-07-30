@@ -200,7 +200,7 @@ pub struct DimensionStat {
     pub n: usize,
     /// Unit of `value`.
     pub unit: &'static str,
-    /// Normalized subscore in [0,1] (formula documented per dimension).
+    /// Normalized subscore in `[0,1]` (formula documented per dimension).
     pub subscore: Option<f64>,
 }
 

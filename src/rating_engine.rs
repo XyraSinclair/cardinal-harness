@@ -975,7 +975,7 @@ pub struct SpectralDiagnostics {
     /// Σ_e w_e·R_eff(e), reported alongside its theorem-exact target.
     pub resistance_sum: f64,
     pub expected_resistance_sum: f64,
-    /// Per-edge leverage h_e = w_e·R_eff(e) ∈ [0,1] — how much each
+    /// Per-edge leverage h_e = w_e·R_eff(e) ∈ `[0,1]` — how much each
     /// judgement determines its own fitted value. Trace identity:
     /// Σ h_e = n − c exactly (Foster), the model's degrees of freedom.
     pub edge_leverage: Vec<f64>,
