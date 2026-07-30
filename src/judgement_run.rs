@@ -354,7 +354,7 @@ pub enum JudgementRunError {
     Execution {
         run_ref: String,
         #[source]
-        source: crate::rerank::MultiRerankError,
+        source: Box<crate::rerank::MultiRerankError>,
     },
     #[error("judgement run {run_ref} violated its execution contract: {error}")]
     ExecutionInvariant { run_ref: String, error: String },
@@ -481,7 +481,10 @@ pub async fn execute_judgement_run_with_ref(
                 execution_error.clone(),
             );
             persist_failed(store, &record, &execution_error)?;
-            Err(JudgementRunError::Execution { run_ref, source })
+            Err(JudgementRunError::Execution {
+                run_ref,
+                source: Box::new(source),
+            })
         }
     }
 }
@@ -595,6 +598,7 @@ fn project_response(axis_key: &str, response: MultiRerankResponse) -> Result<Pro
     })
 }
 
+#[allow(clippy::too_many_arguments)] // mirrors the record's fields; grouping would only rename them
 fn failed_record(
     run_ref: String,
     request: NormalizedJudgementRunRequest,

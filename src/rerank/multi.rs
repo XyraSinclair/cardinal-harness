@@ -368,6 +368,15 @@ pub struct RerankExecution<'a> {
     cancel_flag: Option<&'a AtomicBool>,
 }
 
+/// The execution pieces a portable judgement run borrows from a [`RerankExecution`]:
+/// gateway, optional trace sink, run options, and whether a cache is attached.
+pub(crate) type JudgementRunInstrumentation<'a> = (
+    Arc<dyn ChatGateway>,
+    Option<&'a dyn TraceSink>,
+    RerankRunOptions,
+    bool,
+);
+
 impl<'a> RerankExecution<'a> {
     #[must_use]
     pub fn new(gateway: Arc<dyn ChatGateway>, attribution: Attribution) -> Self {
@@ -428,15 +437,7 @@ impl<'a> RerankExecution<'a> {
 
     pub(crate) fn judgement_run_instrumentation(
         &self,
-    ) -> Result<
-        (
-            Arc<dyn ChatGateway>,
-            Option<&'a dyn TraceSink>,
-            RerankRunOptions,
-            bool,
-        ),
-        &'static str,
-    > {
+    ) -> Result<JudgementRunInstrumentation<'a>, &'static str> {
         if self.model_policy.is_some() {
             return Err("model policies have no portable v1 specification");
         }
