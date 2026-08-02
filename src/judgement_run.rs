@@ -443,6 +443,43 @@ pub async fn execute_judgement_run_with_ref(
                 }
             };
             instrument.engine_spec = Some(projection.engine_spec);
+            // A run with zero successful comparisons has measured nothing:
+            // its scores are the solver's flat priors, not judgements. Landing
+            // them as "completed" poisons the public ledger with plausible-
+            // looking zeros (observed live 2026-08-02: exhausted provider key
+            // -> every attempt failed -> comparisons_used=0, stop_reason
+            // budget_exhausted, flat scores landed). Fail loudly instead,
+            // naming the dominant provider error.
+            if projection.stop_reason != RerankStopReason::Cancelled && projection.comparisons_used == 0 {
+                let failed_calls = provider_calls
+                    .iter()
+                    .filter(|call| matches!(call.outcome, JudgementProviderCallOutcome::Failed { .. }))
+                    .count();
+                let last_error = provider_calls.iter().rev().find_map(|call| match &call.outcome {
+                    JudgementProviderCallOutcome::Failed { error_code, error, .. } => {
+                        Some(format!("{error_code}: {error}"))
+                    }
+                    JudgementProviderCallOutcome::Succeeded { .. } => None,
+                });
+                let error = match last_error {
+                    Some(last) => format!(
+                        "no pairwise comparison succeeded ({failed_calls} provider attempts failed; last error: {last})"
+                    ),
+                    None => "no pairwise comparison was attempted; refusing to report unmeasured flat priors as a completed run".to_string(),
+                };
+                let record = failed_record(
+                    run_ref.clone(),
+                    request,
+                    instrument,
+                    comparison_trace,
+                    provider_calls,
+                    started_at,
+                    finished_at,
+                    error.clone(),
+                );
+                persist_failed(store, &record, &error)?;
+                return Err(JudgementRunError::ExecutionInvariant { run_ref, error });
+            }
             let terminal = if projection.stop_reason == RerankStopReason::Cancelled {
                 JudgementRunTerminal::Cancelled {
                     response: projection.response,
@@ -542,6 +579,7 @@ struct Projection {
     usage: JudgementRunUsage,
     engine_spec: EngineSpec,
     stop_reason: RerankStopReason,
+    comparisons_used: usize,
 }
 
 fn project_response(axis_key: &str, response: MultiRerankResponse) -> Result<Projection, String> {
@@ -595,6 +633,7 @@ fn project_response(axis_key: &str, response: MultiRerankResponse) -> Result<Pro
         },
         engine_spec,
         stop_reason: meta.stop_reason,
+        comparisons_used: meta.comparisons_used,
     })
 }
 
