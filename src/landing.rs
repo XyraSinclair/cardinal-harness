@@ -168,6 +168,18 @@ impl ClickHouseLanding {
                     continue;
                 }
             };
+            if body.is_empty() {
+                // Zero rows to land: the batch is vacuously landed. Remove
+                // the file instead of replaying a bodyless insert that
+                // ClickHouse rejects with 411 on every pass.
+                if let Err(error) = fs::remove_file(&path) {
+                    eprintln!(
+                        "cardinald: could not remove empty pending landing {}: {error}",
+                        path.display()
+                    );
+                }
+                continue;
+            }
             match self.insert_if_missing(table, run_ref, body).await {
                 Ok(()) => {
                     if let Err(error) = fs::remove_file(&path) {
@@ -445,6 +457,12 @@ fn completed_batches(
         });
     }
 
+    // A batch with zero rows has nothing to land: reqwest sends an empty
+    // body without Content-Length and ClickHouse answers 411 Length
+    // Required, parking the batch in landing_pending forever (bit live
+    // 2026-07-28: a degenerate 0-comparison run minted a zero-byte
+    // comparisons batch that failed every replay). Emit only nonempty
+    // batches.
     Ok(vec![
         LandingBatch {
             table: if private {
@@ -462,7 +480,10 @@ fn completed_batches(
             },
             body: json_lines(&score_rows)?,
         },
-    ])
+    ]
+    .into_iter()
+    .filter(|batch| !batch.body.is_empty())
+    .collect())
 }
 
 fn json_lines<T: Serialize>(rows: &[T]) -> Result<Vec<u8>, String> {
