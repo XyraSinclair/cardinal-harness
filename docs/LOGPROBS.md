@@ -93,6 +93,34 @@ top-1 mass of 0.14 with a standard deviation of 0.06. Thus server noise and nonc
 sensitivity had the same size in this measurement. A stability instrument must
 average over repeats before it attributes variance to the nonce.
 
+## The subscription backend (codex oauth)
+
+The ChatGPT subscription backend (`chatgpt.com/backend-api/codex/responses`)
+serves logprobs. The probe route is the cxp pool proxy, which adds the auth
+headers. Probes are in `notes/codex-oauth-logprobs-2026-08-06/`, all measured
+2026-08-06.
+
+- The working shape is `include: ["message.output_text.logprobs"]` with
+  `reasoning: {"effort": "none"}`. Measured: gpt-5.6-sol 10 of 10 calls,
+  gpt-5.4-mini 10 of 10 calls.
+- The backend rejects the `top_logprobs` parameter at each effort (11 of 11
+  rejections). Each logprob entry has an empty alternatives list. Thus one
+  call shows only the mass of the sampled token. To see the spread, sample
+  the same prompt more times.
+- The wire accepts `"none"` as an effort value for gpt-5.6-sol. The error
+  text for `"minimal"` gives the supported set: none, low, medium, high,
+  xhigh, max.
+- The reasoning gate is the same as on the official API. A reasoning effort
+  (or an unset effort) with the logprobs include gets HTTP 400.
+- The two-phase shape from this document also operates on this backend:
+  phase 1 at `medium`, then a phase-2 call at `"none"` with the analysis in
+  the context and the logprobs include (n=1).
+
+CAUTION: On this backend the `response.completed` event has an empty `output`
+list. The output items with the logprobs come only in the
+`response.output_item.done` events. A client that reads only the completed
+event sees no logprobs.
+
 ## Rerun commands
 
 ```
@@ -100,4 +128,6 @@ OPENROUTER_API_KEY=... python3 notes/adaptive-logprobs-2026-07-19/probe_openrout
 OPENAI_API_KEY=...     python3 notes/adaptive-logprobs-2026-07-19/probe_openai_direct.py
 OPENAI_API_KEY=...     python3 notes/adaptive-logprobs-2026-07-19/probe_twophase.py
 OPENAI_API_KEY=...     python3 notes/adaptive-logprobs-2026-07-19/probe_cache.py
+python3 notes/codex-oauth-logprobs-2026-08-06/probe_codex_oauth.py
+python3 notes/codex-oauth-logprobs-2026-08-06/probe_repeats.py gpt-5.6-sol
 ```
