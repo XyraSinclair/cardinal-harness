@@ -1,0 +1,236 @@
+{
+  "items": [
+    {
+      "id": "India",
+      "text": "India",
+      "rank": 1,
+      "latent_mean": 4.298367860961191,
+      "latent_std": 1.1193421442012639,
+      "z_score": 2.4783977266981405,
+      "percentile": 0.9782608695652174
+    },
+    {
+      "id": "Australia",
+      "text": "Australia",
+      "rank": 2,
+      "latent_mean": 2.671444030997775,
+      "latent_std": 0.6599263833652823,
+      "z_score": 0.691422617218936,
+      "percentile": 0.9347826086956522
+    },
+    {
+      "id": "United States",
+      "text": "United States",
+      "rank": 3,
+      "latent_mean": 2.6560286831843447,
+      "latent_std": 0.9580037216076035,
+      "z_score": 0.6744907594765952,
+      "percentile": 0.8913043478260869
+    },
+    {
+      "id": "Botswana",
+      "text": "Botswana",
+      "rank": 4,
+      "latent_mean": 2.6458671936868416,
+      "latent_std": 1.0138814036160055,
+      "z_score": 0.663329616912422,
+      "percentile": 0.8478260869565217
+    },
+    {
+      "id": "Pakistan",
+      "text": "Pakistan",
+      "rank": 5,
+      "latent_mean": 2.611982350003942,
+      "latent_std": 1.021852885254426,
+      "z_score": 0.6261112965862045,
+      "percentile": 0.8043478260869565
+    },
+    {
+      "id": "Japan",
+      "text": "Japan",
+      "rank": 6,
+      "latent_mean": 2.5809721361352342,
+      "latent_std": 0.9520505264676077,
+      "z_score": 0.5920504024604765,
+      "percentile": 0.7608695652173914
+    },
+    {
+      "id": "Germany",
+      "text": "Germany",
+      "rank": 7,
+      "latent_mean": 2.47663139935656,
+      "latent_std": 0.9714659100610336,
+      "z_score": 0.4774449758914865,
+      "percentile": 0.717391304347826
+    },
+    {
+      "id": "Sweden",
+      "text": "Sweden",
+      "rank": 8,
+      "latent_mean": 2.3597043937256927,
+      "latent_std": 1.0499889040950687,
+      "z_score": 0.3490150857883996,
+      "percentile": 0.6739130434782609
+    },
+    {
+      "id": "South Korea",
+      "text": "South Korea",
+      "rank": 9,
+      "latent_mean": 2.279239521850087,
+      "latent_std": 0.887006326557746,
+      "z_score": 0.2606343511891813,
+      "percentile": 0.6304347826086957
+    },
+    {
+      "id": "Bulgaria",
+      "text": "Bulgaria",
+      "rank": 10,
+      "latent_mean": 2.1995601312753346,
+      "latent_std": 1.1193421442012639,
+      "z_score": 0.17311637089212178,
+      "percentile": 0.5869565217391305
+    },
+    {
+      "id": "Netherlands",
+      "text": "Netherlands",
+      "rank": 11,
+      "latent_mean": 2.1219517576739206,
+      "latent_std": 0.8648636540441644,
+      "z_score": 0.0878731472336373,
+      "percentile": 0.5434782608695652
+    },
+    {
+      "id": "Uruguay",
+      "text": "Uruguay",
+      "rank": 12,
+      "latent_mean": 2.0419490108589673,
+      "latent_std": 1.0097618727265454,
+      "z_score": 0.0,
+      "percentile": 0.5
+    },
+    {
+      "id": "Iceland",
+      "text": "Iceland",
+      "rank": 13,
+      "latent_mean": 1.747257494621004,
+      "latent_std": 0.9722233735422999,
+      "z_score": -0.3236822737446589,
+      "percentile": 0.45652173913043476
+    },
+    {
+      "id": "Estonia",
+      "text": "Estonia",
+      "rank": 14,
+      "latent_mean": 1.560764140679208,
+      "latent_std": 0.9743096810470693,
+      "z_score": -0.5285222148897699,
+      "percentile": 0.41304347826086957
+    },
+    {
+      "id": "Barbados",
+      "text": "Barbados",
+      "rank": 15,
+      "latent_mean": 1.0835463003718973,
+      "latent_std": 0.9616716943155695,
+      "z_score": -1.0526871368872321,
+      "percentile": 0.3695652173913043
+    },
+    {
+      "id": "Tonga",
+      "text": "Tonga",
+      "rank": 16,
+      "latent_mean": 0.8769537962566023,
+      "latent_std": 0.9437896086273961,
+      "z_score": -1.2796035148145957,
+      "percentile": 0.32608695652173914
+    },
+    {
+      "id": "Dominica",
+      "text": "Dominica",
+      "rank": 17,
+      "latent_mean": 0.7722073074381073,
+      "latent_std": 0.9478649184455783,
+      "z_score": -1.3946546099406665,
+      "percentile": 0.2826086956521739
+    },
+    {
+      "id": "Saint Kitts and Nevis",
+      "text": "Saint Kitts and Nevis",
+      "rank": 18,
+      "latent_mean": 0.7600828948917417,
+      "latent_std": 0.9285087059395055,
+      "z_score": -1.4079717813032004,
+      "percentile": 0.2391304347826087
+    },
+    {
+      "id": "Fiji",
+      "text": "Fiji",
+      "rank": 19,
+      "latent_mean": 0.7559756923746619,
+      "latent_std": 0.9788899721764942,
+      "z_score": -1.4124830365521797,
+      "percentile": 0.1956521739130435
+    },
+    {
+      "id": "Palau",
+      "text": "Palau",
+      "rank": 20,
+      "latent_mean": 0.7196807308134603,
+      "latent_std": 0.9865322255860929,
+      "z_score": -1.4523485740253324,
+      "percentile": 0.15217391304347827
+    },
+    {
+      "id": "Malta",
+      "text": "Malta",
+      "rank": 21,
+      "latent_mean": 0.6892149511071697,
+      "latent_std": 0.9731276792845495,
+      "z_score": -1.485811474391874,
+      "percentile": 0.10869565217391304
+    },
+    {
+      "id": "Tuvalu",
+      "text": "Tuvalu",
+      "rank": 22,
+      "latent_mean": 0.5813527494493989,
+      "latent_std": 0.9722189558467403,
+      "z_score": -1.6042847956784627,
+      "percentile": 0.06521739130434782
+    },
+    {
+      "id": "San Marino",
+      "text": "San Marino",
+      "rank": 23,
+      "latent_mean": 0.0,
+      "latent_std": 0.9477954176417236,
+      "z_score": -2.2428290679796046,
+      "percentile": 0.021739130434782608
+    }
+  ],
+  "meta": {
+    "topk_error": 7.70761591588385,
+    "tolerated_error": 0.1,
+    "comparisons_attempted": 92,
+    "comparisons_used": 89,
+    "comparisons_refused": 3,
+    "comparisons_cached": 0,
+    "comparison_budget": 92,
+    "latency_ms": 14676,
+    "model_used": "openai/gpt-5.4-nano",
+    "rater_id_used": "openai/gpt-5.4-nano",
+    "provider_input_tokens": 31308,
+    "provider_output_tokens": 2388,
+    "provider_cost_nanodollars": 9246600,
+    "provider_cost_is_estimate": false,
+    "entities_pruned": 0,
+    "pairs_counterbalanced": 42,
+    "position_flips": 12,
+    "evidence_judgements": 0,
+    "logprob_mode_judgements": 0,
+    "evidence_visible_mass_mean": null,
+    "evidence_order_residual_mean_abs": 0.8144470406146853,
+    "judgement_frustration_mean": 0.19770959457839793,
+    "stop_reason": "budget_exhausted"
+  }
+}

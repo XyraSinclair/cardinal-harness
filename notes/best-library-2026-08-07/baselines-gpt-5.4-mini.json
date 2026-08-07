@@ -1,0 +1,221 @@
+{
+ "judge": "openai/gpt-5.4-mini",
+ "cost": 0.011073,
+ "m1": {
+  "India": {
+   "estimate": 1445000000.0,
+   "raw": "India\u2019s current national population is roughly in the range of 1.44 to 1.46 billion, so a reasonable single-point estimate is:\n\n1445000000"
+  },
+  "United States": {
+   "estimate": 340000000.0,
+   "raw": "About 340 million\n\n340000000"
+  },
+  "Pakistan": {
+   "estimate": 250000000.0,
+   "raw": "Pakistan\u2019s current national population is approximately 250000000"
+  },
+  "Japan": {
+   "estimate": 123000000.0,
+   "raw": "Japan\u2019s population has been gradually declining in recent years and is now around 123 million.\n\n123000000"
+  },
+  "Germany": {
+   "estimate": 83000000.0,
+   "raw": "Germany\u2019s current national population is roughly in the low 83 millions.\n\n83000000"
+  },
+  "South Korea": {
+   "estimate": 51700000.0,
+   "raw": "South Korea\u2019s population is in the low 50 millions, and a reasonable current estimate is about 51.7 million.\n\n51700000"
+  },
+  "Australia": {
+   "estimate": 27000000.0,
+   "raw": "Australia\u2019s current national population is roughly 27 million.\n\n27000000"
+  },
+  "Netherlands": {
+   "estimate": 18000000.0,
+   "raw": "The Netherlands has a current national population of about 18.0 million.\n\n18000000"
+  },
+  "Sweden": {
+   "estimate": 10600000.0,
+   "raw": "Sweden\u2019s population is currently around 10.6 million.\n\n10600000"
+  },
+  "Bulgaria": {
+   "estimate": 6400000.0,
+   "raw": "Bulgaria\u2019s current national population is roughly 6.4 million.\n\n6400000"
+  },
+  "Uruguay": {
+   "estimate": 3400000.0,
+   "raw": "Uruguay\u2019s current national population is roughly 3.4 million.\n\n3400000"
+  },
+  "Botswana": {
+   "estimate": 2600000.0,
+   "raw": "Botswana\u2019s current national population is roughly around 2.6 million.\n\n2600000"
+  },
+  "Estonia": {
+   "estimate": 1370000.0,
+   "raw": "Estonia\u2019s current national population is roughly 1.37 million.\n\n1370000"
+  },
+  "Fiji": {
+   "estimate": 930000.0,
+   "raw": "Fiji\u2019s current national population is roughly 930,000.\n\n930000"
+  },
+  "Malta": {
+   "estimate": 565000.0,
+   "raw": "Malta\u2019s current national population is roughly 565,000. 565000"
+  },
+  "Iceland": {
+   "estimate": 390000.0,
+   "raw": "Iceland\u2019s population is roughly 390,000.\n\n390000"
+  },
+  "Barbados": {
+   "estimate": 281000.0,
+   "raw": "Barbados has a small, fairly stable population, with modest growth or slight decline depending on migration. A reasonable current estimate is around 281,000 people.\n\n281000"
+  },
+  "Tonga": {
+   "estimate": 105000.0,
+   "raw": "Tonga\u2019s current national population is roughly **105,000**.\n\n105000"
+  },
+  "Dominica": {
+   "estimate": 72000.0,
+   "raw": "Dominica\u2019s population is roughly in the low 70-thousands currently.\n\n72000"
+  },
+  "Saint Kitts and Nevis": {
+   "estimate": 47000.0,
+   "raw": "Saint Kitts and Nevis has a very small population, and a reasonable current estimate is about 47 thousand people.\n\n47000"
+  },
+  "San Marino": {
+   "estimate": 34000.0,
+   "raw": "San Marino is a very small country, and its population has been around the low 30-thousands in recent years. A reasonable current estimate is about 34 thousand.\n\n34000"
+  },
+  "Palau": {
+   "estimate": 18000.0,
+   "raw": "Palau\u2019s current national population is very small and has been fairly stable in recent years, at roughly 18,000 people.\n\n18000"
+  },
+  "Tuvalu": {
+   "estimate": 11200.0,
+   "raw": "Tuvalu\u2019s population is very small and has been fairly stable in recent years, with gradual change due to migration and a small natural increase. A reasonable current estimate is around 11,200.\n\n11200"
+  }
+ },
+ "m2": {
+  "India": {
+   "score": 97.0,
+   "raw": "India is extremely populous and is among the top two most populous countries in the world. On a 0\u2013100 scale where 100 means the most populous country in the world, India would score very high.\n\n97"
+  },
+  "United States": {
+   "score": 85.0,
+   "raw": "States is one of the most populous countries in the world, though not the most populous. It has a very large population compared with most countries, so on a 0\u2013100 scale it would score quite high.\n\n85"
+  },
+  "Pakistan": {
+   "score": 85.0,
+   "raw": "well over 200 million. Compared with the entire range from the least populous country imaginable to the most populous country in the world, it scores very high, though not at the absolute maximum.\n\n85"
+  },
+  "Japan": {
+   "score": 72.0,
+   "raw": " is fairly populous: it\u2019s one of the larger countries by population globally, but nowhere near the most populous country in the world. On a 0\u2013100 scale, I\u2019d place it around the upper-middle range.\n\n72"
+  },
+  "Germany": {
+   "score": 66.0,
+   "raw": "Germany is among the more populous countries in the world, but far from the very top. A reasonable score is **66**.\n\n66"
+  },
+  "South Korea": {
+   "score": 31.0,
+   "raw": "e top globally. It has around 51 million people, which puts it well above the world average but far below the most populous countries like India or China. On a 0\u2013100 scale, I\u2019d score it at **31**.\n\n31"
+  },
+  "Australia": {
+   "score": 32.0,
+   "raw": "a is moderately populous: it has a relatively large land area but a modest population compared with the world\u2019s most populous countries. On a 0\u2013100 scale, I\u2019d score it around the low-to-mid range.\n\n32"
+  },
+  "Netherlands": {
+   "score": 58.0,
+   "raw": "area, but it has a fairly high population density and a population of around 18 million. Compared with the world\u2019s most populous countries, it\u2019s much smaller, but it\u2019s far from sparsely populated.\n\n58"
+  },
+  "Sweden": {
+   "score": 21.0,
+   "raw": "hich is far from the most populous countries but also not tiny. On a 0\u2013100 scale where 0 is least populous imaginable and 100 is the most populous country in the world, I\u2019d score Sweden at **21**.\n\n21"
+  },
+  "Bulgaria": {
+   "score": 16.0,
+   "raw": "ntry by global standards, with a population around 6.5\u20137 million. Compared with the world\u2019s most populous countries, that\u2019s quite low, but it is still far from the least populous countries.\n\nScore: 16"
+  },
+  "Uruguay": {
+   "score": 12.0,
+   "raw": "with the world\u2019s largest countries. It has about 3.4 million people, which is far below the most populous nations and also below many mid-sized countries. On a 0\u2013100 scale, I\u2019d place it quite low.\n\n12"
+  },
+  "Botswana": {
+   "score": 14.0,
+   "raw": "ively small population compared with the world\u2019s most populous countries. On a 0\u2013100 scale where 0 is least populous imaginable and 100 is most populous in the world, I\u2019d score Botswana as **14**.\n\n14"
+  },
+  "Estonia": {
+   "score": 18.0,
+   "raw": " a relatively small country in population terms, with about 1.3 million people. On a 0\u2013100 scale where 0 is least populous imaginable and 100 is most populous in the world, I\u2019d score it quite low.\n\n18"
+  },
+  "Fiji": {
+   "score": 8.0,
+   "raw": "in global terms, with a population of under 1 million, so it would score quite low on a 0\u2013100 scale of country population. Compared with the world\u2019s most populous countries, it is near the low end.\n\n8"
+  },
+  "Malta": {
+   "score": 5.0,
+   "raw": "Malta is a very small country with a population of only around half a million, so it would score very low on a global population scale. I\u2019d place it at **5** out of 100.\n\n5"
+  },
+  "Iceland": {
+   "score": 2.0,
+   "raw": "Iceland is very sparsely populated by global standards. It has only around 390,000 people, which is far less than most countries, and nowhere near the world\u2019s most populous countries.\n\nScore: 2"
+  },
+  "Barbados": {
+   "score": 12.0,
+   "raw": "Barbados is a small island nation with a population of roughly 280,000, which is very low compared with the world\u2019s countries. On a 0\u2013100 scale of national population size, I\u2019d score it very low.\n\n12"
+  },
+  "Tonga": {
+   "score": 12.0,
+   "raw": "all country by population, with only around 100,000 people, so it sits very close to the low end of the global scale. It is far less populous than most countries, though not the absolute smallest.\n\n12"
+  },
+  "Dominica": {
+   "score": 1.0,
+   "raw": "Dominica is a very small country with a population of only tens of thousands, so on a global scale it is near the bottom in population. I\u2019d score its populousness at **1**.\n\n1"
+  },
+  "Saint Kitts and Nevis": {
+   "score": 2.0,
+   "raw": "Saint Kitts and Nevis is one of the smallest countries in the world by population, with only around 50,000\u201360,000 people. On a 0\u2013100 scale of global population size, it would score very low.\n\n2"
+  },
+  "San Marino": {
+   "score": 4.0,
+   "raw": "San Marino is one of the smallest sovereign states in the world by population, with roughly 34,000 people. Relative to all countries, that makes it very low on the population scale.\n\n4"
+  },
+  "Palau": {
+   "score": 2.0,
+   "raw": "Palau is very sparsely populated, with only around 18,000 people, so it would score very low on a 0\u2013100 population scale. I\u2019d rate it **2**.\n\n2"
+  },
+  "Tuvalu": {
+   "score": 3.0,
+   "raw": "tremely sparsely populated, with only around 11,000\u201312,000 people, so it would score very low on a global population scale. Compared with the world\u2019s most populous countries, it is near the bottom.\n\n3"
+  }
+ },
+ "m3": {
+  "order": [
+   "India",
+   "United States",
+   "Pakistan",
+   "Japan",
+   "Germany",
+   "South Korea",
+   "Australia",
+   "Netherlands",
+   "Sweden",
+   "Bulgaria",
+   "Uruguay",
+   "Botswana",
+   "Estonia",
+   "Fiji",
+   "Malta",
+   "Iceland",
+   "Barbados",
+   "Tonga",
+   "Saint Kitts and Nevis",
+   "Dominica",
+   "Palau",
+   "San Marino",
+   "Tuvalu"
+  ],
+  "attempt": 1
+ },
+ "failures": []
+}
