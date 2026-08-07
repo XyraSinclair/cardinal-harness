@@ -59,7 +59,10 @@ Background sync automation, if any, should default to `git fetch`, not blind
   `src/bin/cardinal.rs`
 - `src/rerank/comparison.rs`: pairwise LLM comparison logic
 - `src/prompts.rs`: prompt templates and ratio ladder
-- `src/gateway/`: OpenRouter adapter, pricing, usage, logprobs
+- `src/gateway/`: OpenRouter adapter, pricing, usage, logprobs; `claude-code/<model>`
+  slugs route to the subscription-billed Claude Code adapter (rail fitness
+  evidence: notes/claudecode-vs-api-2026-08-06/RESULTS.md — 21/21 decisive-pair
+  agreement with the API rail at $0 marginal)
 - `src/packet.rs`: content-addressed judgment packets, idempotent byte-identical fusion
 - `tests/`: gateway, rerank, trace, packet, and cache coverage
 - `site/`: the public pairwiseratio.org static site (single committed
