@@ -1,5 +1,10 @@
 # Pre-registered design: Claude Code rail vs Claude API rail (2026-08-06)
 
+AMENDMENT (2026-08-06, before any judged call): the 16-item corpus estimated
+$8.09 worst case, over the registered $8 abort line. Per the registered
+remedy the corpus shrank to 15 (dropped the last-fetched item, 2608.06264v1);
+re-estimate $7.59 worst case. All item counts below read 15.
+
 Question: do subscription-billed Claude Code judgments reproduce API-billed
 Claude judgments on the same corpus and attribute — closely enough to trust
 the $0-marginal rail for provenanced judgment runs?
