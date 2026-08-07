@@ -3,14 +3,17 @@
 //! Calls use the local `claude` subscription session and have zero marginal API cost.
 //! [`ClaudeCodeConfig::config_dir`] sets `CLAUDE_CONFIG_DIR` and the child working directory.
 //! Prepare that scratch directory with `scripts/claude_code_judge.py --pure`; this module does not
-//! copy or refresh credentials.
+//! copy or refresh credentials. The scratch credential mirror is a snapshot: a per-comparison
+//! error "OAuth session expired and could not be refreshed" means the mirror went stale — run
+//! `ensure_pure_dir()` (or `--pure`) again to re-mirror, then retry (observed 2026-08-07).
 //! Set `CARDINAL_CLAUDE_CODE_CONFIG_DIR` to configure that directory through
 //! [`crate::gateway::ProviderGateway::from_env`]. Set `CARDINAL_CLAUDE_CODE_EFFORT` to pass an
 //! effort level to Claude Code.
 //!
 //! Without an isolated config dir, the operator's own CLAUDE.md, memory, and hooks run inside
 //! every call — measured on a live smoke: ~78k input tokens for a one-line prompt, and a stop
-//! hook rewrote the final result text. Measurement traffic should always set `config_dir`.
+//! hook rewrote the final result text. `chat` therefore refuses to run when `config_dir` is
+//! unset (guard added 2026-08-07); there is deliberately no opt-out.
 //!
 //! A scratch config directory has no model preference. Callers must always set an explicit model
 //! with `ChatModel::claude_code`.
@@ -75,6 +78,15 @@ impl ClaudeCodeAdapter {
         if req.model.model_id().is_empty() {
             return Err(ProviderError::invalid_request(
                 "Claude Code model must not be empty",
+            ));
+        }
+        if self.config.config_dir.is_none() {
+            return Err(ProviderError::config(
+                "Claude Code judging requires an isolated config directory: set \
+                 CARDINAL_CLAUDE_CODE_CONFIG_DIR (or ClaudeCodeConfig::config_dir) to a \
+                 scratch dir prepared with scripts/claude_code_judge.py --pure. Refusing \
+                 to run judge calls inside the operator's live Claude Code configuration \
+                 (its CLAUDE.md, memory, and hooks would execute in every call).",
             ));
         }
 
