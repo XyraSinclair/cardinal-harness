@@ -12,7 +12,7 @@ use std::time::Duration;
 
 use tokio::time::sleep;
 
-use claude_code::ClaudeCodeAdapter;
+use claude_code::{ClaudeCodeAdapter, ClaudeCodeConfig};
 use openrouter::OpenRouterAdapter;
 use usage::{CallStatus, ProviderCallRecord, UsageSink as UsageSinkTrait};
 
@@ -58,9 +58,14 @@ impl<U: UsageSinkTrait> ChatGateway for ProviderGateway<U> {
 impl<U: UsageSinkTrait> ProviderGateway<U> {
     pub fn from_env(usage_sink: Arc<U>) -> Result<Self, ProviderError> {
         let openrouter = OpenRouterAdapter::from_env()?;
+        let claude_code = ClaudeCodeAdapter::new(ClaudeCodeConfig {
+            config_dir: std::env::var_os("CARDINAL_CLAUDE_CODE_CONFIG_DIR").map(Into::into),
+            effort: std::env::var("CARDINAL_CLAUDE_CODE_EFFORT").ok(),
+            ..ClaudeCodeConfig::default()
+        });
         Ok(Self {
             openrouter: Some(openrouter),
-            claude_code: ClaudeCodeAdapter::default(),
+            claude_code,
             usage_sink,
             config: GatewayConfig::default(),
         })

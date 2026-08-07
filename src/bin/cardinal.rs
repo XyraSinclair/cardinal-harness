@@ -1653,7 +1653,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     let entity = seriate::Entity::new(*text);
                     let rendered = instrument.render(&attribute, &entity, &entity);
                     let mut chat = cardinal_harness::gateway::ChatRequest::new(
-                        cardinal_harness::gateway::ChatModel::openrouter(model),
+                        cardinal_harness::gateway::ChatModel::parse(model),
                         vec![
                             cardinal_harness::gateway::Message::system(rendered.system.clone()),
                             cardinal_harness::gateway::Message::user(rendered.user.clone()),

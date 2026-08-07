@@ -381,7 +381,7 @@ async fn propose_via_chat(
     for _attempt in 0..2 {
         let response = gateway
             .chat(ChatRequest {
-                model: ChatModel::openrouter(model),
+                model: ChatModel::parse(model),
                 messages: vec![Message::system(system), Message::user(user.clone())],
                 temperature: 0.4,
                 max_tokens: Some(600),

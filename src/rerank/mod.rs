@@ -39,6 +39,24 @@ pub mod types;
 pub mod wordings;
 // No async worker in the standalone harness.
 
+/// Cache-routing key (OpenAI `prompt_cache_key`) derived from stable prompt
+/// content. Key on the shared PREFIX of the calls that should co-route:
+/// requests with equal keys land on the same provider cache shard, so their
+/// longest common prompt prefix can hit. Routing hint only — never changes
+/// prompt bytes, packet identity, or the judgment cache. Benefit realizes
+/// once the shared prefix crosses the provider cache floor (~1024 tokens on
+/// OpenAI); short prefixes cost nothing.
+fn prompt_cache_key_from_parts(template_slug: &str, parts: &[&str]) -> String {
+    let mut state = 0xcbf2_9ce4_8422_2325_u64;
+    for part in std::iter::once(template_slug).chain(parts.iter().copied()) {
+        for byte in part.bytes() {
+            state ^= u64::from(byte);
+            state = state.wrapping_mul(0x0000_0100_0000_01B3);
+        }
+    }
+    format!("cardinal:{template_slug}:{state:016x}")
+}
+
 // Re-export main entry points
 pub use anp::{anp, AnpAlternative, AnpCriterion, AnpError, AnpOptions, AnpReport};
 pub use bench::{

@@ -77,7 +77,7 @@ pub async fn elaborate_criterion(
 
     let response = gateway
         .chat(ChatRequest {
-            model: ChatModel::openrouter(model),
+            model: ChatModel::parse(model),
             messages: vec![
                 Message::system(ELABORATION_SYSTEM),
                 Message::user(format!("Attribute: {criterion}")),

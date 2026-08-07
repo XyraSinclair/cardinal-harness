@@ -90,14 +90,6 @@ fn pad_system(system: &str, floor: usize) -> String {
     )
 }
 
-fn fnv(mut state: u64, s: &str) -> u64 {
-    for b in s.bytes() {
-        state ^= u64::from(b);
-        state = state.wrapping_mul(0x0000_0100_0000_01B3);
-    }
-    state
-}
-
 #[expect(clippy::too_many_arguments)]
 pub async fn nonce_draws(
     gateway: &dyn ChatGateway,
@@ -120,13 +112,10 @@ pub async fn nonce_draws(
     );
     // Cache-routing key: derived from the STABLE content only — identical
     // across draws, unchanged by nonce or padding tweaks.
-    let cache_key = {
-        let mut state = 0xcbf2_9ce4_8422_2325_u64;
-        for part in [template_slug, criterion, first.1, second.1] {
-            state = fnv(state, part);
-        }
-        format!("cardinal:{template_slug}:{state:016x}")
-    };
+    // Entities stay in THIS key: nonce draws repeat the identical full
+    // prompt, so per-pair affinity maximizes the shared prefix.
+    let cache_key =
+        super::prompt_cache_key_from_parts(template_slug, &[criterion, first.1, second.1]);
     let padded_system = pad_system(&instance.system, CACHE_FLOOR_CHARS);
 
     let mut draws = Vec::with_capacity(k);
@@ -145,7 +134,7 @@ pub async fn nonce_draws(
         // across draws — the cache-critical invariant.
         let user = format!("{}\ndraw-token: {nonce}", instance.user);
         let request = ChatRequest {
-            model: ChatModel::openrouter(model),
+            model: ChatModel::parse(model),
             messages: vec![Message::system(padded_system.clone()), Message::user(user)],
             temperature,
             max_tokens: Some(256),

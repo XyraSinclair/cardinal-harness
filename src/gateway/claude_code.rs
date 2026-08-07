@@ -4,6 +4,9 @@
 //! [`ClaudeCodeConfig::config_dir`] sets `CLAUDE_CONFIG_DIR` and the child working directory.
 //! Prepare that scratch directory with `scripts/claude_code_judge.py --pure`; this module does not
 //! copy or refresh credentials.
+//! Set `CARDINAL_CLAUDE_CODE_CONFIG_DIR` to configure that directory through
+//! [`crate::gateway::ProviderGateway::from_env`]. Set `CARDINAL_CLAUDE_CODE_EFFORT` to pass an
+//! effort level to Claude Code.
 //!
 //! Without an isolated config dir, the operator's own CLAUDE.md, memory, and hooks run inside
 //! every call — measured on a live smoke: ~78k input tokens for a one-line prompt, and a stop

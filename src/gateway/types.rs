@@ -179,6 +179,18 @@ pub enum ChatModel {
 }
 
 impl ChatModel {
+    /// Canonical entry point for user-supplied model slugs.
+    ///
+    /// Slugs prefixed with `claude-code/` use the Claude Code adapter. All
+    /// other slugs use OpenRouter.
+    pub fn parse(slug: impl Into<String>) -> Self {
+        let slug = slug.into();
+        match slug.strip_prefix("claude-code/") {
+            Some(model_id) => ChatModel::ClaudeCode(model_id.to_string()),
+            None => ChatModel::OpenRouter(slug),
+        }
+    }
+
     pub fn openrouter(model_id: impl Into<String>) -> Self {
         ChatModel::OpenRouter(model_id.into())
     }

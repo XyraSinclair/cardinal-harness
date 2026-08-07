@@ -709,12 +709,20 @@ pub async fn compare_pair(
         ));
     }
 
+    // Key on the per-attribute system prefix (template + attribute), NOT the
+    // entities: within one objective every pair shares that prefix, so
+    // co-routing all pairs is what lets it hit (multi-recon 2026-08-06).
+    let prompt_cache_key = super::prompt_cache_key_from_parts(
+        &prompt_instance.template_slug,
+        &[request.spec.attribute.prompt],
+    );
     let mut chat_request = ChatRequest::new(
-        ChatModel::openrouter(request.spec.model),
+        ChatModel::parse(request.spec.model),
         prompt_instance.to_messages(),
         request.attribution,
     )
     .max_tokens(PAIRWISE_MAX_OUTPUT_TOKENS_DEFAULT);
+    chat_request.prompt_cache_key = Some(prompt_cache_key);
     if should_use_json_mode(request.spec.model) {
         chat_request = chat_request.json();
     }
@@ -1039,15 +1047,21 @@ async fn compare_pair_seriate(
         ));
     }
 
+    // Per-attribute system-prefix key; see compare_pair for the rationale.
+    let prompt_cache_key = super::prompt_cache_key_from_parts(
+        &rendered.template_slug,
+        &[request.spec.attribute.prompt],
+    );
     let messages = rendered.to_messages();
-    let base_request = ChatRequest::new(
-        ChatModel::openrouter(request.spec.model),
+    let mut base_request = ChatRequest::new(
+        ChatModel::parse(request.spec.model),
         messages,
         request.attribution.clone(),
     )
     // Single-letter answer; 16 is the observed provider floor (OpenAI
     // responses path rejects smaller — logprob reality map, 2026-07-04).
     .max_tokens(16);
+    base_request.prompt_cache_key = Some(prompt_cache_key);
 
     let mut input_tokens_total = 0u32;
     let mut output_tokens_total = 0u32;

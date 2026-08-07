@@ -63,7 +63,7 @@ async fn chat_json(
     for _attempt in 0..2 {
         let response = gateway
             .chat(ChatRequest {
-                model: ChatModel::openrouter(model),
+                model: ChatModel::parse(model),
                 messages: vec![Message::system(system), Message::user(user.clone())],
                 temperature: 0.6,
                 max_tokens: Some(900),
