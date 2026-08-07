@@ -11,6 +11,7 @@ use reqwest::{Client, Url};
 use serde::Serialize;
 use sha2::{Digest, Sha256};
 
+use crate::gateway::types::DEFAULT_CHAT_TEMPERATURE;
 use crate::judgement_run::{
     JudgementPrivacy, JudgementRunRecord, JudgementRunStore, JudgementRunTerminal,
     JUDGEMENT_PROMPT_TEMPLATE_SLUG,
@@ -22,10 +23,10 @@ const PRIVATE_COMPARISONS: &str = "scry_judgements_private.comparisons";
 const PRIVATE_SCORES: &str = "scry_judgements_private.scores";
 const HARNESS: &str = "cardinal-harness";
 
-const COMPARISON_COLUMNS: &str = "observed_at,run_id,lens,axis_key,axis_prompt,axis_prompt_hash,harness,template_slug,template_hash,model,comparison_index,entity_a_id,entity_b_id,entity_a_hash,entity_b_hash,swapped,cached,refused,higher_ranked,ratio,confidence,input_tokens,output_tokens,cost_nanodollars,cost_is_estimate,error";
-const PRIVATE_COMPARISON_COLUMNS: &str = "observed_at,run_id,owner_scope,lens,axis_key,axis_prompt,axis_prompt_hash,harness,template_slug,template_hash,model,comparison_index,entity_a_id,entity_b_id,entity_a_hash,entity_b_hash,swapped,cached,refused,higher_ranked,ratio,confidence,input_tokens,output_tokens,cost_nanodollars,cost_is_estimate,error";
-const SCORE_COLUMNS: &str = "scored_at,run_id,lens,axis_key,axis_prompt,axis_prompt_hash,harness,model,seed,item_count,comparison_budget,comparisons_used,stop_reason,topk_error,run_cost_nanodollars,entity_id,entity_text,rank,latent_mean,latent_std,z_score,percentile";
-const PRIVATE_SCORE_COLUMNS: &str = "scored_at,run_id,owner_scope,lens,axis_key,axis_prompt,axis_prompt_hash,harness,model,seed,item_count,comparison_budget,comparisons_used,stop_reason,topk_error,run_cost_nanodollars,entity_id,entity_text,rank,latent_mean,latent_std,z_score,percentile";
+const COMPARISON_COLUMNS: &str = "observed_at,run_id,lens,axis_key,axis_prompt,axis_prompt_hash,harness,template_slug,template_hash,model,comparison_index,entity_a_id,entity_b_id,entity_a_hash,entity_b_hash,swapped,cached,refused,higher_ranked,ratio,confidence,input_tokens,output_tokens,cost_nanodollars,cost_is_estimate,error,temperature,harness_version";
+const PRIVATE_COMPARISON_COLUMNS: &str = "observed_at,run_id,owner_scope,lens,axis_key,axis_prompt,axis_prompt_hash,harness,template_slug,template_hash,model,comparison_index,entity_a_id,entity_b_id,entity_a_hash,entity_b_hash,swapped,cached,refused,higher_ranked,ratio,confidence,input_tokens,output_tokens,cost_nanodollars,cost_is_estimate,error,temperature,harness_version";
+const SCORE_COLUMNS: &str = "scored_at,run_id,lens,axis_key,axis_prompt,axis_prompt_hash,harness,model,seed,item_count,comparison_budget,comparisons_used,stop_reason,topk_error,run_cost_nanodollars,entity_id,entity_text,rank,latent_mean,latent_std,z_score,percentile,temperature,harness_version,entity_hash";
+const PRIVATE_SCORE_COLUMNS: &str = "scored_at,run_id,owner_scope,lens,axis_key,axis_prompt,axis_prompt_hash,harness,model,seed,item_count,comparison_budget,comparisons_used,stop_reason,topk_error,run_cost_nanodollars,entity_id,entity_text,rank,latent_mean,latent_std,z_score,percentile,temperature,harness_version,entity_hash";
 
 /// Credential-aware ClickHouse HTTP client. Its URL is scrubbed of userinfo.
 pub struct ClickHouseLanding {
@@ -308,6 +309,8 @@ struct ComparisonRow<'a> {
     cost_nanodollars: u64,
     cost_is_estimate: u8,
     error: &'a str,
+    temperature: f64,
+    harness_version: String,
 }
 
 #[derive(Serialize)]
@@ -336,6 +339,9 @@ struct ScoreRow<'a> {
     latent_std: f64,
     z_score: f64,
     percentile: f64,
+    temperature: f64,
+    harness_version: String,
+    entity_hash: String,
 }
 
 fn completed_batches(
@@ -404,6 +410,8 @@ fn completed_batches(
             cost_nanodollars: nonnegative_cost(trace.provider_cost_nanodollars),
             cost_is_estimate: u8::from(trace.provider_cost_is_estimate),
             error: trace.error.as_deref().unwrap_or(""),
+            temperature: f64::from(DEFAULT_CHAT_TEMPERATURE),
+            harness_version: env!("CARGO_PKG_VERSION").to_string(),
         });
     }
 
@@ -454,6 +462,9 @@ fn completed_batches(
             latent_std: score.attribute_score.latent_std,
             z_score: score.attribute_score.z_score,
             percentile: score.attribute_score.percentile,
+            temperature: f64::from(DEFAULT_CHAT_TEMPERATURE),
+            harness_version: env!("CARGO_PKG_VERSION").to_string(),
+            entity_hash: sha256_hex(entity_text),
         });
     }
 

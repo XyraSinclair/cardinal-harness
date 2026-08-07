@@ -28,7 +28,9 @@ use crate::rerank::{
 
 pub const JUDGEMENT_RUN_SCHEMA: &str = "cardinal.judgement-run.v1";
 pub const JUDGEMENT_PROMPT_TEMPLATE_SLUG: &str = "canonical_v2";
-const COMPARISONS_PER_ENTITY: usize = 4;
+// Counterbalancing spends two calls per pair, so 8·n calls preserve the old
+// uncounterbalanced budget's approximately 4·n distinct-pair coverage.
+const COMPARISONS_PER_ENTITY: usize = 8;
 const RUN_REF_PREFIX: &str = "jrun_";
 const PROVIDER_CALL_REF_PREFIX: &str = "pcall_";
 const COMPARISON_CONCURRENCY: usize = 8;
@@ -143,7 +145,7 @@ impl NormalizedJudgementRunRequest {
 /// Maximum comparisons that the portable single-axis run planner may attempt.
 ///
 /// `requested_k` affects proposal priority and early stopping, but the hard
-/// comparison budget is currently four attempts per entity for every valid
+/// comparison budget is currently eight attempts per entity for every valid
 /// normalized request.
 pub fn max_judgement_run_comparisons(request: &NormalizedJudgementRunRequest) -> usize {
     COMPARISONS_PER_ENTITY.saturating_mul(request.entities.len())
@@ -570,7 +572,7 @@ fn build_rerank_request(request: &NormalizedJudgementRunRequest) -> MultiRerankR
         comparison_concurrency: Some(COMPARISON_CONCURRENCY),
         max_pair_repeats: None,
         randomize_presentation_order: true,
-        counterbalance_pairs: false,
+        counterbalance_pairs: true,
     }
 }
 
