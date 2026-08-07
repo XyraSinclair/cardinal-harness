@@ -71,6 +71,37 @@ Contrast: the official API measured 12/12 warm hits with the same shape
 is a latency optimization only; the cache-economics case for nonce-perturbed
 resampling lives on the API rail.
 
+## Robustness probes (added 2026-08-07, second pass)
+
+Two refutation attempts against the headline claims, both survived:
+
+**Does analysis context mechanically saturate the phase-2 read?** No — the
+read tracks evidence content (`probe_spread.py` + inline follow-up). On the
+near-tie pair "all ants vs all humans by total mass" (mini baseline: mixed
+tokens, mass 0.66, sd 0.23):
+
+| Context given to mini@none | Tokens (n=5) | Mass |
+|---|---|---|
+| none (baseline) | A,B,A,A,A | 0.66 sd 0.23 |
+| sol@medium real analysis (contains decisive biomass numbers) | B ×5 | 0.999 |
+| deliberately balanced analysis (resolves nothing) | A,A,A,A,B | 0.63 sd 0.20 |
+
+Saturation follows the *decisiveness of the analysis*, not the presence of
+context. A first attempt used an "undecidable" beauty pair (aurora vs
+eclipse) and misfired: mini's baseline was already 0.995, so it could not
+discriminate — refutation pairs need measured baseline spread.
+
+**Does the harness's real rail (OpenRouter) deliver cache hits?** Yes —
+`probe_cache_openrouter.py`, same nonce-at-tail shape, openai/gpt-5.4-mini
+served by Azure: 5/5 warm hits both with and without `prompt_cache_key`
+(3328 of ~3658 tokens cached; warm cost $0.00052 vs cold $0.00277, an 81%
+discount). The key was not load-bearing for serial single-stream calls; per
+OpenAI docs it aids cache routing under concurrent load, so the threaded
+keys are harmless insurance there. Caveat: pinning
+`provider: {"only": ["openai"]}` 401s through the account's stale OpenAI
+BYOK integration — unpinned routing (the harness default) is what was
+measured.
+
 ## Parser trap (cost us the first two runs)
 
 On this backend `response.completed` carries an **empty `output` list**.
@@ -99,6 +130,9 @@ event concludes "no output, no logprobs" and is wrong. `probe_codex_oauth.py`
 - `probe_crossmodel.py` — cross-model two-phase cells A–D.
 - `probe_cache_codex.py` — prompt-cache hit-rate probe (`--key` adds
   `prompt_cache_key`).
+- `probe_spread.py` — saturation-vs-evidence-tracking refutation probe.
+- `probe_cache_openrouter.py` — end-to-end cache hits on the OpenRouter
+  rail (`--no-key` control; needs `vrun`).
 
 All calls route through the cxp proxy; no tokens touched. Cost: subscription
 quota only, ~60 small calls total including the two wasted unguarded runs.

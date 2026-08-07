@@ -87,6 +87,16 @@ Measured on gpt-5.4-mini (2026-07-19, 1562 prompt tokens, 13 calls): 12 of 12 wa
 calls hit the cache with 1280 cached tokens. Cached input tokens cost 10 percent of
 the fresh price on this model family.
 
+The harness's live rail reproduces this (measured 2026-08-07,
+`probe_cache_openrouter.py`): OpenRouter routed openai/gpt-5.4-mini to Azure
+and served 5 of 5 warm hits, with and without `prompt_cache_key` (3328 of
+~3658 tokens cached; warm cost $0.00052 against cold $0.00277, an 81
+percent discount). The key was not necessary for serial calls on this
+route. Keep it for cache routing under concurrent load. CAUTION: a
+`provider: {"only": ["openai"]}` pin routes through the account's OpenAI
+BYOK integration, whose stored key is stale, and gets HTTP 401. Use the
+unpinned default.
+
 NOTE: Same-prompt repeats do not return identical logprobs. Three repeats of one nonce
 gave top-1 ratio-token mass of 0.14, 0.12, and 0.26. Ten different nonces gave a mean
 top-1 mass of 0.14 with a standard deviation of 0.06. Thus server noise and nonce
@@ -136,6 +146,15 @@ The phase-1 instructions must not permit a verdict token. With the one-letter
 system prompt left in place, the "analysis" degenerated to the verdict letter
 (1 character) and phase 2 measured verdict copies, not reasoning transfer.
 The corrected probe asserts a minimum analysis length.
+
+The phase-2 read tracks the content of the analysis, not its presence
+(measured 2026-08-07, pair "all ants vs all humans" by total mass, mini
+baseline mass 0.66 with mixed tokens): a decisive analysis moves the read to
+0.999, and a balanced analysis that resolves nothing keeps the spread (0.63,
+mixed tokens). Thus the two-phase read is an evidence-tracking instrument.
+A refutation pair must have measured baseline spread — a subjectively
+"undecidable" pair (aurora vs eclipse, beauty) read 0.995 at baseline and
+discriminated nothing.
 
 ### Prompt cache on this backend (measured 2026-08-07, small n)
 
