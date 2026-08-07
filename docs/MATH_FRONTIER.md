@@ -154,12 +154,15 @@ content hash) refuses to fuse. Open in #46: the seriate-side provenance
 chain (packet → capture ids), orbit-spectrum and gain metadata fields,
 and the two-party live demo from the pilot map's cache.
 
-## 4. Stochastic transitivity hierarchy — NEXT (new invariance row)
+## 4. Stochastic transitivity hierarchy — SHIPPED (diagnostic)
 
 Weak/moderate/strong stochastic transitivity (WST ⊂ MST ⊂ SST) on
 repeat-sampled choice probabilities catches inconsistency that Hodge
 curl structurally cannot (probabilistic intransitivity with zero mean
-curl). Requires repeat sampling; design the diagnostic with §6 below.
+curl). The diagnostic is implemented (`src/rerank/transitivity.rs`,
+WST/MST/SST over repeat-sampled pairs) with a live study pack at
+`artifacts/live/transitivity-2026-07-08/`. Still open: whether it is
+promoted into the JCB composite headline.
 
 ## 5. Pooling across judges: log-pooling is forced, not chosen
 

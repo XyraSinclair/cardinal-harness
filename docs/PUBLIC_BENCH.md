@@ -152,7 +152,7 @@ as the hero diagram. Dark mode via `prefers-color-scheme` plus a
 v1 sections (all data inlined from the 2026-07-18 board evidence pack,
 ranking asserted equal to the pack README before inlining):
 
-1. **Leaderboard** — 13 models, JUDGE bars, per-axis columns with n and
+1. **Leaderboard** — 15 models (2026-07-18 board plus 2026-08-07 additions), JUDGE bars, per-axis columns with n and
    95% CI in tooltips, refusal and cost columns, retest-floor reading
    guide (#1–#2 shown as a statistical tie).
 2. **The format** — atom strip (the pairwise ratio question + 17-step

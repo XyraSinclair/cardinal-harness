@@ -179,4 +179,8 @@ cardinal bench \
 ```
 
 `OPENROUTER_API_KEY` required; ~$0.05/model on mini-class models. Live
-study records: `artifacts/live/judge-bench-2026-07-05/`.
+study records (v1.2 battery): `artifacts/live/judge-bench-v1.2-2026-07-05/`,
+the 2026-07-18 public board in `artifacts/live/kimi-k3-bench-2026-07-18/`,
+and the 2026-08-07 additions (claude-sonnet-5, claude-opus-4.8) in
+`artifacts/live/jcb-additions-2026-08-07/`. The superseded v1 study
+(114 comparisons, 6 models) remains at `artifacts/live/judge-bench-2026-07-05/`.

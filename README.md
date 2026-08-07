@@ -253,13 +253,15 @@ a benchmark labs can hill-climb without it being memorizable.
 The dimensions cross-check (a content-blind hash judge aces order
 invariance but can't know the negated attribute must reverse; a sycophant
 keeps its correlations and loses spin), and the benchmark validates itself:
-five scripted pathological judges — oracle, constant, position-biased,
-sycophant, cyclic — run the full battery in the test suite, and each must
+six scripted pathological judges — oracle, constant, position-biased,
+sycophant, cyclic, avalanche-hash — run the full battery in the test suite, and each must
 be caught by exactly the dimension that names it. 194 comparisons per
 model, ~$0.05 on mini-class models, every rate with its denominator and
 95% CI. Full argument, formulas, gaming analysis, and honest caveats:
-[`docs/BENCHMARK.md`](docs/BENCHMARK.md). Live leaderboard evidence:
-[`artifacts/live/judge-bench-2026-07-05/`](artifacts/live/judge-bench-2026-07-05/).
+[`docs/BENCHMARK.md`](docs/BENCHMARK.md). Live leaderboard evidence
+(v1.2 battery): [`artifacts/live/judge-bench-v1.2-2026-07-05/`](artifacts/live/judge-bench-v1.2-2026-07-05/),
+the 2026-07-18 board in [`artifacts/live/kimi-k3-bench-2026-07-18/`](artifacts/live/kimi-k3-bench-2026-07-18/),
+and the 2026-08-07 additions in [`artifacts/live/jcb-additions-2026-08-07/`](artifacts/live/jcb-additions-2026-08-07/).
 
 The public board is live at **[pairwiseratio.org](https://pairwiseratio.org/)**:
 15 models on the frozen v1.2 battery (temperature 0, counterbalanced,
