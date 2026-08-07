@@ -103,6 +103,9 @@ pub struct ComparisonUsage {
     pub provider_cost_nanodollars: i64,
     pub provider_cost_is_estimate: bool,
     pub cached: bool,
+    /// Provider-reported served model for the live call, when surfaced
+    /// (e.g. Claude Code modelUsage). None for cached judgements.
+    pub served_model: Option<String>,
     pub prompt_text: Option<String>,
     /// Content identity of the exact system and user message bytes sent to the judge.
     pub rendered_prompt_digest: String,
@@ -683,6 +686,7 @@ pub async fn compare_pair(
                         provider_cost_nanodollars: 0,
                         provider_cost_is_estimate: false,
                         cached: true,
+                        served_model: None,
                         prompt_text: None,
                         rendered_prompt_digest: rendered_prompt_digest.clone(),
                         question_text: None,
@@ -763,6 +767,7 @@ pub async fn compare_pair(
             provider_cost_nanodollars: provider_cost_total,
             provider_cost_is_estimate,
             cached: false,
+            served_model: response.served_model.clone(),
             prompt_text: Some(prompt_text.clone()),
             rendered_prompt_digest: rendered_prompt_digest.clone(),
             question_text: Some(request.spec.attribute.prompt.to_string()),
@@ -1021,6 +1026,7 @@ async fn compare_pair_seriate(
                         provider_cost_nanodollars: 0,
                         provider_cost_is_estimate: false,
                         cached: true,
+                        served_model: None,
                         prompt_text: None,
                         rendered_prompt_digest: rendered_prompt_digest.clone(),
                         question_text: None,
@@ -1109,6 +1115,7 @@ async fn compare_pair_seriate(
         provider_cost_nanodollars: provider_cost_total,
         provider_cost_is_estimate,
         cached: false,
+        served_model: response.served_model.clone(),
         prompt_text: Some(prompt_text),
         rendered_prompt_digest,
         question_text: Some(request.spec.attribute.prompt.to_string()),

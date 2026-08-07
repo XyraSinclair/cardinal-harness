@@ -987,6 +987,7 @@ pub async fn multi_rerank(
                     entity_b_hash: fields.entity_b_hash.clone(),
                     cache_key_hash: fields.cache_key_hash.clone(),
                     model: selected_model.clone(),
+                    served_model: None,
                     higher_ranked: None,
                     ratio: None,
                     confidence: None,
@@ -1031,6 +1032,7 @@ pub async fn multi_rerank(
                             None,
                         );
                         event.refused = true;
+                        event.served_model = usage.served_model.clone();
                         event.output_logprob_token_count =
                             usage.output_logprobs.as_ref().map(Vec::len);
                         if !usage.cached && event.output_logprob_token_count.is_none() {
@@ -1196,6 +1198,7 @@ pub async fn multi_rerank(
                             Some(&usage.rendered_prompt_digest),
                             None,
                         );
+                        event.served_model = usage.served_model.clone();
                         event.higher_ranked = Some(match higher_ranked {
                             HigherRanked::A => "A".to_string(),
                             HigherRanked::B => "B".to_string(),

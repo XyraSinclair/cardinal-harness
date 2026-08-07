@@ -21,6 +21,7 @@ fn make_trace(comparison_index: usize) -> ComparisonTrace {
         entity_b_hash: "b_hash".to_string(),
         cache_key_hash: "key_hash".to_string(),
         model: "openai/gpt-5-mini".to_string(),
+        served_model: None,
         higher_ranked: Some("A".to_string()),
         ratio: Some(2.0),
         confidence: Some(0.9),

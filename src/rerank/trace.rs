@@ -32,6 +32,11 @@ pub struct ComparisonTrace {
     pub entity_b_hash: String,
     pub cache_key_hash: String,
     pub model: String,
+    /// Provider-reported served model for this row's live call, when the
+    /// adapter surfaces one (e.g. Claude Code modelUsage keys). Absent for
+    /// cached rows and providers that do not report it.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub served_model: Option<String>,
     pub higher_ranked: Option<String>,
     pub ratio: Option<f64>,
     pub confidence: Option<f64>,

@@ -40,10 +40,18 @@ run at zero marginal cost. The API rail remains the choice for latency
 ## Caveats
 
 - ComparisonTrace records the requested slug (`claude-code/claude-sonnet-4-6`)
-  per row; the adapter's per-response `served_model` is not yet threaded into
-  traces. Tonight's pin is evidenced by the pre-registered smoke calls
-  (modelUsage `claude-sonnet-4-6`) and by the CLI erroring on unknown model
-  ids. Threading served_model into traces is a noted follow-up.
+  per row; at run time the adapter's per-response `served_model` was not yet
+  threaded into traces. Tonight's pin is evidenced by the pre-registered
+  smoke calls (modelUsage `claude-sonnet-4-6`) and by the CLI erroring on
+  unknown model ids.
+- ADDENDUM (same evening): served_model threading landed right after this
+  run, and its first live smoke read
+  `claude-haiku-4-5-20251001,claude-sonnet-4-6` — the Claude Code CLI runs
+  an auxiliary haiku call (internal CLI utility) alongside the pinned judge
+  model on each invocation. The judgment content comes from the pinned
+  model; the haiku call is CLI-internal and was invisible (and unrecorded)
+  in this run's rows. Future claude-code rows carry the full modelUsage
+  list per row.
 - Prompt bytes differ across rails by construction (CLI scaffolding); this
   measured the rails as deployed.
 - Board-level agreement at 30/105 pair coverage mixes rail difference with
