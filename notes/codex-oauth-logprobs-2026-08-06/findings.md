@@ -27,6 +27,50 @@ docs/LOGPROBS.md survive on it?
    assistant context + logprobs include → logprobs served (n=1 shape check;
    the phase-2 request is the same request class as the 10/10 cell).
 
+## Cross-model two-phase (added 2026-08-07)
+
+`probe_crossmodel.py`, uncertain pair "1L solid ice (A) vs 1L liquid water
+(B) by mass" (correct: B — ice is less dense, so a liter of it is lighter):
+
+| Cell | n | Answer | Sampled mass |
+|---|---|---|---|
+| A: sol@none baseline | 5 | B 5/5 | 1.0000 |
+| D: mini@none baseline | 5 | **A (wrong) 5/5** | 0.4294 mean, 0.15 sd |
+| B: sol ← sol@medium analysis | 5 | B 5/5 | 1.0000 |
+| C: mini ← sol@medium analysis | 5 | B 5/5 | 1.0000 |
+
+Cell C is the payload: **reason on one model, read logprobs on another.**
+mini alone answers wrong at 0.43 confidence; given sol's 314-char
+`medium`-effort analysis (84 reasoning tokens) as assistant context, mini
+flips to correct at 1.0 mass, logprobs served 5/5. The reasoning model does
+the thinking; the cheap non-reasoning read gives the calibrated PMF.
+
+Verdict-leak trap (caught live): phase 1 initially inherited the one-letter
+system prompt, so the "analysis" was literally the verdict letter
+(analysis_chars=1) and phase 2 measured verdict-copying, not reasoning
+transfer. The fixed probe overrides `instructions` with a no-verdict analyst
+prompt and asserts analysis length > 80.
+
+## Prompt cache on this backend (added 2026-08-07, small n)
+
+`probe_cache_codex.py`: ~3700-token prompt, 2816-token stable prefix, nonce
+at the tail, 6 calls per run.
+
+- Unkeyed: 1/6 then 2/6 calls returned `cached_tokens: 2816`.
+- With `prompt_cache_key`: 2/6. Parameter accepted, no visible lift at n=6.
+- Proxy log confirms every call in these runs was served by ONE account —
+  so the miss scatter is upstream OpenAI-side cache routing, not pool
+  rotation.
+- Side discovery: cxp-agent's `thread_key()` uses `prompt_cache_key` (then
+  conversation/session id) for account-affinity routing. Keyed traffic
+  therefore pins one pool account automatically — the right behavior for
+  cache coherence, since each account is its own cache namespace.
+
+Contrast: the official API measured 12/12 warm hits with the same shape
+(docs/LOGPROBS.md). Codex-rail calls are $0 marginal anyway, so cache here
+is a latency optimization only; the cache-economics case for nonce-perturbed
+resampling lives on the API rail.
+
 ## Parser trap (cost us the first two runs)
 
 On this backend `response.completed` carries an **empty `output` list**.
@@ -52,6 +96,9 @@ event concludes "no output, no logprobs" and is wrong. `probe_codex_oauth.py`
 - `probe_variants.py` — include-only vs top_logprobs discrimination.
 - `probe_raw_sse.py` — raw SSE event dump (found the empty-output trap).
 - `probe_repeats.py` — n=10 repeat cells per model.
+- `probe_crossmodel.py` — cross-model two-phase cells A–D.
+- `probe_cache_codex.py` — prompt-cache hit-rate probe (`--key` adds
+  `prompt_cache_key`).
 
 All calls route through the cxp proxy; no tokens touched. Cost: subscription
 quota only, ~60 small calls total including the two wasted unguarded runs.

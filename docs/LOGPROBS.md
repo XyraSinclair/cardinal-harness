@@ -121,6 +121,35 @@ list. The output items with the logprobs come only in the
 `response.output_item.done` events. A client that reads only the completed
 event sees no logprobs.
 
+### Cross-model two-phase (measured 2026-08-07)
+
+Phase 1 can run on one model and phase 2 on another. Probe
+`probe_crossmodel.py`, pair "1L ice vs 1L water" by mass (correct: water):
+
+| Cell | Answer | Sampled-token mass |
+|---|---|---|
+| gpt-5.4-mini alone, effort none (n=5) | A (wrong) 5/5 | 0.43 mean, 0.15 sd |
+| gpt-5.4-mini after a gpt-5.6-sol `medium` analysis (n=5) | B (correct) 5/5 | 1.00 |
+| gpt-5.6-sol alone or after analysis (n=5 each) | B 5/5 | 1.00 |
+
+The phase-1 instructions must not permit a verdict token. With the one-letter
+system prompt left in place, the "analysis" degenerated to the verdict letter
+(1 character) and phase 2 measured verdict copies, not reasoning transfer.
+The corrected probe asserts a minimum analysis length.
+
+### Prompt cache on this backend (measured 2026-08-07, small n)
+
+The backend serves cached prefixes: a 2816-token stable prefix with a tail
+nonce hit `cached_tokens: 2816` in 3 of 12 calls (1 of 6 without
+`prompt_cache_key`, 2 of 6 with it; one account served every call). The
+`prompt_cache_key` parameter is accepted, and the cxp pool proxy uses it as
+the account-affinity key, so keyed traffic pins one account — necessary for
+cache coherence because each account is its own cache namespace. Subscription
+billing is $0 marginal, so cache here buys latency, not money; the economic
+case for cache-aware resampling stays on the API side (see "Prompt cache and
+nonce perturbation" above: 12 of 12 warm hits, cached input at 10 percent
+price).
+
 ## Rerun commands
 
 ```
@@ -130,4 +159,6 @@ OPENAI_API_KEY=...     python3 notes/adaptive-logprobs-2026-07-19/probe_twophase
 OPENAI_API_KEY=...     python3 notes/adaptive-logprobs-2026-07-19/probe_cache.py
 python3 notes/codex-oauth-logprobs-2026-08-06/probe_codex_oauth.py
 python3 notes/codex-oauth-logprobs-2026-08-06/probe_repeats.py gpt-5.6-sol
+python3 notes/codex-oauth-logprobs-2026-08-06/probe_crossmodel.py
+python3 notes/codex-oauth-logprobs-2026-08-06/probe_cache_codex.py --key
 ```
