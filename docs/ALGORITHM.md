@@ -160,3 +160,13 @@ Pairwise judgments are cached in SQLite, keyed on (model, prompt template, attri
 - Adding a new entity to the set only requires comparisons involving that entity.
 - Changing the model or prompt invalidates the relevant cache entries (correctly).
 - Cache hits are treated as observations with the same weight as fresh LLM calls.
+
+## Judgment packets
+
+Above the per-call cache sits the portable evidence layer (`src/packet.rs`):
+a judgment packet is a content-addressed bundle of raw pairwise judgements
+with their rendered-prompt provenance. Packets from different runs, machines,
+or judges fuse idempotently — fusing the same evidence twice is byte-identical
+to fusing it once — so evidence can be shipped, merged, and re-solved without
+double-counting. The `judge --consortium` verb emits one packet per complete
+judge orbit and computes its verdict by fusing them.

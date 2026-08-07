@@ -73,6 +73,13 @@ This builds current `main`. Tagged binaries are available from
 the crate is not currently published to crates.io because `seriate` is a
 git-only dependency.
 
+OpenRouter is not the only rail: `--model claude-code/<model>` routes
+judgements through a subscription-billed Claude Code adapter instead of
+OpenRouter. Measured head-to-head against the API rail on the same corpus,
+seed, and model: **21/21 decisive-pair agreement at $0 marginal cost**
+(slower wall-clock; full instrument-health table in
+[`notes/claudecode-vs-api-2026-08-06/RESULTS.md`](notes/claudecode-vs-api-2026-08-06/RESULTS.md)).
+
 Real output (preserved with full evidence under
 [`artifacts/live/sort-demo-2026-07-02/`](artifacts/live/sort-demo-2026-07-02/)):
 
@@ -254,6 +261,14 @@ model, ~$0.05 on mini-class models, every rate with its denominator and
 [`docs/BENCHMARK.md`](docs/BENCHMARK.md). Live leaderboard evidence:
 [`artifacts/live/judge-bench-2026-07-05/`](artifacts/live/judge-bench-2026-07-05/).
 
+The public board is live at **[pairwiseratio.org](https://pairwiseratio.org/)**:
+15 models on the frozen v1.2 battery (temperature 0, counterbalanced,
+2026-07-18 board plus same-week rows for newly released models — most
+recently claude-sonnet-5 and claude-opus-4.8, added 2026-08-07). Every row
+recomputes from committed judgement evidence; the site is one static
+committed HTML file under [`site/`](site/), plan and methodology in
+[`docs/PUBLIC_BENCH.md`](docs/PUBLIC_BENCH.md).
+
 To *feel* what the spin axis measures, open the interactive evidence viewer
 ([`artifacts/live/evidence-viewer-2026-07-08/`](artifacts/live/evidence-viewer-2026-07-08/),
 serve `artifacts/live/` with any static server): a contested pair, a
@@ -377,7 +392,9 @@ reproducible and deliberately narrow — it does **not** show a universal win:
 - The live method comparison is also mixed: cardinal ties the best regime on two task families, stays close on two, and lags sharply on two.
 - All current cardinal synthetic runs stop at `budget_exhausted`; the evidence does not prove early stopping or lower cost.
 - Equal call counts are not equal token cost: pairwise prompts carry two items, scalar prompts one.
-- An adversarial test battery (266 tests, [docs/TESTING.md](docs/TESTING.md)) pins the solver's mathematical claims — planted-truth recovery, Huber influence bounds, calibration coverage, pathological-judge behavior, method head-to-heads — and its honest negatives: ordinal beats ratio under heavy noise, and the budget-efficiency claim remains unproven.
+- An adversarial test battery (364 tests, [docs/TESTING.md](docs/TESTING.md)) pins the solver's mathematical claims — planted-truth recovery, Huber influence bounds, calibration coverage, pathological-judge behavior, method head-to-heads — and its honest negatives: ordinal beats ratio under heavy noise, and the budget-efficiency claim remains unproven.
+- The newest refutation round ([`notes/best-library-2026-08-07/`](notes/best-library-2026-08-07/)) is deliberately adversarial to our own method: on a memorized ceiling domain, direct estimates were perfect while cardinal reached 0.947/0.892 — with ratio-ladder span compression (slope 0.52/0.27) and position bias (1.32 nats/pair) measured on the way. Round 2 targets the discriminative regime where direct estimation should break first.
+- The subscription-vs-API rail comparison ([`notes/claudecode-vs-api-2026-08-06/`](notes/claudecode-vs-api-2026-08-06/)) pinned 21/21 decisive-pair agreement, Spearman 0.850, with per-rail instrument-health diagnostics.
 
 The next empirical proof target is a larger frozen benchmark with repeated
 runs, equalized token or dollar budgets, more held-out task families, and

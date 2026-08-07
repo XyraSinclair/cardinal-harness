@@ -1,6 +1,7 @@
 # The test battery
 
-266 tests across 27 suites. The six suites below were authored and then
+364 tests across the workspace (`cargo test --all-targets`), 196 of them
+in 39 integration suites under `tests/`. The seven suites below were authored and then
 adversarially reviewed as a deliberate exercise: every assertion had to be
 falsifiable by a plausible implementation bug, every statistical claim had to
 hold over seeded ensembles (never a single draw), every suite had to survive a
@@ -12,17 +13,17 @@ The review found two real bugs in `src/` (both fixed, both pinned by
 regression tests) and several honest negatives (documented below, not painted
 over). That is the point of the battery: it is strong enough to find things.
 
-## The six adversarial suites
+## The seven adversarial suites
 
 | Suite | Attacks | Highlights |
 |---|---|---|
-| `property_solver` (14) | IRLS+Huber recovery claims | Planted-truth Kendall-tau floors over 40–120-seed ensembles; adversarially reversed observations at 5%/15% with bounded rank displacement; robust-vs-naive fit comparison (tau 0.709 vs 0.556 under 15% corruption); gauge/shift invariance to 1e-6; stated-confidence invariance on bare and anchored graphs; strict monotonicity across all 17 ratio-ladder rungs |
-| `censored_likelihood` (10) | Experimental ladder-channel model | Symmetric cuts; probability/score/information reflection; central and off-center finite differences; small-noise point-cell limit; finite extreme-cell fit; gauge-projected covariance; explicit deep-tail underflow; monotone graph optimization; seeded clean-channel comparison against point centers |
+| `property_solver` (15) | IRLS+Huber recovery claims | Planted-truth Kendall-tau floors over 40–120-seed ensembles; adversarially reversed observations at 5%/15% with bounded rank displacement; robust-vs-naive fit comparison (tau 0.709 vs 0.556 under 15% corruption); gauge/shift invariance to 1e-6; stated-confidence invariance on bare and anchored graphs; strict monotonicity across all 17 ratio-ladder rungs |
+| `censored_likelihood` (1) | Experimental ladder-channel model | Seeded clean-channel comparison: the ordered-probit ladder channel must beat or match point centers on its own planted channel (the channel's supporting math — symmetric cuts, reflection, finite differences, underflow guards — lives in the suite's helper functions that this pin exercises) |
 | `metamorphic_invariance` (11) | Full sort path invariances | Input-order and relabeling invariance; duplicate texts score near-equal; weak IIA (adding a clearly-worst item does not invert the top three); sorting by X and by "lack of X" produce reversed orders |
 | `calibration_coverage` (12) | Uncertainty honesty | Gauge-aligned 95% CI coverage over 200-seed ensembles; posterior std shrinks as observations double; top-k error tiny on huge planted gaps and >0.2 on planted coin flips; `p_flip` semantics pinned (≈0 far above boundary, ≈1 far below, ≈0.5 at it) |
 | `adversarial_judges` (12) | Pathological-judge taxonomy | Pure position bias → diagnostics show 100% flips; intransitive A>B>C>A → solver averages through the cycle; scale-compressed (ratio always 1.05) → order still recovered; refuser → run metadata counts it, rest ordered; gaslighter (confidence 0.99, direction seeded-random) → robust fit limits damage without treating confidence as precision; format vandal → failed calls surface, order survives |
 | `method_dominance` (12) | Cardinal vs Likert vs ordinal | Cardinal beats Likert on the scale-compression regime (pinned); cardinal beats ordinal on suite-mean tau (0.703 vs 0.650, pinned); error trajectories weakly improving on every case |
-| `planner_efficiency` (12) | Active planning and stopping | ≥70% of exploitation proposals touch the boundary band; pruning changes `explore_pruned_count` but never the top-k set; answered proposals reduce top-k error; the critical straddling pair is proposed first; certified stopping fires well below n(n−1)/2 observations |
+| `planner_efficiency` (13) | Active planning and stopping | ≥70% of exploitation proposals touch the boundary band; pruning changes `explore_pruned_count` but never the top-k set; answered proposals reduce top-k error; the critical straddling pair is proposed first; certified stopping fires well below n(n−1)/2 observations |
 
 ## Bugs the battery found (fixed)
 

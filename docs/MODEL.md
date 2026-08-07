@@ -98,6 +98,8 @@ The solver is model-agnostic: a rater can be a fixed model, a ladder policy, a c
 - cost-aware/fast routing with `deepseek/deepseek-v4-flash`,
 - a frontier ladder that starts on `anthropic/claude-opus-4.6`, falls back through `google/gemini-3.1-pro-preview`, and uses `openai/gpt-5.4-mini` once uncertainty is low enough.
 
+Model slugs prefixed `claude-code/` route through a subscription-billed Claude Code adapter instead of OpenRouter (`src/gateway/types.rs`, `src/gateway/claude_code.rs`) — same pairwise judgement contract, $0 marginal provider cost, measured 21/21 decisive-pair agreement with the API rail (`notes/claudecode-vs-api-2026-08-06/RESULTS.md`).
+
 Pricing is separate from ranking. Reports distinguish exact local/provider cost from fallback cost estimates; an estimated cost is operational telemetry, not evidence that the provider actually charged that amount.
 
 ## Assumptions

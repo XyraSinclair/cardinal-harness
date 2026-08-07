@@ -1,6 +1,9 @@
 # Prompt Contract
 
-`cardinal-harness` supports three prompt templates: `canonical_v2`, `canonical_bucket_v1`, and `ordinal_v1`.
+`cardinal-harness` supports five JSON prompt templates — `canonical_v2`,
+`canonical_bucket_v1`, `ordinal_v1`, `less_v1`, `fraction_v1` — plus two
+single-token letter templates (`ratio_letter_v1`, `ordinal_letter_v1`) that
+route through the seriate logprob evidence path.
 
 ## Slugs
 
@@ -9,8 +12,17 @@
 | `canonical_v2` | Decimal `ratio` on the canonical ladder range | General pairwise-ratio judgement. This is the default when no `prompt_template_slug` is set. |
 | `canonical_bucket_v1` | Integer `ratio_bucket` in `0..16` | Runs that need output-token logprobs mapped directly to the ratio ladder. The bucket index avoids reconstructing multi-token decimal probabilities. |
 | `ordinal_v1` | Direction only: `higher_ranked` plus `confidence` | Runs that want plain natural-language "which has more X?" judgements. This is cheaper and often more natural, but strictly less informative because magnitude is discarded. Good as a baseline or control. |
+| `less_v1` | `lower_ranked` plus decimal `ratio` ("how many times less") | The group-inverse wording, for the wording-invariance check: a coherent judge must mirror its "times more" answer. The parser lowers the answer to the same (winner, ratio) shape as every other template. |
+| `fraction_v1` | `higher_ranked` plus `fraction` in `(0, 1]` | The fractional wording ("what fraction of the greater one's level does the lesser reach"); a coherent judge's fraction must be the reciprocal of its ratio. Same invariance purpose as `less_v1`. |
+| `ratio_letter_v1` | ONE letter from a 52-token alphabet (case = winner, letter = ladder rung, `A` = parity, `!` = refuse) | The logprob evidence path: a single completion position's top-k logprobs are the model's full judgement PMF, so the solver weights each observation by measured variance. Rendering, parsing, and mass accounting delegated to seriate. Degrades loudly to sampled mode where a provider hides logprobs. |
+| `ordinal_letter_v1` | ONE letter, direction only | Evidence-path counterpart of `ordinal_v1`. |
 
 Unknown slugs are rejected. Omit `prompt_template_slug` only when you want the default `canonical_v2`.
+
+Counterbalancing is a separate, orthogonal default: every planned pair is
+asked in both presentation orders, the per-pair position bias cancels, and
+the flip rate is reported in the run summary and trace
+(`--no-counterbalance` restores single-order randomization).
 
 ## Ratio ladder
 
