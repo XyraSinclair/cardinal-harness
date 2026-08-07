@@ -452,17 +452,24 @@ pub async fn execute_judgement_run_with_ref(
             // -> every attempt failed -> comparisons_used=0, stop_reason
             // budget_exhausted, flat scores landed). Fail loudly instead,
             // naming the dominant provider error.
-            if projection.stop_reason != RerankStopReason::Cancelled && projection.comparisons_used == 0 {
+            if projection.stop_reason != RerankStopReason::Cancelled
+                && projection.comparisons_used == 0
+            {
                 let failed_calls = provider_calls
                     .iter()
-                    .filter(|call| matches!(call.outcome, JudgementProviderCallOutcome::Failed { .. }))
+                    .filter(|call| {
+                        matches!(call.outcome, JudgementProviderCallOutcome::Failed { .. })
+                    })
                     .count();
-                let last_error = provider_calls.iter().rev().find_map(|call| match &call.outcome {
-                    JudgementProviderCallOutcome::Failed { error_code, error, .. } => {
-                        Some(format!("{error_code}: {error}"))
-                    }
-                    JudgementProviderCallOutcome::Succeeded { .. } => None,
-                });
+                let last_error = provider_calls
+                    .iter()
+                    .rev()
+                    .find_map(|call| match &call.outcome {
+                        JudgementProviderCallOutcome::Failed {
+                            error_code, error, ..
+                        } => Some(format!("{error_code}: {error}")),
+                        JudgementProviderCallOutcome::Succeeded { .. } => None,
+                    });
                 let error = match last_error {
                     Some(last) => format!(
                         "no pairwise comparison succeeded ({failed_calls} provider attempts failed; last error: {last})"

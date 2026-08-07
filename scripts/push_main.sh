@@ -26,6 +26,19 @@ if ! git diff --quiet || [[ -n "$(git ls-files --others --exclude-standard)" ]];
 fi
 
 if ! git diff --cached --quiet; then
+  # CI front line, mirrored here so main never turns red on trivia.
+  if ! cargo fmt --all -- --check >/dev/null 2>&1; then
+    echo "refusing to push: cargo fmt --all -- --check fails" >&2
+    echo "run: cargo fmt --all" >&2
+    exit 1
+  fi
+  if git diff --cached --name-only | grep -qE '\.rs$|^Cargo\.(toml|lock)$'; then
+    echo "rust files staged; running clippy gate" >&2
+    if ! cargo clippy --all-targets --all-features -- -D warnings; then
+      echo "refusing to push: clippy fails with -D warnings (same as CI)" >&2
+      exit 1
+    fi
+  fi
   git commit -m "$message"
 else
   echo "no staged changes; syncing and pushing main as-is" >&2
