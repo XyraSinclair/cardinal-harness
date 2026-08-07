@@ -44,8 +44,11 @@ see probes — but it can't fix it).
 5. **Everything is accounted for.** Comparisons, tokens, dollars, stop reasons,
    evidence health, and per-judgement traces that bind the exact solver input
    to a content-addressed engine configuration. SQLite supports zero-provider-call
-   reruns when the cache is present; portable keyless bundles remain the explicit
-   #52 gap. Sibling project
+   reruns when the cache is present, and judgment packets (`src/packet.rs`,
+   emitted via `--packets-out`) make raw pairwise evidence content-addressed
+   and portable — packets fuse byte-identically, so merging the same evidence
+   twice is a no-op. A portable bundle for the *full study record* remains the
+   explicit #52 gap. Sibling project
    [seriate](https://github.com/XyraSinclair/seriate) anchors judgements to
    raw provider bytes when full provenance matters.
 
@@ -54,6 +57,9 @@ see probes — but it can't fix it).
 ```bash
 cargo install --git https://github.com/XyraSinclair/cardinal-harness --locked
 export OPENROUTER_API_KEY=...
+# or, with a Claude Code subscription and no API key:
+#   --model claude-code/<model>  (21/21 decisive-pair agreement with the
+#   API rail at $0 marginal; notes/claudecode-vs-api-2026-08-06/RESULTS.md)
 
 # What will this cost? (no network)
 cardinal sort ideas.txt --by "expected impact" --estimate

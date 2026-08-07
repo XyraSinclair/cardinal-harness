@@ -294,12 +294,15 @@ question made judgeable — "under which attribute does this deserve to
 travel far?" — answered by the counterbalanced pairwise machinery, never
 by the proposer's say-so.
 
-## 9. The judgement ledger, counted (2026-07-05)
+## 9. The judgement ledger, counted
 
-Are we storing the judgements? Yes — in-repo, replayable:
+Are we storing the judgements? Yes — in-repo, replayable. As of
+2026-08-07, `artifacts/live/` holds **35 dated study packs** (through the
+public-board additions and the claude-code rail comparison). The counted
+2026-07-05 snapshot, preserved for scale reference:
 
-- **~900 live provider judgements** across 9 study packs under
-  `artifacts/live/`: 1,483 trace/cache JSONL lines (sort demos 32+120,
+- **~900 live provider judgements** across the first 9 study packs:
+  1,483 trace/cache JSONL lines (sort demos 32+120,
   taste tools 164, evidence path 110, policy benchmark 459 across three
   policies, smoke 2) plus 838 per-call raw evidence files
   (request/response/parsed/usage) in the method-comparison packs.
