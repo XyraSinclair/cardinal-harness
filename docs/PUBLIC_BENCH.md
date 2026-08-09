@@ -1,4 +1,4 @@
-# Cardinal Bench: the public ratio-consistency benchmark
+# Judge Coherence Benchmark: the public ratio-consistency benchmark
 
 Design for taking the Judge Coherence Benchmark (JCB, `docs/BENCHMARK.md`)
 public as a lab-facing, hill-climbable benchmark with meaningful real-world
@@ -7,7 +7,7 @@ entities, a website, and an honest monetization story. Drafted 2026-07-18.
 ## Thesis
 
 Every LLM-judge eval in circulation measures agreement with a reference.
-Cardinal Bench measures whether a model's judgments deserve the name
+JCB measures whether a model's judgments deserve the name
 *beliefs*: a genuine belief is a fixed point of the transformations that
 shouldn't matter. Swap the entities — the direction must hold and the ratio
 must invert. Ask "how many times less" — same magnitude. Negate the
@@ -136,36 +136,31 @@ Do not paywall the leaderboard or the harness; credibility is the asset.
 
 ## Website: pairwiseratio.org
 
-**v1 shipped 2026-07-19**: `site/index.html` — a single self-contained
-static page (committed HTML, no build step, no framework; claude.ai
-Artifacts remain banned). Review locally with
-`python3 -m http.server <port> --bind 127.0.0.1` from `site/`.
+`site/index.html` is a self-contained static page. It has no framework or
+build step. Review it from `site/` with a local HTTP server.
 
-Design system: cool-paper metrology register; physics coolwarm diverging
-poles as the only accent (blue = invariant, oxide red = contradiction);
-Archivo display / Source Serif 4 body / IBM Plex Mono data; categorical
-color follows lab (5 hues, CVD-validated for light and dark surfaces).
-Signature element: the non-commuting triangle (3× · 2× · 1.5× = 9 ≠ 1)
-as the hero diagram. Dark mode via `prefers-color-scheme` plus a
-`?theme=light|dark` override.
+The visual system is a scientific instrument readout:
 
-v1 sections (all data inlined from the 2026-07-18 board evidence pack,
-ranking asserted equal to the pack README before inlining):
+- Source Serif 4 supplies the display and text roles.
+- IBM Plex Mono supplies labels, navigation, and data.
+- Paper, ink, and rules make the base palette.
+- Signal red identifies measured violations only.
+- The belief trace shows one recorded order contradiction in the hero.
 
-1. **Leaderboard** — 15 models (2026-07-18 board plus 2026-08-07 additions), JUDGE bars, per-axis columns with n and
-   95% CI in tooltips, refusal and cost columns, retest-floor reading
-   guide (#1–#2 shown as a statistical tie).
-2. **The format** — atom strip (the pairwise ratio question + 17-step
-   ladder) and the eight-transformation grid, each axis paired with the
-   scripted adversary it kills.
-3. **Caught in the act** — gpt-5.4-nano's real order flip on pair (1,3):
-   both verdicts point at slot B (−1.361/+0.262 nats, conf 0.66), sourced
-   from `artifacts/live/kimi-k3-bench-2026-07-18/oai-report.jsonl`.
-4. **Run it yourself** — one command, measured cost range, JSONL
-   evidence contract.
+The page uses this information order:
 
-v2 pages (not yet built): per-model cards with axis radar and orbit
-character decomposition; PMF-mode badge column.
+1. **Thesis and evidence** — the hero states the test and shows the recorded
+   gpt-5.4-nano order contradiction for pair (1,3).
+2. **Leaderboard** — the primary table shows six columns. The full 14-column
+   table stays available in a disclosure. Mobile devices show metric lists.
+3. **Battery** — a compact matrix states the constraint for each of the eight
+   transformations.
+4. **Evidence** — disclosures contain the exact calls, prompt, diffs, JSONL
+   link, and method link.
+5. **Run and limits** — one command and three visible limits close the page.
+
+The page keeps all 15 models and all committed board values. It also keeps
+the retest-noise statement and evidence links on the primary surface.
 
 ### Hosting (live 2026-07-19)
 
@@ -182,13 +177,13 @@ systemd kills it, silently keeping the old config); log files under
 referencing them loads. The .org is the only domain; the .com is out of
 scope (operator, 2026-07-19).
 
-### Naming (resolves the open question below)
+### Naming
 
 The domain brands the *format* — Pairwise Ratio — which is the right
 public surface: it names the atom every product shares. The benchmark
-keeps its technical name (JCB) in docs and packs; the site headline is
-"the judge benchmark with no answer key". "Cardinal Bench" is retired as
-a working title.
+keeps its technical name (JCB) in docs and packs. The site headline is
+"Does the judgment survive?" "Cardinal Bench" is retired as a working
+title.
 
 ## Operations
 
@@ -204,7 +199,6 @@ a working title.
 
 ## Open questions
 
-- Public name: "Cardinal Bench" (working title) vs. keeping "JCB".
 - Whether the Funders tier is too spicy for lab partnerships (it names
   real institutions; the failure cards would show models' implied funder
   rankings). Could swap headline tier to Interventions.
