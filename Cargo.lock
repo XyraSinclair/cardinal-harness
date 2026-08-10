@@ -2201,7 +2201,8 @@ dependencies = [
 [[package]]
 name = "seriate"
 version = "0.1.2"
-source = "git+https://github.com/XyraSinclair/seriate?tag=v0.1.2#ba32ca0ac97f59c5d49013e5f33276291968a0a3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ac9264f5eaa67d0469eb7cfc4f64fac62191658532cc6adc3b44dbe30233d628"
 dependencies = [
  "async-trait",
  "blake3",
