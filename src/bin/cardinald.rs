@@ -161,6 +161,10 @@ struct GetRunResponse {
     axis_prompt: String,
     model: String,
     entity_ids: Vec<String>,
+    /// SHA-256 hex of each entity's text, aligned with `entity_ids`, so
+    /// downstream services can verify the judged text and not merely an id
+    /// alias (independent review 2026-08-10, finding 4).
+    entity_text_hashes: Vec<String>,
     created_at: DateTime<Utc>,
     #[serde(skip_serializing_if = "Option::is_none")]
     response: Option<CompletedResponse>,
@@ -693,6 +697,7 @@ async fn get_run(
         Ok(Json(project_terminal(metadata, record)))
     } else {
         let entity_ids = metadata.request.entities.iter().map(|entity| entity.id.clone()).collect();
+        let entity_text_hashes = entity_text_hashes(&metadata.request.entities);
         Ok(Json(GetRunResponse {
             run_ref: metadata.run_ref,
             status: metadata.status,
@@ -703,6 +708,7 @@ async fn get_run(
             axis_prompt: metadata.request.axis_prompt,
             model: metadata.request.model,
             entity_ids,
+            entity_text_hashes,
             created_at: metadata.created_at,
             response: None,
             error: metadata.error,
@@ -732,6 +738,7 @@ fn project_terminal(metadata: DaemonRunMetadata, record: JudgementRunRecord) -> 
         JudgementRunTerminal::Failed { error } => ("failed".to_string(), None, Some(error.clone())),
     };
     let entity_ids = record.request.entities.iter().map(|entity| entity.id.clone()).collect();
+    let entity_text_hashes = entity_text_hashes(&record.request.entities);
     GetRunResponse {
         run_ref: record.run_ref,
         status,
@@ -742,10 +749,19 @@ fn project_terminal(metadata: DaemonRunMetadata, record: JudgementRunRecord) -> 
         axis_prompt: record.request.axis_prompt,
         model: record.request.model,
         entity_ids,
+        entity_text_hashes,
         created_at: metadata.created_at,
         response,
         error,
     }
+}
+
+fn entity_text_hashes(entities: &[JudgementCandidate]) -> Vec<String> {
+    use sha2::{Digest, Sha256};
+    entities
+        .iter()
+        .map(|entity| format!("{:x}", Sha256::digest(entity.text.as_bytes())))
+        .collect()
 }
 
 fn project_completed(
