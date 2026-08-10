@@ -12,6 +12,11 @@ Versioning once it reaches `1.0.0`.
 First release published to crates.io (`cargo install cardinal-harness`).
 The 0.9.0 version number was assigned internally on 2026-07-05 (the
 `[0.9.0-dev]` section below); the published crate contains both sections.
+The pre-existing git tag `v0.9.0` marks the 07-05 internal bump, not this
+release — the published crate was built from commit `84aff7b` (clean
+tree), recorded in the package's `.cargo_vcs_info.json` and verified
+against the crates.io CDN copy. Tag-to-crate correspondence realigns at
+the next release.
 
 ### Added
 - The judgment packet (`src/packet.rs`, issue #46): content-addressed
