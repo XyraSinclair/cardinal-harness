@@ -1,6 +1,6 @@
 [package]
 name = "seriate"
-version = "0.1.0"
+version = "0.1.2"
 edition = "2021"
 license = "MIT"
 description = "Provenanced attribute annotation and LLM prior elicitation over entity sets: structured judgements, ordinal-first, logprob-aware, every number traceable to raw provider bytes"
