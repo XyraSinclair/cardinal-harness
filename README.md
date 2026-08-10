@@ -520,7 +520,7 @@ list or request JSON
 - [docs/WORKED_EXAMPLE.md](docs/WORKED_EXAMPLE.md): concrete rerank walkthrough with request shape, gates, stop reasons, uncertainty, cache, and reproducibility evidence
 - [docs/CARDINALD.md](docs/CARDINALD.md): the judgement-run daemon — HTTP contract for estimate, adaptive runs, and the external-harness schedule/submit lane
 - [docs/EVALUATION.md](docs/EVALUATION.md): checked-in synthetic evidence and an honest cardinal-vs-Likert comparison
-- [docs/BENCHMARKS.md](docs/BENCHMARKS.md): scaling harness and current dense-solver evidence
+- [docs/SCALING.md](docs/SCALING.md): scaling harness and current dense-solver evidence
 - [docs/TESTING.md](docs/TESTING.md): the adversarial test battery — what it attacks, the two solver bugs it found, and the honest negatives it pinned
 - [docs/WHAT_WHY_HOW.md](docs/WHAT_WHY_HOW.md): the one-page shareable version — exactly what this is good for, why, and how, with evidence for every claim
 - [docs/FIRST_PRINCIPLES.md](docs/FIRST_PRINCIPLES.md): the type system of structured judgement — the instrument grid (arity × scale × output-form), the invariance group of a belief, efficiency theory, and the honest occupancy map of which cells this repo fills

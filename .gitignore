@@ -20,6 +20,9 @@ target
 .cardinal_pairwise_cache.sqlite-shm
 .cardinal_pairwise_cache.sqlite-wal
 .cardinal_pairwise_cache.sqlite-journal
+# Raw run caches named exactly cache.sqlite stay local (older packs commit
+# cache-export.jsonl instead). Newer packs deliberately COMMIT replayable
+# *-cache.sqlite files (PRINCIPLES.md rule 6) - do not widen this pattern.
 artifacts/live/**/cache.sqlite
 artifacts/live/**/cache.lock
 scorecard.png

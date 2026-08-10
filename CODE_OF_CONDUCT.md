@@ -45,8 +45,8 @@ or harmful.
 If you experience or witness unacceptable behavior, please report it to the
 project maintainers.
 
-If the project is hosted on GitHub, you can also use GitHub's private reporting
-channels (e.g. Security Advisories) to avoid public disclosure.
+You can also use GitHub's private reporting channels (Security Advisories on
+this repository) to avoid public disclosure.
 
 ## Attribution
 
