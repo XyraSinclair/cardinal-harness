@@ -79,6 +79,8 @@ OpenRouter. Measured head-to-head against the API rail on the same corpus,
 seed, and model: **21/21 decisive-pair agreement at $0 marginal cost**
 (slower wall-clock; full instrument-health table in
 [`notes/claudecode-vs-api-2026-08-06/RESULTS.md`](notes/claudecode-vs-api-2026-08-06/RESULTS.md)).
+`--model codex/<model>` routes through the Codex exec CLI the same way —
+smoke-verified only, no rail-fitness study yet.
 
 Real output (preserved with full evidence under
 [`artifacts/live/sort-demo-2026-07-02/`](artifacts/live/sort-demo-2026-07-02/)):
@@ -419,7 +421,10 @@ and the compact mathematical contract in [docs/MODEL.md](docs/MODEL.md).
 
 ## Prompt surfaces
 
-Two prompt templates are supported:
+Five JSON prompt templates are supported (`prompt_by_slug` in
+`src/prompts.rs`), plus two single-token letter templates
+(`ratio_letter_v1`, `ordinal_letter_v1`) rendered by seriate for the
+logprob evidence path. The three everyday JSON templates:
 
 | Slug | Output shape | Use when |
 |------|--------------|----------|
@@ -427,9 +432,10 @@ Two prompt templates are supported:
 | `canonical_bucket_v1` | `{"higher_ranked":"A|B","ratio_bucket":0..16,"confidence":0.0..1.0}` | Bucket-index variant for runs that need to map output logprobs onto the fixed ratio ladder. Self-reported confidence is trace metadata. |
 | `ordinal_v1` | `{"higher_ranked":"A|B","confidence":0.0..1.0}` | Natural direction-only judgement; enters the solver as a fixed modest log-ratio with unit precision. Strictly less informative than ratios — use as a baseline/control or when magnitude questions confuse the judge. |
 
-Both templates use the same ratio ladder and the same refusal shape:
+All JSON templates use the same ratio ladder and the same refusal shape:
 `{"refused":true}`. Unknown `prompt_template_slug` values are rejected.
-Details in [docs/PROMPTS.md](docs/PROMPTS.md).
+The group-inverse probes `less_v1` and `fraction_v1` and the letter
+templates are documented in [docs/PROMPTS.md](docs/PROMPTS.md).
 
 ## CLI
 
@@ -488,7 +494,11 @@ both require `OPENROUTER_API_KEY` and spend provider credits.
 | `rerank::sort` | List-in, list-out sorting convenience over the same engine |
 | `prompts` | Canonical pairwise ratio prompt and ratio ladder |
 | `cache` | SQLite-backed memoization for pairwise judgements |
-| `gateway` | OpenRouter client, pricing, usage, attribution |
+| `gateway` | OpenRouter client, pricing, usage, attribution; subscription adapters (`claude-code/<model>`, `codex/<model>`) |
+| `packet` | Content-addressed judgment packets with byte-identical fusion |
+| `judgement_run` | The portable `cardinal.judgement-run.v1` atom: execute, persist, reload |
+| `landing` | ClickHouse landing for completed judgement runs |
+| `censored_likelihood` | Interval-censored ordered-probit fitting (off the production path) |
 | `text_chunking` | Token-aware chunking helpers |
 
 ```text
