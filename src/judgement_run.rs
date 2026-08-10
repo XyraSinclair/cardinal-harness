@@ -165,6 +165,7 @@ pub struct ExternalJudgementSchedule {
     pub template_slug: String,
     pub template_hash: String,
     pub seed: u64,
+    pub schedule_digest: String,
     pub comparisons: Vec<ScheduledComparison>,
 }
 
@@ -207,7 +208,37 @@ pub struct ExternalJudgementRun {
     pub harness_version: String,
     pub model: String,
     pub seed: u64,
+    pub schedule_digest: String,
     pub results: Vec<ExternalJudgementResult>,
+}
+
+/// Digest binding an external schedule to the exact request it was rendered
+/// for: template bytes, seed, axis, budget, and every entity id and text.
+/// External results must return it, so verdicts collected under one prompt
+/// rendering can never be landed under different texts, a different axis, or
+/// a drifted template (independent review 2026-08-10, finding 1).
+#[must_use]
+pub fn external_schedule_digest(request: &NormalizedJudgementRunRequest, seed: u64) -> String {
+    use sha2::{Digest, Sha256};
+    let template = crate::prompts::PROMPT_V2;
+    let mut hasher = Sha256::new();
+    let mut frame = |bytes: &[u8]| {
+        // Length-prefixed framing keeps adjacent fields from aliasing.
+        Sha256::update(&mut hasher, (bytes.len() as u64).to_le_bytes());
+        Sha256::update(&mut hasher, bytes);
+    };
+    frame(b"cardinald-external-schedule-v1");
+    frame(template.template_hash().as_bytes());
+    frame(&seed.to_le_bytes());
+    frame(request.axis_key.as_bytes());
+    frame(request.axis_prompt.as_bytes());
+    frame(&(request.requested_k as u64).to_le_bytes());
+    frame(&(request.entities.len() as u64).to_le_bytes());
+    for entity in &request.entities {
+        frame(entity.id.as_bytes());
+        frame(entity.text.as_bytes());
+    }
+    format!("{:x}", hasher.finalize())
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -259,6 +290,7 @@ pub fn build_external_schedule(
         template_slug: template.slug.to_string(),
         template_hash: template.template_hash(),
         seed,
+        schedule_digest: external_schedule_digest(request, seed),
         comparisons,
     }
 }
@@ -332,6 +364,15 @@ pub fn validate_external_judgement_run(
     }
     if external.model.trim().is_empty() || external.model.trim() != external.model {
         return Err("external.model must be nonblank and normalized".to_string());
+    }
+    if external.model.len() > 200 {
+        return Err("external.model must not exceed 200 bytes".to_string());
+    }
+    if external.schedule_digest != external_schedule_digest(request, external.seed) {
+        return Err(
+            "external.schedule_digest does not match the issued schedule for this request"
+                .to_string(),
+        );
     }
 
     let schedule = build_external_schedule(request, external.seed);
@@ -427,6 +468,30 @@ pub fn validate_external_judgement_run(
         return Err(
             "external results must contain at least one non-refused comparison".to_string(),
         );
+    }
+    // Coverage floors (independent review 2026-08-10, finding 2): a partial
+    // result set must not mint full-cohort scores. Every scheduled comparison
+    // must be answered (a refusal is an answer), and every entity must carry
+    // at least one non-refused measurement or the run is rejected rather than
+    // landing flat priors as public scores.
+    if indices.len() != scheduled.len() {
+        return Err(format!(
+            "external results must answer every scheduled comparison: {} of {} present",
+            indices.len(),
+            scheduled.len()
+        ));
+    }
+    let mut measured: HashSet<&str> = HashSet::with_capacity(entity_ids.len());
+    for result in &external.results {
+        if !result.refused {
+            measured.insert(result.entity_a_id.as_str());
+            measured.insert(result.entity_b_id.as_str());
+        }
+    }
+    if let Some(unmeasured) = entity_ids.iter().find(|id| !measured.contains(*id)) {
+        return Err(format!(
+            "entity {unmeasured} has no non-refused comparison; refusing to land an unmeasured score"
+        ));
     }
     Ok(())
 }

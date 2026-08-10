@@ -296,8 +296,15 @@ async fn healthz() -> &'static str {
 }
 
 async fn schedule_run(
+    State(state): State<AppState>,
     payload: Result<Json<ScheduleRequest>, JsonRejection>,
 ) -> Result<Json<ExternalJudgementSchedule>, ApiError> {
+    // Schedules render 8xN prompts per call; ride the same admission gate as
+    // runs so a local caller cannot spin unbounded free prompt rendering
+    // (independent review 2026-08-10, finding 3).
+    let _admission_permit = Arc::clone(&state.admission)
+        .try_acquire_owned()
+        .map_err(|_| ApiError::too_many_requests("the run queue is full; retry shortly"))?;
     let Json(payload) = payload.map_err(|_| ApiError::bad_request("invalid JSON request body"))?;
     validate_caps(&payload.judgement)?;
     validate_run_context(
