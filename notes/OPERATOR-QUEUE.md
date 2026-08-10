@@ -59,10 +59,30 @@ next kill before any public tier claim.
 
 ## DUE DATES
 
-- **2026-08-08** — the 07-09 doctrine pack's 30-day tests fall due
-  (notes/red-team-2026-07-09/doctrine.md: external-reference pack test,
-  instrument-vs-artifact commit ratio, errata placement, dormant-instrument
-  marking). Whoever is in the repo that week: run them, record results here.
+- **2026-08-08** — the 07-09 doctrine pack's 30-day tests fell due. Run
+  2026-08-10, two days late (the miss is itself a data point on the
+  queue's throughput). Results:
+  - **External-reference pack (F1): PASS** — closed early as C1 below.
+  - **Instrument-vs-artifact commit ratio (F2): moved, without the edit.**
+    Window 2026-07-09..08-08, 78 commits: 21 instrument-only (src/tests),
+    36 artifact/notes/site-only, 6 mixed, 15 other — 0.58:1 vs the ~9:1
+    baseline the finding measured. The proposed doctrine edit (Q1) never
+    landed, so the wording was epiphenomenal: the ratio inverted anyway.
+    F2's premise that the slogan drives the ratio is refuted in the
+    favorable direction.
+  - **Errata placement (F5a): PASS** — every standing erratum found by
+    grep over pack READMEs/RESULTS and notes (judge-bench ×2, spin-sweep,
+    kimi-k3-bench, axis-research ×2, best-library ×2, decimal-pmf) sits in
+    the top ~10 lines of its file; none buried.
+  - **Retirement/dormant marking (F6b): FAIL — Finding 6 stands
+    confirmed.** Zero retirements or dormant markings in the window
+    (grep retir/dormant/removed over the commit log). First
+    retirement-shaped event is 839c7a7 (2026-08-10, dead embed/batch
+    subsystem excision) — outside the window, and code-level, not
+    instrument-level. Nothing in the doctrine can yet kill an instrument;
+    Q3 remains the live fix.
+  - The >$10-map twin test (F6a) never triggered: no >$10 map shipped in
+    the window (max single-run spend on record: $7.07, P2).
 
 ## CLOSED
 
