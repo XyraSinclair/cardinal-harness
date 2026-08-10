@@ -21,10 +21,16 @@ same evening as the rail comparison — the first arXiv lens on openpriors.com.
 
 ## Board #2: arxiv/interestingness (2026-08-10) — the reusable recipe
 
-48 freshest August cs.AI/LG/CL abstracts, `anthropic/claude-haiku-4.5`,
-`requested_k` 12, privacy public. `jrun_b61f63f83cef4f46bf41d90d70194688`:
-384 comparisons, $1.274 (`cost_is_estimate` false), 427k in + 170k out,
-~5 min wall. Live at openpriors.com/l/arxiv/interestingness.
+48 freshest August cs.AI/LG/CL abstracts, `requested_k` 12, privacy public.
+First run on haiku-4.5 (`jrun_b61f63f83cef4f46bf41d90d70194688`, 384
+comparisons, $1.274, ~5 min) — **immediately overruled**: operator model
+floor (2026-08-10): *haiku-class models are for simple objective bin
+classification only; fuzzy cardinal judgement that matters gets a
+frontier-class judge (sonnet+ / sol)*. Superseding run on
+`anthropic/claude-sonnet-4.6`: `jrun_27fd4f5190504938bc1d8871f8599ef8`.
+`scores_current` keys on (lens, axis_key, entity_id, entity_hash) — no
+model — so the newest run's rows replace the board; earlier runs persist
+only as ledger provenance. Live at openpriors.com/l/arxiv/interestingness.
 
 Recipe deltas vs the pilot (these are the parts worth keeping):
 
