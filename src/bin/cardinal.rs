@@ -41,7 +41,15 @@ impl From<PairwiseModeArg> for cardinal_harness::rerank::evaluation::SyntheticPa
 }
 
 #[derive(Parser)]
-#[command(name = "cardinal", version, about = "Canonical pairwise ratio CLI")]
+#[command(
+    name = "cardinal",
+    version,
+    about = "Canonical pairwise ratio CLI",
+    after_help = "The stability-promised verbs are `sort` and `judge` (plus the judgment-packet \
+format they emit). Verbs marked [research] are honest, provenanced instruments \
+that are free to change shape without notice (AGENTS.md: canonical vs \
+research-grade surface)."
+)]
 struct Cli {
     #[command(subcommand)]
     command: Commands,
@@ -144,7 +152,7 @@ enum Commands {
         #[arg(long)]
         estimate: bool,
     },
-    /// AHP: weigh attributes against a goal via pairwise comparisons
+    /// [research] AHP: weigh attributes against a goal via pairwise comparisons
     ///
     /// Attributes are entities too: each is judged pairwise on "importance
     /// for the goal", and the solver's log-latents are the log priority
@@ -181,7 +189,7 @@ enum Commands {
         #[arg(long)]
         json: bool,
     },
-    /// Find the attributes under which one item stands out from its peers
+    /// [research] Find the attributes under which one item stands out from its peers
     ///
     /// The propagation primitive: given a set and a focal item, propose (or
     /// supply) candidate attributes, MEASURE all of them over the whole set
@@ -219,7 +227,7 @@ enum Commands {
         #[arg(long)]
         json: bool,
     },
-    /// Slate: item + voice note in, stakeholder-backed attributes out
+    /// [research] Slate: item + voice note in, stakeholder-backed attributes out
     ///
     /// The intake front door: name the stakeholders whose judgment of this
     /// item matters (or let the model propose them), have each propose
@@ -250,7 +258,7 @@ enum Commands {
         #[arg(long)]
         json: bool,
     },
-    /// Canonize an attribute: converge on a communication primitive
+    /// [research] Canonize an attribute: converge on a communication primitive
     ///
     /// An attribute is canonical when it induces the SAME cardinal latent
     /// in different minds. This measures exactly that: seed wording (plus
@@ -290,7 +298,7 @@ enum Commands {
         #[arg(long)]
         json: bool,
     },
-    /// Analytic Network Process: goal, criteria, alternatives — with feedback
+    /// [research] Analytic Network Process: goal, criteria, alternatives — with feedback
     ///
     /// AHP generalized to a network. Every supermatrix edge is a solved
     /// pairwise measurement: criteria weighed against the goal, criteria
@@ -334,7 +342,7 @@ enum Commands {
         #[arg(long)]
         json: bool,
     },
-    /// Judge Coherence Benchmark: score models on judgement consistency
+    /// [research] Judge Coherence Benchmark: score models on judgement consistency
     ///
     /// No ground-truth labels: the benchmark measures internal consistency
     /// under meaning-preserving transformations (order swap, reciprocal
@@ -365,7 +373,7 @@ enum Commands {
         #[arg(long)]
         cache: Option<PathBuf>,
     },
-    /// Measure a model's pure elicitation artifacts with null pairs
+    /// [research] Measure a model's pure elicitation artifacts with null pairs
     ///
     /// Presents byte-identical text in both slots of the ratio-letter
     /// instrument: a perfect judge answers parity, so ANY directional
@@ -463,7 +471,7 @@ enum Commands {
         #[arg(long)]
         packets_out: Option<PathBuf>,
     },
-    /// Expand a terse criterion into a precise judging rubric (one LLM call)
+    /// [research] Expand a terse criterion into a precise judging rubric (one LLM call)
     ///
     /// Prints only the rubric to stdout, so it composes:
     ///   cardinal sort list.txt --by "$(cardinal elaborate --by impact)"
@@ -475,7 +483,7 @@ enum Commands {
         #[arg(long)]
         model: Option<String>,
     },
-    /// Explain an existing ranking: which attributes reconstruct it?
+    /// [research] Explain an existing ranking: which attributes reconstruct it?
     ///
     /// FILE (or stdin) holds items in YOUR believed order, best first.
     /// Each --candidate attribute is measured with pairwise judgements and
@@ -509,14 +517,14 @@ enum Commands {
         #[arg(long)]
         seed: Option<u64>,
     },
-    /// Export SQLite cache to JSONL
+    /// [research] Export SQLite cache to JSONL
     CacheExport {
         #[arg(long)]
         db: Option<PathBuf>,
         #[arg(long)]
         out: PathBuf,
     },
-    /// Prune SQLite cache by age and/or size
+    /// [research] Prune SQLite cache by age and/or size
     CachePrune {
         #[arg(long)]
         db: Option<PathBuf>,
@@ -525,12 +533,12 @@ enum Commands {
         #[arg(long)]
         max_rows: Option<usize>,
     },
-    /// List or load model policies
+    /// [research] List or load model policies
     Policy {
         #[command(subcommand)]
         command: PolicyCommands,
     },
-    /// Run the synthetic pairwise-ratio evaluation suite
+    /// [research] Run the synthetic pairwise-ratio evaluation suite
     Eval {
         #[arg(long)]
         case: Option<String>,
@@ -541,7 +549,7 @@ enum Commands {
         #[arg(long, value_enum, default_value = "ratio")]
         mode: PairwiseModeArg,
     },
-    /// Run the synthetic Likert baseline evaluation suite
+    /// [research] Run the synthetic Likert baseline evaluation suite
     EvalLikert {
         #[arg(long)]
         case: Option<String>,
@@ -554,7 +562,7 @@ enum Commands {
         #[arg(long, default_value_t = 1.0, value_parser = parse_positive_finite_f64)]
         budget_multiplier: f64,
     },
-    /// Compare cardinal pairwise evaluation against the Likert baseline
+    /// [research] Compare cardinal pairwise evaluation against the Likert baseline
     EvalCompare {
         #[arg(long)]
         case: Option<String>,
@@ -567,7 +575,7 @@ enum Commands {
         #[arg(long, value_enum, default_value = "ratio")]
         mode: PairwiseModeArg,
     },
-    /// Generate a report from a request + response JSON
+    /// [research] Generate a report from a request + response JSON
     Report {
         #[arg(long)]
         request: PathBuf,
@@ -590,7 +598,7 @@ enum Commands {
         #[arg(long)]
         cache_only: bool,
     },
-    /// Expand one request across prompt templates and positive/negative attribute variants
+    /// [research] Expand one request across prompt templates and positive/negative attribute variants
     ExperimentExpand {
         #[arg(long)]
         request: PathBuf,
@@ -603,12 +611,12 @@ enum Commands {
         #[arg(long = "variant-json")]
         variant_json: Vec<PathBuf>,
     },
-    /// Validate a multi-rerank request JSON without touching the network or cache
+    /// [research] Validate a multi-rerank request JSON without touching the network or cache
     Validate {
         #[arg(long)]
         request: PathBuf,
     },
-    /// Run a rerank from JSON input
+    /// [research] Run a rerank from JSON input
     Rerank {
         #[arg(long)]
         request: PathBuf,
