@@ -70,8 +70,11 @@ don't overlap 0.20 for 4.1-mini).
 
 1. Rust seam: port the ledger/certificate core behind the rerank comparison path so
    judgments can emit (E[Z], honest σ) into IRLS — the internal consumer that proves
-   the kernel before any external story.
-2. Oracle probe #3: exact-ground-truth estimator shootout on a local full-logits
-   model (turns estimator choice into measurement).
+   the kernel before any external story. Include the cross-fit residual estimator
+   per SHOOTOUT.md finding 4; never same-batch subtract (finding 2).
+2. ~~Oracle probe #3: exact-ground-truth estimator shootout~~ **SHIPPED** — see
+   `SHOOTOUT.md`: envelope coverage 1.00 across 4,500 replications, ~47x call
+   efficiency over MC in the high-enum regime, selection bias measured (−0.60 →
+   ≤0.01 via cross-fit), chosen-token-only access confirmed viable.
 3. Prefill census (unlocks Neyman allocation + deep grammars).
 4. Radix-4 signed-log instrument A/B against free-form (instrument-shift experiment).
