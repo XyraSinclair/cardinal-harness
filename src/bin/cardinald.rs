@@ -696,7 +696,12 @@ async fn get_run(
         })?;
         Ok(Json(project_terminal(metadata, record)))
     } else {
-        let entity_ids = metadata.request.entities.iter().map(|entity| entity.id.clone()).collect();
+        let entity_ids = metadata
+            .request
+            .entities
+            .iter()
+            .map(|entity| entity.id.clone())
+            .collect();
         let entity_text_hashes = entity_text_hashes(&metadata.request.entities);
         Ok(Json(GetRunResponse {
             run_ref: metadata.run_ref,
@@ -737,7 +742,12 @@ fn project_terminal(metadata: DaemonRunMetadata, record: JudgementRunRecord) -> 
         ),
         JudgementRunTerminal::Failed { error } => ("failed".to_string(), None, Some(error.clone())),
     };
-    let entity_ids = record.request.entities.iter().map(|entity| entity.id.clone()).collect();
+    let entity_ids = record
+        .request
+        .entities
+        .iter()
+        .map(|entity| entity.id.clone())
+        .collect();
     let entity_text_hashes = entity_text_hashes(&record.request.entities);
     GetRunResponse {
         run_ref: record.run_ref,

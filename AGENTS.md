@@ -67,6 +67,9 @@ Background sync automation, if any, should default to `git fetch`, not blind
   `~/.codexpool/bin/codex`, scratch-cwd isolation, $0 marginal — smoke-verified
   2026-08-10, no rail-fitness study yet)
 - `src/packet.rs`: content-addressed judgment packets, idempotent byte-identical fusion
+- `src/bin/cardinald.rs` + `src/judgement_run.rs` + `src/landing.rs`: the
+  judgement-run daemon (HTTP contract in `docs/CARDINALD.md`), the portable
+  `cardinal.judgement-run.v1` atom, and ClickHouse landing
 - `tests/`: gateway, rerank, trace, packet, and cache coverage
 - `site/`: the public pairwiseratio.org static site (single committed
   `index.html`, board data inlined from dated evidence packs; design and

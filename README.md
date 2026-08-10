@@ -508,6 +508,7 @@ list or request JSON
 - [docs/MODEL.md](docs/MODEL.md): compact mathematical contract, assumptions, and failure modes
 - [docs/PROMPTS.md](docs/PROMPTS.md): supported prompt templates, output contracts, and JSON request examples
 - [docs/WORKED_EXAMPLE.md](docs/WORKED_EXAMPLE.md): concrete rerank walkthrough with request shape, gates, stop reasons, uncertainty, cache, and reproducibility evidence
+- [docs/CARDINALD.md](docs/CARDINALD.md): the judgement-run daemon — HTTP contract for estimate, adaptive runs, and the external-harness schedule/submit lane
 - [docs/EVALUATION.md](docs/EVALUATION.md): checked-in synthetic evidence and an honest cardinal-vs-Likert comparison
 - [docs/BENCHMARKS.md](docs/BENCHMARKS.md): scaling harness and current dense-solver evidence
 - [docs/TESTING.md](docs/TESTING.md): the adversarial test battery — what it attacks, the two solver bugs it found, and the honest negatives it pinned
