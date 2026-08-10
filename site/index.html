@@ -70,6 +70,7 @@ table{width:100%;border-collapse:collapse;font:12px/1.35 var(--mono);font-varian
 th,td{padding:13px 12px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--rule)}
 th{color:var(--muted);font-weight:400}
 th.l,td.l{text-align:left}
+.thead-groups th{padding:12px 6px 0;border-bottom:0;color:var(--faint);font:500 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;text-align:center}
 tbody tr:last-child td{border-bottom:0}
 tbody tr:hover td{background:var(--paper2)}
 td.model,td.judge{color:var(--ink);font-weight:500}
@@ -89,13 +90,18 @@ details[open] summary::before{content:'−'}
 .full-board{margin-top:20px;max-height:620px}
 .full-board table{min-width:1010px}
 .metric-cards{display:none}
-.battery{display:grid;grid-template-columns:repeat(4,1fr);margin-top:38px;border-top:1px solid var(--ink)}
-.test{min-height:184px;padding:22px 24px 28px 0;border-bottom:1px solid var(--rule)}
-.test:not(:nth-child(4n)){border-right:1px solid var(--rule);padding-left:24px}
-.test:nth-child(4n+1){padding-left:0}
-.glyph{margin-bottom:18px;font:500 19px/1 var(--mono)}
-.test h3{margin-bottom:8px;font:600 18px/1.2 var(--serif)}
-.test p{margin:0;color:var(--muted);font-size:15px;line-height:1.45}
+.laws{margin-top:38px;border-top:1px solid var(--ink)}
+.law{padding:26px 0 30px;border-bottom:1px solid var(--rule)}
+.law-head{display:flex;align-items:baseline;gap:16px;margin-bottom:6px}
+.law-index{color:var(--faint);font:500 13px/1 var(--mono)}
+.law-head h3{margin:0;font:600 22px/1.1 var(--serif);letter-spacing:-.01em}
+.law-tag{margin-left:auto;color:var(--muted);font:500 11px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.law-note{max-width:640px;margin:8px 0 0 33px;color:var(--muted);font-size:15px;line-height:1.5}
+.probe{display:grid;grid-template-columns:56px 118px 1fr auto;gap:0 14px;align-items:baseline;margin-left:33px;padding:11px 0 0}
+.glyph{font:500 15px/1 var(--mono)}
+.probe h3{margin:0;font:600 16px/1.25 var(--serif)}
+.probe p{margin:0;color:var(--muted);font-size:15px;line-height:1.45}
+.law-word{color:var(--faint);font:400 11px/1.4 var(--mono)}
 .evidence-list{margin-top:34px}
 .evidence-body{padding:0 0 28px 28px}
 pre{max-height:420px;margin:0;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;background:var(--paper2);padding:20px;color:var(--ink);font:11px/1.65 var(--mono)}
@@ -113,10 +119,6 @@ footer{padding:30px 0 46px;border-top:1px solid var(--rule)}
 @media(max-width:900px){
   .hero{grid-template-columns:1fr;gap:56px;min-height:0;padding:64px 0}
   .instrument{max-width:620px}
-  .battery{grid-template-columns:repeat(2,1fr)}
-  .test:not(:nth-child(4n)){border-right:0;padding-left:0}
-  .test:nth-child(odd){border-right:1px solid var(--rule);padding-right:24px}
-  .test:nth-child(even){padding-left:24px}
   .run-grid{grid-template-columns:1fr;gap:46px}
 }
 @media(max-width:640px){
@@ -146,11 +148,11 @@ footer{padding:30px 0 46px;border-top:1px solid var(--rule)}
   .metric-card{padding:18px 0;border-bottom:1px solid var(--rule);font:11px/1.6 var(--mono)}
   .metric-card dl{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:12px 0 0}
   .metric-card dt{color:var(--faint)}.metric-card dd{margin:2px 0 0;color:var(--ink)}
-  .battery{grid-template-columns:1fr}
-  .test,.test:nth-child(n){min-height:0;padding:20px 0;border-right:0}
-  .test{display:grid;grid-template-columns:48px 82px 1fr;gap:0;align-items:start}
-  .glyph,.test h3{margin:0}
-  .test p{font-size:14px}
+  .law-head{flex-wrap:wrap}
+  .law-note{margin-left:0}
+  .probe{grid-template-columns:40px 92px 1fr;margin-left:0}
+  .law-word{grid-column:3;justify-self:start}
+  .probe p{font-size:14px}
   .diffs{grid-template-columns:1fr}
   .evidence-body{padding-left:0}
   .foot{display:grid}
@@ -214,9 +216,22 @@ footer{padding:30px 0 46px;border-top:1px solid var(--rule)}
       <summary>Show all metrics</summary>
       <div class="board-scroll full-board">
         <table id="full-table">
-          <thead><tr>
-            <th class="l">#</th><th class="l">model</th><th>JUDGE</th><th>signal</th><th>coher.</th><th>flip /20</th><th>resid.</th><th>curl</th><th>spin</th><th>χ</th><th>pol ρ</th><th>para ρ</th><th>ref.</th><th>cost</th>
-          </tr></thead>
+          <thead>
+            <tr class="thead-groups">
+              <th colspan="3"></th>
+              <th colspan="2">substance</th>
+              <th colspan="4">semantic fidelity</th>
+              <th colspan="3">scale coherence</th>
+              <th colspan="2"></th>
+            </tr>
+            <tr>
+              <th class="l">#</th><th class="l">model</th><th>JUDGE</th>
+              <th>signal</th><th>ref.</th>
+              <th>para ρ</th><th>pol ρ</th><th>spin</th><th>χ</th>
+              <th>flip /20</th><th>resid.</th><th>curl</th>
+              <th title="aggregate of the seven law axes">coher.</th><th>cost</th>
+            </tr>
+          </thead>
           <tbody></tbody>
         </table>
         <div class="metric-cards" id="metric-cards"></div>
@@ -226,17 +241,30 @@ footer{padding:30px 0 46px;border-top:1px solid var(--rule)}
 
   <section id="tests">
     <p class="eyebrow">The battery</p>
-    <h2>Eight tests. One requirement.</h2>
-    <p class="section-note">Each test applies a transformation with a known constraint: preserve, invert, compose to 1, or refuse to move. JCB measures the violation.</p>
-    <div class="battery">
-      <div class="test"><div class="glyph">A⇄B</div><h3>Order</h3><p>Swap A/B. Direction should hold; the ratio should reciprocate.</p></div>
-      <div class="test"><div class="glyph">△</div><h3>Cycles</h3><p>Multiply ratios around a cycle. The product should be 1.</p></div>
-      <div class="test"><div class="glyph">¬</div><h3>Polarity</h3><p>Negate the criterion. The ranking should reverse.</p></div>
-      <div class="test"><div class="glyph">≈</div><h3>Paraphrase</h3><p>Reword the criterion. The ranking should persist.</p></div>
-      <div class="test"><div class="glyph">±</div><h3>Spin</h3><p>Lean on the judge. The judgment should resist the lean.</p></div>
-      <div class="test"><div class="glyph">A=A</div><h3>Null</h3><p>Compare an item with itself. The ratio should be 1×.</p></div>
-      <div class="test"><div class="glyph">␣</div><h3>Nuisance</h3><p>Change only formatting or prestige cues. The ratio should not move.</p></div>
-      <div class="test"><div class="glyph">Z₂³</div><h3>Orbit</h3><p>Compose order × polarity × wording. Invariant structure should dominate.</p></div>
+    <h2>Eight probes. One law.</h2>
+    <p class="section-note">Every probe breaks one consequence of a single claim: the judge's log-ratio measures a latent score, <span class="mono">m(A,B)&nbsp;=&nbsp;s(A)&nbsp;−&nbsp;s(B)</span>. The groups break it at increasing depth.</p>
+    <div class="laws">
+      <div class="law">
+        <div class="law-head"><span class="law-index">I</span><h3>Say something</h3><span class="law-tag">substance</span></div>
+        <p class="law-note">The precondition, read off the raw calls: spread across pairs (signal) and answers rather than refusals (coverage). A judge that says 1× everywhere is coherent about nothing.</p>
+      </div>
+      <div class="law">
+        <div class="law-head"><span class="law-index">II</span><h3>Move only with meaning</h3><span class="law-tag">semantic fidelity</span></div>
+        <div class="probe"><div class="glyph">≈</div><h3>Paraphrase</h3><p>Reword the criterion. The ranking should persist.</p><span class="law-word">invariance</span></div>
+        <div class="probe"><div class="glyph">¬</div><h3>Polarity</h3><p>Negate the criterion. The ranking should reverse.</p><span class="law-word">equivariance</span></div>
+        <div class="probe"><div class="glyph">␣</div><h3>Nuisance</h3><p>Change only formatting or prestige cues. The ratio should not move.</p><span class="law-word">surface independence</span></div>
+        <div class="probe"><div class="glyph">±</div><h3>Spin</h3><p>Lean on the judge. The judgment should resist the lean.</p><span class="law-word">requester independence</span></div>
+      </div>
+      <div class="law">
+        <div class="law-head"><span class="law-index">III</span><h3>Fit one scale</h3><span class="law-tag">scale coherence</span></div>
+        <div class="probe"><div class="glyph">A=A</div><h3>Null</h3><p>Compare an item with itself. The ratio should be 1×.</p><span class="law-word">identity</span></div>
+        <div class="probe"><div class="glyph">A⇄B</div><h3>Order</h3><p>Swap A/B. Direction should hold; the ratio should reciprocate.</p><span class="law-word">reciprocity</span></div>
+        <div class="probe"><div class="glyph">△</div><h3>Cycles</h3><p>Multiply ratios around a cycle. The product should be 1.</p><span class="law-word">integrability</span></div>
+      </div>
+      <div class="law">
+        <div class="law-head"><span class="law-index">IV</span><h3>Hold jointly</h3><span class="law-tag">composition</span></div>
+        <div class="probe"><div class="glyph">Z₂³</div><h3>Orbit</h3><p>Compose order × polarity × wording. Invariant structure should dominate.</p><span class="law-word">orbit coherence</span></div>
+      </div>
     </div>
   </section>
 
@@ -389,16 +417,18 @@ DATA.forEach((r,i)=>{
   compactBody.appendChild(compact);
   const full=document.createElement('tr');
   full.innerHTML=`<td class="l rank">${rank}</td><td class="l model">${r.model}</td>
-    <td>${fmt(r.judge,3)}</td><td title="${ciTitle(r.signal,'nats')}">${fmt(r.signal.v,2)}</td>
-    <td title="harmonic mean ${fmt(r.cohH,2)}">${fmt(r.coh,2)}</td>
+    <td>${fmt(r.judge,3)}</td>
+    <td title="${ciTitle(r.signal,'nats')}">${fmt(r.signal.v,2)}</td>
+    <td>${r.refusals}</td>
+    <td title="${ciTitle(r.para,'Spearman ρ')}">${fmt(r.para.v,2)}</td>
+    <td title="${ciTitle(r.pol,'Spearman ρ')}">${fmt(r.pol.v,2)}</td>
+    <td title="${ciTitle(r.spin,'survival rate')}">${Math.round(r.spin.v*r.spin.n)}/${r.spin.n}</td>
+    <td title="${ciTitle(r.chi,'nats/spin')}">${fmt(r.chi.v,2)}</td>
     <td title="${ciTitle(r.flip,'rate')}"><span class="${r.flip.v>=.3?'worst':''}">${Math.round(r.flip.v*20)}</span></td>
     <td title="${ciTitle(r.resid,'nats')}">${fmt(r.resid.v,2)}</td>
     <td title="${ciTitle(r.curl,'fraction; cycle rank 13')}">${fmt(r.curl.v,3)}</td>
-    <td title="${ciTitle(r.spin,'survival rate')}">${Math.round(r.spin.v*r.spin.n)}/${r.spin.n}</td>
-    <td title="${ciTitle(r.chi,'nats/spin')}">${fmt(r.chi.v,2)}</td>
-    <td title="${ciTitle(r.pol,'Spearman ρ')}">${fmt(r.pol.v,2)}</td>
-    <td title="${ciTitle(r.para,'Spearman ρ')}">${fmt(r.para.v,2)}</td>
-    <td>${r.refusals}</td><td>$${r.cost.toFixed(2)}</td>`;
+    <td title="harmonic mean ${fmt(r.cohH,2)}">${fmt(r.coh,2)}</td>
+    <td>$${r.cost.toFixed(2)}</td>`;
   fullBody.appendChild(full);
   const card=document.createElement('article');
   card.className='metric-card';

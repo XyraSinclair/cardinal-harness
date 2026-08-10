@@ -152,9 +152,15 @@ The page uses this information order:
 1. **Thesis and evidence** — the hero states the test and shows the recorded
    gpt-5.4-nano order contradiction for pair (1,3).
 2. **Leaderboard** — the primary table shows six columns. The full 14-column
-   table stays available in a disclosure. Mobile devices show metric lists.
-3. **Battery** — a compact matrix states the constraint for each of the eight
-   transformations.
+   table stays available in a disclosure; a group header row types its
+   columns as substance, semantic fidelity, and scale coherence. Column
+   order changed only; no score changed. Mobile devices show metric lists.
+3. **Battery** — the eight probes appear under the law each one audits:
+   I substance (signal, coverage), II semantic fidelity (paraphrase,
+   polarity, nuisance, spin), III scale coherence (null, order, cycles),
+   IV composition (orbit). One line above the groups states the root
+   claim: `m(A,B) = s(A) − s(B)`. Each probe row carries its law word
+   (invariance, equivariance, identity, reciprocity, integrability, …).
 4. **Evidence** — disclosures contain the exact calls, prompt, diffs, JSONL
    link, and method link.
 5. **Run and limits** — one command and three visible limits close the page.
