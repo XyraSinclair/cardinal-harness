@@ -1,6 +1,7 @@
 //! Provider gateway for chat completions.
 
 pub mod claude_code;
+pub mod codex;
 pub mod error;
 pub mod openrouter;
 pub mod pricing;
@@ -13,6 +14,7 @@ use std::time::Duration;
 use tokio::time::sleep;
 
 use claude_code::{ClaudeCodeAdapter, ClaudeCodeConfig};
+use codex::{CodexAdapter, CodexConfig};
 use openrouter::OpenRouterAdapter;
 use usage::{CallStatus, ProviderCallRecord, UsageSink as UsageSinkTrait};
 
@@ -44,6 +46,7 @@ impl Default for GatewayConfig {
 pub struct ProviderGateway<U: UsageSinkTrait> {
     openrouter: Option<OpenRouterAdapter>,
     claude_code: ClaudeCodeAdapter,
+    codex: CodexAdapter,
     usage_sink: Arc<U>,
     config: GatewayConfig,
 }
@@ -63,9 +66,16 @@ impl<U: UsageSinkTrait> ProviderGateway<U> {
             effort: std::env::var("CARDINAL_CLAUDE_CODE_EFFORT").ok(),
             ..ClaudeCodeConfig::default()
         });
+        let codex = CodexAdapter::new(CodexConfig {
+            binary: std::env::var_os("CARDINAL_CODEX_BINARY")
+                .map(Into::into)
+                .unwrap_or_else(|| CodexConfig::default().binary),
+            effort: std::env::var("CARDINAL_CODEX_EFFORT").ok(),
+        });
         Ok(Self {
             openrouter: Some(openrouter),
             claude_code,
+            codex,
             usage_sink,
             config: GatewayConfig::default(),
         })
@@ -79,6 +89,7 @@ impl<U: UsageSinkTrait> ProviderGateway<U> {
         Self {
             openrouter: Some(openrouter),
             claude_code: ClaudeCodeAdapter::default(),
+            codex: CodexAdapter::default(),
             usage_sink,
             config,
         }
@@ -88,6 +99,7 @@ impl<U: UsageSinkTrait> ProviderGateway<U> {
         Self {
             openrouter: None,
             claude_code,
+            codex: CodexAdapter::default(),
             usage_sink,
             config: GatewayConfig::default(),
         }
@@ -102,8 +114,19 @@ impl<U: UsageSinkTrait> ProviderGateway<U> {
         Self {
             openrouter: Some(openrouter),
             claude_code,
+            codex: CodexAdapter::default(),
             usage_sink,
             config,
+        }
+    }
+
+    pub fn codex(codex: CodexAdapter, usage_sink: Arc<U>) -> Self {
+        Self {
+            openrouter: None,
+            claude_code: ClaudeCodeAdapter::default(),
+            codex,
+            usage_sink,
+            config: GatewayConfig::default(),
         }
     }
 
@@ -117,6 +140,7 @@ impl<U: UsageSinkTrait> ProviderGateway<U> {
                     )),
                 },
                 ChatModel::ClaudeCode(_) => self.claude_code.chat(&req).await,
+                ChatModel::Codex(_) => self.codex.chat(&req).await,
             };
             match result {
                 Ok(resp) => {

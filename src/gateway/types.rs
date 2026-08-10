@@ -176,18 +176,23 @@ pub enum ChatModel {
     OpenRouter(String),
     /// Claude Code model or alias, e.g. "fable".
     ClaudeCode(String),
+    /// Codex model, e.g. "gpt-5.6-sol".
+    Codex(String),
 }
 
 impl ChatModel {
     /// Canonical entry point for user-supplied model slugs.
     ///
-    /// Slugs prefixed with `claude-code/` use the Claude Code adapter. All
-    /// other slugs use OpenRouter.
+    /// Slugs prefixed with `claude-code/` or `codex/` use their subscription
+    /// adapters. All other slugs use OpenRouter.
     pub fn parse(slug: impl Into<String>) -> Self {
         let slug = slug.into();
-        match slug.strip_prefix("claude-code/") {
-            Some(model_id) => ChatModel::ClaudeCode(model_id.to_string()),
-            None => ChatModel::OpenRouter(slug),
+        if let Some(model_id) = slug.strip_prefix("claude-code/") {
+            ChatModel::ClaudeCode(model_id.to_string())
+        } else if let Some(model_id) = slug.strip_prefix("codex/") {
+            ChatModel::Codex(model_id.to_string())
+        } else {
+            ChatModel::OpenRouter(slug)
         }
     }
 
@@ -199,10 +204,15 @@ impl ChatModel {
         ChatModel::ClaudeCode(model_id.into())
     }
 
+    pub fn codex(model_id: impl Into<String>) -> Self {
+        ChatModel::Codex(model_id.into())
+    }
+
     pub fn model_id(&self) -> &str {
         match self {
             ChatModel::OpenRouter(id) => id,
             ChatModel::ClaudeCode(id) => id,
+            ChatModel::Codex(id) => id,
         }
     }
 
@@ -210,6 +220,7 @@ impl ChatModel {
         match self {
             ChatModel::OpenRouter(_) => "openrouter",
             ChatModel::ClaudeCode(_) => "claude-code",
+            ChatModel::Codex(_) => "codex",
         }
     }
 
@@ -218,6 +229,7 @@ impl ChatModel {
         match self {
             ChatModel::OpenRouter(id) => id.split('/').next().unwrap_or(id),
             ChatModel::ClaudeCode(_) => "claude-code",
+            ChatModel::Codex(_) => "codex",
         }
     }
 }

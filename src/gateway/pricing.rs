@@ -18,6 +18,8 @@ pub struct ModelPricing {
 }
 
 const DEFAULT_CHAT_ESTIMATE: ModelPricing = ModelPricing::new("unknown", 1_000, 5_000);
+const CLAUDE_CODE_SUBSCRIPTION: ModelPricing = ModelPricing::new("claude-code", 0, 0);
+const CODEX_SUBSCRIPTION: ModelPricing = ModelPricing::new("codex", 0, 0);
 
 /// Whether a chat cost was priced from a known model entry or from the fallback estimate.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -198,6 +200,12 @@ fn init_pricing() -> HashMap<&'static str, ModelPricing> {
 
 /// Get pricing for a model.
 pub fn get_pricing(model_id: &str) -> Option<ModelPricing> {
+    if model_id.starts_with("claude-code/") {
+        return Some(CLAUDE_CODE_SUBSCRIPTION);
+    }
+    if model_id.starts_with("codex/") {
+        return Some(CODEX_SUBSCRIPTION);
+    }
     let map = PRICING_MAP.get_or_init(init_pricing);
     map.get(model_id).copied()
 }
