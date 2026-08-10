@@ -2200,8 +2200,8 @@ dependencies = [
 
 [[package]]
 name = "seriate"
-version = "0.1.0"
-source = "git+https://github.com/XyraSinclair/seriate?tag=v0.1.1#acee8d13c3f4eabb7726e04bc9319c2b271754fd"
+version = "0.1.2"
+source = "git+https://github.com/XyraSinclair/seriate?tag=v0.1.2#ba32ca0ac97f59c5d49013e5f33276291968a0a3"
 dependencies = [
  "async-trait",
  "blake3",
