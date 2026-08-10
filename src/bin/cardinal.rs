@@ -933,11 +933,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                      entries and/or --propose <n>"
                     .into());
             }
-            if std::env::var("OPENROUTER_API_KEY").is_err() {
-                return Err("OPENROUTER_API_KEY is not set. Create a key at \
-                     https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
-                    .into());
-            }
+            require_openrouter_key()?;
             let gateway = Arc::new(ProviderGateway::from_env(Arc::new(NoopUsageSink))?);
 
             let mut parsed: Vec<(String, String)> = attributes
@@ -1085,11 +1081,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                      and at least 2 peers)"
                     .into());
             }
-            if std::env::var("OPENROUTER_API_KEY").is_err() {
-                return Err("OPENROUTER_API_KEY is not set. Create a key at \
-                     https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
-                    .into());
-            }
+            require_openrouter_key()?;
 
             // Resolve the focal item: 1-based line number, id, or exact text.
             let focal_id = if let Ok(index) = focus.parse::<usize>() {
@@ -1228,11 +1220,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             model,
             json,
         } => {
-            if std::env::var("OPENROUTER_API_KEY").is_err() {
-                return Err("OPENROUTER_API_KEY is not set. Create a key at \
-                     https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
-                    .into());
-            }
+            require_openrouter_key()?;
             let item_text = read_item_arg(&item)?;
             let note_text = note.as_deref().map(read_item_arg).transpose()?;
             let stakeholder_list: Vec<String> = stakeholders
@@ -1289,11 +1277,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .map(|m| m.trim().to_string())
                 .filter(|m| !m.is_empty())
                 .collect();
-            if std::env::var("OPENROUTER_API_KEY").is_err() {
-                return Err("OPENROUTER_API_KEY is not set. Create a key at \
-                     https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
-                    .into());
-            }
+            require_openrouter_key()?;
             let gateway = Arc::new(ProviderGateway::from_env(Arc::new(NoopUsageSink))?);
 
             let mut candidates = vec![by.clone()];
@@ -1409,11 +1393,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         } => {
             let raw = read_sort_input(input.as_deref())?;
             let alternatives = parse_sort_items(&raw)?;
-            if std::env::var("OPENROUTER_API_KEY").is_err() {
-                return Err("OPENROUTER_API_KEY is not set. Create a key at \
-                     https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
-                    .into());
-            }
+            require_openrouter_key()?;
             let gateway = Arc::new(ProviderGateway::from_env(Arc::new(NoopUsageSink))?);
 
             let mut criteria: Vec<(String, String)> = attributes
@@ -1506,11 +1486,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             no_cache,
             cache,
         } => {
-            if std::env::var("OPENROUTER_API_KEY").is_err() {
-                return Err("OPENROUTER_API_KEY is not set. Create a key at \
-                     https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
-                    .into());
-            }
+            require_openrouter_key()?;
             let model_list: Vec<String> = models
                 .split(',')
                 .map(|m| m.trim().to_string())
@@ -1624,11 +1600,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         Commands::Calibrate { models, nulls, out } => {
-            if std::env::var("OPENROUTER_API_KEY").is_err() {
-                return Err("OPENROUTER_API_KEY is not set. Create a key at \
-                     https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
-                    .into());
-            }
+            require_openrouter_key()?;
             let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
             let null_texts = [
                 "The quick brown fox jumps over the lazy dog.",
@@ -1784,11 +1756,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     .map(|m| m.trim().to_string())
                     .filter(|m| !m.is_empty())
                     .collect();
-                if std::env::var("OPENROUTER_API_KEY").is_err() {
-                    return Err("OPENROUTER_API_KEY is not set. Create a key at \
-                         https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
-                        .into());
-                }
+                require_openrouter_key()?;
                 let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
                 let cache_store = if no_cache {
                     None
@@ -1923,11 +1891,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
 
             if let Some(k) = draws {
-                if std::env::var("OPENROUTER_API_KEY").is_err() {
-                    return Err("OPENROUTER_API_KEY is not set. Create a key at \
-                         https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
-                        .into());
-                }
+                require_openrouter_key()?;
                 let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
                 let report = cardinal_harness::rerank::nonce_draws(
                     &gateway,
@@ -1974,11 +1938,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
 
             if orbit {
-                if std::env::var("OPENROUTER_API_KEY").is_err() {
-                    return Err("OPENROUTER_API_KEY is not set. Create a key at \
-                         https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
-                        .into());
-                }
+                require_openrouter_key()?;
                 let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
                 let cache_store = if no_cache {
                     None
@@ -2031,11 +1991,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
 
             if wordings {
-                if std::env::var("OPENROUTER_API_KEY").is_err() {
-                    return Err("OPENROUTER_API_KEY is not set. Create a key at \
-                         https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
-                        .into());
-                }
+                require_openrouter_key()?;
                 let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
                 let cache_store = if no_cache {
                     None
@@ -2095,11 +2051,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
 
             if sweep {
-                if std::env::var("OPENROUTER_API_KEY").is_err() {
-                    return Err("OPENROUTER_API_KEY is not set. Create a key at \
-                         https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
-                        .into());
-                }
+                require_openrouter_key()?;
                 let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
                 let cache_store = if no_cache {
                     None
@@ -2160,11 +2112,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
 
             if spin {
-                if std::env::var("OPENROUTER_API_KEY").is_err() {
-                    return Err("OPENROUTER_API_KEY is not set. Create a key at \
-                         https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
-                        .into());
-                }
+                require_openrouter_key()?;
                 let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
                 let cache_store = if no_cache {
                     None
@@ -2256,10 +2204,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 );
             }
 
-            if std::env::var("OPENROUTER_API_KEY").is_err() {
-                return Err("OPENROUTER_API_KEY is not set. Create a key at                      https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
-                    .into());
-            }
+            require_openrouter_key()?;
             let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
             let cache_store = if no_cache {
                 None
@@ -2333,10 +2278,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         Commands::Elaborate { by, model } => {
-            if std::env::var("OPENROUTER_API_KEY").is_err() {
-                return Err("OPENROUTER_API_KEY is not set. Create a key at                      https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
-                    .into());
-            }
+            require_openrouter_key()?;
             let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
             let rubric = cardinal_harness::rerank::elaborate_criterion(
                 &gateway,
@@ -2373,10 +2315,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     "explain requires at least 3 items (in your believed order, best first)".into(),
                 );
             }
-            if std::env::var("OPENROUTER_API_KEY").is_err() {
-                return Err("OPENROUTER_API_KEY is not set. Create a key at                      https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
-                    .into());
-            }
+            require_openrouter_key()?;
             let gateway = Arc::new(ProviderGateway::from_env(Arc::new(NoopUsageSink))?);
 
             let mut candidates = candidate;
@@ -2900,6 +2839,15 @@ fn provider_gateway(
     }
 
     Ok(ProviderGateway::from_env(Arc::new(NoopUsageSink))?)
+}
+
+fn require_openrouter_key() -> Result<(), Box<dyn std::error::Error>> {
+    if std::env::var("OPENROUTER_API_KEY").is_err() {
+        return Err("OPENROUTER_API_KEY is not set. Create a key at \
+             https://openrouter.ai/keys and `export OPENROUTER_API_KEY=...`."
+            .into());
+    }
+    Ok(())
 }
 
 fn load_policy(
