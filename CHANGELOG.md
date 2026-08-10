@@ -8,6 +8,34 @@ Versioning once it reaches `1.0.0`.
 ## [Unreleased]
 
 ### Added
+- The judgment packet (`src/packet.rs`, issue #46): content-addressed
+  evidence bundles (blake3 over canonical bytes, f64 bit patterns) that fuse
+  byte-identically for any partition of the same evidence in any order,
+  pinned with `to_bits` equality. The pin forced a real solver fix (HashMap
+  fuse buckets randomized edge order; now BTreeMap).
+- `cardinal.judgement-run.v1` (`src/judgement_run.rs`): the portable
+  judgment atom for finite-candidate single-axis runs — execute, persist,
+  reload, reproduce.
+- `cardinald` (`src/bin/cardinald.rs`): localhost judgement-run daemon with
+  ClickHouse provenance landing. Endpoints: `/healthz`, `POST /v1/estimate`
+  (worst-case spend bound), `POST /v1/runs` (adaptive), `GET
+  /v1/runs/{ref}`. Contract in `docs/CARDINALD.md`.
+- cardinald external-harness lane: `POST /v1/schedule` returns a stateless
+  counterbalanced comparison plan (prompts rendered by the same
+  `canonical_v2` code as the adaptive path); `mode=external` on `POST
+  /v1/runs` accepts one-shot pushed comparison results from an allowlisted
+  harness (`claude-code`) with zero provider calls. Hardened per the
+  2026-08-10 independent review: `schedule_digest` binds results to the
+  issued rendering, coverage floors reject partial result sets, and
+  `GET /v1/runs/{ref}` carries `entity_ids` + `entity_text_hashes`.
+- The public JCB board site (`site/index.html`) at pairwiseratio.org —
+  one static committed HTML file, every row recomputable from committed
+  evidence packs.
+- Codex gateway adapter (`gateway::codex`): `codex/<model>` slugs route
+  through the subscription-billed Codex exec CLI (pooled shim, scratch-cwd
+  isolation, zero marginal cost). Smoke-verified; no rail-fitness study
+  yet — the claude-code rail has one (21/21 decisive-pair agreement,
+  notes/claudecode-vs-api-2026-08-06).
 - Native Claude Code gateway adapter (`gateway::claude_code`): chat
   completions through local `claude -p` print mode, billed to the operator's
   subscription at zero marginal API cost. `ChatModel::ClaudeCode` routes
@@ -71,6 +99,29 @@ Versioning once it reaches `1.0.0`.
 - Corrected install and release documentation: source installs track `main`,
   tagged binaries come from GitHub Releases, and the crate is not currently
   published to crates.io.
+
+## [0.9.0] - 2026-07-05
+
+### Added
+- `cardinal weigh` (AHP priority vector over attributes-as-entities) and
+  `weigh --propose`: automated AHP — the goal decomposed into judgeable
+  considerations, then measured pairwise on importance for that goal.
+- `cardinal distinguish`: the propagation primitive — propose-then-MEASURE
+  the attributes under which a focal item stands out
+  (`differentiation_profile`: percentile and z-score per attribute).
+- Hodge curl fraction of the judgement edge field surfaced per attribute
+  and in run meta; transitive-vs-cyclic judge test pins the
+  quantization-curl floor and planted-cycle detection.
+- `docs/FIRST_PRINCIPLES.md`: the instrument type grid, invariance group,
+  and efficiency theory matched cell-by-cell against the repo.
+
+## [0.8.1] - 2026-07-05
+
+### Fixed
+- Build: seriate v0.1.1 with default features off; the `cardinal` binary
+  requires `sqlite-store` — pure-library consumers avoid the
+  `libsqlite3-sys` links conflict. (Cargo version drift from the v0.8.1
+  tag repaired in v0.9.0.)
 
 ## [0.8.0] - 2026-07-04
 
