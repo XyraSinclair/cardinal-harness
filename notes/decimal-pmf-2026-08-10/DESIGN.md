@@ -15,7 +15,10 @@ doctrine, and L0–L3 framing stand.
 Status: design, reviewed and substantially upgraded from `PROBLEM.md` (same directory,
 same day). PROBLEM.md stated the obstructions; this note is the plan. Tokenizer facts
 below are measured (o200k_base, 2026-08-10, this directory's session). Oracle consult
-in flight; reconcile on return.
+reconciled in `ORACLE.md` (same directory): adopts bounded-domain identifiability, the
+Frankenstein-mixture threat + guarantee tiers, cross-fit/HT estimator correction,
+q·osc expansion index (my distance-from-mean claim was wrong for linear targets), and
+`SignedLogRatioDistribution` as the product wedge.
 
 ## What changed since PROBLEM.md (the review findings)
 
