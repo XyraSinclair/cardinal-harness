@@ -9,30 +9,16 @@ dropped. Sessions: read this at start when work touches strategy, doctrine,
 or publication; update states in the same commit as the work that changes
 them.
 
-## OPEN (5 of 5 — queue is at cap)
-
-**Q1. Adjudicate the six 07-09 doctrine word-ledger edits.** Written and
-waiting since 2026-07-09 (notes/red-team-2026-07-09/SYNTHESIS.md § "Proposed
-to operator"; full text in doctrine.md). Six one-line accept/rejects: §8
-external-reference clause · delete-or-enforce "Distribution > capability"
-(PRINCIPLES.md:84, still verbatim) · delete the "self-refutation count"
-metric sentence · §4 retitle + "binds hardest on our own instruments" ·
-§10 retirement criterion (stopping rule) · sub-$0.10 cost sig-figs.
-Verified 2026-07-26: zero of six landed.
+## OPEN (3 of 5)
 
 **Q2. Stake reorder + external-contact stake #0.** 07-09 strategy findings:
 external-contact event as stake #0, habit loop above the map, 14K scale-up
 shrunk pending the 20-entity probe, JCB published as the one asset with a
 living external consumer. Partially overtaken: pairwiseratio.org is live;
 the contact *event* (a post a stranger reads) has still never happened.
-Q4 is its vehicle.
-
-**Q3. Adopt the instrument admission/retirement constraint.** Guardian
-panel Leveson M3: no new instrument or axis without a pre-registered
-admission rubric and a named retirement condition at birth (the pattern
-that already worked: axis wave 2 admitted 6/69 via rubric + decoys;
-eps/gamma knobs died by pre-named gate). Subsumes Q1's §10 line but is a
-standing constraint, not a doctrine edit.
+Q4 is its vehicle — decision 2026-08-10: the P2 post IS stake #0's
+artifact; its first external reader is the contact event, recorded here
+when it happens.
 
 **Q4. Publish P2?** The professed-vs-revealed mechanism inversion
 (notes/manifund-campaign-2026-07-13/p2-results.md). **GATE PASSED
@@ -85,6 +71,28 @@ next kill before any public tier claim.
     the window (max single-run spend on record: $7.07, P2).
 
 ## CLOSED
+
+- **C2 (2026-08-10). Q1 closed — all six 07-09 doctrine edits ACCEPTED
+  and landed in docs/PRINCIPLES.md**, adjudicated on the 30-day test
+  evidence recorded above (operator directive: make the calls, ship).
+  Per-edit grounds: §8 external-reference clause (F1 passed via C1 — the
+  clause codifies what already worked); "Distribution > capability"
+  deleted (F2 showed the ratio inverted with the slogan absent, so the
+  sentence was epiphenomenal; the live driver is Q2/Q4); self-refutation
+  metric sentence deleted (a count invites Goodharting; the surviving
+  sentence carries the principle); §4 retitle + "binds hardest on our own
+  instruments" (the deleted subtitle was itself a story); §10 retirement
+  criterion (F6b FAILED — zero retirements in 131+ commits — so the
+  criterion is load-bearing, not decorative); sub-$0.10 sig-figs (§12
+  already owned denomination; false precision is the same sin as missing
+  denominators).
+
+- **C3 (2026-08-10). Q3 closed — admission/retirement constraint
+  adopted**, folded into the §10 edit above: no instrument or axis is
+  admitted without a pre-registered rubric and a retirement condition
+  named at birth. Grounds: the pattern already worked where applied (axis
+  wave 2 admitted 6/69 via rubric + decoys; eps/gamma knobs died by
+  pre-named gate) and F6b confirmed nothing dies without it.
 
 - **C1 (2026-07-26). P2 passed doctrine Finding 1's external-reference
   test — 12 days early.** The 07-09 test asked: "does any pack exist by
