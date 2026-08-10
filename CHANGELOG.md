@@ -7,6 +7,12 @@ Versioning once it reaches `1.0.0`.
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-08-10
+
+First release published to crates.io (`cargo install cardinal-harness`).
+The 0.9.0 version number was assigned internally on 2026-07-05 (the
+`[0.9.0-dev]` section below); the published crate contains both sections.
+
 ### Added
 - The judgment packet (`src/packet.rs`, issue #46): content-addressed
   evidence bundles (blake3 over canonical bytes, f64 bit patterns) that fuse
@@ -98,9 +104,14 @@ Versioning once it reaches `1.0.0`.
   what they contain rather than using a generic audit-artifact label.
 - Corrected install and release documentation: source installs track `main`,
   tagged binaries come from GitHub Releases, and the crate is not currently
-  published to crates.io.
+  published to crates.io. (True when written; superseded by this release —
+  the blocker, seriate being git-only, dissolved when seriate 0.1.2 was
+  published to crates.io the same day.)
 
-## [0.9.0] - 2026-07-05
+## [0.9.0-dev] - 2026-07-05
+
+Internal version bump, never separately released — included in the 0.9.0
+crates.io release above.
 
 ### Added
 - `cardinal weigh` (AHP priority vector over attributes-as-entities) and

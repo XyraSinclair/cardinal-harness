@@ -62,16 +62,18 @@ What you get that the alternatives don't, in one package:
 ## Quickstart
 
 ```bash
-cargo install --git https://github.com/XyraSinclair/cardinal-harness --locked
+cargo install cardinal-harness --locked
 export OPENROUTER_API_KEY=your_key_here   # any model on OpenRouter
 
 cardinal sort examples/sort-demo.txt --by "usefulness as advice for a software engineer" --scores
 ```
 
-This builds current `main`. Tagged binaries are available from
-[GitHub Releases](https://github.com/XyraSinclair/cardinal-harness/releases);
-the crate is not currently published to crates.io because `seriate` is a
-git-only dependency.
+This installs the released crate from
+[crates.io](https://crates.io/crates/cardinal-harness). To build current
+`main` instead:
+`cargo install --git https://github.com/XyraSinclair/cardinal-harness --locked`.
+Tagged binaries are available from
+[GitHub Releases](https://github.com/XyraSinclair/cardinal-harness/releases).
 
 OpenRouter is not the only rail: `--model claude-code/<model>` routes
 judgements through a subscription-billed Claude Code adapter instead of

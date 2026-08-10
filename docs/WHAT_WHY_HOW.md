@@ -55,7 +55,7 @@ see probes — but it can't fix it).
 ## How to use it
 
 ```bash
-cargo install --git https://github.com/XyraSinclair/cardinal-harness --locked
+cargo install cardinal-harness --locked
 export OPENROUTER_API_KEY=...
 # or, with a Claude Code subscription and no API key:
 #   --model claude-code/<model>  (21/21 decisive-pair agreement with the
@@ -79,8 +79,10 @@ cardinal explain my-ranking.txt --propose 3
 # attribute correlation matrix — see docs and the multi_rerank API.
 ```
 
-The source-install command builds current `main`. Tagged binaries are available
-from GitHub Releases; the crate is not currently published to crates.io.
+The install command pulls the released crate from crates.io. A source
+install of current `main`
+(`cargo install --git https://github.com/XyraSinclair/cardinal-harness --locked`)
+and tagged binaries from GitHub Releases remain available.
 
 Every run prints its evidence summary: comparisons, cost, order flips,
 evidence health, stop reason. When something would be uninformative, it refuses
