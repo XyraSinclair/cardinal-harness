@@ -17,9 +17,11 @@ use cardinal_harness::gateway::{
     NoopUsageSink, ProviderError, ProviderGateway, OPENROUTER_PRICING_AS_OF,
 };
 use cardinal_harness::judgement_run::{
-    execute_judgement_run_with_ref, max_judgement_run_comparisons, JudgementCandidate,
-    JudgementPrivacy, JudgementRunRecord, JudgementRunRequest, JudgementRunStore,
-    JudgementRunTerminal, NormalizedJudgementRunRequest, JUDGEMENT_PROMPT_TEMPLATE_SLUG,
+    build_external_schedule, execute_external_judgement_run_with_ref,
+    execute_judgement_run_with_ref, max_judgement_run_comparisons, validate_external_judgement_run,
+    ExternalJudgementRun, ExternalJudgementSchedule, JudgementCandidate, JudgementPrivacy,
+    JudgementRunRecord, JudgementRunRequest, JudgementRunStore, JudgementRunTerminal,
+    NormalizedJudgementRunRequest, JUDGEMENT_PROMPT_TEMPLATE_SLUG,
 };
 use cardinal_harness::landing::{land_completed_run, ClickHouseLanding};
 use cardinal_harness::rerank::comparison::{
@@ -80,6 +82,38 @@ struct CreateRunRequest {
     owner_scope: Option<String>,
     #[serde(default)]
     lens: Option<String>,
+    #[serde(default)]
+    mode: Option<CreateRunMode>,
+    #[serde(default)]
+    external: Option<ExternalJudgementRun>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
+#[serde(rename_all = "lowercase")]
+enum CreateRunMode {
+    External,
+}
+
+#[derive(Debug, Deserialize)]
+struct ScheduleRequest {
+    #[serde(flatten)]
+    judgement: JudgementRequestFields,
+    privacy: JudgementPrivacy,
+    #[serde(default)]
+    owner_scope: Option<String>,
+    #[serde(default)]
+    lens: Option<String>,
+}
+
+enum QueuedRun {
+    Adaptive {
+        request: JudgementRunRequest,
+        gateway: Arc<dyn ChatGateway>,
+    },
+    External {
+        request: JudgementRunRequest,
+        external: ExternalJudgementRun,
+    },
 }
 
 #[derive(Debug, Serialize)]
@@ -126,6 +160,7 @@ struct GetRunResponse {
     axis_key: String,
     axis_prompt: String,
     model: String,
+    entity_ids: Vec<String>,
     created_at: DateTime<Utc>,
     #[serde(skip_serializing_if = "Option::is_none")]
     response: Option<CompletedResponse>,
@@ -245,6 +280,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let app = Router::new()
         .route("/healthz", get(healthz))
         .route("/v1/estimate", post(estimate_run))
+        .route("/v1/schedule", post(schedule_run))
         .route("/v1/runs", post(create_run))
         .route("/v1/runs/{run_ref}", get(get_run))
         .with_state(state);
@@ -257,6 +293,25 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 async fn healthz() -> &'static str {
     "ok"
+}
+
+async fn schedule_run(
+    payload: Result<Json<ScheduleRequest>, JsonRejection>,
+) -> Result<Json<ExternalJudgementSchedule>, ApiError> {
+    let Json(payload) = payload.map_err(|_| ApiError::bad_request("invalid JSON request body"))?;
+    validate_caps(&payload.judgement)?;
+    validate_run_context(
+        payload.privacy,
+        payload.owner_scope.as_deref(),
+        payload.lens.as_deref(),
+    )?;
+    let normalized = payload
+        .judgement
+        .into_run_request(payload.privacy)
+        .normalize()
+        .map_err(|error| ApiError::bad_request(error.to_string()))?;
+    let seed = rand::random::<u64>();
+    Ok(Json(build_external_schedule(&normalized, seed)))
 }
 
 async fn estimate_run(
@@ -427,23 +482,8 @@ async fn create_run(
     validate_caps(&payload.judgement)?;
 
     let owner_scope = payload.owner_scope.unwrap_or_default();
-    match payload.privacy {
-        JudgementPrivacy::Public if !owner_scope.is_empty() => {
-            return Err(ApiError::bad_request(
-                "owner_scope must be empty for public runs",
-            ));
-        }
-        JudgementPrivacy::Private if owner_scope.trim().is_empty() => {
-            return Err(ApiError::bad_request(
-                "owner_scope must be nonblank for private runs",
-            ));
-        }
-        JudgementPrivacy::Public | JudgementPrivacy::Private => {}
-    }
     let lens = payload.lens.unwrap_or_else(|| "api".to_string());
-    if lens.trim().is_empty() {
-        return Err(ApiError::bad_request("lens must not be blank"));
-    }
+    validate_run_context(payload.privacy, Some(&owner_scope), Some(&lens))?;
 
     let request = payload.judgement.into_run_request(payload.privacy);
     let normalized = request
@@ -454,9 +494,29 @@ async fn create_run(
     let admission_permit = Arc::clone(&state.admission)
         .try_acquire_owned()
         .map_err(|_| ApiError::too_many_requests("run queue is at capacity"))?;
-    let provider_key = provider_key(&headers)?;
-    let gateway = build_gateway(provider_key)
-        .map_err(|_| ApiError::unauthorized("provider key is invalid"))?;
+    let queued_run = match (payload.mode, payload.external) {
+        (None, None) => {
+            let provider_key = provider_key(&headers)?;
+            let gateway = build_gateway(provider_key)
+                .map_err(|_| ApiError::unauthorized("provider key is invalid"))?;
+            QueuedRun::Adaptive { request, gateway }
+        }
+        (Some(CreateRunMode::External), Some(external)) => {
+            validate_external_judgement_run(&normalized, &external)
+                .map_err(ApiError::bad_request)?;
+            QueuedRun::External { request, external }
+        }
+        (Some(CreateRunMode::External), None) => {
+            return Err(ApiError::bad_request(
+                "external is required when mode is external",
+            ));
+        }
+        (None, Some(_)) => {
+            return Err(ApiError::bad_request(
+                "mode must be external when external is supplied",
+            ));
+        }
+    };
     let run_ref = state.store.allocate_run_ref();
     let metadata = DaemonRunMetadata {
         run_ref: run_ref.clone(),
@@ -510,8 +570,7 @@ async fn create_run(
                 task_state,
                 task_metadata,
                 task_run_ref,
-                request,
-                gateway,
+                queued_run,
                 permit,
                 admission_permit,
             ));
@@ -540,20 +599,30 @@ async fn execute_queued_run(
     state: AppState,
     metadata: DaemonRunMetadata,
     run_ref: String,
-    request: JudgementRunRequest,
-    gateway: Arc<dyn ChatGateway>,
+    queued_run: QueuedRun,
     permit: tokio::sync::OwnedSemaphorePermit,
     admission_permit: tokio::sync::OwnedSemaphorePermit,
 ) {
-    let seed = rand::random::<u64>();
-    let execution = RerankExecution::new(gateway, Attribution::new("cardinald::run")).run_options(
-        RerankRunOptions {
-            rng_seed: Some(seed),
-            cache_only: false,
-        },
-    );
-    let result =
-        execute_judgement_run_with_ref(request, run_ref.clone(), execution, &state.store).await;
+    let result = match queued_run {
+        QueuedRun::Adaptive { request, gateway } => {
+            let seed = rand::random::<u64>();
+            let execution = RerankExecution::new(gateway, Attribution::new("cardinald::run"))
+                .run_options(RerankRunOptions {
+                    rng_seed: Some(seed),
+                    cache_only: false,
+                });
+            execute_judgement_run_with_ref(request, run_ref.clone(), execution, &state.store).await
+        }
+        QueuedRun::External { request, external } => {
+            execute_external_judgement_run_with_ref(
+                request,
+                run_ref.clone(),
+                external,
+                &state.store,
+            )
+            .await
+        }
+    };
     drop(permit);
     drop(admission_permit);
 
@@ -616,6 +685,7 @@ async fn get_run(
         })?;
         Ok(Json(project_terminal(metadata, record)))
     } else {
+        let entity_ids = metadata.request.entities.iter().map(|entity| entity.id.clone()).collect();
         Ok(Json(GetRunResponse {
             run_ref: metadata.run_ref,
             status: metadata.status,
@@ -625,6 +695,7 @@ async fn get_run(
             axis_key: metadata.request.axis_key,
             axis_prompt: metadata.request.axis_prompt,
             model: metadata.request.model,
+            entity_ids,
             created_at: metadata.created_at,
             response: None,
             error: metadata.error,
@@ -653,6 +724,7 @@ fn project_terminal(metadata: DaemonRunMetadata, record: JudgementRunRecord) -> 
         ),
         JudgementRunTerminal::Failed { error } => ("failed".to_string(), None, Some(error.clone())),
     };
+    let entity_ids = record.request.entities.iter().map(|entity| entity.id.clone()).collect();
     GetRunResponse {
         run_ref: record.run_ref,
         status,
@@ -662,6 +734,7 @@ fn project_terminal(metadata: DaemonRunMetadata, record: JudgementRunRecord) -> 
         axis_key: record.request.axis_key,
         axis_prompt: record.request.axis_prompt,
         model: record.request.model,
+        entity_ids,
         created_at: metadata.created_at,
         response,
         error,
@@ -721,6 +794,30 @@ fn validate_caps(payload: &JudgementRequestFields) -> Result<(), ApiError> {
         return Err(ApiError::bad_request(format!(
             "axis_prompt exceeds {MAX_AXIS_PROMPT_BYTES} bytes"
         )));
+    }
+    Ok(())
+}
+
+fn validate_run_context(
+    privacy: JudgementPrivacy,
+    owner_scope: Option<&str>,
+    lens: Option<&str>,
+) -> Result<(), ApiError> {
+    match privacy {
+        JudgementPrivacy::Public if owner_scope.is_some_and(|value| !value.is_empty()) => {
+            return Err(ApiError::bad_request(
+                "owner_scope must be empty for public runs",
+            ));
+        }
+        JudgementPrivacy::Private if owner_scope.is_none_or(|value| value.trim().is_empty()) => {
+            return Err(ApiError::bad_request(
+                "owner_scope must be nonblank for private runs",
+            ));
+        }
+        JudgementPrivacy::Public | JudgementPrivacy::Private => {}
+    }
+    if lens.is_some_and(|value| value.trim().is_empty()) {
+        return Err(ApiError::bad_request("lens must not be blank"));
     }
     Ok(())
 }

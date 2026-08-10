@@ -289,7 +289,7 @@ struct ComparisonRow<'a> {
     axis_key: &'a str,
     axis_prompt: &'a str,
     axis_prompt_hash: &'a str,
-    harness: &'static str,
+    harness: &'a str,
     template_slug: &'a str,
     template_hash: &'a str,
     model: &'a str,
@@ -323,7 +323,7 @@ struct ScoreRow<'a> {
     axis_key: &'a str,
     axis_prompt: &'a str,
     axis_prompt_hash: &'a str,
-    harness: &'static str,
+    harness: &'a str,
     model: &'a str,
     seed: u64,
     item_count: u32,
@@ -363,6 +363,21 @@ fn completed_batches(
     let template = crate::prompts::prompt_by_slug(JUDGEMENT_PROMPT_TEMPLATE_SLUG)
         .ok_or_else(|| "canonical judgement prompt template is missing".to_string())?;
     let template_hash = sha256_hex(&format!("{}\n{}", template.system, template.user));
+    let harness = record
+        .provenance
+        .as_ref()
+        .map(|provenance| provenance.harness.as_str())
+        .unwrap_or(HARNESS);
+    let harness_version = record
+        .provenance
+        .as_ref()
+        .map(|provenance| provenance.harness_version.as_str())
+        .unwrap_or(env!("CARGO_PKG_VERSION"));
+    let landing_model = record
+        .provenance
+        .as_ref()
+        .map(|provenance| provenance.model.as_str())
+        .unwrap_or(&record.request.model);
     let entities: HashMap<&str, &str> = record
         .request
         .entities
@@ -389,7 +404,7 @@ fn completed_batches(
             axis_key: &record.request.axis_key,
             axis_prompt: &record.request.axis_prompt,
             axis_prompt_hash: &axis_prompt_hash,
-            harness: HARNESS,
+            harness,
             template_slug: JUDGEMENT_PROMPT_TEMPLATE_SLUG,
             template_hash: &template_hash,
             model: &trace.model,
@@ -411,7 +426,7 @@ fn completed_batches(
             cost_is_estimate: u8::from(trace.provider_cost_is_estimate),
             error: trace.error.as_deref().unwrap_or(""),
             temperature: f64::from(DEFAULT_CHAT_TEMPERATURE),
-            harness_version: env!("CARGO_PKG_VERSION").to_string(),
+            harness_version: harness_version.to_string(),
         });
     }
 
@@ -442,8 +457,8 @@ fn completed_batches(
             axis_key: &record.request.axis_key,
             axis_prompt: &record.request.axis_prompt,
             axis_prompt_hash: &axis_prompt_hash,
-            harness: HARNESS,
-            model: &record.request.model,
+            harness,
+            model: landing_model,
             seed,
             item_count: u32::try_from(record.request.entities.len())
                 .map_err(|_| "item count exceeds UInt32".to_string())?,
@@ -463,7 +478,7 @@ fn completed_batches(
             z_score: score.attribute_score.z_score,
             percentile: score.attribute_score.percentile,
             temperature: f64::from(DEFAULT_CHAT_TEMPERATURE),
-            harness_version: env!("CARGO_PKG_VERSION").to_string(),
+            harness_version: harness_version.to_string(),
             entity_hash: sha256_hex(entity_text),
         });
     }

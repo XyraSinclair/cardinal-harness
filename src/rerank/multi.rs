@@ -474,7 +474,9 @@ impl<'a> RerankExecution<'a> {
     }
 }
 
-fn build_trait_search_config(req: &MultiRerankRequest) -> (TraitSearchConfig, TopKConfig) {
+pub(crate) fn build_trait_search_config(
+    req: &MultiRerankRequest,
+) -> (TraitSearchConfig, TopKConfig) {
     let attributes = req
         .attributes
         .iter()
@@ -509,7 +511,10 @@ fn build_trait_search_config(req: &MultiRerankRequest) -> (TraitSearchConfig, To
     )
 }
 
-fn build_engine_config(run_options: &RerankRunOptions, topk: &TopKConfig) -> EngineConfig {
+pub(crate) fn build_engine_config(
+    run_options: &RerankRunOptions,
+    topk: &TopKConfig,
+) -> EngineConfig {
     let mut config = EngineConfig::default();
     if let Some(seed) = run_options.rng_seed {
         config.rng_seed = seed;
