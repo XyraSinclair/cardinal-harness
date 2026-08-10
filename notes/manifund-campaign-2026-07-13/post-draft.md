@@ -1,8 +1,9 @@
-# DRAFT — not published. Publication, venue, and final wording are Xyra's decision (queue Q4).
+# FINAL TEXT (2026-08-10) — venue decided: EA Forum, LessWrong crosspost after.
 
-Proposed venue: EA Forum. Alternates: LessWrong crosspost, personal site.
-Every number below traces to a committed evidence pack; links are repo-relative
-and need swapping for public URLs at publish time.
+Wording, links, and venue are final per the 2026-08-10 ship directive; every
+number traces to a committed evidence pack and all URLs below are live.
+SENDING remains Xyra's alone — this file is the exact text awaiting her
+explicit approval to post. Drafting is not permission to transmit.
 
 ---
 
@@ -20,7 +21,8 @@ Choice (both hosted on Manifund). Score every proposal on four attributes
 using pairwise ratio judgments from an LLM judge — thousands of "how many
 times better is A than B on this attribute?" comparisons, solved into
 cardinal scores with uncertainty (the machinery is open:
-[pairwiseratio.org]). The four attributes, worded precisely:
+[pairwiseratio.org](https://pairwiseratio.org)). The four attributes,
+worded precisely:
 
 1. plausibility of the causal path from activities to claimed impact
 2. expected impact per marginal dollar at the stated ask
@@ -31,8 +33,14 @@ cardinal scores with uncertainty (the machinery is open:
 Then ask, separately for each mechanism: which weighted combination of
 these four best reconstructs the realized dollar order? The predictions
 were committed to a public git history before any comparison against
-ground truth — the registration is the commit log, not a promise. Total
-elicitation cost for the headline: about $2.50.
+ground truth — the registration is the commit log
+([ACX](https://github.com/XyraSinclair/cardinal-harness/commit/ca1928c70be4d575426495b4548006398633c7d4),
+[EA CC](https://github.com/XyraSinclair/cardinal-harness/commit/892e0c0827de384601abeb5534a2a765f714e18f),
+[second judge](https://github.com/XyraSinclair/cardinal-harness/commit/e304a5dc666fa838aefc16beb0745c88e3d1a47e)),
+not a promise. The original two-cohort measurement cost $1.43; the
+second-judge replication and polish control added $7.07 (one judge
+produced 4.5× the expected reasoning tokens — the overrun is quoted in
+the pack, not hidden).
 
 ## The inversion
 
@@ -87,18 +95,16 @@ costs a few dollars to instrument it.
 ## Everything is inspectable
 
 Every judgment, prompt, trace, cost, pre-registration commit, and the
-analysis scripts fixed before unblinding: [evidence packs]. The engine —
-prompts, robust solver, uncertainty, caching — is open at
-[pairwiseratio.org] / [github repo]. If you think the wordings are doing
-hidden work, rerun with your own; the wording is the axis, and that is
-half of what this instrument is for.
+analysis scripts fixed before unblinding:
+[original pack](https://github.com/XyraSinclair/cardinal-harness/tree/main/artifacts/live/manifund-p2-2026-07-19),
+[second-judge pack](https://github.com/XyraSinclair/cardinal-harness/tree/main/artifacts/live/manifund-p2-secondjudge-2026-07-27).
+The engine — prompts, robust solver, uncertainty, caching — is open at
+[pairwiseratio.org](https://pairwiseratio.org)
+([source](https://github.com/XyraSinclair/cardinal-harness)). If you
+think the wordings are doing hidden work, rerun with your own; the
+wording is the axis, and that is half of what this instrument is for.
 
 If you fund things — or design the mechanisms that do — I would genuinely
 like to know what your mechanism reveals. It costs less than a coffee to
 find out.
 
----
-
-*[link swap list at publish time: pairwiseratio.org, evidence pack URLs
-(artifacts/live/manifund-p2-2026-07-19/, artifacts/live/manifund-p2-secondjudge-2026-07-27/),
-registration commits ca1928c/892e0c0/e304a5d, repo URL]*

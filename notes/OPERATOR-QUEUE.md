@@ -27,10 +27,13 @@ when it happens.
 confound is EXCLUDED (EI 1.000 vs polish 0.000) —
 artifacts/live/manifund-p2-secondjudge-2026-07-27/RESULTS.md, verdicts
 mechanical from pre-committed rules; one honest spend overrun quoted
-($7.07 vs $5 registered abort line). The remaining decision is venue +
-framing — the post publicly characterizes a named community's funding
-decisions; mechanism-property framing (neither mechanism the villain) is
-the proposed mitigation. Draft in progress; SENDING is yours alone.
+($7.07 vs $5 registered abort line). Venue + framing DECIDED 2026-08-10
+(ship directive): EA Forum, LessWrong crosspost after; mechanism-property
+framing (neither mechanism the villain) is in the final text, costs
+quoted honestly, all links live. Final text:
+notes/manifund-campaign-2026-07-13/post-draft.md. The ONE remaining act
+is the send — yours alone; nothing posts without your explicit approval
+of that exact text and destination.
 
 **Q5. Axis wave 3 arrest gate.** Guardian panel Hamming M3 + Feynman M3:
 wave 3 does not run until (a) one smart stranger sees one admitted-axis
