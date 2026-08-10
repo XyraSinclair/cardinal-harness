@@ -1,5 +1,17 @@
 # The descend/peel kernel: calibrated value distributions from constrained logprob access
 
+**ERRATA (same night, see `RESULTS.md`):** the census falsified two mechanisms below
+and replaced them with a stronger one. (a) logit_bias peeling is DEAD on GPT-5.x/Azure
+(accepted, ignored). (b) Grammar-mutation peeling is not a pure measurement — the
+schema is visible to the model, so changing it changes beliefs (instrument identity).
+The replacement: **resampling IS peeling** — every temperature-1 draw under the fixed
+grammar returns its own exact chosen-token logprob even below top-5, so residual mass
+is harvested by redrawing, discovery ∝ undiscovered mass. Also measured: for the ratio
+grammar all format positions are forced (p=1.0), the trie collapses to ~2 stochastic
+positions, and prefill is NOT needed for the flagship instrument. §"Moves" and the
+regime ladder should be read through that correction; the ledger, policy, grammar
+doctrine, and L0–L3 framing stand.
+
 Status: design, reviewed and substantially upgraded from `PROBLEM.md` (same directory,
 same day). PROBLEM.md stated the obstructions; this note is the plan. Tokenizer facts
 below are measured (o200k_base, 2026-08-10, this directory's session). Oracle consult
