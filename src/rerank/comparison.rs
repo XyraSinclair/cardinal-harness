@@ -28,11 +28,6 @@ use super::types::{HigherRanked, PairwiseJudgement};
 // Constants
 // =============================================================================
 
-/// Minimum variance (high confidence).
-pub const SIGMA_MIN: f64 = 0.2;
-/// Maximum variance (low confidence).
-pub const SIGMA_MAX: f64 = 2.0;
-
 /// Default max output tokens for pairwise judgements.
 ///
 /// Reasoning-capable models can spend a large hidden budget before they emit the
@@ -880,29 +875,6 @@ pub fn estimate_pairwise_input_tokens(
 // Mapping functions
 // =============================================================================
 
-/// Map confidence ∈ 0..=1 to variance in log-space.
-///
-/// High confidence → low variance (tight observation).
-/// Low confidence → high variance (noisy observation).
-pub fn confidence_to_variance(confidence: f64) -> f64 {
-    let c = confidence.clamp(0.0, 1.0);
-    let sigma = SIGMA_MAX - c * (SIGMA_MAX - SIGMA_MIN);
-    sigma * sigma
-}
-
-/// Compute signed log-ratio from judgement.
-///
-/// Returns `ln_ratio` where:
-/// - Positive means entity i scores higher than entity j
-/// - Negative means entity j scores higher than entity i
-pub fn compute_ln_ratio(higher_ranked: HigherRanked, ratio: f64) -> f64 {
-    let ln_r = ratio.ln();
-    match higher_ranked {
-        HigherRanked::A => ln_r,  // A > B means i > j
-        HigherRanked::B => -ln_r, // B > A means j > i
-    }
-}
-
 fn cached_to_judgement(cached: &CachedJudgement) -> Option<PairwiseJudgement> {
     if cached.refused {
         return Some(PairwiseJudgement::Refused);
@@ -1668,32 +1640,6 @@ That's my assessment."#;
         assert_eq!(usage.output_logprobs.as_ref().unwrap().len(), 2);
         assert!(usage.pairwise_logprob_posterior.is_some());
         assert_eq!(gateway.responses.lock().unwrap().len(), 0);
-    }
-
-    #[test]
-    fn test_confidence_to_variance() {
-        // High confidence → low variance
-        let var_high = confidence_to_variance(1.0);
-        assert!((var_high - 0.04).abs() < 0.001); // SIGMA_MIN^2
-
-        // Low confidence → high variance
-        let var_low = confidence_to_variance(0.0);
-        assert!((var_low - 4.0).abs() < 0.001); // SIGMA_MAX^2
-
-        // Mid confidence
-        let var_mid = confidence_to_variance(0.5);
-        assert!(var_mid > var_high && var_mid < var_low);
-    }
-
-    #[test]
-    fn test_compute_ln_ratio() {
-        let ln_a = compute_ln_ratio(HigherRanked::A, 2.0);
-        assert!(ln_a > 0.0);
-
-        let ln_b = compute_ln_ratio(HigherRanked::B, 2.0);
-        assert!(ln_b < 0.0);
-
-        assert!((ln_a + ln_b).abs() < 0.001);
     }
 
     #[test]

@@ -86,16 +86,6 @@ impl ModelPricing {
 // PRICING DATA
 // =============================================================================
 
-// OpenAI Embeddings
-// text-embedding-3-large: $0.13/1M tokens = 130 nanodollars/token
-// text-embedding-3-small: $0.02/1M tokens = 20 nanodollars/token
-// Batch API: 50% discount
-
-const OPENAI_EMBED_3_LARGE: ModelPricing = ModelPricing::new("openai", 130, 0);
-const OPENAI_EMBED_3_SMALL: ModelPricing = ModelPricing::new("openai", 20, 0);
-const OPENAI_EMBED_3_LARGE_BATCH: ModelPricing = ModelPricing::new("openai", 65, 0);
-const OPENAI_EMBED_3_SMALL_BATCH: ModelPricing = ModelPricing::new("openai", 10, 0);
-
 /// Date of the OpenRouter price snapshot compiled into this registry.
 pub const OPENROUTER_PRICING_AS_OF: &str = "2026-06-29";
 
@@ -149,10 +139,6 @@ fn init_pricing() -> HashMap<&'static str, ModelPricing> {
     let mut map = HashMap::new();
 
     // OpenAI Embeddings
-    map.insert("text-embedding-3-large", OPENAI_EMBED_3_LARGE);
-    map.insert("text-embedding-3-small", OPENAI_EMBED_3_SMALL);
-    map.insert("text-embedding-3-large:batch", OPENAI_EMBED_3_LARGE_BATCH);
-    map.insert("text-embedding-3-small:batch", OPENAI_EMBED_3_SMALL_BATCH);
 
     // Anthropic
     map.insert("anthropic/claude-fable-5", CLAUDE_FABLE_5);
@@ -208,24 +194,6 @@ pub fn get_pricing(model_id: &str) -> Option<ModelPricing> {
     }
     let map = PRICING_MAP.get_or_init(init_pricing);
     map.get(model_id).copied()
-}
-
-/// Get pricing for a model, falling back to a default.
-pub fn get_pricing_or_default(model_id: &str, default: ModelPricing) -> ModelPricing {
-    get_pricing(model_id).unwrap_or(default)
-}
-
-/// Calculate embedding cost (sync API).
-pub fn embedding_cost(model: &str, tokens: u32) -> i64 {
-    let pricing = get_pricing(model).unwrap_or(OPENAI_EMBED_3_LARGE);
-    pricing.calculate_cost(tokens, 0)
-}
-
-/// Calculate embedding cost (batch API, 50% discount).
-pub fn embedding_cost_batch(model: &str, tokens: u32) -> i64 {
-    let batch_model = format!("{model}:batch");
-    let pricing = get_pricing(&batch_model).unwrap_or(OPENAI_EMBED_3_LARGE_BATCH);
-    pricing.calculate_cost(tokens, 0)
 }
 
 /// Calculate chat cost and expose whether pricing was exact or estimated.
@@ -365,20 +333,6 @@ pub fn cache_aware_pricing(model_id: &str) -> Option<CacheAwarePricing> {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_embedding_cost() {
-        // 1M tokens at $0.13/1M = $0.13 = 130,000,000 nanodollars
-        let cost = embedding_cost("text-embedding-3-large", 1_000_000);
-        assert_eq!(cost, 130_000_000);
-    }
-
-    #[test]
-    fn test_embedding_cost_batch() {
-        // 1M tokens at $0.065/1M = $0.065 = 65,000,000 nanodollars
-        let cost = embedding_cost_batch("text-embedding-3-large", 1_000_000);
-        assert_eq!(cost, 65_000_000);
-    }
 
     #[test]
     fn test_chat_cost() {

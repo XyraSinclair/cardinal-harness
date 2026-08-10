@@ -3,7 +3,7 @@
 //! Rust port of the Python `rating_engine.py` with the same public API:
 //! - Config, AttributeParams, RaterParams, Observation, Edge
 //! - CalibrationEvidence, SolveSummary, PlanProposal
-//! - RatingEngine, plan_edges_for_rater, solve_once
+//! - RatingEngine, plan_edges_for_rater
 //!
 //! Implementation notes:
 //! - Uses dense `nalgebra::DMatrix` + Cholesky instead of SciPy sparse solvers.
@@ -1366,7 +1366,7 @@ pub fn compute_hodge_split(
     let mut pivots: Vec<(usize, usize)> = Vec::new();
     for col in 0..t {
         let Some(best) =
-            (pivot_row..t).max_by(|&x, &y| a[x][col].abs().partial_cmp(&a[y][col].abs()).unwrap())
+            (pivot_row..t).max_by(|&x, &y| a[x][col].abs().total_cmp(&a[y][col].abs()))
         else {
             break;
         };
@@ -2439,20 +2439,4 @@ pub fn plan_edges_for_rater(
     });
 
     Ok(proposals)
-}
-
-// ---------------------------------------------------------------------
-//  Convenience: one-shot solve
-// ---------------------------------------------------------------------
-
-pub fn solve_once(
-    n: usize,
-    attr: AttributeParams,
-    raters: HashMap<String, RaterParams>,
-    observations: &[Observation],
-    cfg: Option<Config>,
-) -> SolveSummary {
-    let mut eng = RatingEngine::new(n, attr, raters, cfg).expect("Invalid item count");
-    eng.ingest(observations);
-    eng.solve()
 }

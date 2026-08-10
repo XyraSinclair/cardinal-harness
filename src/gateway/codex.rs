@@ -171,7 +171,18 @@ impl CodexAdapter {
                 false,
             )
         })?;
-        let usage = stream.usage.unwrap_or_default();
+        // Token counts feed run denominators; a missing usage event must not
+        // silently report zero (the claude_code adapter errors identically).
+        let usage = stream.usage.ok_or_else(|| {
+            ProviderError::provider(
+                PROVIDER,
+                format!(
+                    "missing token_count event in JSONL event stream; stderr: {:?}",
+                    tail(&stderr, 300)
+                ),
+                false,
+            )
+        })?;
 
         Ok(ChatResponse {
             provider_call_id: None,
