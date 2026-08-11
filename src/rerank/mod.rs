@@ -14,6 +14,7 @@ pub mod bench;
 pub mod canonize;
 pub mod comparison;
 pub mod consortium;
+pub mod decimal_ledger;
 pub mod elaborate;
 pub mod ensemble;
 pub mod evaluation;

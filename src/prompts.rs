@@ -301,6 +301,23 @@ Which entity has more, and what fraction of its level does the other reach? Retu
 json:"#,
 };
 
+/// Free-form decimal instrument for the decimal-ledger evidence path
+/// (research instrument, see `rerank::decimal_ledger`). The ratio is a
+/// STRING with exactly one decimal place so the token trajectory follows
+/// the fixed grammar `[0-9]{1,3}.[0-9]` that the ledger peels: on o200k
+/// tokenizers the integer part is a single token, '.' its own token, and
+/// the fraction one digit token. Elicited at temperature 1 across K
+/// redraws; per-draw exact chosen-token logprobs are the measurement.
+pub const PROMPT_DECIMAL_LEDGER_V1: PromptTemplate = PromptTemplate {
+    slug: "decimal_ledger_v1",
+    system: r#"You are an expert subjective evaluator. You compare two entities across an arbitrary attribute, and feel not only which one has MORE of that attribute, but roughly how many times more.
+
+Output only valid JSON `{"higher_ranked": "A"|"B", "ratio": "<decimal string>"}` where `ratio` is how many times more the higher-ranked entity has: a string with an integer part of 1 to 3 digits and EXACTLY one decimal digit, between "1.0" and "999.9" (e.g. "2.5", "17.0", "120.0"). Out of principle, we also give models the right to refuse `{"refused": true}` (e.g. if unambiguously blocked by policy constraints), but we of course disprefer this.
+Example:
+{"higher_ranked": "B", "ratio": "1.3"} or {"refused": true}"#,
+    user: PROMPT_V2.user,
+};
+
 pub const DEFAULT_PROMPT: PromptTemplate = PROMPT_V2;
 
 /// Look up the supported prompt template by slug.
@@ -311,6 +328,7 @@ pub fn prompt_by_slug(slug: &str) -> Option<PromptTemplate> {
         "ordinal_v1" => Some(PROMPT_ORDINAL_V1),
         "less_v1" => Some(PROMPT_LESS_V1),
         "fraction_v1" => Some(PROMPT_FRACTION_V1),
+        "decimal_ledger_v1" => Some(PROMPT_DECIMAL_LEDGER_V1),
         _ => None,
     }
 }
