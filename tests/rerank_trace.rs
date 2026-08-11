@@ -294,6 +294,7 @@ async fn rerank_records_trace_for_cached_comparison() {
         log_ratio_mean: None,
         log_ratio_var: None,
         visible_mass: None,
+        logprob_mode: None,
     };
     let value_ba = CachedJudgement {
         higher_ranked: Some("A".to_string()),
@@ -306,6 +307,7 @@ async fn rerank_records_trace_for_cached_comparison() {
         log_ratio_mean: None,
         log_ratio_var: None,
         visible_mass: None,
+        logprob_mode: None,
     };
 
     cache.put(&key_ab, &value_ab).await.unwrap();
@@ -491,6 +493,7 @@ async fn cached_evidence_replays_bitwise_and_naive_confidence_reconstruction_div
         log_ratio_mean: Some(log_ratio_mean),
         log_ratio_var: Some(0.0),
         visible_mass: Some(1.0),
+        logprob_mode: Some(true),
     };
     cache.put(&key_ab, &evidence("A", mean)).await.unwrap();
     cache.put(&key_ba, &evidence("B", -mean)).await.unwrap();
@@ -593,6 +596,7 @@ async fn seeded_swapped_trace_matches_presented_cache_key() {
         log_ratio_mean: None,
         log_ratio_var: None,
         visible_mass: None,
+        logprob_mode: None,
     };
     cache.put(&key_ba, &value_ba).await.unwrap();
 

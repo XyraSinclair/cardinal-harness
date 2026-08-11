@@ -627,7 +627,7 @@ pub const DECIMAL_LEDGER_SLUG: &str = "decimal_ledger_v1";
 /// MC once atoms accumulate; HARVEST.md closed envelopes to ~0.1 log
 /// units in 25-40 draws on live providers, and 8 keeps per-judgement
 /// cost within one order of the point path).
-const DECIMAL_LEDGER_DRAWS: usize = 8;
+pub(crate) const DECIMAL_LEDGER_DRAWS: usize = 8;
 
 /// PMF-derived log-ratio moments for one judgement, in PRESENTED
 /// (A-over-B) coordinates. Carried alongside the point judgement so the
@@ -693,7 +693,7 @@ pub async fn compare_pair(
     if let (Some(cache), Some(ref key)) = (cache, &cache_key) {
         match cache.get(key).await {
             Ok(Some(hit)) => {
-                if let Some(judgement) = cached_to_judgement(&hit) {
+                if let Some(judgement) = cached_to_judgement(&hit, LADDER_RATIO_CAP) {
                     let usage = ComparisonUsage {
                         input_tokens: 0,
                         output_tokens: 0,
@@ -894,14 +894,18 @@ pub fn estimate_pairwise_input_tokens(
 // Mapping functions
 // =============================================================================
 
-fn cached_to_judgement(cached: &CachedJudgement) -> Option<PairwiseJudgement> {
+/// Ratio cap for the ladder-shaped elicitation paths (the last rung of
+/// [`RATIO_LADDER`]). The decimal-ledger path passes its own wider domain.
+const LADDER_RATIO_CAP: f64 = 26.0;
+
+fn cached_to_judgement(cached: &CachedJudgement, max_ratio: f64) -> Option<PairwiseJudgement> {
     if cached.refused {
         return Some(PairwiseJudgement::Refused);
     }
     let higher = cached.higher_ranked.as_deref()?;
     let ratio = cached.ratio?;
     let confidence = cached.confidence?;
-    if !(1.0..=26.0).contains(&ratio) {
+    if !(1.0..=max_ratio).contains(&ratio) {
         return None;
     }
     let higher_ranked = match higher.to_uppercase().as_str() {
@@ -1010,7 +1014,7 @@ async fn compare_pair_seriate(
     if let (Some(cache), Some(ref key)) = (cache, &cache_key) {
         match cache.get(key).await {
             Ok(Some(hit)) => {
-                if let Some(judgement) = cached_to_judgement(&hit) {
+                if let Some(judgement) = cached_to_judgement(&hit, LADDER_RATIO_CAP) {
                     let usage = ComparisonUsage {
                         input_tokens: 0,
                         output_tokens: 0,
@@ -1210,7 +1214,10 @@ async fn compare_pair_decimal_ledger(
     if let (Some(cache), Some(ref key)) = (cache, &cache_key) {
         match cache.get(key).await {
             Ok(Some(hit)) => {
-                if let Some(judgement) = cached_to_judgement(&hit) {
+                // The decimal instrument's domain reaches 999.9; validating
+                // cached rows against the 26.0 ladder cap would turn every
+                // strong judgement into a permanent cache miss.
+                if let Some(judgement) = cached_to_judgement(&hit, decimal_ledger::DOMAIN_HI) {
                     let usage = ComparisonUsage {
                         input_tokens: 0,
                         output_tokens: 0,
@@ -1271,7 +1278,18 @@ async fn compare_pair_decimal_ledger(
     let mut first_content: Option<String> = None;
     let mut first_logprobs = None;
 
-    let mut logprobs_supported = true;
+    // Seed from the house logprob census (Anthropic and reasoning-variant
+    // models never surface logprobs; their rejections often don't say
+    // "logprob", so the substring sniff below would miss them and the
+    // judgement would error instead of degrading). The sniff remains as
+    // the backstop for models the census wrongly believes support them.
+    let mut logprobs_supported = model_supports_logprobs(request.spec.model);
+    if !logprobs_supported {
+        warn!(
+            model = request.spec.model,
+            "decimal ledger: model census says no logprobs; using sampled draws (frequency-MC moments)"
+        );
+    }
     let mut trajectories = Vec::new();
     let mut text_obs: Vec<(HigherRanked, f64)> = Vec::new();
     let mut refusals = 0usize;
@@ -1499,6 +1517,7 @@ fn judgement_to_cached(judgement: &PairwiseJudgement, usage: &ComparisonUsage) -
             log_ratio_mean: None,
             log_ratio_var: None,
             visible_mass: None,
+            logprob_mode: None,
         },
         PairwiseJudgement::Observation {
             higher_ranked,
@@ -1518,19 +1537,23 @@ fn judgement_to_cached(judgement: &PairwiseJudgement, usage: &ComparisonUsage) -
             log_ratio_mean: usage.evidence_moments.map(|m| m.log_ratio_mean),
             log_ratio_var: usage.evidence_moments.map(|m| m.log_ratio_var),
             visible_mass: usage.evidence_moments.map(|m| m.visible_mass),
+            logprob_mode: usage.evidence_moments.map(|m| m.logprob_mode),
         },
     }
 }
 
 /// Reconstruct evidence moments from a cache hit (evidence-mode rows only).
 fn evidence_moments_from_cached(hit: &CachedJudgement) -> Option<EvidenceMoments> {
+    let visible_mass = hit.visible_mass?;
     Some(EvidenceMoments {
         log_ratio_mean: hit.log_ratio_mean?,
         log_ratio_var: hit.log_ratio_var?,
-        visible_mass: hit.visible_mass?,
-        // Cached moments came from a logprob-mode call; sampled-mode
-        // judgements carry no moments.
-        logprob_mode: true,
+        visible_mass,
+        // Rows written since the `logprob_mode` column exists carry the
+        // flag directly; for older rows infer it from visible mass (a
+        // sampled/frequency fallback stores 0.0), so degraded judgements
+        // stay visibly degraded on cache replay.
+        logprob_mode: hit.logprob_mode.unwrap_or(visible_mass > 0.0),
     })
 }
 

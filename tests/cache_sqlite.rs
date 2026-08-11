@@ -50,6 +50,7 @@ async fn sqlite_cache_put_get_and_export_increments_hit_count() {
         log_ratio_mean: None,
         log_ratio_var: None,
         visible_mass: None,
+        logprob_mode: None,
     };
 
     cache.put(&key, &value).await.unwrap();
@@ -128,6 +129,7 @@ async fn sqlite_cache_prune_max_rows_keeps_most_recent() {
         log_ratio_mean: None,
         log_ratio_var: None,
         visible_mass: None,
+        logprob_mode: None,
     };
 
     cache.put(&old_key, &value).await.unwrap();

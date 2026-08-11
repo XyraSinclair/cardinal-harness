@@ -153,6 +153,16 @@ pub fn estimate_max_rerank_charge(req: &MultiRerankRequest) -> RerankChargeEstim
     } else {
         PAIRWISE_MAX_OUTPUT_TOKENS_DEFAULT
     };
+    // The decimal-ledger instrument makes K gateway calls per comparison
+    // (each resending the full prompt); reserve for the worst case when any
+    // attribute uses it, matching the worst-case prompt selection below.
+    let calls_per_comparison = if req.attributes.iter().any(|a| {
+        a.prompt_template_slug.as_deref() == Some(crate::rerank::comparison::DECIMAL_LEDGER_SLUG)
+    }) {
+        crate::rerank::comparison::DECIMAL_LEDGER_DRAWS as u32
+    } else {
+        1
+    };
 
     // Worst-case attribute prompt: choose the largest prompt by token count (bounded, cheap).
     let (attr_id, attr_prompt, attr_template_slug) = req
@@ -178,12 +188,14 @@ pub fn estimate_max_rerank_charge(req: &MultiRerankRequest) -> RerankChargeEstim
     let input_tokens_per_comparison =
         estimate_pairwise_input_tokens(attr_id, attr_prompt, attr_template_slug, a_text, b_text);
 
-    // Provider cost per comparison at the capped max output tokens.
+    // Provider cost per comparison at the capped max output tokens, times
+    // the calls one comparison actually makes (decimal ledger: K draws).
     let provider_cost_per_comparison = provider_pricing::chat_cost(
         model,
         input_tokens_per_comparison,
         output_tokens_per_comparison,
-    );
+    )
+    .saturating_mul(i64::from(calls_per_comparison));
 
     let provider_cost_max_nanodollars =
         provider_cost_per_comparison.saturating_mul(comparison_budget as i64);
@@ -191,8 +203,10 @@ pub fn estimate_max_rerank_charge(req: &MultiRerankRequest) -> RerankChargeEstim
 
     RerankChargeEstimate {
         comparison_budget,
-        input_tokens_per_comparison,
-        output_tokens_per_comparison,
+        input_tokens_per_comparison: input_tokens_per_comparison
+            .saturating_mul(calls_per_comparison),
+        output_tokens_per_comparison: output_tokens_per_comparison
+            .saturating_mul(calls_per_comparison),
         provider_cost_max_nanodollars,
         user_charge_max_nanodollars,
     }
