@@ -34,7 +34,7 @@ pub const DOMAIN_HI: f64 = 999.9;
 /// (SHOOTOUT.md finding 4).
 pub const ENUM_MASS_POINT_THRESHOLD: f64 = 0.9;
 
-const BOOTSTRAP_REPS: usize = 100;
+const BOOTSTRAP_REPS: usize = 200;
 
 fn zmax() -> f64 {
     DOMAIN_HI.ln()
@@ -80,13 +80,23 @@ impl DrawTrajectory {
 
 /// Extract the instrument trajectory from a response's output logprobs.
 ///
-/// Grammar-adjacency is enforced strictly: the integer must be ONE token,
-/// immediately followed by the '.' token, immediately followed by a
-/// single-digit fraction token. Multi-token integers (non-o200k digit
-/// grouping) are rejected rather than silently mis-binned — a sharper
-/// guard than the notes-pack prototype, which could misread a split
-/// integer's first token as the whole integer.
+/// Grammar-adjacency is enforced strictly: the integer must be ONE bare
+/// digit-token, immediately followed by the '.' token, immediately
+/// followed by a single bare digit-token fraction. Multi-token integers
+/// (non-o200k digit grouping) are rejected rather than silently
+/// mis-binned — a sharper guard than the notes-pack prototype, which
+/// could misread a split integer's first token as the whole integer.
+///
+/// Tokens are matched RAW (no whitespace trimming), mirroring the
+/// prototype's `token[:1].isdigit()` semantics: a leading-space token
+/// like ` 12` is a prose-position number (e.g. "about 12.5 times" in a
+/// non-JSON-mode preamble), not the string-literal grammar position, and
+/// accepting it would mint atoms from prose conditionals
+/// (port-fidelity review, 2026-08-11).
 pub fn extract_trajectory(tokens: &[TokenLogprob]) -> Option<DrawTrajectory> {
+    fn bare_digits(tok: &str) -> bool {
+        !tok.is_empty() && tok.chars().all(|c| c.is_ascii_digit())
+    }
     let mut seen = String::new();
     let mut dir_i = None;
     let mut int_i = None;
@@ -96,16 +106,10 @@ pub fn extract_trajectory(tokens: &[TokenLogprob]) -> Option<DrawTrajectory> {
         let prev_contains_higher = seen.contains("higher");
         let prev_contains_ratio = seen.contains("ratio");
         seen.push_str(&t.token);
-        let trimmed = t.token.trim_start();
         if dir_i.is_none() && (t.token == "A" || t.token == "B") && prev_contains_higher {
             dir_i = Some(i);
         }
-        if dir_i.is_some()
-            && int_i.is_none()
-            && prev_contains_ratio
-            && !trimmed.is_empty()
-            && trimmed.chars().all(|c| c.is_ascii_digit())
-        {
+        if dir_i.is_some() && int_i.is_none() && prev_contains_ratio && bare_digits(&t.token) {
             int_i = Some(i);
             continue;
         }
@@ -115,7 +119,7 @@ pub fn extract_trajectory(tokens: &[TokenLogprob]) -> Option<DrawTrajectory> {
                     dot_i = Some(i);
                     continue;
                 }
-                if trimmed.chars().all(|c| c.is_ascii_digit()) {
+                if bare_digits(&t.token) {
                     // integer split across tokens: reject the draw
                     return None;
                 }
@@ -123,7 +127,7 @@ pub fn extract_trajectory(tokens: &[TokenLogprob]) -> Option<DrawTrajectory> {
         }
         if let Some(di) = dot_i {
             if frac_i.is_none() && i == di + 1 {
-                if trimmed.len() == 1 && trimmed.chars().all(|c| c.is_ascii_digit()) {
+                if t.token.len() == 1 && bare_digits(&t.token) {
                     frac_i = Some(i);
                 } else {
                     return None;
@@ -143,8 +147,8 @@ pub fn extract_trajectory(tokens: &[TokenLogprob]) -> Option<DrawTrajectory> {
     let dir = if tokens[dir_i].token == "A" { 'A' } else { 'B' };
     Some(DrawTrajectory {
         dir,
-        int_tok: tokens[int_i].token.trim_start().to_string(),
-        frac_tok: tokens[frac_i].token.trim_start().to_string(),
+        int_tok: tokens[int_i].token.clone(),
+        frac_tok: tokens[frac_i].token.clone(),
         nodes: [node(dir_i), node(int_i), node(frac_i)],
     })
 }
@@ -173,9 +177,12 @@ impl NodeStats {
 pub type Trie = BTreeMap<Vec<String>, NodeStats>;
 
 /// Accumulate draw trajectories into the trie. Top-k sidebands are folded
-/// in alongside chosen-token observations; digit/letter tokens arrive
-/// whitespace-trimmed from `extract_trajectory`, and sideband tokens are
-/// trimmed here to match.
+/// in alongside chosen-token observations, RAW: distinct token strings
+/// (` 12` vs `12`) stay distinct obs vectors. Merging them would let a
+/// near-zero whitespace variant dilute a real token's drift-averaged mass;
+/// kept raw, the variant simply fails the ledger's digit/letter filters
+/// and routes conservatively into residual cells, matching the prototype
+/// (port-fidelity review, 2026-08-11).
 pub fn accumulate(draws: &[DrawTrajectory]) -> Trie {
     let mut trie = Trie::new();
     for d in draws {
@@ -187,9 +194,9 @@ pub fn accumulate(draws: &[DrawTrajectory]) -> Trie {
         for (key, node_obs) in keys.iter().zip(d.nodes.iter()) {
             let ns = trie.entry(key.clone()).or_default();
             let (ref tok, p) = node_obs.chosen;
-            ns.add(tok.trim_start(), p);
+            ns.add(tok, p);
             for (tok, p) in &node_obs.top {
-                ns.add(tok.trim_start(), *p);
+                ns.add(tok, *p);
             }
         }
     }
@@ -464,6 +471,15 @@ pub struct LedgerOutcome {
 
 /// Fuse parsed draw trajectories into a single evidence outcome.
 /// Returns `None` when no trajectory parsed.
+///
+/// Deliberate hybrid in the low-enumeration regime: the MEAN switches to
+/// the cross-fit estimator (SHOOTOUT.md finding 4) while the VARIANCE
+/// stays envelope-shaped (`width²/12` + a bootstrap of the midpoint
+/// statistic). The envelope covers truth regardless of which point
+/// estimator is reported (coverage 1.00 in the ground-truth shootout),
+/// and in the crossfit regime the envelope term dominates, so the pair is
+/// conservative rather than internally inconsistent — but it is a hybrid,
+/// not a single estimator's (mean, var).
 pub fn analyze(draws: &[DrawTrajectory]) -> Option<LedgerOutcome> {
     if draws.is_empty() {
         return None;

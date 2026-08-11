@@ -68,10 +68,13 @@ don't overlap 0.20 for 4.1-mini).
 
 ## Next steps (in value order)
 
-1. Rust seam: port the ledger/certificate core behind the rerank comparison path so
-   judgments can emit (E[Z], honest σ) into IRLS — the internal consumer that proves
-   the kernel before any external story. Include the cross-fit residual estimator
-   per SHOOTOUT.md finding 4; never same-batch subtract (finding 2).
+1. ~~Rust seam~~ **SHIPPED 2026-08-11** — `src/rerank/decimal_ledger.rs` +
+   slug `decimal_ledger_v1` (K=8 temp-1 redraws → exact-atom ledger →
+   EvidenceMoments → IRLS precision via the existing evidence seam; cross-fit
+   below 0.9 enum mass, never same-batch subtract). Live-smoked on
+   gpt-4.1-mini ($0.0008/judgement, 12/12 logprob-mode); four review passes
+   (port-fidelity, integration, mom, dad) reconciled in the two follow-up
+   commits after the initial one.
 2. ~~Oracle probe #3: exact-ground-truth estimator shootout~~ **SHIPPED** — see
    `SHOOTOUT.md`: envelope coverage 1.00 across 4,500 replications, ~47x call
    efficiency over MC in the high-enum regime, selection bias measured (−0.60 →

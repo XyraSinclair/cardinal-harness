@@ -1415,18 +1415,25 @@ async fn compare_pair_decimal_ledger(
     });
 
     let Some((mean, var, visible_mass, logprob_mode, confidence)) = fused else {
-        if refusals * 2 < DECIMAL_LEDGER_DRAWS {
+        // Cache the refusal only when the model actually refused a majority
+        // of draws. A transient parse-failure burst must not become a sticky
+        // $0 `Refused` served from cache forever (integration review,
+        // 2026-08-11); uncached, the next run simply retries live.
+        let genuine_refusal = refusals * 2 >= DECIMAL_LEDGER_DRAWS;
+        if !genuine_refusal {
             warn!(
                 model = request.spec.model,
                 refusals,
                 draws = DECIMAL_LEDGER_DRAWS,
-                "decimal ledger: no usable draws; treating as refusal"
+                "decimal ledger: no usable draws; treating as refusal (not cached)"
             );
         }
         let judgement = PairwiseJudgement::Refused;
-        if let (Some(cache), Some(ref key)) = (cache, &cache_key) {
-            let entry = judgement_to_cached(&judgement, &usage);
-            let _ = cache.put(key, &entry).await;
+        if genuine_refusal {
+            if let (Some(cache), Some(ref key)) = (cache, &cache_key) {
+                let entry = judgement_to_cached(&judgement, &usage);
+                let _ = cache.put(key, &entry).await;
+            }
         }
         return Ok((judgement, usage));
     };

@@ -58,6 +58,11 @@ Background sync automation, if any, should default to `git fetch`, not blind
   `sort_documents`) over the single-attribute path; CLI `sort` verb lives in
   `src/bin/cardinal.rs`
 - `src/rerank/comparison.rs`: pairwise LLM comparison logic
+- `src/rerank/decimal_ledger.rs`: decimal-ledger evidence instrument
+  (research slug `decimal_ledger_v1`): K temp-1 redraws of a free-form
+  decimal ratio fused into a credal exact-atom ledger; (E[Z], honest var)
+  enter IRLS via the evidence_moments seam (evidence pack:
+  notes/decimal-pmf-2026-08-10/)
 - `src/prompts.rs`: prompt templates and ratio ladder
 - `src/gateway/`: OpenRouter adapter, pricing, usage, logprobs; `claude-code/<model>`
   slugs route to the subscription-billed Claude Code adapter (rail fitness
