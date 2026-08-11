@@ -62,7 +62,8 @@ Background sync automation, if any, should default to `git fetch`, not blind
   (research slug `decimal_ledger_v1`): K temp-1 redraws of a free-form
   decimal ratio fused into a credal exact-atom ledger; (E[Z], honest var)
   enter IRLS via the evidence_moments seam (evidence pack:
-  notes/decimal-pmf-2026-08-10/)
+  notes/decimal-pmf-2026-08-10/; ground-truth property battery:
+  `cargo run --release --example decimal_ledger_groundtruth`)
 - `src/prompts.rs`: prompt templates and ratio ladder
 - `src/gateway/`: OpenRouter adapter, pricing, usage, logprobs; `claude-code/<model>`
   slugs route to the subscription-billed Claude Code adapter (rail fitness

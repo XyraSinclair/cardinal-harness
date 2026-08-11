@@ -74,7 +74,10 @@ don't overlap 0.20 for 4.1-mini).
    below 0.9 enum mass, never same-batch subtract). Live-smoked on
    gpt-4.1-mini ($0.0008/judgement, 12/12 logprob-mode); four review passes
    (port-fidelity, integration, mom, dad) reconciled in the two follow-up
-   commits after the initial one.
+   commits after the initial one. Ground-truth property battery over the
+   production Rust code path: `RUST-BATTERY.md` (envelope coverage 1.000
+   across 4,000 outcomes incl. 2% provider jitter, exact antisymmetry,
+   conservation detector verified, extract discipline verified).
 2. ~~Oracle probe #3: exact-ground-truth estimator shootout~~ **SHIPPED** — see
    `SHOOTOUT.md`: envelope coverage 1.00 across 4,500 replications, ~47x call
    efficiency over MC in the high-enum regime, selection bias measured (−0.60 →
