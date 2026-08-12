@@ -1,9 +1,9 @@
-# How cardinal-harness relates to the rest of the field
+# How ratiometer relates to the rest of the field
 
 The LLM-ranking ecosystem almost universally elicits **binary or ordinal**
 preferences ("is A better than B?", "rank these 20") and then either uses the
 order directly or fits an **interval-scale** latent strength from binary
-outcomes (Bradley–Terry / Elo). cardinal-harness differs on three axes at
+outcomes (Bradley–Terry / Elo). ratiometer differs on three axes at
 once:
 
 1. It elicits **ratio-magnitude** judgements ("how many times more of X does

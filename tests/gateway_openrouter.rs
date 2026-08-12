@@ -2,9 +2,9 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
-use cardinal_harness::gateway::openrouter::OpenRouterAdapter;
-use cardinal_harness::gateway::usage::{CallStatus, ProviderCallRecord, UsageSink};
-use cardinal_harness::gateway::{
+use ratiometer::gateway::openrouter::OpenRouterAdapter;
+use ratiometer::gateway::usage::{CallStatus, ProviderCallRecord, UsageSink};
+use ratiometer::gateway::{
     Attribution, ChatModel, ChatRequest, FinishReason, GatewayConfig, Message, NoopUsageSink,
     ProviderError, ProviderGateway, RateLimitSource, ReasoningConfig,
 };
@@ -428,7 +428,7 @@ async fn provider_gateway_records_usage_for_retry_then_success() {
     assert_eq!(second.request_id.as_deref(), Some("usage-success"));
     assert_eq!(
         second.cost_nanodollars,
-        cardinal_harness::gateway::chat_cost("openai/gpt-5-mini", 3, 5)
+        ratiometer::gateway::chat_cost("openai/gpt-5-mini", 3, 5)
     );
 }
 

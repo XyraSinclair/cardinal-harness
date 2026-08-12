@@ -6,9 +6,9 @@
 use std::sync::Arc;
 use std::time::Duration;
 
-use cardinal_harness::gateway::openrouter::OpenRouterAdapter;
-use cardinal_harness::gateway::{GatewayConfig, NoopUsageSink, ProviderGateway};
-use cardinal_harness::rerank::{run_judge_bench, JudgeBenchOptions, JudgeBenchReport, CORPUS};
+use ratiometer::gateway::openrouter::OpenRouterAdapter;
+use ratiometer::gateway::{GatewayConfig, NoopUsageSink, ProviderGateway};
+use ratiometer::rerank::{run_judge_bench, JudgeBenchOptions, JudgeBenchReport, CORPUS};
 use serde_json::json;
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, Request, Respond, ResponseTemplate};
@@ -52,7 +52,7 @@ fn depth_of(text: &str) -> Option<f64> {
         return Some(DEPTHS[k]);
     }
     let norm = normalize(text);
-    cardinal_harness::rerank::HARMONIC_BLOCK
+    ratiometer::rerank::HARMONIC_BLOCK
         .iter()
         .position(|&t| t == norm)
         .map(|k| HARMONIC_DEPTHS[k])
@@ -60,7 +60,7 @@ fn depth_of(text: &str) -> Option<f64> {
 
 fn harmonic_index(text: &str) -> Option<usize> {
     let norm = normalize(text);
-    cardinal_harness::rerank::HARMONIC_BLOCK
+    ratiometer::rerank::HARMONIC_BLOCK
         .iter()
         .position(|&t| t == norm)
 }

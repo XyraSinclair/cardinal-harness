@@ -7,6 +7,31 @@ Versioning once it reaches `1.0.0`.
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-08-12
+
+### Changed
+
+- **Renamed the crate and repository: `cardinal-harness` → `ratiometer`**
+  (operator decision 2026-08-12; north-star ontology and naming map in
+  `notes/north-star-ontology-2026-08-11.md`). A ratiometer measures the
+  ratio of two signals; ratiometric measurement — no absolute anchor,
+  every reading taken against a paired reference — is this engine's
+  epistemics. Public type paths move from `cardinal_harness::X` to
+  `ratiometer::X` (semver-honest minor bump pre-1.0). The old crate name
+  is parked: `cardinal-harness` 0.11.1 is a pointer release and earlier
+  versions stay published so existing lockfiles keep resolving.
+- Deliberately UNCHANGED, as frozen contracts: the binary names
+  (`cardinal`, `cardinald`), the judgement-run atom (`cardinal.judgement-run.v1`),
+  and the content-address domain string
+  `cardinal-harness/rendered-prompt/v1` (now commented as frozen in
+  `src/prompts.rs`) — changing the last would invalidate every existing
+  cache key and packet id.
+- Data-plane label: the default landing provenance (`landing.rs` HARNESS)
+  now writes `ratiometer`; rows landed earlier carry `cardinal-harness`.
+- Docs: `docs/WHAT_WHY_HOW.md` gains the locked "What we are building"
+  section (attribute → magnitude → instrument → evidence → scaling of
+  readings; "readings, not rankings").
+
 ## [0.11.0] - 2026-08-11
 
 ### Changed

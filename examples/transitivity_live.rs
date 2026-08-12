@@ -5,9 +5,9 @@
 
 use std::sync::Arc;
 
-use cardinal_harness::gateway::{Attribution, NoopUsageSink, ProviderGateway};
-use cardinal_harness::repeat_pooling::RepeatDraws;
-use cardinal_harness::rerank::{nonce_draws, stochastic_transitivity, CORPUS, PRIMARY_ATTRIBUTE};
+use ratiometer::gateway::{Attribution, NoopUsageSink, ProviderGateway};
+use ratiometer::repeat_pooling::RepeatDraws;
+use ratiometer::rerank::{nonce_draws, stochastic_transitivity, CORPUS, PRIMARY_ATTRIBUTE};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

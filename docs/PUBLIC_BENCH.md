@@ -124,7 +124,7 @@ wild and one aligned default:
    certificate on *their* judge+prompt+model configuration. Recurring,
    because configurations churn. This is SOC2-shaped, and nobody occupies
    the niche yet.
-3. **The harness as product**: cardinal-harness itself (counterbalancing,
+3. **The harness as product**: ratiometer itself (counterbalancing,
    orbit elicitation, IRLS fusion) sold as the *fix* for whatever the
    benchmark exposes. Benchmark = top of funnel for OpenPriors.
 4. **Zero-revenue default is still a win**: if labs internalize the metric
@@ -190,6 +190,15 @@ public surface: it names the atom every product shares. The benchmark
 keeps its technical name (JCB) in docs and packs. The site headline is
 "Does the judgment survive?" "Cardinal Bench" is retired as a working
 title.
+
+Naming map (locked 2026-08-12, full record in
+`notes/north-star-ontology-2026-08-11.md`): the engine crate/repo is
+**ratiometer** (renamed from cardinal-harness at 0.12.0); the product
+sentence is **"Readings, not rankings"**; the working vocabulary stays
+common nouns (scaling, reading, magnitude, doubling) so the ranking-vs-
+scaling distinction can propagate unattributed; "pogson" is parked as a
+possible informal unit name; instruments keep versioned slugs, never
+brandable names.
 
 ## Operations
 

@@ -11,24 +11,22 @@ use axum::http::{HeaderMap, StatusCode};
 use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
 use axum::{Json, Router};
-use cardinal_harness::gateway::openrouter::OpenRouterAdapter;
-use cardinal_harness::gateway::{
+use chrono::{DateTime, Utc};
+use ratiometer::gateway::openrouter::OpenRouterAdapter;
+use ratiometer::gateway::{
     Attribution, ChatGateway, ChatRequest, ChatResponse, ErrorContext, GatewayConfig, ModelPricing,
     NoopUsageSink, ProviderError, ProviderGateway, OPENROUTER_PRICING_AS_OF,
 };
-use cardinal_harness::judgement_run::{
+use ratiometer::judgement_run::{
     build_external_schedule, execute_external_judgement_run_with_ref,
     execute_judgement_run_with_ref, max_judgement_run_comparisons, validate_external_judgement_run,
     ExternalJudgementRun, ExternalJudgementSchedule, JudgementCandidate, JudgementPrivacy,
     JudgementRunRecord, JudgementRunRequest, JudgementRunStore, JudgementRunTerminal,
     NormalizedJudgementRunRequest, JUDGEMENT_PROMPT_TEMPLATE_SLUG,
 };
-use cardinal_harness::landing::{land_completed_run, ClickHouseLanding};
-use cardinal_harness::rerank::comparison::{
-    estimate_pairwise_input_tokens, pairwise_max_output_tokens,
-};
-use cardinal_harness::rerank::{RerankExecution, RerankRunOptions, RerankStopReason};
-use chrono::{DateTime, Utc};
+use ratiometer::landing::{land_completed_run, ClickHouseLanding};
+use ratiometer::rerank::comparison::{estimate_pairwise_input_tokens, pairwise_max_output_tokens};
+use ratiometer::rerank::{RerankExecution, RerankRunOptions, RerankStopReason};
 use serde::{Deserialize, Serialize};
 use tokio::sync::Semaphore;
 use uuid::Uuid;
@@ -335,7 +333,7 @@ async fn estimate_run(
         .into_run_request(JudgementPrivacy::Public)
         .normalize()
         .map_err(|error| ApiError::bad_request(error.to_string()))?;
-    let pricing = cardinal_harness::gateway::get_pricing(&normalized.model)
+    let pricing = ratiometer::gateway::get_pricing(&normalized.model)
         .filter(|pricing| pricing.provider == "openrouter")
         .ok_or_else(|| ApiError::conflict("price_unknown"))?;
     let planned_comparisons = max_judgement_run_comparisons(&normalized);
@@ -777,7 +775,7 @@ fn entity_text_hashes(entities: &[JudgementCandidate]) -> Vec<String> {
 fn project_completed(
     record: &JudgementRunRecord,
     stop_reason: RerankStopReason,
-    response: &cardinal_harness::judgement_run::JudgementRunResponse,
+    response: &ratiometer::judgement_run::JudgementRunResponse,
 ) -> CompletedResponse {
     let scores = response
         .entities

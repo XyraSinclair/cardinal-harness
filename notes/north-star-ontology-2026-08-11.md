@@ -1,8 +1,9 @@
-# North-star ontology (proposed, 2026-08-11 — NOT yet locked)
+# North-star ontology (LOCKED 2026-08-12)
 
-Status: proposed to the operator in chat 2026-08-11 23:40; awaiting her
-lock before this becomes canonical doctrine in `docs/WHAT_WHY_HOW.md`.
-Until then this is a note, not doctrine.
+Status: LOCKED by the operator 2026-08-12 ("sure, yolo"). Canonized in
+`docs/WHAT_WHY_HOW.md` § "What we are building"; naming map executed the
+same day (crate/repo renamed to ratiometer at 0.12.0). This note is the
+decision record.
 
 **One-liner:** the instrument that turns an LLM's felt sense into
 calibrated measurement. Sorting is the demo; measurement is the product.
@@ -39,7 +40,7 @@ transfer across lists — readings accumulate into a web of priors
 **Stack:** attribute → magnitude → instruments → evidence → scaling of
 readings. LLM-sorter is the storefront; the ratiometer is the machine.
 
-## Naming map (proposed 2026-08-12, same lock gate)
+## Naming map (locked + executed 2026-08-12)
 
 Four layers wanting different KINDS of names:
 

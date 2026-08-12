@@ -7,7 +7,7 @@
 //! Cost caveat: use a FRESH (no-cache) pack — a cached run's costs are
 //! near zero and poison the per-dollar column.
 
-use cardinal_harness::rerank::judge_geometry;
+use ratiometer::rerank::judge_geometry;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let path = std::env::args()

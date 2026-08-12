@@ -1,4 +1,4 @@
-//! Minimal end-to-end example for `cardinal-harness`.
+//! Minimal end-to-end example for `ratiometer`.
 //!
 //! This ranks three entities by "clarity of explanation" and returns
 //! quantitative scores with uncertainty estimates.
@@ -9,12 +9,12 @@
 
 use std::sync::Arc;
 
-use cardinal_harness::gateway::NoopUsageSink;
-use cardinal_harness::rerank::{
+use ratiometer::gateway::NoopUsageSink;
+use ratiometer::rerank::{
     ModelLadderPolicy, MultiRerankAttributeSpec, MultiRerankEntity, MultiRerankRequest,
     MultiRerankTopKSpec, RerankRunOptions,
 };
-use cardinal_harness::{Attribution, ProviderGateway, SqlitePairwiseCache};
+use ratiometer::{Attribution, ProviderGateway, SqlitePairwiseCache};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -92,9 +92,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // -- Run it --------------------------------------------------------------
 
-    let resp = cardinal_harness::rerank::multi_rerank(
+    let resp = ratiometer::rerank::multi_rerank(
         req,
-        cardinal_harness::rerank::RerankExecution::new(
+        ratiometer::rerank::RerankExecution::new(
             Arc::new(gateway),
             Attribution::new("example::quickstart"),
         )

@@ -20,11 +20,11 @@
 use std::sync::{Arc, Mutex, PoisonError};
 use std::time::Duration;
 
-use cardinal_harness::gateway::openrouter::OpenRouterAdapter;
-use cardinal_harness::gateway::{
+use ratiometer::gateway::openrouter::OpenRouterAdapter;
+use ratiometer::gateway::{
     Attribution, ChatGateway, GatewayConfig, NoopUsageSink, ProviderGateway,
 };
-use cardinal_harness::rerank::{
+use ratiometer::rerank::{
     sort_documents, sort_texts, RerankDocument, RerankRunOptions, SortOptions, SortedTexts,
 };
 use serde_json::json;
@@ -188,8 +188,8 @@ fn execution_for(
     server: &MockServer,
     seed: u64,
     tag: &'static str,
-) -> cardinal_harness::rerank::RerankExecution<'static> {
-    cardinal_harness::rerank::RerankExecution::new(gateway_for(server), Attribution::new(tag))
+) -> ratiometer::rerank::RerankExecution<'static> {
+    ratiometer::rerank::RerankExecution::new(gateway_for(server), Attribution::new(tag))
         .run_options(RerankRunOptions {
             rng_seed: Some(seed),
             cache_only: false,

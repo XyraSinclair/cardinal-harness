@@ -1,4 +1,4 @@
-use cardinal_harness::rerank::{
+use ratiometer::rerank::{
     validate_multi_rerank_request, MultiRerankAttributeSpec, MultiRerankEntity, MultiRerankRequest,
 };
 

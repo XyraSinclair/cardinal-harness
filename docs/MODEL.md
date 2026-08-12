@@ -1,6 +1,6 @@
 # Model
 
-This is the compact mathematical contract behind `cardinal-harness`. `docs/ALGORITHM.md` gives the engineering rationale; this page states the objects, assumptions, and limits.
+This is the compact mathematical contract behind `ratiometer`. `docs/ALGORITHM.md` gives the engineering rationale; this page states the objects, assumptions, and limits.
 
 ## Objects
 

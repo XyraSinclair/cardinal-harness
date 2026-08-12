@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
-use cardinal_harness::rating_engine::{AttributeParams, Observation, RaterParams, RatingEngine};
-use cardinal_harness::trait_search::{
+use ratiometer::rating_engine::{AttributeParams, Observation, RaterParams, RatingEngine};
+use ratiometer::trait_search::{
     AttributeConfig, GateSpec, TopKConfig, TraitSearchConfig, TraitSearchManager,
 };
 

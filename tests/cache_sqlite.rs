@@ -1,5 +1,5 @@
-use cardinal_harness::cache::{CachedJudgement, PairwiseCacheKey, SqlitePairwiseCache};
-use cardinal_harness::PairwiseCache;
+use ratiometer::cache::{CachedJudgement, PairwiseCacheKey, SqlitePairwiseCache};
+use ratiometer::PairwiseCache;
 use tempfile::tempdir;
 
 #[derive(Debug, serde::Deserialize)]

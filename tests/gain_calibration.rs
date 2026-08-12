@@ -3,7 +3,7 @@
 //! answer to the measured wording bias (fraction wording runs hotter than
 //! ratio wording for the same belief).
 
-use cardinal_harness::gain_calibration::{solve_with_template_gains, GainObservation};
+use ratiometer::gain_calibration::{solve_with_template_gains, GainObservation};
 
 fn planted(
     n: usize,

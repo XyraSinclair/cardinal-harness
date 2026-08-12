@@ -3,9 +3,9 @@
 use std::sync::Arc;
 use std::time::Duration;
 
-use cardinal_harness::gateway::openrouter::OpenRouterAdapter;
-use cardinal_harness::gateway::{Attribution, GatewayConfig, NoopUsageSink, ProviderGateway};
-use cardinal_harness::rerank::{explain_ranking, ExplainOptions, RerankDocument, RerankExecution};
+use ratiometer::gateway::openrouter::OpenRouterAdapter;
+use ratiometer::gateway::{Attribution, GatewayConfig, NoopUsageSink, ProviderGateway};
+use ratiometer::rerank::{explain_ranking, ExplainOptions, RerankDocument, RerankExecution};
 use serde_json::json;
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, Request, Respond, ResponseTemplate};

@@ -5,9 +5,7 @@
 //! form. Plus: tamper-evidence (one flipped byte = a different packet;
 //! conflicting entity content = refusal to fuse) and serde round-trip.
 
-use cardinal_harness::packet::{
-    entity_text_hash, fuse, JudgmentPacket, PacketError, PacketObservation,
-};
+use ratiometer::packet::{entity_text_hash, fuse, JudgmentPacket, PacketError, PacketObservation};
 
 fn entities(n: usize) -> Vec<(String, String)> {
     (0..n)

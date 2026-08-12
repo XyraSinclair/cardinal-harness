@@ -1,10 +1,10 @@
-# cardinal-harness
+# ratiometer
 
-[![CI](https://github.com/XyraSinclair/cardinal-harness/actions/workflows/ci.yml/badge.svg)](https://github.com/XyraSinclair/cardinal-harness/actions/workflows/ci.yml)
+[![CI](https://github.com/XyraSinclair/ratiometer/actions/workflows/ci.yml/badge.svg)](https://github.com/XyraSinclair/ratiometer/actions/workflows/ci.yml)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 **Does the model actually believe what it just told you — or was it only
-echoing how you asked?** cardinal-harness measures the difference and gives
+echoing how you asked?** ratiometer measures the difference and gives
 you the number. A preference earns the name *belief* only if it survives the
 transformations that shouldn't matter — presentation order, wording,
 polarity, who's asking. This engine elicits LLM judgements as noisy
@@ -13,13 +13,20 @@ that fails it in nats, with evidence. (Watch one judgement bend under
 framing while another refuses to move, on live committed data:
 [the evidence viewer](artifacts/live/evidence-viewer-2026-07-08/).)
 
+**Readings, not rankings.** A ranking tells you who is above whom; a
+*scaling* keeps the gaps — and gaps are where decisions live. ratiometer
+returns a *reading* per item: a magnitude on a shared ratio scale, with an
+error bar, at a stated price. A ranking is a scaling with the spacing
+deleted. (This crate was `cardinal-harness` until 2026-08-12; the old
+crates.io name is parked and its releases keep resolving.)
+
 The everyday verb is sorting:
 
 ```console
 $ cardinal sort ideas.txt --by "expected impact on retention"
 ```
 
-`cardinal-harness` turns noisy LLM pairwise **ratio** judgements ("how many
+`ratiometer` turns noisy LLM pairwise **ratio** judgements ("how many
 times more of X does A have than B?") into globally consistent **cardinal
 scores with uncertainty**, spends each next comparison where it buys the most
 information about the order, and stops when the top-k is certain enough — or
@@ -37,7 +44,7 @@ Every obvious way to sort a list with an LLM breaks somewhere:
 | "Which is better, A or B?" over pairs | Ordinal only — throws away *how much* better; naive schedules cost O(n²) |
 | Elo / Bradley–Terry over wins | Better aggregation, but still magnitude-blind and usually passive about which pair to ask next |
 
-`cardinal-harness` treats each ratio answer as a noisy log-space measurement,
+`ratiometer` treats each ratio answer as a noisy log-space measurement,
 fits latent scores over the whole comparison graph with a robust solver (IRLS,
 Huber loss), reads uncertainty off the posterior, and plans the next
 comparison by effective resistance on the graph. Default budget is 4·n
@@ -62,18 +69,18 @@ What you get that the alternatives don't, in one package:
 ## Quickstart
 
 ```bash
-cargo install cardinal-harness --locked
+cargo install ratiometer --locked
 export OPENROUTER_API_KEY=your_key_here   # any model on OpenRouter
 
 cardinal sort examples/sort-demo.txt --by "usefulness as advice for a software engineer" --scores
 ```
 
 This installs the released crate from
-[crates.io](https://crates.io/crates/cardinal-harness). To build current
+[crates.io](https://crates.io/crates/ratiometer). To build current
 `main` instead:
-`cargo install --git https://github.com/XyraSinclair/cardinal-harness --locked`.
+`cargo install --git https://github.com/XyraSinclair/ratiometer --locked`.
 Tagged binaries are available from
-[GitHub Releases](https://github.com/XyraSinclair/cardinal-harness/releases).
+[GitHub Releases](https://github.com/XyraSinclair/ratiometer/releases).
 
 OpenRouter is not the only rail: `--model claude-code/<model>` routes
 judgements through a subscription-billed Claude Code adapter instead of
@@ -290,9 +297,9 @@ page to the source bytes so they cannot drift apart.
 
 ```rust,no_run
 use std::sync::Arc;
-use cardinal_harness::gateway::NoopUsageSink;
-use cardinal_harness::rerank::{sort_texts, RerankExecution, SortOptions};
-use cardinal_harness::{Attribution, ProviderGateway};
+use ratiometer::gateway::NoopUsageSink;
+use ratiometer::rerank::{sort_texts, RerankExecution, SortOptions};
+use ratiometer::{Attribution, ProviderGateway};
 
 # async fn demo() -> Result<(), Box<dyn std::error::Error>> {
 let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
@@ -342,7 +349,7 @@ In that object:
 This crate is the bounded structured-judgment kernel for that system, not the
 feed host. Consumer systems such as ExoPriors own corpus ingestion, identity,
 retrieval, nearest-neighbor indexes, user history, and delivery. They hand
-cardinal-harness a finite candidate set and receive criterion-separable
+ratiometer a finite candidate set and receive criterion-separable
 posteriors plus evidence. “Nearest,” “relevant,” “well-prioritized,” and
 “tagged” can share that evidence, but they are not interchangeable scores:
 retrieval, query relevance, multi-criteria prioritization, and classification

@@ -3,6 +3,37 @@
 The one-page version, for sharing. Every claim below has evidence in this
 repository—a test, a checked-in artifact from a live run, or both.
 
+## What we are building (locked 2026-08-12)
+
+The instrument that turns an LLM's felt sense into calibrated measurement.
+Sorting is the demo; measurement is the product. The ontology is five nouns:
+
+1. **Attribute** — any nameable dimension, vibes included.
+2. **Magnitude** — the latent positive quantity each entity has of it. Only
+   ratios of magnitudes are observable; the absolute scale is gauge freedom.
+3. **Instrument** — any elicitation mode that yields evidence about magnitude
+   ratios (ratio letters, ordinal reads, decimal ledgers, …). Instruments are
+   diverse and swappable; none touches the solver directly.
+4. **Evidence** — the one currency every instrument must emit:
+   (E[log-ratio], honest variance). This is why the instrument zoo stays
+   commensurable instead of becoming a mess.
+5. **Scaling** — the output. A **ranking is ordinal; a scaling is cardinal**.
+   A ranking is a scaling with the spacing deleted. Each entity in a scaling
+   carries a **reading**: magnitude ± uncertainty on the shared log-ratio
+   scale. Readings, not rankings.
+
+The precedent is star magnitudes: astronomy's rank buckets ("first magnitude
+stars") became a measurement system when Pogson fixed the ratio step (2.512×)
+in 1856 — composable, comparable across instruments, indefinitely extensible.
+The ratio ladder is that move, generalized to any attribute.
+
+Why cardinal is worth the extra machinery: gaps are where decisions live
+(prioritization needs "10× more valuable", not "ranked above"); ratios
+compose along paths, so sparse comparisons cover a list and yield free
+consistency checks; and magnitudes on a shared scale transfer — readings
+accumulate into a web of priors (the OpenPriors endgame) instead of every
+sort starting from zero.
+
 ## What it's good for
 
 Sorting and ranking **short lists of things by judgement calls** — the work
@@ -56,7 +87,7 @@ see probes — but it can't fix it).
 ## How to use it
 
 ```bash
-cargo install cardinal-harness --locked
+cargo install ratiometer --locked
 export OPENROUTER_API_KEY=...
 # or, with a Claude Code subscription and no API key:
 #   --model claude-code/<model>  (21/21 decisive-pair agreement with the
@@ -82,7 +113,7 @@ cardinal explain my-ranking.txt --propose 3
 
 The install command pulls the released crate from crates.io. A source
 install of current `main`
-(`cargo install --git https://github.com/XyraSinclair/cardinal-harness --locked`)
+(`cargo install --git https://github.com/XyraSinclair/ratiometer --locked`)
 and tagged binaries from GitHub Releases remain available.
 
 Every run prints its evidence summary: comparisons, cost, order flips,

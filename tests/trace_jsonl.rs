@@ -1,5 +1,5 @@
-use cardinal_harness::rating_engine::Observation;
-use cardinal_harness::{ComparisonTrace, JsonlTraceSink, TraceSink};
+use ratiometer::rating_engine::Observation;
+use ratiometer::{ComparisonTrace, JsonlTraceSink, TraceSink};
 use tempfile::tempdir;
 
 fn make_trace(comparison_index: usize) -> ComparisonTrace {

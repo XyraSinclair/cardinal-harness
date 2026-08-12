@@ -15,14 +15,14 @@
 use std::collections::HashMap;
 use std::collections::HashSet;
 
-use cardinal_harness::rating_engine::{
-    AttributeParams, Observation, PlannerMode, RaterParams, RatingEngine,
-};
-use cardinal_harness::trait_search::{
-    AttributeConfig, TopKConfig, TraitSearchConfig, TraitSearchManager,
-};
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
+use ratiometer::rating_engine::{
+    AttributeParams, Observation, PlannerMode, RaterParams, RatingEngine,
+};
+use ratiometer::trait_search::{
+    AttributeConfig, TopKConfig, TraitSearchConfig, TraitSearchManager,
+};
 
 const ATTR: &str = "quality";
 const N: usize = 24;

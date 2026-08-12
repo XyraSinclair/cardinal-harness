@@ -222,7 +222,7 @@ pub fn chat_cost(model: &str, input_tokens: u32, output_tokens: u32) -> i64 {
 /// Pricing model that accounts for provider prompt caching.
 ///
 /// Modern providers implement paged KV-cache where tokens sharing a common
-/// prefix are served at a discount. This is structurally ideal for cardinal-harness
+/// prefix are served at a discount. This is structurally ideal for ratiometer
 /// because all comparisons for an attribute share the same system prompt + template.
 #[derive(Debug, Clone, Copy)]
 pub struct CacheAwarePricing {

@@ -16,7 +16,7 @@
 //!
 //! Usage: cargo run --example design_atlas
 
-use cardinal_harness::rating_engine::{compute_hodge_split, spectral_diagnostics, Config};
+use ratiometer::rating_engine::{compute_hodge_split, spectral_diagnostics, Config};
 
 fn circulant(n: usize, strides: &[usize]) -> Vec<(usize, usize)> {
     let mut edges = std::collections::BTreeSet::new();

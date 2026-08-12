@@ -33,11 +33,11 @@
 
 use std::collections::HashSet;
 
-use cardinal_harness::rerank::evaluation::{
+use ratiometer::rerank::evaluation::{
     run_likert_baseline_case, run_synthetic_case_with_config, synthetic_cases, LikertEvalConfig,
     PairwiseEvalConfig, SyntheticAttribute, SyntheticCase, SyntheticPairwiseMode,
 };
-use cardinal_harness::rerank::types::MultiRerankTopKSpec;
+use ratiometer::rerank::types::MultiRerankTopKSpec;
 
 // =============================================================================
 // Local synthetic-case builders (independent of the checked-in suite, so

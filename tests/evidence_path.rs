@@ -7,15 +7,15 @@ use std::process::{Command, Stdio};
 use std::sync::{mpsc, Arc};
 use std::time::Duration;
 
-use cardinal_harness::gateway::openrouter::OpenRouterAdapter;
-use cardinal_harness::gateway::{Attribution, GatewayConfig, NoopUsageSink, ProviderGateway};
-use cardinal_harness::prompts::PromptInstance;
-use cardinal_harness::rerank::{
+use ratiometer::gateway::openrouter::OpenRouterAdapter;
+use ratiometer::gateway::{Attribution, GatewayConfig, NoopUsageSink, ProviderGateway};
+use ratiometer::prompts::PromptInstance;
+use ratiometer::rerank::{
     compare_pair, sort_texts, PairwiseComparisonAttribute, PairwiseComparisonEntity,
     PairwiseComparisonRequest, PairwiseComparisonSpec, RerankExecution, RerankRunOptions,
     SortOptions,
 };
-use cardinal_harness::{ComparisonTrace, SqlitePairwiseCache, TraceError, TraceSink};
+use ratiometer::{ComparisonTrace, SqlitePairwiseCache, TraceError, TraceSink};
 use serde_json::json;
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, Request, Respond, ResponseTemplate};
@@ -168,22 +168,19 @@ fn evidence_spec(slug: &str) -> PairwiseComparisonSpec<'_> {
 #[test]
 fn evidence_prompt_instances_are_rendered_by_the_requested_seriate_instrument() {
     for slug in ["ratio_letter_v1", "ordinal_letter_v1"] {
-        let instrument: Box<dyn cardinal_harness::seriate::instrument::Instrument> = match slug {
+        let instrument: Box<dyn ratiometer::seriate::instrument::Instrument> = match slug {
             "ratio_letter_v1" => {
-                Box::new(cardinal_harness::seriate::instrument::ratio_letter::RatioLetterInstrument)
+                Box::new(ratiometer::seriate::instrument::ratio_letter::RatioLetterInstrument)
             }
             "ordinal_letter_v1" => {
-                Box::new(cardinal_harness::seriate::instrument::ordinal::OrdinalInstrument)
+                Box::new(ratiometer::seriate::instrument::ordinal::OrdinalInstrument)
             }
             _ => unreachable!(),
         };
         let expected = instrument.render(
-            &cardinal_harness::seriate::Attribute::new(
-                "brightness",
-                "brightness <with literal markup>",
-            ),
-            &cardinal_harness::seriate::Entity::new("alpha & amber"),
-            &cardinal_harness::seriate::Entity::new("beta > blue"),
+            &ratiometer::seriate::Attribute::new("brightness", "brightness <with literal markup>"),
+            &ratiometer::seriate::Entity::new("alpha & amber"),
+            &ratiometer::seriate::Entity::new("beta > blue"),
         );
         let actual = evidence_spec(slug).prompt_instance();
         let canonical = evidence_spec("canonical_v2").prompt_instance();
@@ -263,12 +260,12 @@ async fn evidence_trace_identity_matches_the_exact_provider_prompt_and_seriate_t
     assert_eq!(events.len(), requests.len());
     assert!(!events.is_empty());
 
-    let instrument = cardinal_harness::seriate::instrument::ratio_letter::RatioLetterInstrument;
-    let expected_template_hash = cardinal_harness::seriate::instrument::Instrument::render(
+    let instrument = ratiometer::seriate::instrument::ratio_letter::RatioLetterInstrument;
+    let expected_template_hash = ratiometer::seriate::instrument::Instrument::render(
         &instrument,
-        &cardinal_harness::seriate::Attribute::new("fingerprint", "fingerprint"),
-        &cardinal_harness::seriate::Entity::new("A"),
-        &cardinal_harness::seriate::Entity::new("B"),
+        &ratiometer::seriate::Attribute::new("fingerprint", "fingerprint"),
+        &ratiometer::seriate::Entity::new("A"),
+        &ratiometer::seriate::Entity::new("B"),
     )
     .template
     .0
@@ -587,7 +584,7 @@ async fn evidence_moments_survive_the_cache_round_trip() {
         async move {
             let execution = RerankExecution::new(gateway, Attribution::new("test::evidence"))
                 .cache(&cache)
-                .run_options(cardinal_harness::rerank::RerankRunOptions {
+                .run_options(ratiometer::rerank::RerankRunOptions {
                     rng_seed: Some(seed),
                     cache_only: false,
                 });

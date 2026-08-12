@@ -2,15 +2,15 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 use std::time::Duration;
 
-use cardinal_harness::gateway::{
+use ratiometer::gateway::{
     Attribution, ChatGateway, ChatRequest, ChatResponse, FinishReason, ProviderError,
 };
-use cardinal_harness::judgement_run::edge::RerankJudgementResponse;
-use cardinal_harness::judgement_run::{
+use ratiometer::judgement_run::edge::RerankJudgementResponse;
+use ratiometer::judgement_run::{
     execute_judgement_run, JudgementCandidate, JudgementPrivacy, JudgementProviderCallOutcome,
     JudgementRunRequest, JudgementRunStore, JudgementRunTerminal, JUDGEMENT_RUN_SCHEMA,
 };
-use cardinal_harness::rerank::RerankExecution;
+use ratiometer::rerank::RerankExecution;
 
 #[derive(Default)]
 struct CountingGateway {

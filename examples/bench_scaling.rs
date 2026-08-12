@@ -10,7 +10,7 @@ use std::io::{BufWriter, Write};
 use std::path::PathBuf;
 use std::time::Instant;
 
-use cardinal_harness::rating_engine::{
+use ratiometer::rating_engine::{
     plan_edges_for_rater, AttributeParams, Config, Observation, PlannerMode, RaterParams,
     RatingEngine,
 };

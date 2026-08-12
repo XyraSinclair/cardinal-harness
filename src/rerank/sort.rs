@@ -6,10 +6,10 @@
 //!
 //! ```no_run
 //! use std::sync::Arc;
-//! use cardinal_harness::gateway::NoopUsageSink;
-//! use cardinal_harness::rerank::sort::{sort_texts, SortOptions};
-//! use cardinal_harness::rerank::RerankExecution;
-//! use cardinal_harness::{Attribution, ProviderGateway};
+//! use ratiometer::gateway::NoopUsageSink;
+//! use ratiometer::rerank::sort::{sort_texts, SortOptions};
+//! use ratiometer::rerank::RerankExecution;
+//! use ratiometer::{Attribution, ProviderGateway};
 //!
 //! # async fn demo() -> Result<(), Box<dyn std::error::Error>> {
 //! let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;

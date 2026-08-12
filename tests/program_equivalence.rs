@@ -15,7 +15,7 @@
 
 use std::collections::HashMap;
 
-use cardinal_harness::rating_engine::{
+use ratiometer::rating_engine::{
     spectral_diagnostics, AttributeParams, Config, Observation, RaterParams, RatingEngine,
 };
 

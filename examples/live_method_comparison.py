@@ -200,8 +200,8 @@ class OpenRouterClient:
             headers={
                 "Authorization": f"Bearer {self.api_key}",
                 "Content-Type": "application/json",
-                "HTTP-Referer": "https://github.com/XyraSinclair/cardinal-harness",
-                "X-Title": "cardinal-harness live method comparison",
+                "HTTP-Referer": "https://github.com/XyraSinclair/ratiometer",
+                "X-Title": "ratiometer live method comparison",
             },
             method="POST",
         )

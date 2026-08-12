@@ -4,8 +4,8 @@
 
 use std::sync::Arc;
 
-use cardinal_harness::gateway::claude_code::{ClaudeCodeAdapter, ClaudeCodeConfig};
-use cardinal_harness::gateway::{
+use ratiometer::gateway::claude_code::{ClaudeCodeAdapter, ClaudeCodeConfig};
+use ratiometer::gateway::{
     Attribution, ChatModel, ChatRequest, Message, NoopUsageSink, ProviderGateway,
 };
 

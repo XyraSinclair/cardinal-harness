@@ -11,9 +11,7 @@
 
 use std::collections::HashMap;
 
-use cardinal_harness::rating_engine::{
-    AttributeParams, Config, Observation, RaterParams, RatingEngine,
-};
+use ratiometer::rating_engine::{AttributeParams, Config, Observation, RaterParams, RatingEngine};
 
 /// The repo's ladder (src/prompts.rs).
 const REPO_LADDER: [f64; 17] = [

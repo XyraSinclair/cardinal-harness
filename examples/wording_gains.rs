@@ -7,9 +7,9 @@
 
 use std::sync::Arc;
 
-use cardinal_harness::gain_calibration::{solve_with_template_gains, GainObservation};
-use cardinal_harness::gateway::{Attribution, NoopUsageSink, ProviderGateway};
-use cardinal_harness::rerank::{
+use ratiometer::gain_calibration::{solve_with_template_gains, GainObservation};
+use ratiometer::gateway::{Attribution, NoopUsageSink, ProviderGateway};
+use ratiometer::rerank::{
     compare_pair, core_pairs, HigherRanked, PairwiseComparisonAttribute, PairwiseComparisonEntity,
     PairwiseComparisonRequest, PairwiseComparisonSpec, PairwiseJudgement, CORPUS,
     PRIMARY_ATTRIBUTE, WORDING_SLUGS,

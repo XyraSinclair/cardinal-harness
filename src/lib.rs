@@ -1,17 +1,26 @@
 #![forbid(unsafe_code)]
 
-//! # cardinal-harness
+//! # ratiometer
 //!
-//! The highest quality way to have LLMs put numbers on things.
+//! The instrument that turns an LLM's felt sense into calibrated measurement.
 //!
 //! Instead of asking an LLM to "rate this 1–10" (unreliable, miscalibrated),
-//! cardinal-harness asks pairwise ratio questions: "how many times more attribute
+//! ratiometer asks pairwise ratio questions: "how many times more attribute
 //! does A have than B?" A robust statistical solver (IRLS with Huber loss) combines
 //! these noisy observations into globally consistent scores with uncertainty
 //! estimates. The system selects the most informative pairs to query and stops
 //! when the top-K ranking is sufficiently certain.
 //!
-//! See `docs/ALGORITHM.md` for the design rationale.
+//! The ontology, in five nouns: an **attribute** (any nameable dimension) over
+//! entities, each holding a latent **magnitude** (only ratios are observable);
+//! **instruments** (elicitation modes) emit **evidence** in one currency —
+//! (E\[log-ratio\], honest variance) — which the solver fuses into a
+//! **scaling**: every entity placed on a shared log-ratio scale with a
+//! *reading* (magnitude ± uncertainty). A ranking is a scaling with the
+//! spacing deleted.
+//!
+//! Known as `cardinal-harness` before 2026-08-12. See `docs/ALGORITHM.md` for
+//! the design rationale and `docs/WHAT_WHY_HOW.md` for the one-page version.
 
 pub mod cache;
 pub mod censored_likelihood;

@@ -1,10 +1,10 @@
-use cardinal_harness::censored_likelihood::{
-    fit_ordered_probit, CensoredFitConfig, CensoredObservation, CensoredPartition,
-};
-use cardinal_harness::prompts::RATIO_LADDER;
 use nalgebra::{DMatrix, DVector};
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
+use ratiometer::censored_likelihood::{
+    fit_ordered_probit, CensoredFitConfig, CensoredObservation, CensoredPartition,
+};
+use ratiometer::prompts::RATIO_LADDER;
 use std::collections::BTreeMap;
 
 fn standard_normal(rng: &mut StdRng) -> f64 {

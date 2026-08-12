@@ -3,9 +3,9 @@
 use std::sync::Arc;
 use std::time::Duration;
 
-use cardinal_harness::gateway::openrouter::OpenRouterAdapter;
-use cardinal_harness::gateway::{Attribution, GatewayConfig, NoopUsageSink, ProviderGateway};
-use cardinal_harness::rerank::{
+use ratiometer::gateway::openrouter::OpenRouterAdapter;
+use ratiometer::gateway::{Attribution, GatewayConfig, NoopUsageSink, ProviderGateway};
+use ratiometer::rerank::{
     multi_rerank, MultiRerankAttributeSpec, MultiRerankEntity, MultiRerankRequest,
     MultiRerankTopKSpec, RerankExecution,
 };

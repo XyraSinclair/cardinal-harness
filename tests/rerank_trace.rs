@@ -2,17 +2,17 @@ use std::collections::HashMap;
 use std::sync::Mutex;
 use std::time::Duration;
 
-use cardinal_harness::cache::{CachedJudgement, PairwiseCacheKey, SqlitePairwiseCache};
-use cardinal_harness::gateway::openrouter::OpenRouterAdapter;
-use cardinal_harness::gateway::{GatewayConfig, NoopUsageSink, ProviderGateway};
-use cardinal_harness::prompts::prompt_by_slug;
-use cardinal_harness::rating_engine::{Observation, RatingEngine};
-use cardinal_harness::rerank::{
+use ratiometer::cache::{CachedJudgement, PairwiseCacheKey, SqlitePairwiseCache};
+use ratiometer::gateway::openrouter::OpenRouterAdapter;
+use ratiometer::gateway::{GatewayConfig, NoopUsageSink, ProviderGateway};
+use ratiometer::prompts::prompt_by_slug;
+use ratiometer::rating_engine::{Observation, RatingEngine};
+use ratiometer::rerank::{
     multi_rerank, MultiRerankAttributeSpec, MultiRerankEntity, MultiRerankMeta, MultiRerankRequest,
     MultiRerankTopKSpec, RerankExecution, RerankRunOptions, WarmStartData, WarmStartError,
     WarmStartProvider,
 };
-use cardinal_harness::{
+use ratiometer::{
     Attribution, ComparisonEvent, ComparisonObserver, ComparisonTrace, ObserverError,
     PairwiseCache, TraceError, TraceSink,
 };
@@ -119,7 +119,7 @@ fn replay_trace(
 
 fn assert_live_matches_replay(
     req: &MultiRerankRequest,
-    response: &cardinal_harness::rerank::MultiRerankResponse,
+    response: &ratiometer::rerank::MultiRerankResponse,
     replayed: &ReplayPosterior,
 ) {
     for (entity_index, requested) in req.entities.iter().enumerate() {
@@ -455,11 +455,11 @@ async fn cached_evidence_replays_bitwise_and_naive_confidence_reconstruction_div
     let cache = SqlitePairwiseCache::new(dir.path().join("cache.sqlite")).unwrap();
     let model = "openai/gpt-5-mini";
     let prompt_slug = "ratio_letter_v1";
-    let template_hash = cardinal_harness::seriate::instrument::Instrument::render(
-        &cardinal_harness::seriate::instrument::ratio_letter::RatioLetterInstrument,
-        &cardinal_harness::seriate::Attribute::new("fingerprint", "fingerprint"),
-        &cardinal_harness::seriate::Entity::new("A"),
-        &cardinal_harness::seriate::Entity::new("B"),
+    let template_hash = ratiometer::seriate::instrument::Instrument::render(
+        &ratiometer::seriate::instrument::ratio_letter::RatioLetterInstrument,
+        &ratiometer::seriate::Attribute::new("fingerprint", "fingerprint"),
+        &ratiometer::seriate::Entity::new("A"),
+        &ratiometer::seriate::Entity::new("B"),
     )
     .template
     .0

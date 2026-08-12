@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::process::Command;
 
-use cardinal_harness::rerank::{
+use ratiometer::rerank::{
     AttributeScoreSummary, MultiRerankAttributeSpec, MultiRerankEntity, MultiRerankEntityResult,
     MultiRerankMeta, MultiRerankRequest, MultiRerankResponse, MultiRerankTopKSpec,
     RerankStopReason,

@@ -1,12 +1,12 @@
 [package]
-name = "cardinal-harness"
-version = "0.11.0"
+name = "ratiometer"
+version = "0.12.0"
 edition = "2021"
 license = "MIT"
-description = "Pairwise LLM judgements fitted into cardinal scores with uncertainty, active selection, and explicit cost and provenance"
+description = "Readings, not rankings: pairwise LLM ratio judgements fitted into cardinal scores with uncertainty, active selection, and explicit cost and provenance. Formerly cardinal-harness."
 readme = "README.md"
-repository = "https://github.com/XyraSinclair/cardinal-harness"
-homepage = "https://github.com/XyraSinclair/cardinal-harness"
+repository = "https://github.com/XyraSinclair/ratiometer"
+homepage = "https://github.com/XyraSinclair/ratiometer"
 keywords = ["llm", "ranking", "sorting", "pairwise", "reranking"]
 categories = ["algorithms", "science", "command-line-utilities"]
 include = [

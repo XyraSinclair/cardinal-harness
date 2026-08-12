@@ -6,9 +6,9 @@
 use std::io::Write;
 use std::sync::Arc;
 
-use cardinal_harness::cache::{PairwiseCache, SqlitePairwiseCache};
-use cardinal_harness::gateway::{Attribution, NoopUsageSink, ProviderGateway};
-use cardinal_harness::rerank::{
+use ratiometer::cache::{PairwiseCache, SqlitePairwiseCache};
+use ratiometer::gateway::{Attribution, NoopUsageSink, ProviderGateway};
+use ratiometer::rerank::{
     sort_documents, RerankDocument, RerankExecution, RerankRunOptions, SortOptions,
 };
 

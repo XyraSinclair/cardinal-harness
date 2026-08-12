@@ -1,6 +1,6 @@
 # AGENTS.md
 
-`cardinal-harness` is the pairwise-ratio elicitation engine behind the rest of
+`ratiometer` is the pairwise-ratio elicitation engine behind the rest of
 the OpenPriors stack.
 
 It is the algorithmic core for:

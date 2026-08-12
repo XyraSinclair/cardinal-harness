@@ -1,6 +1,6 @@
 # Prompt Contract
 
-`cardinal-harness` supports five JSON prompt templates — `canonical_v2`,
+`ratiometer` supports five JSON prompt templates — `canonical_v2`,
 `canonical_bucket_v1`, `ordinal_v1`, `less_v1`, `fraction_v1` — plus two
 single-token letter templates (`ratio_letter_v1`, `ordinal_letter_v1`) that
 route through the seriate logprob evidence path.

@@ -11,8 +11,8 @@ use std::f64::consts::PI;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 
-use cardinal_harness::rating_engine::{AttributeParams, Observation, RaterParams, RatingEngine};
-use cardinal_harness::trait_search::{
+use ratiometer::rating_engine::{AttributeParams, Observation, RaterParams, RatingEngine};
+use ratiometer::trait_search::{
     AttributeConfig, TopKConfig, TraitSearchConfig, TraitSearchManager,
 };
 

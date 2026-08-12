@@ -5,18 +5,18 @@ use std::io::{self, Write};
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use cardinal_harness::cache::SqlitePairwiseCache;
-use cardinal_harness::gateway::{NoopUsageSink, ProviderGateway};
-use cardinal_harness::rerank::model_policy::ModelPolicy;
-use cardinal_harness::rerank::report::validate_report_inputs;
-use cardinal_harness::rerank::{
+use clap::{Parser, Subcommand, ValueEnum};
+use ratiometer::cache::SqlitePairwiseCache;
+use ratiometer::gateway::{NoopUsageSink, ProviderGateway};
+use ratiometer::rerank::model_policy::ModelPolicy;
+use ratiometer::rerank::report::validate_report_inputs;
+use ratiometer::rerank::{
     build_report, expand_prompt_experiment_request, load_policy_from_path, render_report_markdown,
     validate_multi_rerank_request, AttributeVariantSpec, JsonlTraceSink, MultiRerankRequest,
     MultiRerankResponse, PolicyRegistry, PromptExperimentConfig, RerankReportOptions,
     RerankRunOptions, TraceSink,
 };
-use cardinal_harness::Attribution;
-use clap::{Parser, Subcommand, ValueEnum};
+use ratiometer::Attribution;
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
 enum PairwiseModeArg {
@@ -31,7 +31,7 @@ enum ReportFormatArg {
     Json,
 }
 
-impl From<PairwiseModeArg> for cardinal_harness::rerank::evaluation::SyntheticPairwiseMode {
+impl From<PairwiseModeArg> for ratiometer::rerank::evaluation::SyntheticPairwiseMode {
     fn from(mode: PairwiseModeArg) -> Self {
         match mode {
             PairwiseModeArg::Ratio => Self::Ratio,
@@ -690,7 +690,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
 
             if estimate {
-                let opts = cardinal_harness::rerank::SortOptions {
+                let opts = ratiometer::rerank::SortOptions {
                     model: model.clone(),
                     comparison_budget: budget,
                     top_k,
@@ -701,10 +701,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     prompt_template_slug: template.clone(),
                     ..Default::default()
                 };
-                let simple =
-                    cardinal_harness::rerank::sort::sort_request(documents.clone(), &by, &opts);
-                let multi = cardinal_harness::rerank::simple::to_multi_request(&simple);
-                let charge = cardinal_harness::rerank::estimate_max_rerank_charge(&multi);
+                let simple = ratiometer::rerank::sort::sort_request(documents.clone(), &by, &opts);
+                let multi = ratiometer::rerank::simple::to_multi_request(&simple);
+                let charge = ratiometer::rerank::estimate_max_rerank_charge(&multi);
                 println!(
                     "worst case: {} comparisons · ~{} input + {} output tokens each · provider max ${:.4}",
                     charge.comparison_budget,
@@ -737,7 +736,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let trace_ref = trace_sink.as_ref().map(|sink| sink as &dyn TraceSink);
 
             let gateway = Arc::new(gateway);
-            let mut execution = cardinal_harness::rerank::RerankExecution::new(
+            let mut execution = ratiometer::rerank::RerankExecution::new(
                 gateway.clone(),
                 Attribution::new("cardinal::sort"),
             )
@@ -755,7 +754,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 execution = execution.trace(trace);
             }
 
-            let opts = cardinal_harness::rerank::SortOptions {
+            let opts = ratiometer::rerank::SortOptions {
                 model: model.clone(),
                 comparison_budget: budget,
                 top_k,
@@ -767,7 +766,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 ..Default::default()
             };
             let criterion = if elaborate {
-                let rubric = cardinal_harness::rerank::elaborate_criterion(
+                let rubric = ratiometer::rerank::elaborate_criterion(
                     gateway.as_ref(),
                     model.as_deref(),
                     &by,
@@ -789,8 +788,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 by.clone()
             };
             let mut sorted =
-                cardinal_harness::rerank::sort_documents(documents, &criterion, execution, opts)
-                    .await?;
+                ratiometer::rerank::sort_documents(documents, &criterion, execution, opts).await?;
 
             drop(trace_sink);
             if let Some(worker) = trace_worker {
@@ -892,8 +890,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
                 for probe in &sorted.probes {
                     let kind = match probe.kind {
-                        cardinal_harness::rerank::SortProbeKind::Opposite => "opposite",
-                        cardinal_harness::rerank::SortProbeKind::Paraphrase => "paraphrase",
+                        ratiometer::rerank::SortProbeKind::Opposite => "opposite",
+                        ratiometer::rerank::SortProbeKind::Paraphrase => "paraphrase",
                     };
                     match probe.consistency {
                         Some(c) => {
@@ -944,7 +942,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 })
                 .collect();
             if let Some(count) = propose {
-                let (proposed, usage) = cardinal_harness::rerank::propose_for_goal(
+                let (proposed, usage) = ratiometer::rerank::propose_for_goal(
                     gateway.as_ref(),
                     model.as_deref().unwrap_or("openai/gpt-5.4-mini"),
                     &goal,
@@ -972,9 +970,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             if parsed.len() < 2 {
                 return Err("fewer than 2 distinct attributes after proposal".into());
             }
-            let documents: Vec<cardinal_harness::rerank::RerankDocument> = parsed
+            let documents: Vec<ratiometer::rerank::RerankDocument> = parsed
                 .iter()
-                .map(|(name, text)| cardinal_harness::rerank::RerankDocument {
+                .map(|(name, text)| ratiometer::rerank::RerankDocument {
                     id: name.clone(),
                     text: if name == text {
                         name.clone()
@@ -990,7 +988,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             );
             let cache_path = cache.unwrap_or_else(SqlitePairwiseCache::default_path);
             let cache_store = SqlitePairwiseCache::new(cache_path)?;
-            let execution = cardinal_harness::rerank::RerankExecution::new(
+            let execution = ratiometer::rerank::RerankExecution::new(
                 gateway,
                 Attribution::new("cardinal::weigh"),
             )
@@ -999,15 +997,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 rng_seed: Some(seed),
                 cache_only: false,
             });
-            let opts = cardinal_harness::rerank::SortOptions {
+            let opts = ratiometer::rerank::SortOptions {
                 model,
                 comparison_budget: budget,
                 prompt_template_slug: template,
                 ..Default::default()
             };
             let sorted =
-                cardinal_harness::rerank::sort_documents(documents, &criterion, execution, opts)
-                    .await?;
+                ratiometer::rerank::sort_documents(documents, &criterion, execution, opts).await?;
 
             // Softmax of log-latents: normalized ratio-scale weights.
             let max_latent = sorted
@@ -1108,7 +1105,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let mut candidates = by;
             let propose_count = propose.unwrap_or(if candidates.is_empty() { 5 } else { 0 });
             if propose_count > 0 {
-                let (proposed, usage) = cardinal_harness::rerank::propose_distinguishing(
+                let (proposed, usage) = ratiometer::rerank::propose_distinguishing(
                     gateway.as_ref(),
                     model.as_deref().unwrap_or("openai/gpt-5.4-mini"),
                     &documents,
@@ -1141,7 +1138,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             let cache_path = cache.unwrap_or_else(SqlitePairwiseCache::default_path);
             let cache_store = SqlitePairwiseCache::new(cache_path)?;
-            let execution = cardinal_harness::rerank::RerankExecution::new(
+            let execution = ratiometer::rerank::RerankExecution::new(
                 gateway,
                 Attribution::new("cardinal::distinguish"),
             )
@@ -1150,7 +1147,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 rng_seed: Some(seed),
                 cache_only: false,
             });
-            let opts = cardinal_harness::rerank::ExplainOptions {
+            let opts = ratiometer::rerank::ExplainOptions {
                 model,
                 comparison_budget: budget,
                 ..Default::default()
@@ -1160,7 +1157,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .find(|d| d.id == focal_id)
                 .map(|d| d.text.clone())
                 .unwrap_or_default();
-            let profile = cardinal_harness::rerank::differentiation_profile(
+            let profile = ratiometer::rerank::differentiation_profile(
                 documents, &focal_id, candidates, execution, opts,
             )
             .await?;
@@ -1228,7 +1225,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .map(|s| s.split(',').map(|x| x.trim().to_string()).collect())
                 .unwrap_or_default();
             let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
-            let report = cardinal_harness::rerank::propose_slate(
+            let report = ratiometer::rerank::propose_slate(
                 &gateway,
                 model.as_deref().unwrap_or("openai/gpt-5.4-mini"),
                 &item_text,
@@ -1282,7 +1279,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             let mut candidates = vec![by.clone()];
             if propose > 0 {
-                let (proposed, usage) = cardinal_harness::rerank::propose_rewordings(
+                let (proposed, usage) = ratiometer::rerank::propose_rewordings(
                     gateway.as_ref(),
                     judge_list
                         .first()
@@ -1308,7 +1305,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
 
-            let sorts = cardinal_harness::rerank::planned_sorts(
+            let sorts = ratiometer::rerank::planned_sorts(
                 accepted.len(),
                 candidates.len(),
                 judge_list.len(),
@@ -1332,13 +1329,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             let cache_path = cache.unwrap_or_else(SqlitePairwiseCache::default_path);
             let cache_store = SqlitePairwiseCache::new(cache_path)?;
-            let report = cardinal_harness::rerank::canonize(
+            let report = ratiometer::rerank::canonize(
                 gateway,
-                Some(&cache_store as &dyn cardinal_harness::cache::PairwiseCache),
+                Some(&cache_store as &dyn ratiometer::cache::PairwiseCache),
                 entities,
                 candidates,
                 accepted,
-                cardinal_harness::rerank::CanonizeOptions {
+                ratiometer::rerank::CanonizeOptions {
                     judges: judge_list,
                     comparison_budget: budget,
                     seed,
@@ -1404,7 +1401,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 })
                 .collect();
             if let Some(count) = propose {
-                let (proposed, usage) = cardinal_harness::rerank::propose_for_goal(
+                let (proposed, usage) = ratiometer::rerank::propose_for_goal(
                     gateway.as_ref(),
                     model.as_deref().unwrap_or("openai/gpt-5.4-mini"),
                     &goal,
@@ -1431,13 +1428,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             let cache_path = cache.unwrap_or_else(SqlitePairwiseCache::default_path);
             let cache_store = SqlitePairwiseCache::new(cache_path)?;
-            let report = cardinal_harness::rerank::anp(
+            let report = ratiometer::rerank::anp(
                 gateway,
-                Some(&cache_store as &dyn cardinal_harness::cache::PairwiseCache),
+                Some(&cache_store as &dyn ratiometer::cache::PairwiseCache),
                 &goal,
                 &criteria,
                 alternatives,
-                cardinal_harness::rerank::AnpOptions {
+                ratiometer::rerank::AnpOptions {
                     model,
                     alpha,
                     comparison_budget: budget,
@@ -1504,7 +1501,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             };
             let cache_ref = cache_store
                 .as_ref()
-                .map(|c| c as &dyn cardinal_harness::cache::PairwiseCache);
+                .map(|c| c as &dyn ratiometer::cache::PairwiseCache);
 
             let mut out_file = match out.as_ref() {
                 Some(path) => Some(std::io::BufWriter::new(std::fs::File::create(path)?)),
@@ -1513,17 +1510,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let mut reports = Vec::new();
             for model in &model_list {
                 eprintln!("benchmarking {model} ...");
-                let report = cardinal_harness::rerank::run_judge_bench(
+                let report = ratiometer::rerank::run_judge_bench(
                     &gateway,
                     cache_ref,
-                    cardinal_harness::rerank::JudgeBenchOptions {
+                    ratiometer::rerank::JudgeBenchOptions {
                         model: model.clone(),
                         template: template.clone(),
                         concurrency,
                     },
                 )
                 .await?;
-                eprint!("{}", cardinal_harness::rerank::render_bench_report(&report));
+                eprint!("{}", ratiometer::rerank::render_bench_report(&report));
                 if let Some(file) = out_file.as_mut() {
                     use std::io::Write as _;
                     writeln!(file, "{}", serde_json::to_string(&report)?)?;
@@ -1612,13 +1609,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 "A minor seventh chord contains four distinct pitches.",
                 "Snow fell quietly on the empty parking lot.",
             ];
-            let attribute = cardinal_harness::seriate::Attribute::new(
-                "quality",
-                "overall quality of the writing",
-            );
-            let instrument =
-                cardinal_harness::seriate::instrument::ratio_letter::RatioLetterInstrument;
-            use cardinal_harness::seriate::instrument::Instrument as _;
+            let attribute =
+                ratiometer::seriate::Attribute::new("quality", "overall quality of the writing");
+            let instrument = ratiometer::seriate::instrument::ratio_letter::RatioLetterInstrument;
+            use ratiometer::seriate::instrument::Instrument as _;
 
             println!(
                 "{:<40} {:>7} {:>7} {:>7} {:>10} {:>8}",
@@ -1634,13 +1628,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let mut cost: i64 = 0;
                 let mut logprob_mode = 0usize;
                 for text in null_texts.iter().take(nulls as usize) {
-                    let entity = cardinal_harness::seriate::Entity::new(*text);
+                    let entity = ratiometer::seriate::Entity::new(*text);
                     let rendered = instrument.render(&attribute, &entity, &entity);
-                    let mut chat = cardinal_harness::gateway::ChatRequest::new(
-                        cardinal_harness::gateway::ChatModel::parse(model),
+                    let mut chat = ratiometer::gateway::ChatRequest::new(
+                        ratiometer::gateway::ChatModel::parse(model),
                         vec![
-                            cardinal_harness::gateway::Message::system(rendered.system.clone()),
-                            cardinal_harness::gateway::Message::user(rendered.user.clone()),
+                            ratiometer::gateway::Message::system(rendered.system.clone()),
+                            ratiometer::gateway::Message::user(rendered.user.clone()),
                         ],
                         Attribution::new("cardinal::calibrate"),
                     )
@@ -1662,7 +1656,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     else {
                         continue;
                     };
-                    if parsed.mode == cardinal_harness::seriate::AcquisitionMode::Logprob {
+                    if parsed.mode == ratiometer::seriate::AcquisitionMode::Logprob {
                         logprob_mode += 1;
                     }
                     if let Some((p_a, p_par, p_b)) = parsed.evidence.directional_summary() {
@@ -1755,7 +1749,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 };
                 let cache_ref = cache_store
                     .as_ref()
-                    .map(|c| c as &dyn cardinal_harness::cache::PairwiseCache);
+                    .map(|c| c as &dyn ratiometer::cache::PairwiseCache);
                 // Stable entity labels: packets accrete across runs by
                 // id + content hash, so @path items keep their file stem
                 // and literals get a content-derived label.
@@ -1767,13 +1761,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 .map(|s| s.to_string_lossy().into_owned())
                         })
                         .unwrap_or_else(|| {
-                            cardinal_harness::packet::entity_text_hash(text)[..12].to_string()
+                            ratiometer::packet::entity_text_hash(text)[..12].to_string()
                         })
                 };
                 let id_a = label(&item_a, &text_a);
                 let id_b = label(&item_b, &text_b);
                 let created = chrono::Utc::now().to_rfc3339();
-                let report = cardinal_harness::rerank::consortium_verdict(
+                let report = ratiometer::rerank::consortium_verdict(
                     &gateway,
                     cache_ref,
                     &models,
@@ -1882,7 +1876,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             if let Some(k) = draws {
                 require_openrouter_key()?;
                 let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
-                let report = cardinal_harness::rerank::nonce_draws(
+                let report = ratiometer::rerank::nonce_draws(
                     &gateway,
                     &model,
                     &template,
@@ -1937,8 +1931,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 };
                 let cache_ref = cache_store
                     .as_ref()
-                    .map(|c| c as &dyn cardinal_harness::cache::PairwiseCache);
-                let report = cardinal_harness::rerank::orbit_transform(
+                    .map(|c| c as &dyn ratiometer::cache::PairwiseCache);
+                let report = ratiometer::rerank::orbit_transform(
                     &gateway,
                     cache_ref,
                     &model,
@@ -1958,7 +1952,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     );
                 } else {
                     let total: f64 = report.energies.iter().sum();
-                    for (idx, name) in cardinal_harness::rerank::CHARACTERS.iter().enumerate() {
+                    for (idx, name) in ratiometer::rerank::CHARACTERS.iter().enumerate() {
                         println!(
                             "{name:<26} {:+.3} nats  ({:.1}% of energy)",
                             report.coefficients[idx],
@@ -1990,8 +1984,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 };
                 let cache_ref = cache_store
                     .as_ref()
-                    .map(|c| c as &dyn cardinal_harness::cache::PairwiseCache);
-                let report = cardinal_harness::rerank::wording_invariance(
+                    .map(|c| c as &dyn ratiometer::cache::PairwiseCache);
+                let report = ratiometer::rerank::wording_invariance(
                     &gateway,
                     cache_ref,
                     &model,
@@ -2050,8 +2044,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 };
                 let cache_ref = cache_store
                     .as_ref()
-                    .map(|c| c as &dyn cardinal_harness::cache::PairwiseCache);
-                let report = cardinal_harness::rerank::spin_sweep(
+                    .map(|c| c as &dyn ratiometer::cache::PairwiseCache);
+                let report = ratiometer::rerank::spin_sweep(
                     &gateway,
                     cache_ref,
                     &model,
@@ -2111,8 +2105,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 };
                 let cache_ref = cache_store
                     .as_ref()
-                    .map(|c| c as &dyn cardinal_harness::cache::PairwiseCache);
-                let report = cardinal_harness::rerank::spin_probe(
+                    .map(|c| c as &dyn ratiometer::cache::PairwiseCache);
+                let report = ratiometer::rerank::spin_probe(
                     &gateway,
                     cache_ref,
                     &model,
@@ -2128,9 +2122,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 } else {
                     for reading in &report.readings {
                         let label = match reading.framing {
-                            cardinal_harness::rerank::SpinFraming::Neutral => "neutral   ",
-                            cardinal_harness::rerank::SpinFraming::ProFirst => "pro-A spin",
-                            cardinal_harness::rerank::SpinFraming::ProSecond => "pro-B spin",
+                            ratiometer::rerank::SpinFraming::Neutral => "neutral   ",
+                            ratiometer::rerank::SpinFraming::ProFirst => "pro-A spin",
+                            ratiometer::rerank::SpinFraming::ProSecond => "pro-B spin",
                         };
                         match reading.mean_log_ratio {
                             Some(m) => {
@@ -2164,18 +2158,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 return Ok(());
             }
 
-            let spec = cardinal_harness::rerank::PairwiseComparisonSpec {
+            let spec = ratiometer::rerank::PairwiseComparisonSpec {
                 model: &model,
-                attribute: cardinal_harness::rerank::PairwiseComparisonAttribute {
+                attribute: ratiometer::rerank::PairwiseComparisonAttribute {
                     id: "judge",
                     prompt: &by,
                     prompt_template_slug: Some(&template),
                 },
-                entity_a: cardinal_harness::rerank::PairwiseComparisonEntity {
+                entity_a: ratiometer::rerank::PairwiseComparisonEntity {
                     id: "A",
                     text: &text_a,
                 },
-                entity_b: cardinal_harness::rerank::PairwiseComparisonEntity {
+                entity_b: ratiometer::rerank::PairwiseComparisonEntity {
                     id: "B",
                     text: &text_b,
                 },
@@ -2203,12 +2197,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             };
             let cache_ref = cache_store
                 .as_ref()
-                .map(|c| c as &dyn cardinal_harness::cache::PairwiseCache);
+                .map(|c| c as &dyn ratiometer::cache::PairwiseCache);
 
-            let (judgement, usage) = cardinal_harness::rerank::compare_pair(
+            let (judgement, usage) = ratiometer::rerank::compare_pair(
                 &gateway,
                 cache_ref,
-                cardinal_harness::rerank::PairwiseComparisonRequest {
+                ratiometer::rerank::PairwiseComparisonRequest {
                     spec,
                     cache_only: false,
                     attribution: Attribution::new("cardinal::judge"),
@@ -2218,14 +2212,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             let cost_usd = usage.provider_cost_nanodollars as f64 / 1e9;
             match judgement {
-                cardinal_harness::rerank::PairwiseJudgement::Observation {
+                ratiometer::rerank::PairwiseJudgement::Observation {
                     higher_ranked,
                     ratio,
                     confidence,
                 } => {
                     let winner = match higher_ranked {
-                        cardinal_harness::rerank::HigherRanked::A => "A",
-                        cardinal_harness::rerank::HigherRanked::B => "B",
+                        ratiometer::rerank::HigherRanked::A => "A",
+                        ratiometer::rerank::HigherRanked::B => "B",
                     };
                     if json {
                         println!(
@@ -2249,7 +2243,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         );
                     }
                 }
-                cardinal_harness::rerank::PairwiseJudgement::Refused => {
+                ratiometer::rerank::PairwiseJudgement::Refused => {
                     if json {
                         println!(
                             "{}",
@@ -2269,7 +2263,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Commands::Elaborate { by, model } => {
             require_openrouter_key()?;
             let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
-            let rubric = cardinal_harness::rerank::elaborate_criterion(
+            let rubric = ratiometer::rerank::elaborate_criterion(
                 &gateway,
                 model.as_deref(),
                 &by,
@@ -2309,7 +2303,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             let mut candidates = candidate;
             if let Some(count) = propose {
-                let (proposed, usage) = cardinal_harness::rerank::propose_candidates(
+                let (proposed, usage) = ratiometer::rerank::propose_candidates(
                     gateway.as_ref(),
                     model.as_deref().unwrap_or("openai/gpt-5.4-mini"),
                     &documents,
@@ -2340,7 +2334,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let cache_path = cache.unwrap_or_else(SqlitePairwiseCache::default_path);
                 Some(SqlitePairwiseCache::new(cache_path)?)
             };
-            let mut execution = cardinal_harness::rerank::RerankExecution::new(
+            let mut execution = ratiometer::rerank::RerankExecution::new(
                 gateway.clone(),
                 Attribution::new("cardinal::explain"),
             )
@@ -2352,11 +2346,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 execution = execution.cache(store);
             }
 
-            let explanation = cardinal_harness::rerank::explain_ranking(
+            let explanation = ratiometer::rerank::explain_ranking(
                 documents,
                 candidates,
                 execution,
-                cardinal_harness::rerank::ExplainOptions {
+                ratiometer::rerank::ExplainOptions {
                     model,
                     comparison_budget: budget,
                     ..Default::default()
@@ -2443,9 +2437,8 @@ no combination of these attributes reconstructs your ranking"
             curve_csv,
             mode,
         } => {
-            let cfg =
-                cardinal_harness::rerank::evaluation::PairwiseEvalConfig { mode: mode.into() };
-            let results = cardinal_harness::rerank::evaluation::run_synthetic_suite_with_config(
+            let cfg = ratiometer::rerank::evaluation::PairwiseEvalConfig { mode: mode.into() };
+            let results = ratiometer::rerank::evaluation::run_synthetic_suite_with_config(
                 case.as_deref(),
                 cfg,
             )?;
@@ -2471,14 +2464,12 @@ no combination of these attributes reconstructs your ranking"
             levels,
             budget_multiplier,
         } => {
-            let cfg = cardinal_harness::rerank::evaluation::LikertEvalConfig {
+            let cfg = ratiometer::rerank::evaluation::LikertEvalConfig {
                 levels,
                 budget_multiplier,
             };
-            let results = cardinal_harness::rerank::evaluation::run_likert_baseline_suite(
-                case.as_deref(),
-                cfg,
-            )?;
+            let results =
+                ratiometer::rerank::evaluation::run_likert_baseline_suite(case.as_deref(), cfg)?;
             let mut file = File::create(out)?;
             for result in &results {
                 let line = serde_json::to_string(result)?;
@@ -2502,16 +2493,17 @@ no combination of these attributes reconstructs your ranking"
             mode,
         } => {
             let pairwise_cfg =
-                cardinal_harness::rerank::evaluation::PairwiseEvalConfig { mode: mode.into() };
-            let likert_cfg = cardinal_harness::rerank::evaluation::LikertEvalConfig {
+                ratiometer::rerank::evaluation::PairwiseEvalConfig { mode: mode.into() };
+            let likert_cfg = ratiometer::rerank::evaluation::LikertEvalConfig {
                 levels,
                 budget_multiplier,
             };
-            let summary = cardinal_harness::rerank::evaluation::run_evaluation_comparison_summary_with_config(
-                case.as_deref(),
-                pairwise_cfg,
-                likert_cfg,
-            )?;
+            let summary =
+                ratiometer::rerank::evaluation::run_evaluation_comparison_summary_with_config(
+                    case.as_deref(),
+                    pairwise_cfg,
+                    likert_cfg,
+                )?;
             let mut file = File::create(out)?;
             serde_json::to_writer_pretty(&mut file, &summary)?;
             writeln!(file)?;
@@ -2620,7 +2612,7 @@ no combination of these attributes reconstructs your ranking"
             };
             let trace_ref = trace_sink.as_ref().map(|sink| sink as &dyn TraceSink);
 
-            let mut execution = cardinal_harness::rerank::RerankExecution::new(
+            let mut execution = ratiometer::rerank::RerankExecution::new(
                 Arc::new(gateway),
                 Attribution::new("cardinal::rerank"),
             )
@@ -2633,7 +2625,7 @@ no combination of these attributes reconstructs your ranking"
                 execution = execution.trace(trace);
             }
 
-            let resp = cardinal_harness::rerank::multi_rerank(req.clone(), execution).await?;
+            let resp = ratiometer::rerank::multi_rerank(req.clone(), execution).await?;
 
             write_json(&out, &resp)?;
 
@@ -2687,8 +2679,8 @@ fn read_sort_input(file: Option<&std::path::Path>) -> Result<String, Box<dyn std
 /// or `{"id", "text"}` objects when the first non-whitespace byte is `[`.
 fn parse_sort_items(
     raw: &str,
-) -> Result<Vec<cardinal_harness::rerank::RerankDocument>, Box<dyn std::error::Error>> {
-    use cardinal_harness::rerank::RerankDocument;
+) -> Result<Vec<ratiometer::rerank::RerankDocument>, Box<dyn std::error::Error>> {
+    use ratiometer::rerank::RerankDocument;
 
     if raw.trim_start().starts_with('[') {
         let value: serde_json::Value = serde_json::from_str(raw)
@@ -2742,7 +2734,7 @@ fn parse_sort_items(
 /// Render sorted output in the requested format.
 fn render_sorted(
     out: &mut impl Write,
-    sorted: &cardinal_harness::rerank::SortedTexts,
+    sorted: &ratiometer::rerank::SortedTexts,
     format: SortFormatArg,
     scores: bool,
 ) -> Result<(), Box<dyn std::error::Error>> {
@@ -2806,7 +2798,7 @@ fn provider_gateway(
     cache_only: bool,
 ) -> Result<ProviderGateway<NoopUsageSink>, Box<dyn std::error::Error>> {
     if cache_only {
-        let adapter = cardinal_harness::gateway::openrouter::OpenRouterAdapter::with_config(
+        let adapter = ratiometer::gateway::openrouter::OpenRouterAdapter::with_config(
             "cache-only",
             "http://127.0.0.1:9",
             std::time::Duration::from_secs(1),
@@ -2816,7 +2808,7 @@ fn provider_gateway(
         return Ok(ProviderGateway::with_config(
             adapter,
             Arc::new(NoopUsageSink),
-            cardinal_harness::gateway::GatewayConfig::default(),
+            ratiometer::gateway::GatewayConfig::default(),
         ));
     }
 

@@ -2,9 +2,9 @@ use std::sync::atomic::AtomicBool;
 use std::sync::Arc;
 use std::time::Duration;
 
-use cardinal_harness::gateway::openrouter::OpenRouterAdapter;
-use cardinal_harness::gateway::{Attribution, GatewayConfig, NoopUsageSink, ProviderGateway};
-use cardinal_harness::rerank::{
+use ratiometer::gateway::openrouter::OpenRouterAdapter;
+use ratiometer::gateway::{Attribution, GatewayConfig, NoopUsageSink, ProviderGateway};
+use ratiometer::rerank::{
     multi_rerank, MultiRerankAttributeSpec, MultiRerankEntity, MultiRerankRequest,
     MultiRerankTopKSpec, RerankStopReason,
 };
@@ -70,7 +70,7 @@ async fn multi_rerank_honors_cancel_flag_before_any_comparisons() {
     let cancel_flag = AtomicBool::new(true);
     let resp = multi_rerank(
         req,
-        cardinal_harness::rerank::RerankExecution::new(gateway, Attribution::new("test"))
+        ratiometer::rerank::RerankExecution::new(gateway, Attribution::new("test"))
             .cancel_flag(&cancel_flag),
     )
     .await
