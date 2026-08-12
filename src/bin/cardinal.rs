@@ -1657,23 +1657,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         Err(err) => return Err(err.into()),
                     };
                     cost += response.cost_nanodollars;
-                    let seriate_logprobs: Option<Vec<cardinal_harness::seriate::TokenLogprob>> =
-                        response.output_logprobs.as_ref().map(|positions| {
-                            positions
-                                .iter()
-                                .map(|position| cardinal_harness::seriate::TokenLogprob {
-                                    token: position.token.clone(),
-                                    logprob: position.logprob,
-                                    top: position
-                                        .top_alternatives
-                                        .iter()
-                                        .map(|alt| (alt.token.clone(), alt.logprob))
-                                        .collect(),
-                                })
-                                .collect()
-                        });
                     let Ok(parsed) =
-                        instrument.parse(&response.content, seriate_logprobs.as_deref())
+                        instrument.parse(&response.content, response.output_logprobs.as_deref())
                     else {
                         continue;
                     };

@@ -1089,23 +1089,6 @@ async fn compare_pair_seriate(
     provider_cost_total = provider_cost_total.saturating_add(response.cost_nanodollars);
     provider_cost_is_estimate |= response.cost_is_estimate;
 
-    // Adapt cardinal logprob positions to seriate's shape.
-    let seriate_logprobs: Option<Vec<crate::seriate::TokenLogprob>> =
-        response.output_logprobs.as_ref().map(|positions| {
-            positions
-                .iter()
-                .map(|position| crate::seriate::TokenLogprob {
-                    token: position.token.clone(),
-                    logprob: position.logprob,
-                    top: position
-                        .top_alternatives
-                        .iter()
-                        .map(|alt| (alt.token.clone(), alt.logprob))
-                        .collect(),
-                })
-                .collect()
-        });
-
     let prompt_text = format!("{}\n---\n{}", rendered.system, rendered.user);
     let mut usage = ComparisonUsage {
         input_tokens: input_tokens_total,
@@ -1123,7 +1106,7 @@ async fn compare_pair_seriate(
         evidence_moments: None,
     };
 
-    let parsed = match instrument.parse(&response.content, seriate_logprobs.as_deref()) {
+    let parsed = match instrument.parse(&response.content, response.output_logprobs.as_deref()) {
         Ok(parsed) => parsed,
         Err(err) => {
             warn!(error = %err, "ratio-letter parse failed; treating as refusal");

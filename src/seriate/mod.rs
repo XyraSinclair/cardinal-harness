@@ -14,14 +14,14 @@
 //!
 //! Vendored closure: `ontology`, `atom`, `evidence`, `record`, the
 //! [`instrument::Instrument`] trait with the `ratio_letter` and `ordinal`
-//! instruments, and the [`gateway::TokenLogprob`] transport shape. The
-//! standalone crate's CLI, gateway, sqlite evidence log, posterior
-//! compiler, and k-wise/scalar instruments were culled with the repo
+//! instruments, consuming [`crate::gateway::TokenLogprob`] directly (the
+//! standalone crate's transport shim was unified away). Its CLI, gateway,
+//! sqlite evidence log, posterior compiler, and k-wise/scalar instruments
+//! were culled with the repo
 //! (history preserved at <https://github.com/XyraSinclair/seriate>).
 
 pub mod atom;
 pub mod evidence;
-pub mod gateway;
 pub mod instrument;
 pub mod ontology;
 pub mod record;
@@ -31,7 +31,6 @@ pub use evidence::{
     evidence_from_logprobs, evidence_from_resamples, fused_evidence, jsd, AnswerEvidence,
     AtomLogprob, AtomProb, EvidenceError, PmfCompleteness,
 };
-pub use gateway::TokenLogprob;
 pub use ontology::{
     Attribute, AttributeId, CaptureId, ContentId, Entity, EntityId, JudgementId, PairKey,
     Presentation, TemplateHash,

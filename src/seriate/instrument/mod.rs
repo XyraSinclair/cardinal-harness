@@ -9,12 +9,12 @@
 //! (The standalone seriate crate also carried `kwise` and `scalar`
 //! instruments; they were culled in the fold-back — unused by cardinal.)
 //!
-//! ## `crate::seriate::gateway::TokenLogprob`
+//! ## `crate::gateway::TokenLogprob`
 //!
 //! `answer_logprobs` is one entry per completion **position**, in
 //! generation order, carrying that position's chosen token/logprob plus the
 //! top-k alternatives the provider considered there (`token`, `logprob`,
-//! `top: Vec<(String, f64)>`) — mirroring the standard chat-completions
+//! `top_alternatives: Vec<TokenAlternative>`) — mirroring the standard chat-completions
 //! logprobs shape (`logprobs.content[i]`). This is what "find the answer
 //! position" / "top-k entries at that position" below refer to. All gateway
 //! field access is isolated to `find_answer_position` and
@@ -27,9 +27,9 @@
 pub mod ordinal;
 pub mod ratio_letter;
 
+use crate::gateway::TokenLogprob;
 use crate::seriate::atom::AnswerAtom;
 use crate::seriate::evidence::{AnswerEvidence, AtomProb, EvidenceError, PmfCompleteness};
-use crate::seriate::gateway::TokenLogprob;
 use crate::seriate::ontology::{Attribute, Entity, TemplateHash};
 use crate::seriate::record::{AcquisitionMode, EvidenceHealth, InstrumentKind, ParserVersion};
 
@@ -144,7 +144,12 @@ pub(crate) fn find_answer_position(
 pub(crate) fn merge_candidates(position: &TokenLogprob) -> Vec<(String, f64)> {
     let mut seen = std::collections::HashSet::new();
     std::iter::once((position.token.clone(), position.logprob))
-        .chain(position.top.iter().cloned())
+        .chain(
+            position
+                .top_alternatives
+                .iter()
+                .map(|alt| (alt.token.clone(), alt.logprob)),
+        )
         .filter(|(tok, _)| seen.insert(trim_token(tok).to_string()))
         .collect()
 }
@@ -194,7 +199,13 @@ mod tests {
         TokenLogprob {
             token: token.to_string(),
             logprob,
-            top: alts.iter().map(|(t, p)| (t.to_string(), *p)).collect(),
+            top_alternatives: alts
+                .iter()
+                .map(|(t, p)| crate::gateway::TokenAlternative {
+                    token: t.to_string(),
+                    logprob: *p,
+                })
+                .collect(),
         }
     }
 

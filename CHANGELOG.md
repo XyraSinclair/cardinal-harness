@@ -7,6 +7,17 @@ Versioning once it reaches `1.0.0`.
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-08-11
+
+### Changed
+
+- **TokenLogprob unified** (the follow-up flagged in 0.10.0): the vendored
+  instruments now consume `gateway::TokenLogprob` directly; the vendored
+  transport shim (`seriate::gateway`) and both hand-written adapters in
+  `comparison.rs` and the CLI are deleted. BREAKING for the vendored
+  module's public API: `seriate::TokenLogprob` is gone —
+  `Instrument::parse` takes `&[cardinal_harness::gateway::TokenLogprob]`.
+
 ## [0.10.0] - 2026-08-11
 
 ### Changed

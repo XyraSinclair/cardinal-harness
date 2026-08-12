@@ -9,9 +9,9 @@
 //! JSON wrapper and confidence field entirely — with the answer as the bare
 //! first token, single-token logprobs already ARE the confidence.
 
+use crate::gateway::TokenLogprob;
 use crate::seriate::atom::{AnswerAtom, RATIO_LADDER};
 use crate::seriate::evidence::{evidence_from_logprobs, evidence_from_resamples, AtomLogprob};
-use crate::seriate::gateway::TokenLogprob;
 use crate::seriate::ontology::{Attribute, Entity};
 use crate::seriate::record::{AcquisitionMode, EvidenceHealth, InstrumentKind, ParserVersion};
 
@@ -203,7 +203,13 @@ mod tests {
         TokenLogprob {
             token: token.to_string(),
             logprob: p.ln(),
-            top: alts.iter().map(|(t, p)| (t.to_string(), p.ln())).collect(),
+            top_alternatives: alts
+                .iter()
+                .map(|(t, p)| crate::gateway::TokenAlternative {
+                    token: t.to_string(),
+                    logprob: p.ln(),
+                })
+                .collect(),
         }
     }
 

@@ -13,9 +13,9 @@
 //! ratio-letter reading, but it costs the same one token and never asks the
 //! model for a magnitude it may not have a stable prior over.
 
+use crate::gateway::TokenLogprob;
 use crate::seriate::atom::AnswerAtom;
 use crate::seriate::evidence::{evidence_from_logprobs, evidence_from_resamples, AtomLogprob};
-use crate::seriate::gateway::TokenLogprob;
 use crate::seriate::ontology::{Attribute, Entity};
 use crate::seriate::record::{AcquisitionMode, EvidenceHealth, InstrumentKind, ParserVersion};
 
@@ -202,7 +202,13 @@ mod tests {
         TokenLogprob {
             token: token.to_string(),
             logprob: p.ln(),
-            top: alts.iter().map(|(t, p)| (t.to_string(), p.ln())).collect(),
+            top_alternatives: alts
+                .iter()
+                .map(|(t, p)| crate::gateway::TokenAlternative {
+                    token: t.to_string(),
+                    logprob: p.ln(),
+                })
+                .collect(),
         }
     }
 

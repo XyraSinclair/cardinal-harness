@@ -1,6 +1,6 @@
 [package]
 name = "cardinal-harness"
-version = "0.10.0"
+version = "0.11.0"
 edition = "2021"
 license = "MIT"
 description = "Pairwise LLM judgements fitted into cardinal scores with uncertainty, active selection, and explicit cost and provenance"
