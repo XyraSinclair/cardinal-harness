@@ -151,15 +151,16 @@ impl PairwiseComparisonSpec<'_> {
             .prompt_template_slug
             .filter(|slug| is_evidence_slug(slug))
         {
-            let instrument: Box<dyn seriate::instrument::Instrument> =
+            let instrument: Box<dyn crate::seriate::instrument::Instrument> =
                 if slug == ORDINAL_LETTER_SLUG {
-                    Box::new(seriate::instrument::ordinal::OrdinalInstrument)
+                    Box::new(crate::seriate::instrument::ordinal::OrdinalInstrument)
                 } else {
-                    Box::new(seriate::instrument::ratio_letter::RatioLetterInstrument)
+                    Box::new(crate::seriate::instrument::ratio_letter::RatioLetterInstrument)
                 };
-            let attribute = seriate::Attribute::new(self.attribute.id, self.attribute.prompt);
-            let entity_a = seriate::Entity::new(self.entity_a.text);
-            let entity_b = seriate::Entity::new(self.entity_b.text);
+            let attribute =
+                crate::seriate::Attribute::new(self.attribute.id, self.attribute.prompt);
+            let entity_a = crate::seriate::Entity::new(self.entity_a.text);
+            let entity_b = crate::seriate::Entity::new(self.entity_b.text);
             let rendered = instrument.render(&attribute, &entity_a, &entity_b);
             return PromptInstance {
                 template_slug: slug.to_string(),
@@ -652,16 +653,18 @@ fn seriate_template_fingerprint(slug: &str) -> &'static str {
     use std::sync::OnceLock;
     static RATIO: OnceLock<String> = OnceLock::new();
     static ORDINAL: OnceLock<String> = OnceLock::new();
-    fn compute(instrument: &dyn seriate::instrument::Instrument) -> String {
-        let attribute = seriate::Attribute::new("fingerprint", "fingerprint");
-        let a = seriate::Entity::new("A");
-        let b = seriate::Entity::new("B");
+    fn compute(instrument: &dyn crate::seriate::instrument::Instrument) -> String {
+        let attribute = crate::seriate::Attribute::new("fingerprint", "fingerprint");
+        let a = crate::seriate::Entity::new("A");
+        let b = crate::seriate::Entity::new("B");
         instrument.render(&attribute, &a, &b).template.0 .0.clone()
     }
     if slug == ORDINAL_LETTER_SLUG {
-        ORDINAL.get_or_init(|| compute(&seriate::instrument::ordinal::OrdinalInstrument))
+        ORDINAL.get_or_init(|| compute(&crate::seriate::instrument::ordinal::OrdinalInstrument))
     } else {
-        RATIO.get_or_init(|| compute(&seriate::instrument::ratio_letter::RatioLetterInstrument))
+        RATIO.get_or_init(|| {
+            compute(&crate::seriate::instrument::ratio_letter::RatioLetterInstrument)
+        })
     }
 }
 
@@ -1002,11 +1005,11 @@ async fn compare_pair_seriate(
     cache: Option<&dyn PairwiseCache>,
     request: PairwiseComparisonRequest<'_>,
 ) -> Result<(PairwiseJudgement, ComparisonUsage), ComparisonError> {
-    let instrument: Box<dyn seriate::instrument::Instrument> =
+    let instrument: Box<dyn crate::seriate::instrument::Instrument> =
         if request.spec.attribute.prompt_template_slug == Some(ORDINAL_LETTER_SLUG) {
-            Box::new(seriate::instrument::ordinal::OrdinalInstrument)
+            Box::new(crate::seriate::instrument::ordinal::OrdinalInstrument)
         } else {
-            Box::new(seriate::instrument::ratio_letter::RatioLetterInstrument)
+            Box::new(crate::seriate::instrument::ratio_letter::RatioLetterInstrument)
         };
     let rendered = request.spec.prompt_instance();
     let rendered_prompt_digest = rendered.rendered_digest();
@@ -1087,11 +1090,11 @@ async fn compare_pair_seriate(
     provider_cost_is_estimate |= response.cost_is_estimate;
 
     // Adapt cardinal logprob positions to seriate's shape.
-    let seriate_logprobs: Option<Vec<seriate::TokenLogprob>> =
+    let seriate_logprobs: Option<Vec<crate::seriate::TokenLogprob>> =
         response.output_logprobs.as_ref().map(|positions| {
             positions
                 .iter()
-                .map(|position| seriate::TokenLogprob {
+                .map(|position| crate::seriate::TokenLogprob {
                     token: position.token.clone(),
                     logprob: position.logprob,
                     top: position
@@ -1156,7 +1159,7 @@ async fn compare_pair_seriate(
         log_ratio_mean: mean,
         log_ratio_var: var,
         visible_mass: parsed.health.visible_mass,
-        logprob_mode: parsed.mode == seriate::AcquisitionMode::Logprob,
+        logprob_mode: parsed.mode == crate::seriate::AcquisitionMode::Logprob,
     });
 
     // Point summary DERIVED from the PMF, for every point-shaped surface.

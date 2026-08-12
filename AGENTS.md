@@ -65,6 +65,10 @@ Background sync automation, if any, should default to `git fetch`, not blind
   notes/decimal-pmf-2026-08-10/; ground-truth property battery:
   `cargo run --release --example decimal_ledger_groundtruth`)
 - `src/prompts.rs`: prompt templates and ratio ladder
+- `src/seriate/`: vendored single-token evidence instruments
+  (`ratio_letter`/`ordinal`, PMF evidence, content-addressed judgement
+  records) — folded back from the standalone seriate crate 2026-08-11
+  (`notes/seriate-fold-2026-08-11.md`); the external crate is tombstoned
 - `src/gateway/`: OpenRouter adapter, pricing, usage, logprobs; `claude-code/<model>`
   slugs route to the subscription-billed Claude Code adapter (rail fitness
   evidence: notes/claudecode-vs-api-2026-08-06/RESULTS.md — 21/21 decisive-pair

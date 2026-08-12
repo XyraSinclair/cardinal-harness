@@ -16,8 +16,8 @@ use std::collections::{hash_map::DefaultHasher, HashMap};
 use std::f64::consts::SQRT_2;
 use std::hash::{Hash, Hasher};
 
+use crate::seriate::ontology::ContentId;
 use serde::{Deserialize, Serialize};
-use seriate::ontology::ContentId;
 
 use nalgebra::linalg::{Cholesky, SymmetricEigen};
 use nalgebra::{DMatrix, DVector};

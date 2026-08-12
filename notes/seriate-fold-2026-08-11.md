@@ -1,5 +1,13 @@
 # Seriate fold-back — decided cull, execution spec
 
+**EXECUTED 2026-08-11** (operator "ok do it"): vendored per this spec,
+full suite green, released as 0.10.0. One invariant the spec missed,
+found by the vendored tests: seriate required serde_json's
+`float_roundtrip` feature — content-addressed record ids depend on exact
+float parse-roundtrip; cardinal's manifest now pins it. Also culled
+beyond spec: the dead `InvalidPresentationCount` error variant and the
+`OrdinalKWise`/`ScalarControl` enum variants (kwise/scalar-only).
+
 **Decision (operator, 2026-08-11):** cull the separate seriate repo/crate;
 fold the slice cardinal-harness actually uses back in as `src/seriate/`.
 The split (agent-created 2026-07-04) has one consumer, produced three

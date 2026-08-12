@@ -293,11 +293,11 @@ fn judge_show_prompt_prints_seriate_evidence_bytes_before_missing_key_failure() 
 
     assert!(!output.status.success());
     let stderr = String::from_utf8(output.stderr).unwrap();
-    let rendered = seriate::instrument::Instrument::render(
-        &seriate::instrument::ratio_letter::RatioLetterInstrument,
-        &seriate::Attribute::new("judge", "shininess"),
-        &seriate::Entity::new("dull TIN spoon"),
-        &seriate::Entity::new("shiny GOLD ring"),
+    let rendered = cardinal_harness::seriate::instrument::Instrument::render(
+        &cardinal_harness::seriate::instrument::ratio_letter::RatioLetterInstrument,
+        &cardinal_harness::seriate::Attribute::new("judge", "shininess"),
+        &cardinal_harness::seriate::Entity::new("dull TIN spoon"),
+        &cardinal_harness::seriate::Entity::new("shiny GOLD ring"),
     );
     let expected_prompt = format!(
         "--- system ---\n{}\n--- user ---\n{}\n---",

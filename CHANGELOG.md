@@ -7,6 +7,32 @@ Versioning once it reaches `1.0.0`.
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-08-11
+
+### Changed
+
+- **Seriate folded back in** (`src/seriate/`): the external `seriate`
+  dependency is gone; the slice cardinal actually uses is vendored —
+  ontology, atoms, evidence PMFs, judgement records, the `Instrument`
+  trait with `ratio_letter`/`ordinal`, and the `TokenLogprob` transport
+  shape (seriate @ `ba32ca0`, decision record in
+  `notes/seriate-fold-2026-08-11.md`). The standalone crate's CLI,
+  gateway, sqlite evidence log, posterior compiler, and unused
+  `kwise`/`scalar` instruments were culled (~4.4k lines; history stays in
+  the tombstoned repo). BREAKING for type identity: what was
+  `seriate::X` in public signatures is now `cardinal_harness::seriate::X`.
+  seriate 0.1.2 stays published un-yanked so 0.9.0 keeps resolving.
+- `serde_json` now pins the `float_roundtrip` feature: vendored judgement
+  records are content-addressed over their JSON serialization, and exact
+  float parse-roundtrip is load-bearing for id stability (caught by the
+  vendored `json_round_trip_preserves_id` test under cardinal's default
+  serde_json).
+- The logprob reality map (DeepSeek logprobs vs own sampling at JSD 0.81)
+  moved from the seriate repo to `notes/logprob-reality-2026-07-04/`.
+- Two `TokenLogprob` types now coexist (cardinal's `gateway::TokenLogprob`
+  and the vendored `seriate::gateway::TokenLogprob`); unification is a
+  known follow-up seam cleanup, deliberately out of the fold's scope.
+
 ## [0.9.0] - 2026-08-10
 
 First release published to crates.io (`cargo install cardinal-harness`).

@@ -37,8 +37,8 @@
 
 use std::collections::HashMap;
 
+use crate::seriate::ontology::ContentId;
 use serde::{Deserialize, Serialize};
-use seriate::ontology::ContentId;
 
 use crate::rating_engine::{AttributeParams, Config, Observation, RaterParams, RatingEngine};
 

@@ -1612,9 +1612,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 "A minor seventh chord contains four distinct pitches.",
                 "Snow fell quietly on the empty parking lot.",
             ];
-            let attribute = seriate::Attribute::new("quality", "overall quality of the writing");
-            let instrument = seriate::instrument::ratio_letter::RatioLetterInstrument;
-            use seriate::instrument::Instrument as _;
+            let attribute = cardinal_harness::seriate::Attribute::new(
+                "quality",
+                "overall quality of the writing",
+            );
+            let instrument =
+                cardinal_harness::seriate::instrument::ratio_letter::RatioLetterInstrument;
+            use cardinal_harness::seriate::instrument::Instrument as _;
 
             println!(
                 "{:<40} {:>7} {:>7} {:>7} {:>10} {:>8}",
@@ -1630,7 +1634,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let mut cost: i64 = 0;
                 let mut logprob_mode = 0usize;
                 for text in null_texts.iter().take(nulls as usize) {
-                    let entity = seriate::Entity::new(*text);
+                    let entity = cardinal_harness::seriate::Entity::new(*text);
                     let rendered = instrument.render(&attribute, &entity, &entity);
                     let mut chat = cardinal_harness::gateway::ChatRequest::new(
                         cardinal_harness::gateway::ChatModel::parse(model),
@@ -1653,11 +1657,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         Err(err) => return Err(err.into()),
                     };
                     cost += response.cost_nanodollars;
-                    let seriate_logprobs: Option<Vec<seriate::TokenLogprob>> =
+                    let seriate_logprobs: Option<Vec<cardinal_harness::seriate::TokenLogprob>> =
                         response.output_logprobs.as_ref().map(|positions| {
                             positions
                                 .iter()
-                                .map(|position| seriate::TokenLogprob {
+                                .map(|position| cardinal_harness::seriate::TokenLogprob {
                                     token: position.token.clone(),
                                     logprob: position.logprob,
                                     top: position
@@ -1673,7 +1677,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     else {
                         continue;
                     };
-                    if parsed.mode == seriate::AcquisitionMode::Logprob {
+                    if parsed.mode == cardinal_harness::seriate::AcquisitionMode::Logprob {
                         logprob_mode += 1;
                     }
                     if let Some((p_a, p_par, p_b)) = parsed.evidence.directional_summary() {

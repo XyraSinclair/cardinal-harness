@@ -25,6 +25,7 @@ pub mod prompts;
 pub mod rating_engine;
 pub mod repeat_pooling;
 pub mod rerank;
+pub mod seriate;
 pub mod text_chunking;
 pub mod trait_search;
 

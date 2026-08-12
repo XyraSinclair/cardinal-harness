@@ -34,7 +34,8 @@ see probes — but it can't fix it).
    null pairs — four models measured clean). Attribute coherence:
    measured per attribute (`--two-sided`, `--also-by` probes; a live probe
    caught a shaky paraphrase at +0.35). Logprob trustworthiness: measured
-   per provider (seriate's reality map: DeepSeek's logprobs disagree with
+   per provider (the logprob reality map,
+   `notes/logprob-reality-2026-07-04/`: DeepSeek's logprobs disagree with
    its own sampling at JSD 0.81).
 4. **It applies the same skepticism to itself.** The planner's efficiency
    claim was benchmarked against uniform random pair selection, FAILED,
@@ -48,9 +49,9 @@ see probes — but it can't fix it).
    emitted via `--packets-out`) make raw pairwise evidence content-addressed
    and portable — packets fuse byte-identically, so merging the same evidence
    twice is a no-op. A portable bundle for the *full study record* remains the
-   explicit #52 gap. Sibling project
-   [seriate](https://github.com/XyraSinclair/seriate) anchors judgements to
-   raw provider bytes when full provenance matters.
+   explicit #52 gap. The seriate instrument layer (single-token evidence,
+   content-addressed judgement records) lives in `src/seriate/`, folded back
+   from the standalone crate 2026-08-11 (`notes/seriate-fold-2026-08-11.md`).
 
 ## How to use it
 

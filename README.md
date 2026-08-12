@@ -117,8 +117,8 @@ a 52-token alphabet (case = which item, letter = magnitude on the ladder,
 `A` = parity, `!` = refuse) — so a single completion position's top-k
 logprobs are the model's **full judgement PMF**. The solver then weights
 each observation by its **measured variance** instead of a stated
-confidence. Rendering, parsing, and mass accounting are delegated to
-[seriate](https://github.com/XyraSinclair/seriate); where a provider hides
+confidence. Rendering, parsing, and mass accounting live in the vendored
+seriate instrument layer (`src/seriate/`); where a provider hides
 or rejects logprobs, the path degrades loudly to sampled mode and the run
 summary says so (`evidence: 63/63 logprob-mode, visible 0.99`).
 

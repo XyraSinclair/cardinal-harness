@@ -1,6 +1,6 @@
 [package]
 name = "cardinal-harness"
-version = "0.9.0"
+version = "0.10.0"
 edition = "2021"
 license = "MIT"
 description = "Pairwise LLM judgements fitted into cardinal scores with uncertainty, active selection, and explicit cost and provenance"
@@ -46,9 +46,11 @@ rand = "0.8"
 regex = "1"
 reqwest = { version = "0.13", features = ["json", "gzip", "stream"] }
 rusqlite = { version = "0.38", features = ["bundled"], optional = true }
-seriate = { version = "0.1.2", default-features = false }
 serde = { version = "1", features = ["derive"] }
-serde_json = "1"
+# float_roundtrip: vendored seriate judgement records are content-addressed
+# over their JSON serialization; exact float parse-roundtrip is load-bearing
+# for id stability (src/seriate/record.rs json_round_trip_preserves_id).
+serde_json = { version = "1", features = ["float_roundtrip"] }
 sha2 = "0.10"
 statrs = "0.18"
 tempfile = "3"

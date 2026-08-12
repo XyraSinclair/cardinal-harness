@@ -168,15 +168,22 @@ fn evidence_spec(slug: &str) -> PairwiseComparisonSpec<'_> {
 #[test]
 fn evidence_prompt_instances_are_rendered_by_the_requested_seriate_instrument() {
     for slug in ["ratio_letter_v1", "ordinal_letter_v1"] {
-        let instrument: Box<dyn seriate::instrument::Instrument> = match slug {
-            "ratio_letter_v1" => Box::new(seriate::instrument::ratio_letter::RatioLetterInstrument),
-            "ordinal_letter_v1" => Box::new(seriate::instrument::ordinal::OrdinalInstrument),
+        let instrument: Box<dyn cardinal_harness::seriate::instrument::Instrument> = match slug {
+            "ratio_letter_v1" => {
+                Box::new(cardinal_harness::seriate::instrument::ratio_letter::RatioLetterInstrument)
+            }
+            "ordinal_letter_v1" => {
+                Box::new(cardinal_harness::seriate::instrument::ordinal::OrdinalInstrument)
+            }
             _ => unreachable!(),
         };
         let expected = instrument.render(
-            &seriate::Attribute::new("brightness", "brightness <with literal markup>"),
-            &seriate::Entity::new("alpha & amber"),
-            &seriate::Entity::new("beta > blue"),
+            &cardinal_harness::seriate::Attribute::new(
+                "brightness",
+                "brightness <with literal markup>",
+            ),
+            &cardinal_harness::seriate::Entity::new("alpha & amber"),
+            &cardinal_harness::seriate::Entity::new("beta > blue"),
         );
         let actual = evidence_spec(slug).prompt_instance();
         let canonical = evidence_spec("canonical_v2").prompt_instance();
@@ -256,12 +263,12 @@ async fn evidence_trace_identity_matches_the_exact_provider_prompt_and_seriate_t
     assert_eq!(events.len(), requests.len());
     assert!(!events.is_empty());
 
-    let instrument = seriate::instrument::ratio_letter::RatioLetterInstrument;
-    let expected_template_hash = seriate::instrument::Instrument::render(
+    let instrument = cardinal_harness::seriate::instrument::ratio_letter::RatioLetterInstrument;
+    let expected_template_hash = cardinal_harness::seriate::instrument::Instrument::render(
         &instrument,
-        &seriate::Attribute::new("fingerprint", "fingerprint"),
-        &seriate::Entity::new("A"),
-        &seriate::Entity::new("B"),
+        &cardinal_harness::seriate::Attribute::new("fingerprint", "fingerprint"),
+        &cardinal_harness::seriate::Entity::new("A"),
+        &cardinal_harness::seriate::Entity::new("B"),
     )
     .template
     .0

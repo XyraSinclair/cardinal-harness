@@ -449,11 +449,11 @@ async fn cached_evidence_replays_bitwise_and_naive_confidence_reconstruction_div
     let cache = SqlitePairwiseCache::new(dir.path().join("cache.sqlite")).unwrap();
     let model = "openai/gpt-5-mini";
     let prompt_slug = "ratio_letter_v1";
-    let template_hash = seriate::instrument::Instrument::render(
-        &seriate::instrument::ratio_letter::RatioLetterInstrument,
-        &seriate::Attribute::new("fingerprint", "fingerprint"),
-        &seriate::Entity::new("A"),
-        &seriate::Entity::new("B"),
+    let template_hash = cardinal_harness::seriate::instrument::Instrument::render(
+        &cardinal_harness::seriate::instrument::ratio_letter::RatioLetterInstrument,
+        &cardinal_harness::seriate::Attribute::new("fingerprint", "fingerprint"),
+        &cardinal_harness::seriate::Entity::new("A"),
+        &cardinal_harness::seriate::Entity::new("B"),
     )
     .template
     .0
