@@ -1,4 +1,4 @@
-# DRAFT — GitHub issue for steipete/oracle (NOT POSTED; needs Xyra's approval)
+# POSTED 2026-08-11 as https://github.com/steipete/oracle/issues/367 (Xyra approved 2026-08-11 23:41)
 
 Title: Browser engine's cookie-copy mode can silently invalidate the user's live
 ChatGPT session (token rotation race) — propose a persistent automation profile
