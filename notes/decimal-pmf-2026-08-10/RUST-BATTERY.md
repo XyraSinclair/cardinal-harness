@@ -52,3 +52,39 @@ Run: `cargo run --release --example decimal_ledger_groundtruth`
 Together with SHOOTOUT.md (Python estimator theory), the four review passes
 (port fidelity), and the live smokes (wire integration), this completes the
 validation chain: theory → port → wire, each layer measured, not assumed.
+
+## Matrix-level gauntlet (P10–P16, added 2026-08-11 evening)
+
+The single-pair battery validates the instrument in isolation. The PMF-shaped
+outcome only earns its keep if it *composes*: a matrix of per-pair credal
+ledgers must fuse — through the real sign algebra (multi.rs presented-
+coordinate flip) and the real solver (`Observation::from_log_ratio_moments`
+→ IRLS) — into a coherent cardinal scale. Same example binary, second phase.
+
+Setup: 8 items on a latent nats scale spanning 1.4x–200x gaps; each pair's
+judge is an **exact quantizer PMF** (latent signed log10 ratio ~
+Normal(gap, σ=0.25), pushed through the decimal grid — quantization bias of
+the grid itself measured at 0.0004 nats, negligible); 2 counterbalanced
+observations per pair, K=8 draws each, through `analyze` → `RatingEngine`.
+
+| property | result | denominator |
+|---|---|---|
+| P10 end-to-end recovery | Kendall tau **1.000** every rep; gap RMSE 0.216 nats, bias +0.094 (toward zero) | 40 reps × 28 pairs |
+| P16 calibration decomposition | kernel-level \|z\|≤2 coverage **0.932**; matrix-level 0.821 | 1,120 pair-reps |
+| P16b anytime (K=32) | bias +0.030, RMSE 0.087, tau 1.000 — shrinkage converges out with draws | 10 reps |
+| P11 matrix presentation invariance | max \|Δgap\| = 6e−15 when EVERY pair is presented mirrored (sign algebra exact end-to-end) | 28 pairs |
+| P12 triangle composition of raw ledger means | max \|m_ij+m_jk−m_ik\|/σ = **1.40** — raw means compose additively within uncertainty | 56 triangles |
+| P13 precision flow | flat judge (σ=0.8) carries 2.1× ledger var; adding it *improves* recovery (0.202→0.192 RMSE) — precision weighting works, more evidence never poisons | 28 pairs, 10 reps |
+| P15 round-number attractor | 50% of fraction mass snapped to .0: tau stays **1.000**, bias +0.27 reported honestly — the instrument faithfully measures the pathological judge's actual PMF | 10 reps |
+
+**The one deep finding — fusion undercoverage (0.93 kernel → 0.82 matrix)**:
+the kernel's small toward-zero magnitude shrinkage at K=8 is *correlated*
+across the two counterbalanced observations (mirror symmetry preserves it),
+so fusing them halves the variance without shrinking the bias — z inflates
+by ~√2. This is a structural property of any moment-collapse fusion, not a
+bug in the ledger: kernel calibration is 0.93–0.94 at every K, and the bias
+term decays with draws (+0.094 @K=8 → +0.030 @K=32). The engine's
+temperature/beta calibration layer (`CalibrationEvidence`) is the designed
+absorber for exactly this residual-scatter-vs-claimed-precision mismatch.
+Asserted floor: kernel ≥ 0.85, matrix ≥ 0.75, and K=32 must not degrade
+either calibration or RMSE.

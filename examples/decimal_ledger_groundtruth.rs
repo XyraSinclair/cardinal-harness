@@ -26,7 +26,10 @@
 
 use std::collections::BTreeMap;
 
+use std::collections::HashMap;
+
 use cardinal_harness::gateway::{TokenAlternative, TokenLogprob};
+use cardinal_harness::rating_engine::{AttributeParams, Observation, RaterParams, RatingEngine};
 use cardinal_harness::rerank::decimal_ledger::{
     analyze, extract_trajectory, DrawTrajectory, NodeObs,
 };
@@ -70,27 +73,32 @@ fn load_truth() -> Truth {
     let v: serde_json::Value = serde_json::from_str(&raw).expect("parse truth tree");
     let leaves_obj = v["leaves"].as_object().expect("leaves");
     let mut leaves = Vec::with_capacity(leaves_obj.len());
-    let mut p_dir: BTreeMap<char, f64> = BTreeMap::new();
-    let mut p_int_acc: BTreeMap<(char, String), f64> = BTreeMap::new();
-    let mut p_frac_acc: BTreeMap<(char, String, String), f64> = BTreeMap::new();
-    let mut true_mean = 0.0;
     for (key, mass) in leaves_obj {
         // key like "B:235.7"
         let (d, rest) = key.split_once(':').expect("leaf key");
         let (int_s, frac_s) = rest.split_once('.').expect("leaf digits");
         let dir = d.chars().next().unwrap();
         let p = mass.as_f64().unwrap();
-        let r: f64 = rest.parse().unwrap();
-        // Python truth: h = +log10 when dir == 'B'. Presented natural-log
-        // coordinates: positive = A higher. Convert: z = s_A * ln(clamped r).
-        let s = if dir == 'A' { 1.0 } else { -1.0 };
-        true_mean += p * s * r.clamp(1.0, 999.9).ln();
-        *p_dir.entry(dir).or_default() += p;
-        *p_int_acc.entry((dir, int_s.to_string())).or_default() += p;
-        *p_frac_acc
-            .entry((dir, int_s.to_string(), frac_s.to_string()))
-            .or_default() += p;
         leaves.push(((dir, int_s.to_string(), frac_s.to_string()), p));
+    }
+    truth_from_leaves(leaves)
+}
+
+fn truth_from_leaves(leaves: Vec<((char, String, String), f64)>) -> Truth {
+    let mut p_dir: BTreeMap<char, f64> = BTreeMap::new();
+    let mut p_int_acc: BTreeMap<(char, String), f64> = BTreeMap::new();
+    let mut p_frac_acc: BTreeMap<(char, String, String), f64> = BTreeMap::new();
+    let mut true_mean = 0.0;
+    for ((dir, int_s, frac_s), p) in &leaves {
+        let r: f64 = format!("{int_s}.{frac_s}").parse().unwrap();
+        // Presented natural-log coordinates: positive = A higher.
+        let s = if *dir == 'A' { 1.0 } else { -1.0 };
+        true_mean += p * s * r.clamp(1.0, 999.9).ln();
+        *p_dir.entry(*dir).or_default() += p;
+        *p_int_acc.entry((*dir, int_s.clone())).or_default() += p;
+        *p_frac_acc
+            .entry((*dir, int_s.clone(), frac_s.clone()))
+            .or_default() += p;
     }
     let mut cum = Vec::with_capacity(leaves.len());
     let mut acc = 0.0;
@@ -409,5 +417,402 @@ fn main() {
     }
 
     // ---- P5 headline at production K=8, exact access.
-    println!("\nAll asserted properties held. See the K=8 rows above for the production operating point.");
+    println!("\nSingle-pair battery: all asserted properties held. See the K=8 rows for the production operating point.");
+
+    matrix_gauntlet();
+}
+
+// ===================== Matrix-level gauntlet (P10–P16) =====================
+//
+// The ledger's PMF-shaped outcome only earns its keep if it composes: a
+// matrix of per-pair credal PMFs must fuse — through the REAL sign algebra
+// (multi.rs presented-coordinate flip) and the REAL solver
+// (Observation::from_log_ratio_moments → IRLS) — into a coherent cardinal
+// scale. This phase builds a synthetic judge as an exact quantizer PMF
+// (latent signed log10 ratio ~ Normal(gap, σ), pushed forward through the
+// decimal grid), emulates draws, and measures the whole chain.
+
+/// Standard normal CDF via Abramowitz–Stegun 7.1.26 erf (|err| < 1.5e-7).
+fn phi(x: f64) -> f64 {
+    let t = 1.0 / (1.0 + 0.3275911 * (x.abs() / std::f64::consts::SQRT_2));
+    let poly = t
+        * (0.254829592
+            + t * (-0.284496736 + t * (1.421413741 + t * (-1.453152027 + t * 1.061405429))));
+    let erf = 1.0 - poly * (-(x * x) / 2.0).exp();
+    if x >= 0.0 {
+        0.5 * (1.0 + erf)
+    } else {
+        0.5 * (1.0 - erf)
+    }
+}
+
+/// Exact PMF of a quantizer judge: latent y ~ Normal(mu, sigma) in signed
+/// log10-ratio space (positive = presented A higher), quantized to the
+/// decimal grid dir ∈ {A,B}, r ∈ {1.0, 1.1, …, 999.9}. `snap_alpha` moves
+/// that fraction of each non-.0 leaf's mass to the same integer's .0 leaf
+/// (round-number attractor pathology).
+fn judge_pmf(mu: f64, sigma: f64, snap_alpha: f64) -> Vec<((char, String, String), f64)> {
+    let mut acc: BTreeMap<(char, String, String), f64> = BTreeMap::new();
+    for deci in 10u32..=9999 {
+        let r = deci as f64 / 10.0;
+        let (int_s, frac_d) = (deci / 10, deci % 10);
+        // Preimage of grid point r on the positive axis.
+        let lo = if deci == 10 { 0.0 } else { (r - 0.05).log10() };
+        let hi = if deci == 9999 {
+            f64::INFINITY
+        } else {
+            (r + 0.05).log10()
+        };
+        for (dir, mass) in [
+            ('A', phi((hi - mu) / sigma) - phi((lo - mu) / sigma)),
+            ('B', phi((-lo - mu) / sigma) - phi((-hi - mu) / sigma)),
+        ] {
+            if mass < 1e-14 {
+                continue;
+            }
+            let (kept, snapped) = if frac_d == 0 {
+                (mass, 0.0)
+            } else {
+                (mass * (1.0 - snap_alpha), mass * snap_alpha)
+            };
+            if kept > 0.0 {
+                *acc.entry((dir, int_s.to_string(), frac_d.to_string()))
+                    .or_default() += kept;
+            }
+            if snapped > 0.0 {
+                *acc.entry((dir, int_s.to_string(), "0".to_string()))
+                    .or_default() += snapped;
+            }
+        }
+    }
+    acc.into_iter().collect()
+}
+
+fn kendall_tau(a: &[f64], b: &[f64]) -> f64 {
+    let n = a.len();
+    let mut concordant = 0i64;
+    let mut discordant = 0i64;
+    for i in 0..n {
+        for j in i + 1..n {
+            let s = (a[i] - a[j]) * (b[i] - b[j]);
+            if s > 0.0 {
+                concordant += 1;
+            } else if s < 0.0 {
+                discordant += 1;
+            }
+        }
+    }
+    (concordant - discordant) as f64 / (concordant + discordant).max(1) as f64
+}
+
+/// Mirror multi.rs: presented-coordinate mean, swap flips the sign, variance
+/// floored at EVIDENCE_VAR_FLOOR before precision = 1/var.
+const EVIDENCE_VAR_FLOOR: f64 = 1e-3;
+
+fn obs_from_outcome(
+    i: usize,
+    j: usize,
+    mean_presented: f64,
+    var: f64,
+    swapped: bool,
+    rater: &str,
+) -> Observation {
+    let mean_ij = if swapped {
+        -mean_presented
+    } else {
+        mean_presented
+    };
+    Observation::from_log_ratio_moments(i, j, mean_ij, var.max(EVIDENCE_VAR_FLOOR), rater, 1.0)
+}
+
+struct SolvedRep {
+    gaps_err: Vec<f64>, // recovered − latent gap, per pair (i<j)
+    zscores: Vec<f64>,  // (recovered − latent gap) / sqrt(diff_var)
+    /// Kernel-level z per sharp observation: (mean_ij − E[Z]_pmf) / σ_ledger,
+    /// before any solver fusion. Separates instrument calibration from
+    /// fusion calibration.
+    kernel_z: Vec<f64>,
+    tau: f64,
+}
+
+#[allow(clippy::too_many_arguments)]
+fn run_rep(
+    n: usize,
+    s: &[f64],
+    truths: &BTreeMap<(usize, usize), Truth>,
+    noisy: Option<&BTreeMap<(usize, usize), Truth>>,
+    k: usize,
+    rep_seed: u64,
+    mirror_all: bool,
+) -> SolvedRep {
+    let mut observations = Vec::new();
+    let mut kernel_z = Vec::new();
+    let mut raters = HashMap::new();
+    raters.insert("sharp".to_string(), RaterParams::default());
+    if noisy.is_some() {
+        raters.insert("noisy".to_string(), RaterParams::default());
+    }
+    for (&(i, j), truth) in truths {
+        for swapped in [false, true] {
+            // In mirror_all mode every presentation is flipped: the pair is
+            // shown as (j, i), the draws mirror, and the multi.rs sign flip
+            // must undo it exactly.
+            let presented_swap = swapped ^ mirror_all;
+            let mut rng = XorShift(
+                rep_seed ^ ((i as u64) << 40) ^ ((j as u64) << 24) ^ ((swapped as u64) << 1) | 1,
+            );
+            let draws: Vec<DrawTrajectory> = (0..k)
+                .map(|_| truth.draw(&mut rng, 0.0, presented_swap))
+                .collect();
+            let out = analyze(&draws).expect("matrix analyze");
+            let mean_ij = if presented_swap { -out.mean } else { out.mean };
+            kernel_z.push((mean_ij - truth.true_mean) / out.var.max(EVIDENCE_VAR_FLOOR).sqrt());
+            observations.push(obs_from_outcome(
+                i,
+                j,
+                out.mean,
+                out.var,
+                presented_swap,
+                "sharp",
+            ));
+            if let Some(noisy_truths) = noisy {
+                let nt = &noisy_truths[&(i, j)];
+                let mut rng2 = XorShift(
+                    rep_seed
+                        ^ 0xDEAD
+                        ^ ((i as u64) << 40)
+                        ^ ((j as u64) << 24)
+                        ^ ((swapped as u64) << 1)
+                        | 1,
+                );
+                let nd: Vec<DrawTrajectory> = (0..k)
+                    .map(|_| nt.draw(&mut rng2, 0.0, presented_swap))
+                    .collect();
+                let no = analyze(&nd).expect("noisy analyze");
+                observations.push(obs_from_outcome(
+                    i,
+                    j,
+                    no.mean,
+                    no.var,
+                    presented_swap,
+                    "noisy",
+                ));
+            }
+        }
+    }
+    let mut engine =
+        RatingEngine::new(n, AttributeParams::default(), raters, None).expect("engine");
+    engine.ingest(&observations);
+    engine.solve();
+    let scores = engine.scores().expect("scores").to_vec();
+    let mut gaps_err = Vec::new();
+    let mut zscores = Vec::new();
+    for &(i, j) in truths.keys() {
+        let latent = s[i] - s[j];
+        let rec = scores[i] - scores[j];
+        gaps_err.push(rec - latent);
+        if let Some(dv) = engine.diff_var_for(i, j) {
+            if dv > 0.0 {
+                zscores.push((rec - latent) / dv.sqrt());
+            }
+        }
+    }
+    SolvedRep {
+        gaps_err,
+        zscores,
+        kernel_z,
+        tau: kendall_tau(&scores, s),
+    }
+}
+
+fn matrix_gauntlet() {
+    println!("\n==================== matrix gauntlet (P10–P16) ====================");
+    const N: usize = 8;
+    // Latent scale in nats: gaps span 1.4x (adjacent) to 200x (extremes),
+    // all inside the instrument domain.
+    let s = [0.0, 0.35, 0.8, 1.4, 2.1, 3.0, 4.1, 5.3];
+    let sigma_sharp = 0.25; // judge scatter, log10 units (matches HARVEST scale)
+    let sigma_noisy = 0.80;
+    let build = |sigma: f64, snap: f64| -> BTreeMap<(usize, usize), Truth> {
+        let mut m = BTreeMap::new();
+        for i in 0..N {
+            for j in i + 1..N {
+                let mu = (s[i] - s[j]) / LN10;
+                m.insert((i, j), truth_from_leaves(judge_pmf(mu, sigma, snap)));
+            }
+        }
+        m
+    };
+    let truths = build(sigma_sharp, 0.0);
+    let noisy_truths = build(sigma_noisy, 0.0);
+
+    // Quantization bias of the instrument grid itself (PMF truth vs latent).
+    let mut max_qbias: f64 = 0.0;
+    for (&(i, j), t) in &truths {
+        max_qbias = max_qbias.max((t.true_mean - (s[i] - s[j])).abs());
+    }
+    println!("grid quantization bias (max |E[Z]_pmf − latent gap|): {max_qbias:.4} nats");
+
+    // ---- P10 + P16: end-to-end recovery and diff-var calibration.
+    const R: usize = 40;
+    let stats_at = |k: usize, reps: usize, seed_base: u64| {
+        let mut taus = Vec::new();
+        let mut all_err = Vec::new();
+        let mut all_z = Vec::new();
+        let mut all_kz = Vec::new();
+        for rep in 0..reps {
+            let sr = run_rep(N, &s, &truths, None, k, seed_base + rep as u64, false);
+            taus.push(sr.tau);
+            all_err.extend(sr.gaps_err);
+            all_z.extend(sr.zscores);
+            all_kz.extend(sr.kernel_z);
+        }
+        let mean_tau = taus.iter().sum::<f64>() / reps as f64;
+        let rmse = (all_err.iter().map(|e| e * e).sum::<f64>() / all_err.len() as f64).sqrt();
+        let bias = all_err.iter().sum::<f64>() / all_err.len() as f64;
+        let cover2 = all_z.iter().filter(|z| z.abs() <= 2.0).count() as f64 / all_z.len() as f64;
+        let kcover2 = all_kz.iter().filter(|z| z.abs() <= 2.0).count() as f64 / all_kz.len() as f64;
+        (mean_tau, bias, rmse, cover2, kcover2, all_z.len())
+    };
+    let (mean_tau, bias, rmse, cover2, kcover2, nz) = stats_at(8, R, 0x51D0_0000);
+    println!(
+        "P10 recovery over {R} reps × {} pairs (2 counterbalanced obs/pair, K=8): mean tau {mean_tau:.3}, gap bias {bias:+.4}, gap RMSE {rmse:.4} nats",
+        truths.len()
+    );
+    println!(
+        "P16 calibration at K=8: kernel-level |z|≤2 coverage {kcover2:.3}; matrix-level {cover2:.3} over {nz} pair-reps"
+    );
+    // Matrix-level undercoverage relative to kernel-level is the fusion
+    // √2 effect: the kernel's toward-zero magnitude shrinkage is CORRELATED
+    // across the two counterbalanced observations (mirror symmetry preserves
+    // it), so fusing them halves the variance without shrinking the bias.
+    // The engine's temperature-calibration layer is the designed absorber.
+    let (t32, b32, r32, c32, kc32, _) = stats_at(32, 10, 0x51D3_2000);
+    println!(
+        "P16b anytime at K=32 (10 reps): tau {t32:.3}, bias {b32:+.4}, RMSE {r32:.4}, matrix coverage {c32:.3}, kernel {kc32:.3}"
+    );
+    assert!(mean_tau >= 0.95, "P10 FAIL: mean tau {mean_tau}");
+    assert!(rmse < 0.35, "P10 FAIL: gap RMSE {rmse}");
+    assert!(kcover2 >= 0.85, "P16 FAIL: kernel coverage {kcover2}");
+    assert!(cover2 >= 0.75, "P16 FAIL: matrix coverage {cover2}");
+    assert!(
+        c32 >= cover2 - 0.02 && r32 <= rmse,
+        "P16b FAIL: more draws must not degrade calibration/RMSE (K=8 {cover2:.3}/{rmse:.4} → K=32 {c32:.3}/{r32:.4})"
+    );
+
+    // ---- P11: full-matrix presentation invariance. Same rep seed, every
+    // pair mirrored at presentation; the multi.rs sign algebra must return
+    // byte-identical scores.
+    {
+        let a = run_rep(N, &s, &truths, None, 8, 0xC0FFEE, false);
+        let b = run_rep(N, &s, &truths, None, 8, 0xC0FFEE, true);
+        let max_d = a
+            .gaps_err
+            .iter()
+            .zip(&b.gaps_err)
+            .map(|(x, y)| (x - y).abs())
+            .fold(0.0f64, f64::max);
+        println!("P11 matrix presentation invariance: max |Δgap| = {max_d:.2e}");
+        assert!(max_d < 1e-9, "P11 FAIL");
+    }
+
+    // ---- P12: triangle composition of RAW ledger means (before the solver
+    // ever sees them): for additive truth, m_ij + m_jk − m_ik ≈ 0 within
+    // combined uncertainty.
+    {
+        let mut worst_ratio: f64 = 0.0;
+        let mut means: BTreeMap<(usize, usize), (f64, f64)> = BTreeMap::new();
+        for (&(i, j), truth) in &truths {
+            let mut rng = XorShift(0x7A1A_0000 ^ ((i as u64) << 16) ^ j as u64);
+            let draws: Vec<DrawTrajectory> =
+                (0..8).map(|_| truth.draw(&mut rng, 0.0, false)).collect();
+            let out = analyze(&draws).unwrap();
+            means.insert((i, j), (out.mean, out.var.max(EVIDENCE_VAR_FLOOR)));
+        }
+        for i in 0..N {
+            for j in i + 1..N {
+                for k in j + 1..N {
+                    let (mij, vij) = means[&(i, j)];
+                    let (mjk, vjk) = means[&(j, k)];
+                    let (mik, vik) = means[&(i, k)];
+                    let c = mij + mjk - mik;
+                    worst_ratio = worst_ratio.max(c.abs() / (vij + vjk + vik).sqrt());
+                }
+            }
+        }
+        println!("P12 triangle composition of raw ledger means: max |cycle|/σ = {worst_ratio:.2} over 56 triangles");
+        assert!(
+            worst_ratio < 5.0,
+            "P12 FAIL: cyclic residual {worst_ratio}σ"
+        );
+    }
+
+    // ---- P13: precision flow. A flat judge (σ=0.8 vs 0.25) must carry
+    // larger ledger variance and must not poison the sharp judge's recovery.
+    {
+        let mut var_sharp = Vec::new();
+        let mut var_noisy = Vec::new();
+        for (&(i, j), truth) in &truths {
+            let mut r1 = XorShift(0xBEE5 ^ ((i as u64) << 16) ^ j as u64);
+            let mut r2 = XorShift(0xBEE5 ^ ((i as u64) << 16) ^ j as u64);
+            let d1: Vec<_> = (0..8).map(|_| truth.draw(&mut r1, 0.0, false)).collect();
+            let d2: Vec<_> = (0..8)
+                .map(|_| noisy_truths[&(i, j)].draw(&mut r2, 0.0, false))
+                .collect();
+            var_sharp.push(analyze(&d1).unwrap().var);
+            var_noisy.push(analyze(&d2).unwrap().var);
+        }
+        var_sharp.sort_by(|a, b| a.total_cmp(b));
+        var_noisy.sort_by(|a, b| a.total_cmp(b));
+        let med_ratio = var_noisy[var_noisy.len() / 2] / var_sharp[var_sharp.len() / 2];
+        let mut rmse_sharp = Vec::new();
+        let mut rmse_both = Vec::new();
+        for rep in 0..10 {
+            let a = run_rep(N, &s, &truths, None, 8, 0xF00D_0000 + rep, false);
+            let b = run_rep(
+                N,
+                &s,
+                &truths,
+                Some(&noisy_truths),
+                8,
+                0xF00D_0000 + rep,
+                false,
+            );
+            rmse_sharp.push(
+                (a.gaps_err.iter().map(|e| e * e).sum::<f64>() / a.gaps_err.len() as f64).sqrt(),
+            );
+            rmse_both.push(
+                (b.gaps_err.iter().map(|e| e * e).sum::<f64>() / b.gaps_err.len() as f64).sqrt(),
+            );
+        }
+        let ms = rmse_sharp.iter().sum::<f64>() / 10.0;
+        let mb = rmse_both.iter().sum::<f64>() / 10.0;
+        println!("P13 precision flow: median ledger-var ratio noisy/sharp = {med_ratio:.1}; recovery RMSE sharp-only {ms:.4} vs sharp+noisy {mb:.4}");
+        assert!(med_ratio > 2.0, "P13 FAIL: flat judge not higher-variance");
+        assert!(
+            mb <= ms * 1.25,
+            "P13 FAIL: noisy judge poisoned recovery ({ms} → {mb})"
+        );
+    }
+
+    // ---- P15: round-number attractor pathology (half of all fraction mass
+    // snapped to .0): ordering must survive, bias reported honestly.
+    {
+        let snapped = build(sigma_sharp, 0.5);
+        let mut taus = Vec::new();
+        let mut errs = Vec::new();
+        for rep in 0..10 {
+            let sr = run_rep(N, &s, &snapped, None, 8, 0x5A4B_0000 + rep, false);
+            taus.push(sr.tau);
+            errs.extend(sr.gaps_err);
+        }
+        let mt = taus.iter().sum::<f64>() / 10.0;
+        let bias = errs.iter().sum::<f64>() / errs.len() as f64;
+        println!(
+            "P15 attractor pathology (50% snap-to-.0): mean tau {mt:.3}, gap bias {bias:+.4} nats"
+        );
+        assert!(mt >= 0.9, "P15 FAIL: tau {mt}");
+    }
+
+    println!("\nMatrix gauntlet: all asserted properties held.");
 }
