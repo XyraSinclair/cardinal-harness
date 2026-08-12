@@ -38,3 +38,24 @@ transfer across lists — readings accumulate into a web of priors
 
 **Stack:** attribute → magnitude → instruments → evidence → scaling of
 readings. LLM-sorter is the storefront; the ratiometer is the machine.
+
+## Naming map (proposed 2026-08-12, same lock gate)
+
+Four layers wanting different KINDS of names:
+
+1. **Vocabulary — common nouns, never brand:** scaling, reading,
+   magnitude, doubling. The ranking-vs-scaling distinction should
+   propagate unattributed; jargon would quarantine it.
+2. **Machine (crate/repo) — instrument noun:** **ratiometer**
+   (crates.io-free, self-describing) over **pogson** (also free; the
+   story-name — Pogson cardinalized ordinal star magnitudes with a fixed
+   ratio step in 1856 — but opaque on first contact). Pogson parked as a
+   future informal UNIT name (a ladder step / doubling, as bel→decibel).
+3. **Storefront — a sentence, not a noun:** "Readings, not rankings."
+   pairwiseratio.org headline; states product + leaderboard critique.
+4. **OpenPriors — unchanged;** the ontology (readings → web of priors)
+   is the name's justification.
+
+Anti-recommendation: instruments stay versioned slugs
+(`decimal_ledger_v1`), never brandable names — research-grade surface
+must be free to die.
