@@ -1,5 +1,16 @@
 # seriate
 
+> **⚰️ Folded into [cardinal-harness](https://github.com/XyraSinclair/cardinal-harness)** (2026-08-11).
+> The instrument layer this crate existed for — single-token evidence PMFs,
+> content-addressed judgement records, the `ratio_letter`/`ordinal`
+> instruments — now lives at `cardinal-harness/src/seriate/` (vendored from
+> this repo @ `ba32ca0`, released as cardinal-harness 0.10.0). The
+> standalone CLI, gateway, sqlite evidence log, and posterior compiler were
+> retired with this repo. `seriate 0.1.2` stays published on crates.io so
+> `cardinal-harness 0.9.0` keeps resolving; no further releases are
+> planned. The crate name is parked for possible future re-extraction.
+> Decision record: `cardinal-harness/notes/seriate-fold-2026-08-11.md`.
+
 [![CI](https://github.com/XyraSinclair/seriate/actions/workflows/ci.yml/badge.svg)](https://github.com/XyraSinclair/seriate/actions/workflows/ci.yml)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
