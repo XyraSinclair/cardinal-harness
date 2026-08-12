@@ -618,7 +618,7 @@ pub fn is_evidence_slug(slug: &str) -> bool {
 /// Prompt-template slug for the decimal-ledger evidence instrument
 /// (research instrument): free-form decimal ratio elicited at temperature 1
 /// across K redraws; per-draw exact chosen-token logprobs plus top-k
-/// sidebands are fused into a credal exact-atom ledger whose (E[Z], var)
+/// sidebands are fused into a credal exact-atom ledger whose (E\[Z\], var)
 /// enter the solver as measured precision. Kernel in
 /// [`super::decimal_ledger`]; evidence pack notes/decimal-pmf-2026-08-10.
 pub const DECIMAL_LEDGER_SLUG: &str = "decimal_ledger_v1";
@@ -1187,7 +1187,7 @@ async fn compare_pair_seriate(
 /// The decimal-ledger evidence path: K temperature-1 redraws of a free-form
 /// decimal ratio whose per-draw exact chosen-token logprobs (plus top-k
 /// sidebands) are fused into a credal exact-atom ledger
-/// ([`super::decimal_ledger`]). The judgement PMF's (E[Z], var) ride in
+/// ([`super::decimal_ledger`]). The judgement PMF's (E\[Z\], var) ride in
 /// `ComparisonUsage::evidence_moments` and enter the solver as measured
 /// precision; the point judgement is DERIVED from the ledger so every
 /// point-shaped surface (traces, counterbalance stats, cache) keeps working.

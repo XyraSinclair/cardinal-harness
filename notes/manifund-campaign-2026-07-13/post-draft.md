@@ -34,9 +34,9 @@ Then ask, separately for each mechanism: which weighted combination of
 these four best reconstructs the realized dollar order? The predictions
 were committed to a public git history before any comparison against
 ground truth — the registration is the commit log
-([ACX](https://github.com/XyraSinclair/cardinal-harness/commit/ca1928c70be4d575426495b4548006398633c7d4),
-[EA CC](https://github.com/XyraSinclair/cardinal-harness/commit/892e0c0827de384601abeb5534a2a765f714e18f),
-[second judge](https://github.com/XyraSinclair/cardinal-harness/commit/e304a5dc666fa838aefc16beb0745c88e3d1a47e)),
+([ACX](https://github.com/XyraSinclair/ratiometer/commit/ca1928c70be4d575426495b4548006398633c7d4),
+[EA CC](https://github.com/XyraSinclair/ratiometer/commit/892e0c0827de384601abeb5534a2a765f714e18f),
+[second judge](https://github.com/XyraSinclair/ratiometer/commit/e304a5dc666fa838aefc16beb0745c88e3d1a47e)),
 not a promise. The original two-cohort measurement cost $1.43; the
 second-judge replication and polish control added $7.07 (one judge
 produced 4.5× the expected reasoning tokens — the overrun is quoted in
@@ -96,11 +96,11 @@ costs a few dollars to instrument it.
 
 Every judgment, prompt, trace, cost, pre-registration commit, and the
 analysis scripts fixed before unblinding:
-[original pack](https://github.com/XyraSinclair/cardinal-harness/tree/main/artifacts/live/manifund-p2-2026-07-19),
-[second-judge pack](https://github.com/XyraSinclair/cardinal-harness/tree/main/artifacts/live/manifund-p2-secondjudge-2026-07-27).
+[original pack](https://github.com/XyraSinclair/ratiometer/tree/main/artifacts/live/manifund-p2-2026-07-19),
+[second-judge pack](https://github.com/XyraSinclair/ratiometer/tree/main/artifacts/live/manifund-p2-secondjudge-2026-07-27).
 The engine — prompts, robust solver, uncertainty, caching — is open at
 [pairwiseratio.org](https://pairwiseratio.org)
-([source](https://github.com/XyraSinclair/cardinal-harness)). If you
+([source](https://github.com/XyraSinclair/ratiometer)). If you
 think the wordings are doing hidden work, rerun with your own; the
 wording is the axis, and that is half of what this instrument is for.
 

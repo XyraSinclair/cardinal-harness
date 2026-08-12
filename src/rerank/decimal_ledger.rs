@@ -344,7 +344,7 @@ fn ledger_with(trie: &Trie, mass_fn: MassFn) -> (Atoms, Vec<Cell>) {
     (atoms, cells)
 }
 
-/// The credal certificate over E[Z].
+/// The credal certificate over E\[Z\].
 #[derive(Debug, Clone, Copy)]
 pub struct Certificate {
     pub enumerated_mass: f64,
@@ -450,7 +450,7 @@ impl XorShift {
 }
 
 /// Provider-noise band: resample each token's mass from its observed
-/// values, rebuild the ledger, recompute the midpoint E[Z]; the std of
+/// values, rebuild the ledger, recompute the midpoint E\[Z\]; the std of
 /// those replicates is the jitter component of the reported variance
 /// (HARVEST.md finding 3: continuous 1-2% logit jitter, not backend
 /// bimodality).
