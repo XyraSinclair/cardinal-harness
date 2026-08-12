@@ -103,7 +103,12 @@ pub fn extract_trajectory(tokens: &[TokenLogprob]) -> Option<DrawTrajectory> {
     let mut dot_i = None;
     let mut frac_i = None;
     for (i, t) in tokens.iter().enumerate() {
-        let prev_contains_higher = seen.contains("higher");
+        // Anchor on the full JSON key: a "reason" field whose prose
+        // contains the word "higher" followed by a bare A/B token would
+        // otherwise mint a sign-flipped direction atom (falsifier
+        // FRAGILE-1, 2026-08-11). Token concatenation makes the key
+        // substring robust to any tokenizer split of "higher_ranked".
+        let prev_contains_higher = seen.contains("higher_ranked");
         let prev_contains_ratio = seen.contains("ratio");
         seen.push_str(&t.token);
         if dir_i.is_none() && (t.token == "A" || t.token == "B") && prev_contains_higher {
@@ -136,12 +141,27 @@ pub fn extract_trajectory(tokens: &[TokenLogprob]) -> Option<DrawTrajectory> {
         }
     }
     let (dir_i, int_i, frac_i) = (dir_i?, int_i?, frac_i?);
+    // Probability sanitation (falsifier BUG-3, 2026-08-11): providers can
+    // emit logprob > 0 (mass > 1) and, in principle, non-finite values.
+    // NaN defeats every downstream `<= 0.0` guard and +inf poisons the
+    // moments; a non-finite chosen probability rejects the draw, and all
+    // masses are clamped into [0, 1] at intake (-inf → 0 is already sane).
+    for &i in &[dir_i, int_i, frac_i] {
+        let p = tokens[i].logprob.exp();
+        if p.is_nan() || p == f64::INFINITY {
+            return None;
+        }
+    }
     let node = |i: usize| NodeObs {
-        chosen: (tokens[i].token.clone(), tokens[i].logprob.exp()),
+        chosen: (
+            tokens[i].token.clone(),
+            tokens[i].logprob.exp().clamp(0.0, 1.0),
+        ),
         top: tokens[i]
             .top_alternatives
             .iter()
-            .map(|alt| (alt.token.clone(), alt.logprob.exp()))
+            .filter(|alt| alt.logprob.exp().is_finite())
+            .map(|alt| (alt.token.clone(), alt.logprob.exp().clamp(0.0, 1.0)))
             .collect(),
     };
     let dir = if tokens[dir_i].token == "A" { 'A' } else { 'B' };
@@ -213,8 +233,11 @@ fn zrange_cell(dir: char, int_tok: Option<&str>) -> (f64, f64) {
             let r_lo = i.max(DOMAIN_LO);
             let r_hi = (i + 0.95).min(DOMAIN_HI);
             if r_hi < r_lo {
-                // cell wholly below the domain (integer 0): conservative
-                (0.0, zmax())
+                // Cell wholly below the domain (integer 0): every leaf 0.x
+                // clamps to z = 0 under the validated convention, so the
+                // cell's Z-range is exactly {0} — not full-domain slack
+                // (unified with certify's atom handling, 2026-08-11).
+                (0.0, 0.0)
             } else {
                 (r_lo.ln(), r_hi.ln())
             }
@@ -350,10 +373,12 @@ fn certify(atoms: &BTreeMap<(char, String, String), f64>, cells: &[Cell]) -> Cer
             out_of_domain += p;
             continue;
         };
-        if r < DOMAIN_LO {
-            out_of_domain += p;
-            continue;
-        }
+        // Sub-domain ratios (integer token "0") follow the validated clamp
+        // convention everywhere: zval maps them to exactly 0, so their z is
+        // KNOWN and they belong in the head, not in full-domain slack
+        // (coherence review 2026-08-11: certify previously paid ±zmax
+        // envelope width for atoms whose value is exact under the same
+        // file's own zval convention).
         e_head += p * zval(*dir, r);
     }
     let cell_mass: f64 = cells.iter().map(|c| c.mass).sum();
@@ -476,10 +501,13 @@ pub struct LedgerOutcome {
 /// the cross-fit estimator (SHOOTOUT.md finding 4) while the VARIANCE
 /// stays envelope-shaped (`width²/12` + a bootstrap of the midpoint
 /// statistic). The envelope covers truth regardless of which point
-/// estimator is reported (coverage 1.00 in the ground-truth shootout),
-/// and in the crossfit regime the envelope term dominates, so the pair is
-/// conservative rather than internally inconsistent — but it is a hybrid,
-/// not a single estimator's (mean, var).
+/// estimator is reported (coverage 1.00 in the ground-truth shootout).
+/// To account for the hybrid honestly, the squared DISAGREEMENT between
+/// the two point estimators is folded into the variance whenever both are
+/// computable (coherence review 2026-08-11): it is exactly the
+/// estimator-choice variance the threshold switch would otherwise leave
+/// unreported, it removes the discontinuity's unaccounted component, and
+/// it absorbs part of the cross-fit half-split sensitivity.
 pub fn analyze(draws: &[DrawTrajectory]) -> Option<LedgerOutcome> {
     if draws.is_empty() {
         return None;
@@ -487,14 +515,22 @@ pub fn analyze(draws: &[DrawTrajectory]) -> Option<LedgerOutcome> {
     let trie = accumulate(draws);
     let (atoms, cells) = ledger_with(&trie, &|ns| ns.masses());
     let cert = certify(&atoms, &cells);
+    // The point estimate must live inside its own credal envelope: the
+    // cross-fit residual mean assigns unresolved mass to the est-half
+    // sample mean, which tail draws can push past the cells' bounded
+    // Z-ranges (falsifier BUG-2, 2026-08-11 — a certified-incompatible
+    // observation would otherwise reach the solver). The certificate is
+    // the sound object; clamp the point into it.
+    let crossfit = crossfit_point(draws).map(|cf| cf.clamp(cert.e_lo, cert.e_hi));
     let mean = if cert.enumerated_mass >= ENUM_MASS_POINT_THRESHOLD {
         cert.e_mid
     } else {
-        crossfit_point(draws).unwrap_or(cert.e_mid)
+        crossfit.unwrap_or(cert.e_mid)
     };
+    let disagreement = crossfit.map_or(0.0, |cf| cert.e_mid - cf);
     let boot = bootstrap_std(&trie);
     let width = cert.width();
-    let var = width * width / 12.0 + boot * boot;
+    let var = width * width / 12.0 + boot * boot + disagreement * disagreement;
     let empty = NodeStats::default();
     let dir_m = trie.get(&vec![]).unwrap_or(&empty).masses();
     let p_a = dir_m.get("A").copied().unwrap_or(0.0);

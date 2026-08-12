@@ -1483,6 +1483,12 @@ fn parse_decimal_ledger_text(content: &str) -> DecimalDrawText {
     let Some(end) = content.rfind('}') else {
         return DecimalDrawText::Unparseable;
     };
+    if start > end {
+        // A '}' before the first '{' (prose like "oops :} then {…") would
+        // otherwise panic the slice below on raw model output
+        // (falsifier BUG-1, 2026-08-11).
+        return DecimalDrawText::Unparseable;
+    }
     let Ok(value) = serde_json::from_str::<serde_json::Value>(&content[start..=end]) else {
         return DecimalDrawText::Unparseable;
     };

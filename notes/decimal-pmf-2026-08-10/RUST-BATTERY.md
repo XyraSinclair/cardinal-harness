@@ -1,5 +1,13 @@
 # Rust kernel ground-truth property battery (2026-08-11)
 
+> **Errata / evolution**: numbers in the first two sections are the
+> PRE-review-round measurements (kernel as first ported). The
+> "Adversarial review round" section below records the three kernel
+> changes that came out of the coherence + falsifier reviews and the
+> post-fix numbers (±2σ and matrix coverage now 1.000 everywhere,
+> recovery RMSE roughly halved). The historical numbers are kept because
+> they document the mechanisms the fixes address.
+
 The Python prototype was validated against exact ground truth (SHOOTOUT.md).
 The shipped Rust port (`src/rerank/decimal_ledger.rs`) had four adversarial
 reviews and two live smokes — but "reviewed" is not "measured". This battery
@@ -87,4 +95,70 @@ term decays with draws (+0.094 @K=8 → +0.030 @K=32). The engine's
 temperature/beta calibration layer (`CalibrationEvidence`) is the designed
 absorber for exactly this residual-scatter-vs-claimed-precision mismatch.
 Asserted floor: kernel ≥ 0.85, matrix ≥ 0.75, and K=32 must not degrade
-either calibration or RMSE.
+either calibration or RMSE. **Resolved same night** — see below: folding the
+estimator-disagreement term into var lifted kernel AND matrix coverage to
+1.000 and halved recovery RMSE.
+
+## Adversarial review round (2026-08-11 late): coherence + falsifier
+
+Two independent agents ran after the matrix gauntlet: a deep-coherence
+review (are the PMF structures mathematically consistent credal objects;
+is the moment collapse the right matrix interface) and an empirical
+falsifier (attack the kernel with concrete inputs in an isolated worktree).
+
+**Coherence verdicts**: the trie/ledger is a coherent "conserved measure +
+slack" credal object (the conservation gap doubles as a jitter detector);
+the collapse to (E[Z], var) is the **correct** matrix interface — interval
+matrices hit the dependency problem, separated direction×magnitude cannot
+enter a linear-Gaussian likelihood — keep it; the sign algebra is trap-free
+end-to-end (presentation is baked into the cache key, so cross-presentation
+replay is structurally impossible). Sub-additivity is approximate, not
+strict (top-k selection censoring can oversubscribe node masses; the gap
+channel catches aggregate oversubscription) — measured negligible at 1–2%
+jitter, documented rather than "fixed".
+
+**Kernel changes landed from the round** (each verified by full battery
+re-run):
+
+1. **Estimator-disagreement variance** (coherence F6): var gains
+   `(e_mid − crossfit)²` whenever both estimators are computable — exactly
+   the estimator-choice variance the 0.9 threshold switch left unreported.
+   Effect: ±2σ coverage 1.000 at every K and access mode (was 0.57–0.98);
+   matrix-level coverage 0.82 → **1.000**; recovery RMSE 0.216 → **0.114**
+   nats; K=32 RMSE 0.087 → 0.048. The var is now deliberately conservative
+   (coverage above nominal) — right side to err on for a credal instrument.
+2. **Sub-1.0 convention unified** (coherence F3): integer-token-"0" atoms
+   and cells now contribute exactly z = 0 (the validated clamp convention)
+   instead of paying full ±zmax envelope slack for a value the convention
+   itself makes exact.
+3. **Crossfit clamped into its own envelope** (falsifier BUG-2): the
+   cross-fit residual mean could exit [e_lo, e_hi] under tail-heavy
+   est-half draws (constructed case: mean 3.95 vs envelope [−0.68, 1.29]),
+   handing IRLS a certificate-incompatible observation. The certificate is
+   the sound object; the point is now clamped into it.
+4. **Panic on untrusted output fixed** (falsifier BUG-1, HIGH):
+   `parse_decimal_ledger_text` sliced `content[start..=end]` with a `}`
+   preceding the first `{` — reachable panic on live model prose. Now
+   Unparseable.
+5. **Probability sanitation at intake** (falsifier BUG-3): non-finite
+   chosen-token probabilities reject the draw; all masses clamp to [0, 1]
+   (providers do emit logprob > 0 in the wild); non-finite sideband
+   alternatives are dropped.
+6. **Direction anchor tightened** (falsifier FRAGILE-1): dir binds only
+   after the full key substring `higher_ranked` (concatenation-robust to
+   any tokenizer split), so a "reason" field containing prose like "B is
+   higher than A" can no longer mint a sign-flipped direction atom.
+
+**Known non-fixes** (documented, deliberate): key-order-swapped JSON
+(`ratio` before `higher_ranked`) degrades to frequency-MC rather than
+parsing (prompt mandates order; degradation not corruption);
+`enumerated_mass` can exceed 1 under direction-contradictory certainty
+(the gap channel widens the envelope to full domain — conservative);
+persisting `e_lo`/`e_hi`/gap through `EvidenceMoments` + cache for
+post-solve interval audits (coherence F5, the sharpest improvement) is
+queued behind the in-flight seriate fold-back that owns comparison.rs.
+
+Post-fix battery: single-pair P1–P9 and matrix P10–P16 all held; final
+numbers: P10 tau 1.000, bias +0.002, RMSE 0.114; P12 max cycle 0.65σ;
+P13 var ratio 2.4, RMSE 0.107 vs 0.114 (within tolerance); P15 tau 1.000,
+bias +0.115; full test suite + clippy clean.
