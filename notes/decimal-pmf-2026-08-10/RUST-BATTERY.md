@@ -153,10 +153,13 @@ re-run):
 (`ratio` before `higher_ranked`) degrades to frequency-MC rather than
 parsing (prompt mandates order; degradation not corruption);
 `enumerated_mass` can exceed 1 under direction-contradictory certainty
-(the gap channel widens the envelope to full domain — conservative);
-persisting `e_lo`/`e_hi`/gap through `EvidenceMoments` + cache for
-post-solve interval audits (coherence F5, the sharpest improvement) is
-queued behind the in-flight seriate fold-back that owns comparison.rs.
+(the gap channel widens the envelope to full domain — conservative).
+
+Coherence F5 — persisting `e_lo`/`e_hi`/`conservation_gap` through
+`EvidenceMoments` + the sqlite cache for post-solve interval audits —
+LANDED 2026-08-12 (commit 2a35cab): the certificate now survives the
+(mean, var) collapse and round-trips through cache replay; ratio-letter
+and MC-fallback evidence carries `None` (no certificate to fake).
 
 Post-fix battery: single-pair P1–P9 and matrix P10–P16 all held; final
 numbers: P10 tau 1.000, bias +0.002, RMSE 0.114; P12 max cycle 0.65σ;
