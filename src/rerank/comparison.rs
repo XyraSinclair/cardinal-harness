@@ -644,6 +644,17 @@ pub struct EvidenceMoments {
     /// True when the PMF came from logprobs; false when from a sampled
     /// point (loud degradation).
     pub logprob_mode: bool,
+    /// Credal-envelope lower bound on the signed log-ratio (decimal-ledger
+    /// evidence only). Persisted so the interval certificate survives the
+    /// (mean, var) collapse: a post-solve audit can ask whether adversarial
+    /// resolution of unattributed probability mass could flip a ranking
+    /// (coherence review F5, 2026-08-11).
+    pub e_lo: Option<f64>,
+    /// Credal-envelope upper bound (see `e_lo`).
+    pub e_hi: Option<f64>,
+    /// Probability mass the token-layer enumeration failed to attribute
+    /// (1 − Σ cells); doubles as a provider-jitter detector.
+    pub conservation_gap: Option<f64>,
 }
 
 /// Stable template fingerprint for the ratio-letter path, derived from the
@@ -1143,6 +1154,9 @@ async fn compare_pair_seriate(
         log_ratio_var: var,
         visible_mass: parsed.health.visible_mass,
         logprob_mode: parsed.mode == crate::seriate::AcquisitionMode::Logprob,
+        e_lo: None,
+        e_hi: None,
+        conservation_gap: None,
     });
 
     // Point summary DERIVED from the PMF, for every point-shaped surface.
@@ -1364,6 +1378,7 @@ async fn compare_pair_decimal_ledger(
                 outcome.enumerated_mass,
                 true,
                 confidence,
+                Some((outcome.e_lo, outcome.e_hi, outcome.conservation_gap)),
             )
         })
     } else {
@@ -1397,10 +1412,10 @@ async fn compare_pair_decimal_ledger(
         // Variance of the MEAN across draws (sample variance / n).
         let var = z.iter().map(|v| (v - mean).powi(2)).sum::<f64>() / (n - 1.0) / n;
         let agree = z.iter().filter(|v| (**v >= 0.0) == (mean >= 0.0)).count() as f64 / n;
-        Some((mean, var, 0.0, false, agree))
+        Some((mean, var, 0.0, false, agree, None))
     });
 
-    let Some((mean, var, visible_mass, logprob_mode, confidence)) = fused else {
+    let Some((mean, var, visible_mass, logprob_mode, confidence, certificate)) = fused else {
         // Cache the refusal only when the model actually refused a majority
         // of draws. A transient parse-failure burst must not become a sticky
         // $0 `Refused` served from cache forever (integration review,
@@ -1429,6 +1444,9 @@ async fn compare_pair_decimal_ledger(
         log_ratio_var: var,
         visible_mass,
         logprob_mode,
+        e_lo: certificate.map(|(lo, _, _)| lo),
+        e_hi: certificate.map(|(_, hi, _)| hi),
+        conservation_gap: certificate.map(|(_, _, gap)| gap),
     });
 
     let higher_ranked = if mean >= 0.0 {
@@ -1517,6 +1535,9 @@ fn judgement_to_cached(judgement: &PairwiseJudgement, usage: &ComparisonUsage) -
             log_ratio_var: None,
             visible_mass: None,
             logprob_mode: None,
+            e_lo: None,
+            e_hi: None,
+            conservation_gap: None,
         },
         PairwiseJudgement::Observation {
             higher_ranked,
@@ -1537,6 +1558,9 @@ fn judgement_to_cached(judgement: &PairwiseJudgement, usage: &ComparisonUsage) -
             log_ratio_var: usage.evidence_moments.map(|m| m.log_ratio_var),
             visible_mass: usage.evidence_moments.map(|m| m.visible_mass),
             logprob_mode: usage.evidence_moments.map(|m| m.logprob_mode),
+            e_lo: usage.evidence_moments.and_then(|m| m.e_lo),
+            e_hi: usage.evidence_moments.and_then(|m| m.e_hi),
+            conservation_gap: usage.evidence_moments.and_then(|m| m.conservation_gap),
         },
     }
 }
@@ -1553,6 +1577,9 @@ fn evidence_moments_from_cached(hit: &CachedJudgement) -> Option<EvidenceMoments
         // sampled/frequency fallback stores 0.0), so degraded judgements
         // stay visibly degraded on cache replay.
         logprob_mode: hit.logprob_mode.unwrap_or(visible_mass > 0.0),
+        e_lo: hit.e_lo,
+        e_hi: hit.e_hi,
+        conservation_gap: hit.conservation_gap,
     })
 }
 
