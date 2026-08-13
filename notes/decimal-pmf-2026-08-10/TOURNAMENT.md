@@ -1,15 +1,15 @@
 # Elicitation-geometry tournament — synthetic frontier (2026-08-13)
 
-> **Live rounds 1–2 update (same day): the top two synthetic arms FAILED
-> their live validity checks.** Round 1 (BINCDF.md): bin-lp's percept-CDF
-> assumption fails — step collapse, threshold anchoring, round-number
-> attractors, near-tie incoherence. Round 2 (GRID16.md): grid16 is
-> perfect-but-empty on peaked models and contaminated on flat ones
-> (codebook TV to 0.55, slot bias flipping near-tie signs, 0.6–0.9 log10
-> order effects). Emerging law: native-numeral geometries inherit the
-> model's calibration; artificial codebooks measure their own artifact.
-> Peel remains the location-faithful incumbent; radix4's validity cell is
-> the one remaining challenger question.
+> **Live A/B DECIDED (same day, rounds 1–3): all three synthetic
+> challengers failed live validity; peel wins the program outright.**
+> bin-lp: step collapse, threshold anchoring, round-number attractors
+> (BINCDF.md). grid16: perfect-but-empty on peaked models, letter priors +
+> slot bias + compression on flat ones (GRID16.md). radix4: worst of all —
+> abstract positional semantics collapse to digit priors (RADIX4.md).
+> The law: a geometry is valid iff its code-to-measurand mapping is one
+> the model already uses natively. Engine work proceeds on peel's
+> evidence path; counterbalancing stays mandatory (slot bias is real).
+> Total live spend deciding this: $0.44.
 
 Oracle roadmap item #1 (ORACLE-ROADMAP-2026-08-12.md): stop improving the
 microscope; make different microscopes compete on whether they improve the
