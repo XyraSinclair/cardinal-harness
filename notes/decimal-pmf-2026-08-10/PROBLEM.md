@@ -1,8 +1,13 @@
 # Decimal logprob enumeration: full distributions over free-form elicited numbers
 
-Status: **problem statement + design sketch, unimplemented** (captured 2026-08-10 from an
-operator voice note; the operator flagged this as "monumentally cool if solved" but hard to
-articulate — this note is that articulation).
+Status: **DECIDED — pack closed 2026-08-13.** The instrument was built, validated
+(SHOOTOUT.md), ported to production (`src/rerank/decimal_ledger.rs`), and defended in a
+geometry tournament whose three synthetic challengers all failed live validity
+(TOURNAMENT.md banner → BINCDF.md / GRID16.md / RADIX4.md): native decimal peel won the
+program outright. New probes do not belong in this pack; instrument work continues in the
+engine. Original framing below, preserved as captured 2026-08-10 from an operator voice
+note (the operator flagged this as "monumentally cool if solved" but hard to articulate —
+this note is that articulation).
 
 The shipped instrument is the indexed answer key (`src/prompts.rs`, indexed ratio ladder:
 bucket integer 0..16 as a single answer token, strict `json_schema` pinning the token
