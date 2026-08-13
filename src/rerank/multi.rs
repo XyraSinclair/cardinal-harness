@@ -56,6 +56,12 @@ use super::types::{
 // Constants
 // =============================================================================
 
+/// Variance floor applied to PMF-derived evidence at solver ingestion: a
+/// delta-certain PMF must not claim infinite precision against the rest of
+/// the graph. Public so estimator replay (`examples/replay_trace.rs`) applies
+/// the exact ingestion transform when reconstructing solver observations.
+pub const EVIDENCE_VAR_FLOOR: f64 = 1e-3;
+
 /// Default batch size for proposed comparisons.
 const DEFAULT_BATCH_SIZE: usize = 32;
 
@@ -1014,6 +1020,7 @@ pub async fn multi_rerank(
                     pairwise_logprob_posterior: None,
                     output_logprob_token_count: None,
                     pairwise_logprob_posterior_error: None,
+                    ledger_draws: None,
                     refused: false,
                     cached,
                     swapped: task.swapped,
@@ -1154,9 +1161,6 @@ pub async fn multi_rerank(
                         } else {
                             moments.log_ratio_mean
                         };
-                        // Variance floor: a delta-certain PMF must not claim
-                        // infinite precision against the rest of the graph.
-                        const EVIDENCE_VAR_FLOOR: f64 = 1e-3;
                         Observation::from_log_ratio_moments(
                             task.i,
                             task.j,
@@ -1232,6 +1236,7 @@ pub async fn multi_rerank(
                                 .map(|error| format!("solver rejected observation: {error}"));
                         }
                         event.pairwise_logprob_posterior = usage.pairwise_logprob_posterior.clone();
+                        event.ledger_draws = usage.ledger_draws.clone();
                         event.output_logprob_token_count =
                             usage.output_logprobs.as_ref().map(Vec::len);
                         if !usage.cached && event.pairwise_logprob_posterior.is_none() {

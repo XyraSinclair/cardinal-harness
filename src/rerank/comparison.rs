@@ -112,6 +112,11 @@ pub struct ComparisonUsage {
     /// consumes these as explicit-precision observations when present.
     pub evidence_moments: Option<EvidenceMoments>,
     pub pairwise_logprob_posterior: Option<PairwiseLogprobPosterior>,
+    /// Raw ledger draw trajectories + grammar version (decimal-ledger path
+    /// only, live rows fused through the exact-atom ledger). This is the
+    /// estimator-replay seam: `decimal_ledger::analyze` over these draws
+    /// reproduces the judgement's moments and certificate bit-for-bit.
+    pub ledger_draws: Option<decimal_ledger::LedgerDrawsRecord>,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -722,6 +727,7 @@ pub async fn compare_pair(
                         output_logprobs: None,
                         pairwise_logprob_posterior: None,
                         evidence_moments: evidence_moments_from_cached(&hit),
+                        ledger_draws: None,
                     };
                     return Ok((judgement, usage));
                 }
@@ -803,6 +809,7 @@ pub async fn compare_pair(
             output_logprobs: None,
             pairwise_logprob_posterior: None,
             evidence_moments: None,
+            ledger_draws: None,
         };
 
         match parse_pairwise_response(
@@ -1043,6 +1050,7 @@ async fn compare_pair_seriate(
                         output_logprobs: None,
                         pairwise_logprob_posterior: None,
                         evidence_moments: evidence_moments_from_cached(&hit),
+                        ledger_draws: None,
                     };
                     return Ok((judgement, usage));
                 }
@@ -1115,6 +1123,7 @@ async fn compare_pair_seriate(
         output_logprobs: fallback_stored_logprobs(response.output_logprobs.as_deref()),
         pairwise_logprob_posterior: None,
         evidence_moments: None,
+        ledger_draws: None,
     };
 
     let parsed = match instrument.parse(&response.content, response.output_logprobs.as_deref()) {
@@ -1232,6 +1241,7 @@ async fn compare_pair_decimal_ledger(
                         output_logprobs: None,
                         pairwise_logprob_posterior: None,
                         evidence_moments: evidence_moments_from_cached(&hit),
+                        ledger_draws: None,
                     };
                     return Ok((judgement, usage));
                 }
@@ -1362,6 +1372,7 @@ async fn compare_pair_decimal_ledger(
         output_logprobs: first_logprobs,
         pairwise_logprob_posterior: None,
         evidence_moments: None,
+        ledger_draws: None,
     };
 
     // Fusion ladder: exact-atom ledger, then frequency MC, then refusal.
@@ -1448,6 +1459,15 @@ async fn compare_pair_decimal_ledger(
         e_hi: certificate.map(|(_, hi, _)| hi),
         conservation_gap: certificate.map(|(_, _, gap)| gap),
     });
+    // Estimator-replay seam: persist the raw draws exactly when the ledger
+    // produced this judgement's evidence (logprob_mode). MC-fallback rows
+    // had < 2 usable trajectories — nothing analyze() could replay.
+    if logprob_mode {
+        usage.ledger_draws = Some(decimal_ledger::LedgerDrawsRecord {
+            grammar_version: decimal_ledger::GRAMMAR_VERSION.to_string(),
+            draws: trajectories,
+        });
+    }
 
     let higher_ranked = if mean >= 0.0 {
         HigherRanked::A

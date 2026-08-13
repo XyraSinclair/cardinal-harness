@@ -8,6 +8,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::gateway::PairwiseLogprobPosterior;
 use crate::rating_engine::Observation;
+use crate::rerank::decimal_ledger::LedgerDrawsRecord;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ComparisonTrace {
@@ -62,6 +63,14 @@ pub struct ComparisonTrace {
     /// non-cached observation where logprobs were requested.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pairwise_logprob_posterior_error: Option<String>,
+    /// Raw decimal-ledger draw trajectories + grammar version — the
+    /// estimator-replay seam. Present only for live rows whose evidence came
+    /// from the exact-atom ledger; `decimal_ledger::analyze(&record.draws)`
+    /// reproduces this row's moments and certificate offline (see
+    /// `examples/replay_trace.rs`). Absent for cached rows (the cache stores
+    /// collapsed moments, not draws), point/MC rows, and older traces.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ledger_draws: Option<LedgerDrawsRecord>,
     pub refused: bool,
     pub cached: bool,
     /// Whether entity A/B presentation order was swapped to counteract

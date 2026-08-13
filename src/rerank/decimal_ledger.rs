@@ -23,11 +23,20 @@
 
 use std::collections::BTreeMap;
 
+use serde::{Deserialize, Serialize};
+
 use crate::gateway::TokenLogprob;
 
 /// Declared instrument domain for the elicited ratio.
 pub const DOMAIN_LO: f64 = 1.0;
 pub const DOMAIN_HI: f64 = 999.9;
+
+/// Instrument-grammar identity for persisted raw draws. The grammar is part
+/// of the prompt physics (census finding 1b: the schema is in the model's
+/// context and changes beliefs), so replayed estimators must only consume
+/// draws minted under the grammar they understand. Bump when the elicited
+/// JSON shape, the ratio pattern, or the domain changes.
+pub const GRAMMAR_VERSION: &str = "decimal-ratio-v1";
 
 /// Enumerated-mass threshold above which midpoint imputation is the point
 /// estimate; below it the cross-fit head+residual estimator takes over
@@ -50,7 +59,7 @@ fn zval(dir: char, r: f64) -> f64 {
 
 /// One stochastic node observation from a single draw: the exact
 /// chosen-token probability plus top-k sideband probabilities.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NodeObs {
     pub chosen: (String, f64),
     pub top: Vec<(String, f64)>,
@@ -58,13 +67,27 @@ pub struct NodeObs {
 
 /// One parsed draw trajectory through the three stochastic nodes of the
 /// instrument grammar: direction, integer token, fraction digit.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DrawTrajectory {
     pub dir: char,
     pub int_tok: String,
     pub frac_tok: String,
     /// Node observations: `[direction, integer, fraction]`.
     pub nodes: [NodeObs; 3],
+}
+
+/// The raw material of one ledger judgement, persisted for estimator
+/// replay: every parsed draw trajectory (exact chosen-token masses plus
+/// sidebands at each stochastic node) and the grammar version that minted
+/// them. `analyze(&record.draws)` recomputes the judgement's evidence from
+/// these observations alone — no provider call, no cache — so estimator
+/// upgrades can rescore historical traces offline. Replayers must check
+/// `grammar_version == GRAMMAR_VERSION` before analyzing; draws from a
+/// different grammar are a different instrument, not older data.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LedgerDrawsRecord {
+    pub grammar_version: String,
+    pub draws: Vec<DrawTrajectory>,
 }
 
 impl DrawTrajectory {

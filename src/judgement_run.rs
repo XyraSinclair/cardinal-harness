@@ -1103,6 +1103,7 @@ fn fit_external_results(
             pairwise_logprob_posterior: None,
             output_logprob_token_count: None,
             pairwise_logprob_posterior_error: None,
+            ledger_draws: None,
             refused: result.refused,
             cached: false,
             swapped: result.swapped,
