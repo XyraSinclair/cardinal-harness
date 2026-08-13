@@ -1,11 +1,15 @@
 # Elicitation-geometry tournament — synthetic frontier (2026-08-13)
 
-> **Live round 1 update (same day, BINCDF.md): bin-lp's percept-CDF
-> assumption FAILED on real providers** — step collapse on strong models,
-> threshold anchoring on flat ones, round-number attractors, near-tie
-> incoherence. The live order below is superseded: grid16-class first
-> (with codebook calibration), radix4, peel control; bin-lp demoted to
-> direction-finder only.
+> **Live rounds 1–2 update (same day): the top two synthetic arms FAILED
+> their live validity checks.** Round 1 (BINCDF.md): bin-lp's percept-CDF
+> assumption fails — step collapse, threshold anchoring, round-number
+> attractors, near-tie incoherence. Round 2 (GRID16.md): grid16 is
+> perfect-but-empty on peaked models and contaminated on flat ones
+> (codebook TV to 0.55, slot bias flipping near-tie signs, 0.6–0.9 log10
+> order effects). Emerging law: native-numeral geometries inherit the
+> model's calibration; artificial codebooks measure their own artifact.
+> Peel remains the location-faithful incumbent; radix4's validity cell is
+> the one remaining challenger question.
 
 Oracle roadmap item #1 (ORACLE-ROADMAP-2026-08-12.md): stop improving the
 microscope; make different microscopes compete on whether they improve the
