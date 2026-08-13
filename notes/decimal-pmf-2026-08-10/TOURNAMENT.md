@@ -1,5 +1,12 @@
 # Elicitation-geometry tournament — synthetic frontier (2026-08-13)
 
+> **Live round 1 update (same day, BINCDF.md): bin-lp's percept-CDF
+> assumption FAILED on real providers** — step collapse on strong models,
+> threshold anchoring on flat ones, round-number attractors, near-tie
+> incoherence. The live order below is superseded: grid16-class first
+> (with codebook calibration), radix4, peel control; bin-lp demoted to
+> direction-finder only.
+
 Oracle roadmap item #1 (ORACLE-ROADMAP-2026-08-12.md): stop improving the
 microscope; make different microscopes compete on whether they improve the
 map. This is round one — the SYNTHETIC frontier, where the latent world is
