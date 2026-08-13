@@ -13,7 +13,8 @@ use crate::discrete::{DiscreteDistribution, WeightedValue};
 use crate::gateway::{
     pairwise_logprob_posterior, truncate_output_logprobs, Attribution, ChatGateway, ChatModel,
     ChatRequest, ConfidenceSource, PairwiseAnswer, PairwiseLogprobPosterior, PairwisePreferredSide,
-    ProviderError, RatioBucket, SignedLogRatioDistribution, TokenLogprob,
+    ProviderError, RatioBucket, ReasoningConfig, ReasoningEffort, SignedLogRatioDistribution,
+    TokenLogprob,
 };
 use crate::text_chunking::count_tokens;
 
@@ -973,10 +974,13 @@ fn model_supports_logprobs(model: &str) -> bool {
         return false;
     }
 
-    // GPT-5.4 family: logprobs request causes OpenAI backend 502 via OpenRouter.
-    // The upstream API crashes rather than returning logprobs for these models.
-    // GPT-5.6 family (sol/terra/luna): OpenRouter does not list logprobs in
-    // supported_parameters and the provider 400s on the request (2026-07-18).
+    // GPT-5.4 / GPT-5.6 families: logprobs fail UNLESS the request pins
+    // reasoning effort "none" (re-census 2026-08-13 on Azure/OpenRouter:
+    // 5.6-sol 400s at default effort but returns full logprobs at
+    // effort=none; 5.4-mini now works at either, superseding the 2026-07-18
+    // 502 finding). Callers that cannot pin effort keep the conservative
+    // false here; the decimal-ledger instrument opts in via
+    // `ledger_logprobs_require_effort_none` and pins the effort itself.
     if model_lower.starts_with("openai/gpt-5.4") || model_lower.starts_with("openai/gpt-5.6") {
         return false;
     }
@@ -999,6 +1003,18 @@ fn model_supports_logprobs(model: &str) -> bool {
     }
 
     true
+}
+
+/// Models whose logprobs are reachable ONLY with reasoning effort pinned to
+/// "none" (re-census 2026-08-13: gpt-5.6-sol 400s at default effort, full
+/// logprobs at effort=none; gpt-5.4 works at either — pinning is uniform and
+/// harmless there). Effort is part of instrument identity (RESULTS.md
+/// doctrine), so only the decimal-ledger path — whose census + validation
+/// pack (notes/decimal-pmf-2026-08-10) was measured entirely at effort=none —
+/// uses this; the ladder instrument stays as censused.
+fn ledger_logprobs_require_effort_none(model: &str) -> bool {
+    let model_lower = model.to_lowercase();
+    model_lower.starts_with("openai/gpt-5.4") || model_lower.starts_with("openai/gpt-5.6")
 }
 
 fn should_use_json_mode(model: &str) -> bool {
@@ -1279,6 +1295,18 @@ async fn compare_pair_decimal_ledger(
     if should_use_json_mode(request.spec.model) {
         base_request = base_request.json();
     }
+    // GPT-5.x: logprobs are reachable only at reasoning effort "none";
+    // effort=none is also this instrument's measured identity (the whole
+    // decimal-pmf census/validation pack ran at effort none).
+    let pin_effort_none = ledger_logprobs_require_effort_none(request.spec.model);
+    if pin_effort_none {
+        base_request = base_request.reasoning(ReasoningConfig {
+            enabled: None,
+            effort: Some(ReasoningEffort::None),
+            max_tokens: None,
+            exclude: None,
+        });
+    }
 
     let mut input_tokens_total = 0u32;
     let mut output_tokens_total = 0u32;
@@ -1293,7 +1321,7 @@ async fn compare_pair_decimal_ledger(
     // "logprob", so the substring sniff below would miss them and the
     // judgement would error instead of degrading). The sniff remains as
     // the backstop for models the census wrongly believes support them.
-    let mut logprobs_supported = model_supports_logprobs(request.spec.model);
+    let mut logprobs_supported = model_supports_logprobs(request.spec.model) || pin_effort_none;
     if !logprobs_supported {
         warn!(
             model = request.spec.model,
