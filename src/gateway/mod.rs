@@ -3,6 +3,7 @@
 pub mod claude_code;
 pub mod codex;
 pub mod error;
+pub mod gemini_cli;
 pub mod openrouter;
 pub mod pricing;
 pub mod types;
@@ -15,6 +16,7 @@ use tokio::time::sleep;
 
 use claude_code::{ClaudeCodeAdapter, ClaudeCodeConfig};
 use codex::{CodexAdapter, CodexConfig};
+use gemini_cli::{GeminiCliAdapter, GeminiCliConfig};
 use openrouter::OpenRouterAdapter;
 use usage::{CallStatus, ProviderCallRecord, UsageSink as UsageSinkTrait};
 
@@ -47,6 +49,7 @@ pub struct ProviderGateway<U: UsageSinkTrait> {
     openrouter: Option<OpenRouterAdapter>,
     claude_code: ClaudeCodeAdapter,
     codex: CodexAdapter,
+    gemini_cli: GeminiCliAdapter,
     usage_sink: Arc<U>,
     config: GatewayConfig,
 }
@@ -72,10 +75,17 @@ impl<U: UsageSinkTrait> ProviderGateway<U> {
                 .unwrap_or_else(|| CodexConfig::default().binary),
             effort: std::env::var("CARDINAL_CODEX_EFFORT").ok(),
         });
+        let gemini_cli = GeminiCliAdapter::new(GeminiCliConfig {
+            binary: std::env::var_os("CARDINAL_GEMINI_CLI_BINARY")
+                .map(Into::into)
+                .unwrap_or_else(|| GeminiCliConfig::default().binary),
+            home: std::env::var_os("CARDINAL_GEMINI_CLI_HOME").map(Into::into),
+        });
         Ok(Self {
             openrouter: Some(openrouter),
             claude_code,
             codex,
+            gemini_cli,
             usage_sink,
             config: GatewayConfig::default(),
         })
@@ -90,6 +100,7 @@ impl<U: UsageSinkTrait> ProviderGateway<U> {
             openrouter: Some(openrouter),
             claude_code: ClaudeCodeAdapter::default(),
             codex: CodexAdapter::default(),
+            gemini_cli: GeminiCliAdapter::default(),
             usage_sink,
             config,
         }
@@ -100,6 +111,7 @@ impl<U: UsageSinkTrait> ProviderGateway<U> {
             openrouter: None,
             claude_code,
             codex: CodexAdapter::default(),
+            gemini_cli: GeminiCliAdapter::default(),
             usage_sink,
             config: GatewayConfig::default(),
         }
@@ -115,6 +127,7 @@ impl<U: UsageSinkTrait> ProviderGateway<U> {
             openrouter: Some(openrouter),
             claude_code,
             codex: CodexAdapter::default(),
+            gemini_cli: GeminiCliAdapter::default(),
             usage_sink,
             config,
         }
@@ -125,6 +138,7 @@ impl<U: UsageSinkTrait> ProviderGateway<U> {
             openrouter: None,
             claude_code: ClaudeCodeAdapter::default(),
             codex,
+            gemini_cli: GeminiCliAdapter::default(),
             usage_sink,
             config: GatewayConfig::default(),
         }
@@ -141,6 +155,7 @@ impl<U: UsageSinkTrait> ProviderGateway<U> {
                 },
                 ChatModel::ClaudeCode(_) => self.claude_code.chat(&req).await,
                 ChatModel::Codex(_) => self.codex.chat(&req).await,
+                ChatModel::GeminiCli(_) => self.gemini_cli.chat(&req).await,
             };
             match result {
                 Ok(resp) => {

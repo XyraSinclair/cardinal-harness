@@ -91,6 +91,18 @@ seed, and model: **21/21 decisive-pair agreement at $0 marginal cost**
 [`notes/claudecode-vs-api-2026-08-06/RESULTS.md`](notes/claudecode-vs-api-2026-08-06/RESULTS.md)).
 `--model codex/<model>` routes through the Codex exec CLI the same way —
 smoke-verified only, no rail-fitness study yet.
+`--model gemini-cli/<model>` routes through Google's `gemini` CLI under a
+Google AI Pro (Google One) OAuth session, drawing the subscription's daily
+model-request allowance at $0 marginal cost; the CLI refreshes its own token,
+so the adapter carries no auth code. Point it at an operator-provisioned login
+with two env vars: `CARDINAL_GEMINI_CLI_BINARY` (the `gemini` executable) and
+`CARDINAL_GEMINI_CLI_HOME` (a directory used as the child's `HOME`, holding
+`.gemini/oauth_creds.json` for the subscription account). The CLI resolves the
+`-m` slug against its own model table: on gemini-cli 0.54.4 an AI Pro session
+serves `gemini-2.5-pro` natively and maps the flash family onto
+`gemini-3.5-flash`; the actually-served name is reported back in each response.
+Smoke-verified end to end (decisive pairs, both models, $0); no rail-fitness
+study yet.
 
 Real output (preserved with full evidence under
 [`artifacts/live/sort-demo-2026-07-02/`](artifacts/live/sort-demo-2026-07-02/)):
@@ -504,7 +516,7 @@ both require `OPENROUTER_API_KEY` and spend provider credits.
 | `rerank::sort` | List-in, list-out sorting convenience over the same engine |
 | `prompts` | Canonical pairwise ratio prompt and ratio ladder |
 | `cache` | SQLite-backed memoization for pairwise judgements |
-| `gateway` | OpenRouter client, pricing, usage, attribution; subscription adapters (`claude-code/<model>`, `codex/<model>`) |
+| `gateway` | OpenRouter client, pricing, usage, attribution; subscription adapters (`claude-code/<model>`, `codex/<model>`, `gemini-cli/<model>`) |
 | `packet` | Content-addressed judgment packets with byte-identical fusion |
 | `judgement_run` | The portable `cardinal.judgement-run.v1` atom: execute, persist, reload |
 | `landing` | ClickHouse landing for completed judgement runs |

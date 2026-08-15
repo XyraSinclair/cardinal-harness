@@ -106,6 +106,8 @@ pub enum ChatModel {
     ClaudeCode(String),
     /// Codex model, e.g. "gpt-5.6-sol".
     Codex(String),
+    /// Gemini CLI model, e.g. "gemini-2.5-pro".
+    GeminiCli(String),
 }
 
 impl ChatModel {
@@ -119,6 +121,8 @@ impl ChatModel {
             ChatModel::ClaudeCode(model_id.to_string())
         } else if let Some(model_id) = slug.strip_prefix("codex/") {
             ChatModel::Codex(model_id.to_string())
+        } else if let Some(model_id) = slug.strip_prefix("gemini-cli/") {
+            ChatModel::GeminiCli(model_id.to_string())
         } else {
             ChatModel::OpenRouter(slug)
         }
@@ -136,11 +140,16 @@ impl ChatModel {
         ChatModel::Codex(model_id.into())
     }
 
+    pub fn gemini_cli(model_id: impl Into<String>) -> Self {
+        ChatModel::GeminiCli(model_id.into())
+    }
+
     pub fn model_id(&self) -> &str {
         match self {
             ChatModel::OpenRouter(id) => id,
             ChatModel::ClaudeCode(id) => id,
             ChatModel::Codex(id) => id,
+            ChatModel::GeminiCli(id) => id,
         }
     }
 
@@ -149,6 +158,7 @@ impl ChatModel {
             ChatModel::OpenRouter(_) => "openrouter",
             ChatModel::ClaudeCode(_) => "claude-code",
             ChatModel::Codex(_) => "codex",
+            ChatModel::GeminiCli(_) => "gemini-cli",
         }
     }
 }
