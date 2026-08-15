@@ -17,7 +17,7 @@ Env: OPENROUTER_BASE_URL (local judges), CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS
 (/data/clickhouse-twitter-lab/bin/clickhouse client --port 19000) with
 JSONEachRow on stdin (no shell interpolation of data).
 """
-import argparse, json, os, subprocess, sys, time
+import argparse, datetime, json, os, shlex, subprocess, sys, time
 
 CARDINAL = os.path.expanduser("~/projects/llmsorting/target/release/cardinal")
 SSH = "/usr/bin/ssh"
@@ -47,7 +47,10 @@ def land(trace_path, corpus_lines, corpus_name, attr, seed, run_tag):
         else:
             err = ""
         rows.append({
-            "ts": d["timestamp_ms"] / 1000.0,
+            "ts": (datetime.datetime.fromtimestamp(
+                d["timestamp_ms"] / 1000.0, datetime.timezone.utc)
+                .strftime("%Y-%m-%d %H:%M:%S.")
+                + f'{d["timestamp_ms"] % 1000:03d}'),
             "run_tag": run_tag,
             "corpus": corpus_name,
             "model": d["model"],
@@ -72,10 +75,12 @@ def land(trace_path, corpus_lines, corpus_name, attr, seed, run_tag):
             "error": err,
         })
     payload = "\n".join(json.dumps(r, ensure_ascii=False) for r in rows).encode()
+    # ssh joins argv with spaces and the remote shell re-splits, so the
+    # multi-word query must be quoted for the remote side.
+    query = shlex.quote("INSERT INTO ratiometer.judgments FORMAT JSONEachRow")
     proc = subprocess.run(
-        [SSH, "colo2", "/data/clickhouse-twitter-lab/bin/clickhouse", "client",
-         "--port", "19000", "--query",
-         "INSERT INTO ratiometer.judgments FORMAT JSONEachRow"],
+        [SSH, "colo2",
+         f"/data/clickhouse-twitter-lab/bin/clickhouse client --port 19000 --query {query}"],
         input=payload, capture_output=True, timeout=120)
     if proc.returncode != 0:
         raise RuntimeError(f"land failed: {proc.stderr.decode()[:500]}")
