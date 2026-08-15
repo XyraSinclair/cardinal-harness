@@ -81,3 +81,22 @@ by all pairs).
 - Thinking-mode fitness unmeasured: does `enable_thinking:true` fix the case
   convention (at 300x the latency), and does `reasoning_effort:"low"` buy
   direction coherence at acceptable speed?
+
+## Health study: 40 Manifund projects by "existential seriousness" (2026-08-15)
+
+Live subjective-attribute workload (manifund.org /api/v0/projects, title+blurb),
+canonical_v2, budget 240, two independent seeds + one paraphrase run:
+
+- **Test-retest ρ = 0.966** (seed 1 vs seed 2, no cache, fully re-judged);
+  top-10 overlap 8/10, ranks 1-3 identical. ~52s per run (~4.6 cmp/s), $0.
+- Diagnostics per run: order flips 22-27%, order-residual 0.21-0.23 nats,
+  cyclic 11-13%, frustration 0.11-0.14 — moderate and sane for a soft
+  attribute (vs ratio_letter's 100% flips on this model).
+- Paraphrase probe "seriousness about reducing existential risk to humanity":
+  pairwise consistency +0.35 (engine calls it shaky); final-rank ρ vs the
+  main criterion ~0.78. Reads as construct ambiguity, not engine noise: the
+  model genuinely distinguishes existential *seriousness* (gravity of intent)
+  from x-risk *reduction* work — arguably correct behavior, but phrase the
+  criterion precisely when it matters.
+- Items unstable across seeds are mid-pack (Δrank ≤ 8 around ranks 7-33);
+  head and tail are rigid.
