@@ -9,7 +9,18 @@ dropped. Sessions: read this at start when work touches strategy, doctrine,
 or publication; update states in the same commit as the work that changes
 them.
 
-## OPEN (3 of 5)
+## OPEN (4 of 5)
+
+**Q6. Rename ratiometer -> llmsorting?** Raised by Xyra 2026-08-15
+("maybe"), three days after the 2026-08-12 operator lock that named the
+engine ratiometer (505e4ef; naming map in notes/north-star-ontology-2026-08-11.md).
+Session recommendation: keep the split — mechanism keeps its mechanism-name
+(ratiometer = ratiometric measurement), application carries the application-name
+(llmsorting.com = the sorting program hub, live 2026-08-15, experiments home
+in its repo). Full rename cost if chosen: second crates.io park in one week
+(cardinal-harness already parked), citation/CI churn, pairwiseratio.org copy
+sweep; GitHub redirects survive. Close by: Xyra confirms rename (then execute
+in one sweep) or affirms the split (then delete this item).
 
 **Q2. Stake reorder + external-contact stake #0.** 07-09 strategy findings:
 external-contact event as stake #0, habit loop above the map, 14K scale-up
