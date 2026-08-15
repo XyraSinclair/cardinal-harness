@@ -1,0 +1,1265 @@
+//! Setwise ratio elicitation with a cached entity prefix — the instrument-grid
+//! row "k-wise · ratio · point" (docs/FIRST_PRINCIPLES.md §2, currently ✗).
+//!
+//! Geometry: k ∈ {3,4} entities per call. The prompt is ordered for provider
+//! prompt caching: the system message and an `<entities>` block (entity texts
+//! in slots A..D) come FIRST and are byte-identical across the calls that
+//! share a subset+presentation; the ATTRIBUTE comes LAST. Swapping the
+//! attribute never touches the prefix, so with an OpenAI-family model the
+//! ≥1024-token prefix is served from the provider prompt cache on the second
+//! and third attribute of every presentation.
+//!
+//! The model answers, for pivot slot A, the ratio of every other slot to A:
+//! strict JSON `{"ratios":{"B":2.1,"C":0.5},"confidence":0.7}` (r>0; r>1 =
+//! more of the attribute than A) or `{"refused":true}`. A malformed answer is
+//! a recorded failure, never a default. Each call lowers to k−1 INDEPENDENT
+//! log-ratio observations (slot vs pivot) entering the production IRLS engine
+//! exactly like canonical_v2 point judgements: `Observation::new(..)` with
+//! unit precision (stated confidence is not calibrated). Implied non-pivot
+//! pairs are NOT added (they are linear combinations of the pivot pairs);
+//! the shared-call correlation caveat is reported alongside the results.
+//!
+//! Counterbalancing: every subset is asked in ≥2 presentations with a rotated
+//! pivot and permuted slot order; the pivot-rotation sign-flip rate is the
+//! position-bias readout.
+//!
+//! Baseline: the canonical pairwise path (`sort_documents`, canonical_v2,
+//! default budget) over the same items+attribute, same model, same seed.
+//!
+//! Dry run ($0):  cargo run --release --example setwise_cached -- --offline
+//! Live (capped): xyra-vault run repos/documents/openpriors/env/env -- \
+//!     cargo run --release --example setwise_cached
+
+use std::collections::{BTreeMap, HashMap, HashSet};
+use std::io::Write as _;
+use std::path::PathBuf;
+use std::sync::{Arc, Mutex};
+
+use clap::Parser;
+use rand::rngs::StdRng;
+use rand::seq::SliceRandom;
+use rand::{Rng, SeedableRng};
+use serde::{Deserialize, Serialize};
+
+use ratiometer::gateway::{
+    Attribution, ChatGateway, ChatModel, ChatRequest, ChatResponse, FinishReason, Message,
+    NoopUsageSink, ProviderError, ProviderGateway,
+};
+use ratiometer::rating_engine::{
+    AttributeParams, EngineSpec, Observation, RaterParams, RatingEngine,
+};
+use ratiometer::rerank::sort::{sort_documents, SortOptions, SortedTexts};
+use ratiometer::rerank::types::RerankDocument;
+use ratiometer::rerank::{JsonlTraceSink, RerankExecution, RerankRunOptions};
+
+const SLOT_LETTERS: [char; 8] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+const SETWISE_MAX_OUTPUT_TOKENS: u32 = 400;
+const SYNTHETIC_NOISE_SIGMA: f64 = 0.35;
+/// Synthetic pricing (per-token nanodollars) so the offline path exercises
+/// the cost accounting: gpt-4.1-mini list price $0.40/M in, $1.60/M out.
+const SYNTH_ND_PER_INPUT_TOKEN: i64 = 400;
+const SYNTH_ND_PER_OUTPUT_TOKEN: i64 = 1600;
+
+/// Fixed system message: byte-identical across every setwise call.
+const SETWISE_SYSTEM: &str = r#"You are an expert subjective evaluator. You compare a small set of entities across an arbitrary attribute. Entity A is the reference. For every other entity slot you feel not only whether it has MORE or LESS of the attribute than A, but roughly how many times more or less, as a positive ratio: 2.0 means twice as much of the attribute as A, 0.5 means half as much.
+
+You first read the entities; the attribute is given at the end. Output only valid JSON `{"ratios": {"B": r, "C": r, ...}, "confidence": [0,1]}` with exactly one entry per non-reference slot, each r > 0. Out of principle, we also give models the right to refuse `{"refused": true}` (e.g. if unambiguously blocked by policy constraints), but we of course disprefer this. If you are merely very uncertain, set a low confidence score.
+Example:
+{"ratios": {"B": 2.1, "C": 0.45}, "confidence": 0.7}"#;
+
+#[derive(Parser, Debug)]
+#[command(
+    name = "setwise_cached",
+    about = "Setwise ratio elicitation with a cached entity prefix vs the canonical pairwise path"
+)]
+struct Args {
+    /// Deterministic synthetic judge; no network, $0.
+    #[arg(long)]
+    offline: bool,
+    /// OpenRouter model slug (OpenAI-family for automatic prefix caching).
+    #[arg(long, default_value = "openai/gpt-4.1-mini")]
+    model: String,
+    /// Entities drawn from the corpus.
+    #[arg(long, default_value_t = 8)]
+    n: usize,
+    /// Comma-separated set sizes.
+    #[arg(long, default_value = "3,4")]
+    ks: String,
+    /// Comma-separated attribute names (rubric file data/manifund/rubrics/<name>.md is used when present).
+    #[arg(
+        long,
+        default_value = "impact_per_dollar,theory_of_change,team_evidence"
+    )]
+    attrs: String,
+    /// Every unordered entity pair must co-occur in at least this many subsets.
+    #[arg(long, default_value_t = 2)]
+    min_pair_cover: usize,
+    /// Seed for entity selection, subset drawing, presentations, and the pairwise planner.
+    #[arg(long, default_value_t = 17)]
+    seed: u64,
+    /// Truncate each entity text to this many chars (k=3 must clear the ~1024-token cache floor).
+    #[arg(long, default_value_t = 1600)]
+    entity_chars: usize,
+    /// Presentations per subset (pivot rotated, slot order permuted).
+    #[arg(long, default_value_t = 2)]
+    presentations: usize,
+    /// Corpus path (array of {id,text}).
+    #[arg(long, default_value = "data/manifund/items/full.json")]
+    corpus: String,
+    /// Output directory for report.json / trace.jsonl / pairwise_trace.jsonl.
+    #[arg(long, default_value = "artifacts/live/setwise-cached-2026-08-15")]
+    out_dir: PathBuf,
+    /// Hard live-spend cap (USD) across all calls; the run aborts above it.
+    #[arg(long, default_value_t = 3.0)]
+    spend_cap_usd: f64,
+    /// Skip the pairwise baseline arm.
+    #[arg(long)]
+    skip_pairwise: bool,
+}
+
+// ---------------------------------------------------------------------
+//  Corpus + prompt rendering
+// ---------------------------------------------------------------------
+
+#[derive(Deserialize)]
+struct CorpusItem {
+    id: String,
+    text: String,
+}
+
+/// Same escaping as `src/prompts.rs`: the judge sees rendered bytes.
+fn escape_xml_chars(s: &str) -> String {
+    s.replace('&', "&amp;")
+        .replace('<', "&lt;")
+        .replace('>', "&gt;")
+        .replace('"', "&quot;")
+        .replace('\'', "&apos;")
+}
+
+#[derive(Clone)]
+struct Entity {
+    id: String,
+    /// Truncated, trimmed, unescaped: what the pairwise path receives (its
+    /// renderer escapes once).
+    raw: String,
+    /// `escape_xml_chars(raw)`: the exact bytes the setwise prompt places in
+    /// its entities block, byte-identical to what the pairwise renderer
+    /// produces for the same item.
+    escaped: String,
+}
+
+struct AttributeSpec {
+    name: String,
+    /// Rubric text (or the plain name), unescaped.
+    text: String,
+    rubric_source: String,
+}
+
+/// The cache-stable prefix: entities block in slot order. Byte-identical
+/// across the calls sharing one subset+presentation.
+fn entities_block(entities: &[Entity], order: &[usize]) -> String {
+    let mut block = String::from("<entities>\n");
+    for (slot, &idx) in order.iter().enumerate() {
+        let letter = SLOT_LETTERS[slot];
+        block.push_str(&format!(
+            "<entity_{letter}>\n{}\n</entity_{letter}>\n",
+            entities[idx].escaped
+        ));
+    }
+    block.push_str("</entities>");
+    block
+}
+
+/// The attribute tail appended after the prefix. Swapping the attribute
+/// never touches the prefix bytes.
+fn attribute_tail(attr: &AttributeSpec, k: usize) -> String {
+    let non_pivot: Vec<String> = (1..k).map(|s| SLOT_LETTERS[s].to_string()).collect();
+    format!(
+        "\n\nCompare the entities by <attribute_name>: {} </attribute_name>.\n<full_attribute_text>\n{}\n</full_attribute_text>\n\nFor each of the slots {}, give the ratio of its level of the attribute to entity A's level. Return a JSON object.\njson:",
+        escape_xml_chars(&attr.name),
+        escape_xml_chars(attr.text.trim()),
+        non_pivot.join(", ")
+    )
+}
+
+fn prompt_cache_key_for_prefix(prefix: &str) -> String {
+    let hash = blake3::hash(prefix.as_bytes()).to_hex();
+    format!("setwise:{}", &hash.as_str()[..16])
+}
+
+// ---------------------------------------------------------------------
+//  Design: subsets + presentations
+// ---------------------------------------------------------------------
+
+struct SubsetPlan {
+    subset: Vec<usize>,
+    /// Each presentation is a slot order over `subset`; order[0] is the pivot.
+    presentations: Vec<Vec<usize>>,
+}
+
+/// Draw distinct random k-subsets until every unordered pair co-occurs in at
+/// least `min_pair_cover` subsets, then attach `presentations` rotated-pivot
+/// slot orders to each.
+fn draw_design(
+    n: usize,
+    k: usize,
+    min_pair_cover: usize,
+    presentations: usize,
+    rng: &mut StdRng,
+) -> Vec<SubsetPlan> {
+    let mut cover: HashMap<(usize, usize), usize> = HashMap::new();
+    for i in 0..n {
+        for j in (i + 1)..n {
+            cover.insert((i, j), 0);
+        }
+    }
+    let mut seen: HashSet<Vec<usize>> = HashSet::new();
+    let mut subsets: Vec<Vec<usize>> = Vec::new();
+    let mut attempts = 0usize;
+    while cover.values().any(|&c| c < min_pair_cover) {
+        attempts += 1;
+        assert!(
+            attempts <= 100_000,
+            "pair coverage unreachable: n={n} k={k} min_pair_cover={min_pair_cover}"
+        );
+        let mut pool: Vec<usize> = (0..n).collect();
+        pool.shuffle(rng);
+        let mut subset: Vec<usize> = pool[..k].to_vec();
+        subset.sort_unstable();
+        if !seen.insert(subset.clone()) {
+            continue;
+        }
+        for a in 0..k {
+            for b in (a + 1)..k {
+                let key = (subset[a].min(subset[b]), subset[a].max(subset[b]));
+                *cover.get_mut(&key).expect("all pairs pre-seeded") += 1;
+            }
+        }
+        subsets.push(subset);
+    }
+    subsets
+        .into_iter()
+        .map(|subset| {
+            let mut base = subset.clone();
+            base.shuffle(rng);
+            let presentations = (0..presentations)
+                .map(|p| {
+                    // Rotate the pivot; permute the tail so slot order also moves.
+                    let mut order = base.clone();
+                    let shift = p % order.len();
+                    order.rotate_left(shift);
+                    if p > 0 {
+                        order[1..].reverse();
+                    }
+                    order
+                })
+                .collect();
+            SubsetPlan {
+                subset,
+                presentations,
+            }
+        })
+        .collect()
+}
+
+// ---------------------------------------------------------------------
+//  Strict setwise answer parse
+// ---------------------------------------------------------------------
+
+#[derive(Deserialize)]
+struct SetwiseAnswerJson {
+    ratios: Option<BTreeMap<String, f64>>,
+    confidence: Option<f64>,
+    refused: Option<bool>,
+}
+
+enum SetwiseAnswer {
+    Ratios {
+        ratios: BTreeMap<String, f64>,
+        confidence: f64,
+    },
+    Refused,
+}
+
+/// Extract the first balanced JSON object (same tolerance as the canonical
+/// parser in `src/rerank/comparison.rs`), then parse strictly: exactly the
+/// expected non-pivot slots, every ratio finite and > 0.
+fn parse_setwise(raw: &str, expected_slots: &[String]) -> Result<SetwiseAnswer, String> {
+    let json_str = extract_json(raw).ok_or_else(|| "no JSON object in response".to_string())?;
+    let parsed: SetwiseAnswerJson =
+        serde_json::from_str(json_str).map_err(|e| format!("json parse: {e}"))?;
+    if parsed.refused.unwrap_or(false) {
+        return Ok(SetwiseAnswer::Refused);
+    }
+    let ratios = parsed
+        .ratios
+        .ok_or_else(|| "missing 'ratios'".to_string())?;
+    let expected: HashSet<&str> = expected_slots.iter().map(String::as_str).collect();
+    let got: HashSet<&str> = ratios.keys().map(String::as_str).collect();
+    if got != expected {
+        return Err(format!(
+            "ratio slots mismatch: expected {expected_slots:?}, got {:?}",
+            ratios.keys().collect::<Vec<_>>()
+        ));
+    }
+    for (slot, r) in &ratios {
+        if !r.is_finite() || *r <= 0.0 {
+            return Err(format!(
+                "ratio for {slot} out of range (must be finite > 0): {r}"
+            ));
+        }
+    }
+    let confidence = parsed.confidence.unwrap_or(1.0).clamp(0.0, 1.0);
+    Ok(SetwiseAnswer::Ratios { ratios, confidence })
+}
+
+fn extract_json(raw: &str) -> Option<&str> {
+    let trimmed = raw.trim();
+    let start = trimmed.find('{')?;
+    let remainder = &trimmed[start..];
+    let mut depth = 0i32;
+    for (i, c) in remainder.char_indices() {
+        match c {
+            '{' => depth += 1,
+            '}' => {
+                depth -= 1;
+                if depth == 0 {
+                    return Some(&remainder[..=i]);
+                }
+            }
+            _ => {}
+        }
+    }
+    None
+}
+
+// ---------------------------------------------------------------------
+//  Deterministic synthetic judge (offline arm)
+// ---------------------------------------------------------------------
+
+/// Answers both the setwise prompt and canonical_v2 from a shared latent
+/// world: z per (attribute, entity), percept noise lognormal with
+/// σ = SYNTHETIC_NOISE_SIGMA, deterministic per exact prompt bytes.
+struct SyntheticJudge {
+    /// (escaped attribute text, per-entity latents in nats).
+    attrs: Vec<(String, Vec<f64>)>,
+    /// escaped entity bytes -> entity index.
+    text_to_idx: HashMap<String, usize>,
+    seed: u64,
+    /// Simulated provider prompt cache, keyed on exact prefix bytes.
+    prefix_cache: Mutex<HashSet<String>>,
+}
+
+impl SyntheticJudge {
+    fn noise(&self, parts: &[&str]) -> f64 {
+        let mut hasher = blake3::Hasher::new();
+        hasher.update(&self.seed.to_le_bytes());
+        for p in parts {
+            hasher.update(&(p.len() as u64).to_le_bytes());
+            hasher.update(p.as_bytes());
+        }
+        let bytes = hasher.finalize();
+        let b = bytes.as_bytes();
+        let u1 = (u64::from_le_bytes(b[0..8].try_into().expect("8 bytes")) >> 11) as f64
+            / (1u64 << 53) as f64;
+        let u2 = (u64::from_le_bytes(b[8..16].try_into().expect("8 bytes")) >> 11) as f64
+            / (1u64 << 53) as f64;
+        let u1 = u1.max(1e-12);
+        SYNTHETIC_NOISE_SIGMA * (-2.0 * u1.ln()).sqrt() * (2.0 * std::f64::consts::PI * u2).cos()
+    }
+
+    fn find_attr(&self, user: &str) -> Result<&[f64], ProviderError> {
+        self.attrs
+            .iter()
+            .find(|(text, _)| user.contains(text.as_str()))
+            .map(|(_, z)| z.as_slice())
+            .ok_or_else(|| ProviderError::invalid_request("synthetic judge: unknown attribute"))
+    }
+
+    fn entity_between(&self, user: &str, open: &str, close: &str) -> Result<usize, ProviderError> {
+        let start = user
+            .find(open)
+            .ok_or_else(|| ProviderError::invalid_request(format!("missing {open}")))?
+            + open.len();
+        let end = user[start..]
+            .find(close)
+            .ok_or_else(|| ProviderError::invalid_request(format!("missing {close}")))?
+            + start;
+        let text = user[start..end].trim();
+        self.text_to_idx
+            .get(text)
+            .copied()
+            .ok_or_else(|| ProviderError::invalid_request("synthetic judge: unknown entity text"))
+    }
+}
+
+#[async_trait::async_trait]
+impl ChatGateway for SyntheticJudge {
+    async fn chat(&self, req: ChatRequest) -> Result<ChatResponse, ProviderError> {
+        let system = req
+            .messages
+            .iter()
+            .find(|m| matches!(m.role, ratiometer::gateway::Role::System))
+            .map(|m| m.content.clone())
+            .unwrap_or_default();
+        let user = req
+            .messages
+            .iter()
+            .filter(|m| matches!(m.role, ratiometer::gateway::Role::User))
+            .map(|m| m.content.as_str())
+            .collect::<Vec<_>>()
+            .join("\n");
+        let z = self.find_attr(&user)?;
+
+        let (content, cache_read, cache_write) = if user.contains("<entities>") {
+            // Setwise prompt: pivot is slot A; answer every present non-pivot slot.
+            let pivot = self.entity_between(&user, "<entity_A>\n", "\n</entity_A>")?;
+            let mut ratios = serde_json::Map::new();
+            for letter in SLOT_LETTERS.iter().skip(1) {
+                let open = format!("<entity_{letter}>\n");
+                let close = format!("\n</entity_{letter}>");
+                if !user.contains(open.as_str()) {
+                    break;
+                }
+                let idx = self.entity_between(&user, &open, &close)?;
+                let slot = letter.to_string();
+                let r = (z[idx] - z[pivot] + self.noise(&[&user, &slot])).exp();
+                ratios.insert(slot, serde_json::Value::from((r * 1000.0).round() / 1000.0));
+            }
+            let content = serde_json::json!({"ratios": ratios, "confidence": 0.8}).to_string();
+            // Simulated provider prompt cache over the exact prefix bytes
+            // (system + entities block): first sight writes, repeats read.
+            let end = user.find("</entities>").expect("checked above") + "</entities>".len();
+            let prefix = format!("{system}\n{}", &user[..end]);
+            let prefix_tokens = (prefix.len() / 4) as u32;
+            let mut cache = self.prefix_cache.lock().expect("prefix cache lock");
+            if cache.insert(prefix) {
+                (content, Some(0), Some(prefix_tokens))
+            } else {
+                (content, Some(prefix_tokens), Some(0))
+            }
+        } else {
+            // canonical_v2 pairwise prompt.
+            let a = self.entity_between(&user, "<entity_A_context>\n", "\n</entity_A_context>")?;
+            let b = self.entity_between(&user, "<entity_B_context>\n", "\n</entity_B_context>")?;
+            let delta = z[a] - z[b] + self.noise(&[&user]);
+            let (higher, ratio) = if delta >= 0.0 {
+                ("A", delta)
+            } else {
+                ("B", -delta)
+            };
+            let ratio = ratio.exp().clamp(1.0, 26.0);
+            let content = serde_json::json!({
+                "higher_ranked": higher,
+                "ratio": (ratio * 100.0).round() / 100.0,
+                "confidence": 0.8,
+            })
+            .to_string();
+            (content, None, None)
+        };
+
+        let input_tokens = ((system.len() + user.len()) / 4) as u32;
+        let output_tokens = (content.len() / 4) as u32;
+        let uncached_input = input_tokens.saturating_sub(cache_read.unwrap_or(0));
+        let cost = i64::from(uncached_input) * SYNTH_ND_PER_INPUT_TOKEN
+            + i64::from(cache_read.unwrap_or(0)) * SYNTH_ND_PER_INPUT_TOKEN / 4
+            + i64::from(output_tokens) * SYNTH_ND_PER_OUTPUT_TOKEN;
+        Ok(ChatResponse {
+            provider_call_id: None,
+            provider_request_id: None,
+            served_model: Some("synthetic/offline-judge".to_string()),
+            content,
+            reasoning: None,
+            reasoning_tokens: None,
+            input_tokens,
+            output_tokens,
+            cost_nanodollars: cost,
+            cost_is_estimate: true,
+            upstream_cost_nanodollars: None,
+            latency: std::time::Duration::from_millis(0),
+            finish_reason: FinishReason::Stop,
+            output_logprobs: None,
+            cache_read_tokens: cache_read,
+            cache_write_tokens: cache_write,
+        })
+    }
+}
+
+// ---------------------------------------------------------------------
+//  Rank metrics (n is tiny; direct implementations)
+// ---------------------------------------------------------------------
+
+fn ranks(values: &[f64]) -> Vec<f64> {
+    let n = values.len();
+    let mut idx: Vec<usize> = (0..n).collect();
+    idx.sort_by(|&a, &b| values[a].partial_cmp(&values[b]).expect("finite latents"));
+    let mut out = vec![0.0; n];
+    let mut i = 0;
+    while i < n {
+        let mut j = i;
+        while j + 1 < n && values[idx[j + 1]] == values[idx[i]] {
+            j += 1;
+        }
+        let avg = (i + j) as f64 / 2.0 + 1.0;
+        for &item in &idx[i..=j] {
+            out[item] = avg;
+        }
+        i = j + 1;
+    }
+    out
+}
+
+fn spearman_rho(a: &[f64], b: &[f64]) -> f64 {
+    let (ra, rb) = (ranks(a), ranks(b));
+    let n = a.len() as f64;
+    let (ma, mb) = (ra.iter().sum::<f64>() / n, rb.iter().sum::<f64>() / n);
+    let cov: f64 = ra.iter().zip(&rb).map(|(x, y)| (x - ma) * (y - mb)).sum();
+    let va: f64 = ra.iter().map(|x| (x - ma).powi(2)).sum();
+    let vb: f64 = rb.iter().map(|y| (y - mb).powi(2)).sum();
+    cov / (va.sqrt() * vb.sqrt()).max(f64::MIN_POSITIVE)
+}
+
+fn kendall_tau(a: &[f64], b: &[f64]) -> f64 {
+    let n = a.len();
+    let (mut c, mut d) = (0i64, 0i64);
+    for i in 0..n {
+        for j in (i + 1)..n {
+            let s = (a[i] - a[j]) * (b[i] - b[j]);
+            if s > 0.0 {
+                c += 1;
+            } else if s < 0.0 {
+                d += 1;
+            }
+        }
+    }
+    (c - d) as f64 / (c + d).max(1) as f64
+}
+
+fn top_indices(values: &[f64], m: usize) -> Vec<usize> {
+    let mut idx: Vec<usize> = (0..values.len()).collect();
+    idx.sort_by(|&x, &y| values[y].partial_cmp(&values[x]).expect("finite latents"));
+    idx.truncate(m);
+    idx
+}
+
+// ---------------------------------------------------------------------
+//  Report shapes
+// ---------------------------------------------------------------------
+
+#[derive(Serialize)]
+struct TraceRow {
+    call_index: usize,
+    k: usize,
+    subset_ids: Vec<String>,
+    slot_order_ids: Vec<String>,
+    pivot_id: String,
+    attribute: String,
+    prompt_cache_key: String,
+    prefix_bytes: usize,
+    status: String,
+    error: Option<String>,
+    raw_response: Option<String>,
+    parsed_ratios: Option<BTreeMap<String, f64>>,
+    confidence: Option<f64>,
+    input_tokens: u32,
+    output_tokens: u32,
+    cache_read_tokens: Option<u32>,
+    cache_write_tokens: Option<u32>,
+    cost_nanodollars: i64,
+    latency_ms: u128,
+}
+
+#[derive(Serialize, Default, Clone)]
+struct UsageTotals {
+    calls: usize,
+    prompt_tokens: u64,
+    completion_tokens: u64,
+    cache_read_tokens: u64,
+    cache_write_tokens: u64,
+    nanodollars: i64,
+}
+
+#[derive(Serialize)]
+struct CacheEvidence {
+    /// Calls for which the provider reported cache fields at all.
+    calls_with_cache_fields_reported: usize,
+    calls_with_cache_read_gt0: usize,
+    /// Mean of cache_read_tokens/input_tokens over calls reporting the field.
+    mean_cached_fraction: Option<f64>,
+}
+
+#[derive(Serialize)]
+struct ItemLatent {
+    id: String,
+    mean: f64,
+    std: f64,
+}
+
+#[derive(Serialize)]
+struct PivotRotation {
+    pairs_with_both_orientations: usize,
+    sign_flips: usize,
+    mean_abs_residual_nats: Option<f64>,
+}
+
+#[derive(Serialize)]
+struct SetwiseArm {
+    k: usize,
+    attribute: String,
+    calls: usize,
+    calls_ok: usize,
+    calls_refused: usize,
+    calls_malformed: usize,
+    calls_errored: usize,
+    observations: usize,
+    usage: UsageTotals,
+    cache: CacheEvidence,
+    pivot_rotation: PivotRotation,
+    latents: Vec<ItemLatent>,
+}
+
+#[derive(Serialize)]
+struct PairwiseArm {
+    attribute: String,
+    comparisons_attempted: usize,
+    comparisons_used: usize,
+    comparisons_refused: usize,
+    comparison_budget: usize,
+    position_flips: usize,
+    pairs_counterbalanced: usize,
+    provider_input_tokens: u32,
+    provider_output_tokens: u32,
+    nanodollars: i64,
+    /// The sort path's RerankMeta does not surface provider cache token
+    /// counts; reported as null rather than zero.
+    cache_read_tokens: Option<u64>,
+    latents: Vec<ItemLatent>,
+}
+
+#[derive(Serialize)]
+struct ArmComparison {
+    k: usize,
+    attribute: String,
+    spearman_rho: f64,
+    kendall_tau: f64,
+    top1_agree: bool,
+    top3_overlap: f64,
+    setwise_pairwise_equiv_obs_per_dollar: Option<f64>,
+    pairwise_obs_per_dollar: Option<f64>,
+}
+
+#[derive(Serialize)]
+struct GroundTruthCheck {
+    k: usize,
+    attribute: String,
+    rho_setwise_vs_truth: f64,
+    rho_pairwise_vs_truth: Option<f64>,
+}
+
+#[derive(Serialize)]
+struct AttrReport {
+    name: String,
+    rubric_source: String,
+    rubric_chars: usize,
+}
+
+#[derive(Serialize)]
+struct ExampleCall {
+    system: String,
+    user: String,
+    prompt_cache_key: String,
+    prefix_bytes: usize,
+}
+
+#[derive(Serialize)]
+struct Report {
+    generated_at: String,
+    offline: bool,
+    model: String,
+    seed: u64,
+    n: usize,
+    ks: Vec<usize>,
+    entity_chars: usize,
+    min_pair_cover: usize,
+    presentations_per_subset: usize,
+    spend_cap_usd: f64,
+    corpus: String,
+    attributes: Vec<AttrReport>,
+    entity_ids: Vec<String>,
+    engine_spec: EngineSpec,
+    example_call: Option<ExampleCall>,
+    subsets_per_k: BTreeMap<usize, usize>,
+    setwise: Vec<SetwiseArm>,
+    pairwise: Vec<PairwiseArm>,
+    comparisons: Vec<ArmComparison>,
+    offline_ground_truth: Vec<GroundTruthCheck>,
+    total_cost_nanodollars: i64,
+    caveats: Vec<String>,
+}
+
+// ---------------------------------------------------------------------
+//  Main
+// ---------------------------------------------------------------------
+
+struct SpendMeter {
+    cap_nanodollars: i64,
+    spent_nanodollars: i64,
+    live: bool,
+}
+
+impl SpendMeter {
+    fn add(&mut self, nanodollars: i64) -> Result<(), String> {
+        self.spent_nanodollars += nanodollars;
+        if self.live && self.spent_nanodollars > self.cap_nanodollars {
+            return Err(format!(
+                "spend cap exceeded: ${:.4} > ${:.2} — aborting",
+                self.spent_nanodollars as f64 / 1e9,
+                self.cap_nanodollars as f64 / 1e9
+            ));
+        }
+        Ok(())
+    }
+}
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let args = Args::parse();
+    let ks: Vec<usize> = args
+        .ks
+        .split(',')
+        .map(|s| s.trim().parse::<usize>())
+        .collect::<Result<_, _>>()?;
+    for &k in &ks {
+        assert!(
+            (2..=args.n).contains(&k) && k < SLOT_LETTERS.len(),
+            "k must be in 2..=n and fit the slot alphabet"
+        );
+    }
+    std::fs::create_dir_all(&args.out_dir)?;
+
+    // --- corpus: seeded shuffle over items long enough to fill entity_chars.
+    let corpus_raw = std::fs::read_to_string(&args.corpus)?;
+    let corpus: Vec<CorpusItem> = serde_json::from_str(&corpus_raw)?;
+    let mut eligible: Vec<&CorpusItem> = corpus
+        .iter()
+        .filter(|item| item.text.trim().chars().count() >= args.entity_chars)
+        .collect();
+    let mut rng = StdRng::seed_from_u64(args.seed);
+    eligible.shuffle(&mut rng);
+    assert!(
+        eligible.len() >= args.n,
+        "corpus has too few items of at least {} chars",
+        args.entity_chars
+    );
+    let entities: Vec<Entity> = eligible[..args.n]
+        .iter()
+        .map(|item| {
+            let truncated: String = item.text.trim().chars().take(args.entity_chars).collect();
+            let raw = truncated.trim().to_string();
+            Entity {
+                id: item.id.clone(),
+                escaped: escape_xml_chars(&raw),
+                raw,
+            }
+        })
+        .collect();
+
+    // --- attributes: rubric file when present, else the plain name.
+    let attrs: Vec<AttributeSpec> = args
+        .attrs
+        .split(',')
+        .map(|name| {
+            let name = name.trim().to_string();
+            let rubric_path = format!("data/manifund/rubrics/{name}.md");
+            match std::fs::read_to_string(&rubric_path) {
+                Ok(text) => AttributeSpec {
+                    text: text.trim().to_string(),
+                    rubric_source: rubric_path,
+                    name,
+                },
+                Err(_) => AttributeSpec {
+                    text: name.clone(),
+                    rubric_source: "plain attribute name (no rubric file)".to_string(),
+                    name,
+                },
+            }
+        })
+        .collect();
+
+    // --- gateway: live OpenRouter or the deterministic synthetic judge.
+    let mut truth: Vec<(String, Vec<f64>)> = Vec::new();
+    let gateway: Arc<dyn ChatGateway> = if args.offline {
+        let mut text_to_idx = HashMap::new();
+        for (idx, entity) in entities.iter().enumerate() {
+            text_to_idx.insert(entity.escaped.clone(), idx);
+        }
+        let mut judge_attrs = Vec::new();
+        for (a_idx, attr) in attrs.iter().enumerate() {
+            let mut zrng = StdRng::seed_from_u64(args.seed ^ (0x5e7_0000 + a_idx as u64));
+            let z: Vec<f64> = (0..args.n).map(|_| zrng.gen_range(0.0..2.5)).collect();
+            truth.push((attr.name.clone(), z.clone()));
+            judge_attrs.push((escape_xml_chars(attr.text.trim()), z));
+        }
+        Arc::new(SyntheticJudge {
+            attrs: judge_attrs,
+            text_to_idx,
+            seed: args.seed,
+            prefix_cache: Mutex::new(HashSet::new()),
+        })
+    } else {
+        Arc::new(ProviderGateway::from_env(Arc::new(NoopUsageSink))?)
+    };
+
+    let mut meter = SpendMeter {
+        cap_nanodollars: (args.spend_cap_usd * 1e9) as i64,
+        spent_nanodollars: 0,
+        live: !args.offline,
+    };
+
+    let trace_path = args.out_dir.join("trace.jsonl");
+    let mut trace = std::io::BufWriter::new(std::fs::File::create(&trace_path)?);
+    let attribution = Attribution::new("ratiometer::example::setwise_cached");
+
+    // --- setwise arm ------------------------------------------------------
+    // Per (k, attribute): observations, usage, per-pair oriented means for
+    // the pivot-rotation readout.
+    type PairMeans = HashMap<(usize, usize), (Vec<f64>, Vec<f64>)>;
+    let mut arm_obs: BTreeMap<(usize, String), Vec<Observation>> = BTreeMap::new();
+    let mut arm_usage: BTreeMap<(usize, String), UsageTotals> = BTreeMap::new();
+    let mut arm_counts: BTreeMap<(usize, String), (usize, usize, usize, usize)> = BTreeMap::new();
+    let mut arm_cache: BTreeMap<(usize, String), (usize, usize, f64)> = BTreeMap::new();
+    let mut arm_pairs: BTreeMap<(usize, String), PairMeans> = BTreeMap::new();
+    let mut subsets_per_k: BTreeMap<usize, usize> = BTreeMap::new();
+    let mut example_call: Option<ExampleCall> = None;
+    let mut call_index = 0usize;
+
+    for &k in &ks {
+        let mut design_rng = StdRng::seed_from_u64(args.seed ^ (0xde516_u64 << 8) ^ k as u64);
+        let design = draw_design(
+            args.n,
+            k,
+            args.min_pair_cover,
+            args.presentations,
+            &mut design_rng,
+        );
+        subsets_per_k.insert(k, design.len());
+        eprintln!(
+            "k={k}: {} subsets x {} presentations x {} attributes = {} calls",
+            design.len(),
+            args.presentations,
+            attrs.len(),
+            design.len() * args.presentations * attrs.len()
+        );
+        for plan in &design {
+            for order in &plan.presentations {
+                let block = entities_block(&entities, order);
+                let prefix = format!("{SETWISE_SYSTEM}\n{block}");
+                let cache_key = prompt_cache_key_for_prefix(&prefix);
+                let expected_slots: Vec<String> =
+                    (1..k).map(|s| SLOT_LETTERS[s].to_string()).collect();
+                for attr in &attrs {
+                    let user = format!("{block}{}", attribute_tail(attr, k));
+                    let mut request = ChatRequest::new(
+                        ChatModel::parse(args.model.clone()),
+                        vec![Message::system(SETWISE_SYSTEM), Message::user(&user)],
+                        attribution.clone(),
+                    )
+                    .max_tokens(SETWISE_MAX_OUTPUT_TOKENS)
+                    .json();
+                    request.prompt_cache_key = Some(cache_key.clone());
+
+                    if example_call.is_none() {
+                        example_call = Some(ExampleCall {
+                            system: SETWISE_SYSTEM.to_string(),
+                            user: user.clone(),
+                            prompt_cache_key: cache_key.clone(),
+                            prefix_bytes: prefix.len(),
+                        });
+                    }
+
+                    let key = (k, attr.name.clone());
+                    let usage = arm_usage.entry(key.clone()).or_default();
+                    let counts = arm_counts.entry(key.clone()).or_default();
+                    let cache_stats = arm_cache.entry(key.clone()).or_insert((0, 0, 0.0));
+                    usage.calls += 1;
+
+                    let mut row = TraceRow {
+                        call_index,
+                        k,
+                        subset_ids: plan
+                            .subset
+                            .iter()
+                            .map(|&i| entities[i].id.clone())
+                            .collect(),
+                        slot_order_ids: order.iter().map(|&i| entities[i].id.clone()).collect(),
+                        pivot_id: entities[order[0]].id.clone(),
+                        attribute: attr.name.clone(),
+                        prompt_cache_key: cache_key.clone(),
+                        prefix_bytes: prefix.len(),
+                        status: String::new(),
+                        error: None,
+                        raw_response: None,
+                        parsed_ratios: None,
+                        confidence: None,
+                        input_tokens: 0,
+                        output_tokens: 0,
+                        cache_read_tokens: None,
+                        cache_write_tokens: None,
+                        cost_nanodollars: 0,
+                        latency_ms: 0,
+                    };
+                    call_index += 1;
+
+                    match gateway.chat(request).await {
+                        Ok(response) => {
+                            row.input_tokens = response.input_tokens;
+                            row.output_tokens = response.output_tokens;
+                            row.cache_read_tokens = response.cache_read_tokens;
+                            row.cache_write_tokens = response.cache_write_tokens;
+                            row.cost_nanodollars = response.cost_nanodollars;
+                            row.latency_ms = response.latency.as_millis();
+                            row.raw_response = Some(response.content.clone());
+                            usage.prompt_tokens += u64::from(response.input_tokens);
+                            usage.completion_tokens += u64::from(response.output_tokens);
+                            usage.cache_read_tokens +=
+                                u64::from(response.cache_read_tokens.unwrap_or(0));
+                            usage.cache_write_tokens +=
+                                u64::from(response.cache_write_tokens.unwrap_or(0));
+                            usage.nanodollars += response.cost_nanodollars;
+                            if let Some(read) = response.cache_read_tokens {
+                                cache_stats.0 += 1;
+                                if read > 0 {
+                                    cache_stats.1 += 1;
+                                }
+                                if response.input_tokens > 0 {
+                                    cache_stats.2 +=
+                                        f64::from(read) / f64::from(response.input_tokens);
+                                }
+                            }
+                            meter.add(response.cost_nanodollars)?;
+                            match parse_setwise(&response.content, &expected_slots) {
+                                Ok(SetwiseAnswer::Ratios { ratios, confidence }) => {
+                                    row.status = "ok".to_string();
+                                    row.confidence = Some(confidence);
+                                    row.parsed_ratios = Some(ratios.clone());
+                                    counts.0 += 1;
+                                    let pivot = order[0];
+                                    let obs_list = arm_obs.entry(key.clone()).or_default();
+                                    let pair_means = arm_pairs.entry(key.clone()).or_default();
+                                    for (slot, r) in &ratios {
+                                        let slot_pos = SLOT_LETTERS
+                                            .iter()
+                                            .position(|c| slot == &c.to_string())
+                                            .expect("validated slot letter");
+                                        let entity = order[slot_pos];
+                                        // Mirror the canonical_v2 point weight
+                                        // path: unit precision, reps = 1.
+                                        obs_list.push(Observation::new(
+                                            entity,
+                                            pivot,
+                                            *r,
+                                            confidence,
+                                            args.model.clone(),
+                                            1.0,
+                                        ));
+                                        let (lo, hi) = (entity.min(pivot), entity.max(pivot));
+                                        // Oriented lo-vs-hi log ratio for the
+                                        // pivot-rotation readout.
+                                        let m_lo_hi = if entity < pivot { r.ln() } else { -r.ln() };
+                                        let slot_means = pair_means.entry((lo, hi)).or_default();
+                                        if pivot == hi {
+                                            slot_means.0.push(m_lo_hi);
+                                        } else {
+                                            slot_means.1.push(m_lo_hi);
+                                        }
+                                    }
+                                }
+                                Ok(SetwiseAnswer::Refused) => {
+                                    row.status = "refused".to_string();
+                                    counts.1 += 1;
+                                }
+                                Err(reason) => {
+                                    row.status = "malformed".to_string();
+                                    row.error = Some(reason);
+                                    counts.2 += 1;
+                                }
+                            }
+                        }
+                        Err(error) => {
+                            row.status = "error".to_string();
+                            row.error = Some(error.to_string());
+                            counts.3 += 1;
+                        }
+                    }
+                    serde_json::to_writer(&mut trace, &row)?;
+                    trace.write_all(b"\n")?;
+                }
+            }
+        }
+    }
+    trace.flush()?;
+
+    // --- solve setwise latents per (k, attribute) ------------------------
+    let raters: HashMap<String, RaterParams> =
+        [(args.model.clone(), RaterParams::default())].into();
+    let mut engine_spec: Option<EngineSpec> = None;
+    let mut setwise_arms: Vec<SetwiseArm> = Vec::new();
+    let mut setwise_latents: BTreeMap<(usize, String), Vec<f64>> = BTreeMap::new();
+    for &k in &ks {
+        for attr in &attrs {
+            let key = (k, attr.name.clone());
+            let obs = arm_obs.remove(&key).unwrap_or_default();
+            let mut engine =
+                RatingEngine::new(args.n, AttributeParams::default(), raters.clone(), None)?;
+            if engine_spec.is_none() {
+                engine_spec = Some(engine.spec());
+            }
+            engine.add_observations(&obs);
+            let summary = engine.solve();
+            let scores = summary.scores.clone();
+            let latents: Vec<ItemLatent> = entities
+                .iter()
+                .enumerate()
+                .map(|(idx, entity)| ItemLatent {
+                    id: entity.id.clone(),
+                    mean: scores[idx],
+                    std: summary.diag_cov[idx].max(0.0).sqrt(),
+                })
+                .collect();
+            setwise_latents.insert(key.clone(), scores);
+
+            let pair_means = arm_pairs.remove(&key).unwrap_or_default();
+            let mut pairs_with_both = 0usize;
+            let mut sign_flips = 0usize;
+            let mut residuals: Vec<f64> = Vec::new();
+            for (pivot_hi, pivot_lo) in pair_means.values() {
+                if pivot_hi.is_empty() || pivot_lo.is_empty() {
+                    continue;
+                }
+                let mean_hi: f64 = pivot_hi.iter().sum::<f64>() / pivot_hi.len() as f64;
+                let mean_lo: f64 = pivot_lo.iter().sum::<f64>() / pivot_lo.len() as f64;
+                pairs_with_both += 1;
+                if mean_hi * mean_lo < 0.0 {
+                    sign_flips += 1;
+                }
+                residuals.push((mean_hi - mean_lo).abs());
+            }
+            let mean_abs_residual = (!residuals.is_empty())
+                .then(|| residuals.iter().sum::<f64>() / residuals.len() as f64);
+
+            let usage = arm_usage.remove(&key).unwrap_or_default();
+            let (ok, refused, malformed, errored) = arm_counts.remove(&key).unwrap_or_default();
+            let (reported, read_gt0, frac_sum) = arm_cache.remove(&key).unwrap_or((0, 0, 0.0));
+            setwise_arms.push(SetwiseArm {
+                k,
+                attribute: attr.name.clone(),
+                calls: usage.calls,
+                calls_ok: ok,
+                calls_refused: refused,
+                calls_malformed: malformed,
+                calls_errored: errored,
+                observations: obs.len(),
+                usage,
+                cache: CacheEvidence {
+                    calls_with_cache_fields_reported: reported,
+                    calls_with_cache_read_gt0: read_gt0,
+                    mean_cached_fraction: (reported > 0).then(|| frac_sum / reported as f64),
+                },
+                pivot_rotation: PivotRotation {
+                    pairs_with_both_orientations: pairs_with_both,
+                    sign_flips,
+                    mean_abs_residual_nats: mean_abs_residual,
+                },
+                latents,
+            });
+        }
+    }
+
+    // --- pairwise baseline (canonical_v2, sort path, default budget) ------
+    let mut pairwise_arms: Vec<PairwiseArm> = Vec::new();
+    let mut pairwise_latents: BTreeMap<String, Vec<f64>> = BTreeMap::new();
+    if !args.skip_pairwise {
+        let id_to_idx: HashMap<String, usize> = entities
+            .iter()
+            .enumerate()
+            .map(|(idx, e)| (e.id.clone(), idx))
+            .collect();
+        let (sink, worker) = JsonlTraceSink::new(args.out_dir.join("pairwise_trace.jsonl"))?;
+        for attr in &attrs {
+            let documents: Vec<RerankDocument> = entities
+                .iter()
+                .map(|entity| RerankDocument {
+                    id: entity.id.clone(),
+                    text: entity.raw.clone(),
+                })
+                .collect();
+            let execution = RerankExecution::new(Arc::clone(&gateway), attribution.clone())
+                .run_options(RerankRunOptions {
+                    rng_seed: Some(args.seed),
+                    cache_only: false,
+                })
+                .trace(&sink);
+            let sorted: SortedTexts = sort_documents(
+                documents,
+                &attr.text,
+                execution,
+                SortOptions {
+                    model: Some(args.model.clone()),
+                    ..SortOptions::default()
+                },
+            )
+            .await?;
+            meter.add(sorted.meta.provider_cost_nanodollars)?;
+            let mut scores = vec![0.0; args.n];
+            let mut latents: Vec<ItemLatent> = Vec::new();
+            for item in &sorted.items {
+                let idx = id_to_idx[&item.id];
+                scores[idx] = item.latent_mean;
+                latents.push(ItemLatent {
+                    id: item.id.clone(),
+                    mean: item.latent_mean,
+                    std: item.latent_std,
+                });
+            }
+            pairwise_latents.insert(attr.name.clone(), scores);
+            eprintln!(
+                "pairwise {}: {} used / {} attempted, ${:.4}",
+                attr.name,
+                sorted.meta.comparisons_used,
+                sorted.meta.comparisons_attempted,
+                sorted.meta.provider_cost_nanodollars as f64 / 1e9
+            );
+            pairwise_arms.push(PairwiseArm {
+                attribute: attr.name.clone(),
+                comparisons_attempted: sorted.meta.comparisons_attempted,
+                comparisons_used: sorted.meta.comparisons_used,
+                comparisons_refused: sorted.meta.comparisons_refused,
+                comparison_budget: sorted.meta.comparison_budget,
+                position_flips: sorted.meta.position_flips,
+                pairs_counterbalanced: sorted.meta.pairs_counterbalanced,
+                provider_input_tokens: sorted.meta.provider_input_tokens,
+                provider_output_tokens: sorted.meta.provider_output_tokens,
+                nanodollars: sorted.meta.provider_cost_nanodollars,
+                cache_read_tokens: None,
+                latents,
+            });
+        }
+        drop(sink);
+        worker.join()?;
+    }
+
+    // --- compare arms -----------------------------------------------------
+    let mut comparisons: Vec<ArmComparison> = Vec::new();
+    for arm in &setwise_arms {
+        let Some(pair_scores) = pairwise_latents.get(&arm.attribute) else {
+            continue;
+        };
+        let set_scores = &setwise_latents[&(arm.k, arm.attribute.clone())];
+        let pairwise_meta = pairwise_arms
+            .iter()
+            .find(|p| p.attribute == arm.attribute)
+            .expect("latents imply the arm exists");
+        let set_top3 = top_indices(set_scores, 3);
+        let pair_top3 = top_indices(pair_scores, 3);
+        let overlap = set_top3.iter().filter(|i| pair_top3.contains(i)).count();
+        let set_dollars = arm.usage.nanodollars as f64 / 1e9;
+        let pair_dollars = pairwise_meta.nanodollars as f64 / 1e9;
+        comparisons.push(ArmComparison {
+            k: arm.k,
+            attribute: arm.attribute.clone(),
+            spearman_rho: spearman_rho(set_scores, pair_scores),
+            kendall_tau: kendall_tau(set_scores, pair_scores),
+            top1_agree: top_indices(set_scores, 1) == top_indices(pair_scores, 1),
+            top3_overlap: overlap as f64 / 3.0,
+            setwise_pairwise_equiv_obs_per_dollar: (set_dollars > 0.0)
+                .then(|| arm.observations as f64 / set_dollars),
+            pairwise_obs_per_dollar: (pair_dollars > 0.0)
+                .then(|| pairwise_meta.comparisons_used as f64 / pair_dollars),
+        });
+    }
+
+    // --- offline ground-truth recovery (plumbing check) -------------------
+    let mut ground_truth_checks: Vec<GroundTruthCheck> = Vec::new();
+    for (attr_name, z) in &truth {
+        for &k in &ks {
+            let set_scores = &setwise_latents[&(k, attr_name.clone())];
+            ground_truth_checks.push(GroundTruthCheck {
+                k,
+                attribute: attr_name.clone(),
+                rho_setwise_vs_truth: spearman_rho(set_scores, z),
+                rho_pairwise_vs_truth: pairwise_latents.get(attr_name).map(|p| spearman_rho(p, z)),
+            });
+        }
+    }
+
+    let report = Report {
+        generated_at: chrono::Utc::now().to_rfc3339(),
+        offline: args.offline,
+        model: args.model.clone(),
+        seed: args.seed,
+        n: args.n,
+        ks: ks.clone(),
+        entity_chars: args.entity_chars,
+        min_pair_cover: args.min_pair_cover,
+        presentations_per_subset: args.presentations,
+        spend_cap_usd: args.spend_cap_usd,
+        corpus: args.corpus.clone(),
+        attributes: attrs
+            .iter()
+            .map(|attr| AttrReport {
+                name: attr.name.clone(),
+                rubric_source: attr.rubric_source.clone(),
+                rubric_chars: attr.text.len(),
+            })
+            .collect(),
+        entity_ids: entities.iter().map(|e| e.id.clone()).collect(),
+        engine_spec: engine_spec.expect("at least one arm solved"),
+        example_call,
+        subsets_per_k,
+        setwise: setwise_arms,
+        pairwise: pairwise_arms,
+        comparisons,
+        offline_ground_truth: ground_truth_checks,
+        total_cost_nanodollars: meter.spent_nanodollars,
+        caveats: vec![
+            "The k-1 observations of one setwise call share that call's context: they are correlated through the pivot and the call's overall framing, but enter the solver as independent unit-precision observations (mirroring canonical_v2 point weights). Non-pivot implied pairs are deliberately NOT added.".to_string(),
+            "Pairwise cache token counts are not surfaced by the sort path's RerankMeta; the pairwise cache column is null, not zero.".to_string(),
+        ],
+    };
+    let report_path = args.out_dir.join("report.json");
+    std::fs::write(&report_path, serde_json::to_string_pretty(&report)?)?;
+
+    println!(
+        "done: total ${:.4} ({}) -> {}",
+        meter.spent_nanodollars as f64 / 1e9,
+        if args.offline {
+            "offline synthetic pricing"
+        } else {
+            "live"
+        },
+        report_path.display()
+    );
+    for check in &report.offline_ground_truth {
+        println!(
+            "  truth-recovery k={} {}: setwise rho {:.3}, pairwise rho {}",
+            check.k,
+            check.attribute,
+            check.rho_setwise_vs_truth,
+            check
+                .rho_pairwise_vs_truth
+                .map_or("n/a".to_string(), |r| format!("{r:.3}")),
+        );
+    }
+    for comparison in &report.comparisons {
+        println!(
+            "  k={} {}: rho {:.3} tau {:.3} top1 {} top3 {:.2}",
+            comparison.k,
+            comparison.attribute,
+            comparison.spearman_rho,
+            comparison.kendall_tau,
+            comparison.top1_agree,
+            comparison.top3_overlap,
+        );
+    }
+    Ok(())
+}
