@@ -41,6 +41,15 @@ pub const PAIRWISE_LOGPROBS_TOP_N_DEFAULT: u32 = 20;
 pub const PAIRWISE_BUCKET_LOGPROB_MAX_ATTEMPTS: usize = 3;
 
 pub fn pairwise_max_output_tokens(model: &str) -> u32 {
+    // Serve-side contexts can be smaller than the default budget (e.g. a local
+    // vLLM judge with a tight KV pool rejects max_tokens > max_model_len).
+    if let Some(cap) = std::env::var("CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS")
+        .ok()
+        .and_then(|value| value.parse::<u32>().ok())
+        .filter(|value| *value >= 1)
+    {
+        return cap;
+    }
     if model.starts_with("openai/gpt-5") {
         PAIRWISE_MAX_OUTPUT_TOKENS_GPT5
     } else {
