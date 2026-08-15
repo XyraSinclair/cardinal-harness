@@ -3,7 +3,7 @@
 //! the misranking pin — a heavily-resampled frustrated pair drags the
 //! naive k/σ² solve into the wrong order while the floored solve holds.
 
-use ratiometer::repeat_pooling::{pool_repeats, RepeatDraws};
+use llmsorting::repeat_pooling::{pool_repeats, RepeatDraws};
 
 /// Deterministic LCG uniform in (−1, 1).
 struct Lcg(u64);

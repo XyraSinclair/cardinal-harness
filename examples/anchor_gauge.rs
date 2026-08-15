@@ -37,16 +37,16 @@ use std::sync::Arc;
 use clap::Parser;
 use serde::Serialize;
 
-use ratiometer::gateway::{
+use llmsorting::gateway::{
     Attribution, ChatGateway, ChatRequest, ChatResponse, FinishReason, NoopUsageSink,
     ProviderError, ProviderGateway, Role,
 };
-use ratiometer::rating_engine::{
+use llmsorting::rating_engine::{
     AttributeParams, EngineSpec, Observation, RaterParams, RatingEngine,
 };
-use ratiometer::rerank::sort::{sort_documents, SortOptions, SortedTexts};
-use ratiometer::rerank::types::RerankDocument;
-use ratiometer::rerank::{ComparisonTrace, JsonlTraceSink, RerankExecution, RerankRunOptions};
+use llmsorting::rerank::sort::{sort_documents, SortOptions, SortedTexts};
+use llmsorting::rerank::types::RerankDocument;
+use llmsorting::rerank::{ComparisonTrace, JsonlTraceSink, RerankExecution, RerankRunOptions};
 
 /// canonical_v2 ratio ladder ceiling: the synthetic judge saturates exactly
 /// where the live instrument's answer vocabulary does.
@@ -841,7 +841,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
     let ctx = RunCtx {
         gateway,
-        attribution: Attribution::new("ratiometer::example::anchor_gauge"),
+        attribution: Attribution::new("llmsorting::example::anchor_gauge"),
         out_dir: args.out_dir.clone(),
         seed: args.seed,
     };

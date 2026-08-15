@@ -21,9 +21,10 @@ const PUBLIC_COMPARISONS: &str = "scry_judgements.comparisons";
 const PUBLIC_SCORES: &str = "scry_judgements.scores";
 const PRIVATE_COMPARISONS: &str = "scry_judgements_private.comparisons";
 const PRIVATE_SCORES: &str = "scry_judgements_private.scores";
-// Default provenance label written into landed rows. Updated at the crate
-// rename (2026-08-12); rows landed before then carry "cardinal-harness".
-const HARNESS: &str = "ratiometer";
+// Default provenance label written into landed rows. Updated at each crate
+// rename; older rows carry "cardinal-harness" (pre 2026-08-12) or
+// "ratiometer" (pre 2026-08-15).
+const HARNESS: &str = "llmsorting";
 
 const COMPARISON_COLUMNS: &str = "observed_at,run_id,lens,axis_key,axis_prompt,axis_prompt_hash,harness,template_slug,template_hash,model,comparison_index,entity_a_id,entity_b_id,entity_a_hash,entity_b_hash,swapped,cached,refused,higher_ranked,ratio,confidence,input_tokens,output_tokens,cost_nanodollars,cost_is_estimate,error,temperature,harness_version";
 const PRIVATE_COMPARISON_COLUMNS: &str = "observed_at,run_id,owner_scope,lens,axis_key,axis_prompt,axis_prompt_hash,harness,template_slug,template_hash,model,comparison_index,entity_a_id,entity_b_id,entity_a_hash,entity_b_hash,swapped,cached,refused,higher_ranked,ratio,confidence,input_tokens,output_tokens,cost_nanodollars,cost_is_estimate,error,temperature,harness_version";

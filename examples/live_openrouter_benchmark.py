@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run a real OpenRouter-backed ratiometer benchmark suite.
+"""Run a real OpenRouter-backed llmsorting benchmark suite.
 
 This is intentionally not a synthetic evaluator. It shells out to the cardinal
 CLI with OPENROUTER_API_KEY set, records provider-backed rerank studies, exports
@@ -32,11 +32,11 @@ class LiveCase:
 LIVE_CASES: tuple[LiveCase, ...] = (
     LiveCase(
         name="public_evidence_surfaces",
-        description="Rank current ratiometer documentation surfaces by public-release evidence value.",
+        description="Rank current llmsorting documentation surfaces by public-release evidence value.",
         entities=[
             {
                 "id": "readme",
-                "text": "README.md: public entry point. States ratiometer is a canonical list-sorting/reranking engine, explains the tradeoff versus scalar scoring, gives CLI examples, links algorithm, prompt, model, worked-example, evaluation, and benchmark docs.",
+                "text": "README.md: public entry point. States llmsorting is a canonical list-sorting/reranking engine, explains the tradeoff versus scalar scoring, gives CLI examples, links algorithm, prompt, model, worked-example, evaluation, and benchmark docs.",
             },
             {
                 "id": "evaluation_doc",
@@ -174,7 +174,7 @@ LIVE_CASES: tuple[LiveCase, ...] = (
         attributes=[
             {
                 "id": "credibility_risk",
-                "prompt": "risk to public credibility if ratiometer is shared widely as a serious empirical artifact",
+                "prompt": "risk to public credibility if llmsorting is shared widely as a serious empirical artifact",
                 "prompt_template_slug": "canonical_v2",
                 "weight": 0.45,
             },

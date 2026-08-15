@@ -1,6 +1,6 @@
 # AGENTS.md
 
-`ratiometer` is the pairwise-ratio elicitation engine behind the rest of
+`llmsorting` is the pairwise-ratio elicitation engine behind the rest of
 the OpenPriors stack.
 
 It is the algorithmic core for:

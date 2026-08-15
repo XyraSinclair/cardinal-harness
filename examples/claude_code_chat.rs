@@ -4,8 +4,8 @@
 
 use std::sync::Arc;
 
-use ratiometer::gateway::claude_code::{ClaudeCodeAdapter, ClaudeCodeConfig};
-use ratiometer::gateway::{
+use llmsorting::gateway::claude_code::{ClaudeCodeAdapter, ClaudeCodeConfig};
+use llmsorting::gateway::{
     Attribution, ChatModel, ChatRequest, Message, NoopUsageSink, ProviderGateway,
 };
 

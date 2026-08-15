@@ -7,6 +7,25 @@ Versioning once it reaches `1.0.0`.
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-08-15
+
+### Changed
+
+- **Crate and repository renamed `ratiometer` -> `llmsorting`** (operator
+  decision 2026-08-15, closing OPERATOR-QUEUE Q6). Sorting is the
+  application the whole instrument serves; the program hub at
+  llmsorting.com, the experiments ladder, and the engine now share one
+  name. Library paths change (`use llmsorting::...`); the CLI binaries
+  (`cardinal`, `cardinald`), the packet/judgement-run atom names, prompt
+  slugs, and all frozen contracts are unchanged. GitHub redirects from
+  `XyraSinclair/ratiometer` remain live; the `ratiometer` crates.io name
+  is parked (like `cardinal-harness` before it) and its releases keep
+  resolving. Lineage: cardinal-harness (until 2026-08-12) -> ratiometer
+  (until 2026-08-15) -> llmsorting.
+- The llmsorting program repo (PROGRAM.md, experiments/, the
+  llmsorting.com static site) folds in: `PROGRAM.md`, `experiments/`,
+  `www/` (site + deploy). pairwiseratio.org keeps `site/`.
+
 ## [0.12.0] - 2026-08-12
 
 ### Changed

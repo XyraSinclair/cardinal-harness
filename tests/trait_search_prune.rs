@@ -2,10 +2,10 @@
 
 use std::collections::HashMap;
 
-use ratiometer::rating_engine::{
+use llmsorting::rating_engine::{
     AttributeParams, Observation, PlannerMode, RaterParams, RatingEngine,
 };
-use ratiometer::trait_search::{
+use llmsorting::trait_search::{
     AttributeConfig, TopKConfig, TraitSearchConfig, TraitSearchManager,
 };
 

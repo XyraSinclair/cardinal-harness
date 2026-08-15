@@ -1,4 +1,4 @@
-use ratiometer::rerank::evaluation::{
+use llmsorting::rerank::evaluation::{
     run_evaluation_comparison_summary, run_evaluation_comparison_summary_with_config,
     run_likert_baseline_suite, run_synthetic_suite, run_synthetic_suite_with_config,
     synthetic_cases, ComparisonOutcome, LikertEvalConfig, PairwiseEvalConfig,

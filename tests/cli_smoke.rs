@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::process::Command;
 
-use ratiometer::rerank::{
+use llmsorting::rerank::{
     AttributeScoreSummary, MultiRerankAttributeSpec, MultiRerankEntity, MultiRerankEntityResult,
     MultiRerankMeta, MultiRerankRequest, MultiRerankResponse, MultiRerankTopKSpec,
     RerankStopReason,

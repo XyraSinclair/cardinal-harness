@@ -20,11 +20,11 @@
 use std::sync::{Arc, Mutex, PoisonError};
 use std::time::Duration;
 
-use ratiometer::gateway::openrouter::OpenRouterAdapter;
-use ratiometer::gateway::{
+use llmsorting::gateway::openrouter::OpenRouterAdapter;
+use llmsorting::gateway::{
     Attribution, ChatGateway, GatewayConfig, NoopUsageSink, ProviderGateway,
 };
-use ratiometer::rerank::{
+use llmsorting::rerank::{
     sort_documents, sort_texts, RerankDocument, RerankRunOptions, SortOptions, SortedTexts,
 };
 use serde_json::json;
@@ -188,8 +188,8 @@ fn execution_for(
     server: &MockServer,
     seed: u64,
     tag: &'static str,
-) -> ratiometer::rerank::RerankExecution<'static> {
-    ratiometer::rerank::RerankExecution::new(gateway_for(server), Attribution::new(tag))
+) -> llmsorting::rerank::RerankExecution<'static> {
+    llmsorting::rerank::RerankExecution::new(gateway_for(server), Attribution::new(tag))
         .run_options(RerankRunOptions {
             rng_seed: Some(seed),
             cache_only: false,

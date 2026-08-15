@@ -4,7 +4,7 @@
   "cases": [
     {
       "name": "public_artifact_work",
-      "description": "Prioritize work that makes ratiometer more shareable as a serious public artifact.",
+      "description": "Prioritize work that makes llmsorting more shareable as a serious public artifact.",
       "items": [
         {
           "id": "live_baseline_suite",
@@ -133,7 +133,7 @@
     },
     {
       "name": "first_user_path",
-      "description": "Rank onboarding improvements for an engineer trying ratiometer from a fresh clone.",
+      "description": "Rank onboarding improvements for an engineer trying llmsorting from a fresh clone.",
       "items": [
         {
           "id": "copy_paste_quickstart",
@@ -219,7 +219,7 @@
     },
     {
       "name": "public_release_risks",
-      "description": "Rank the risks that would most undermine sharing ratiometer widely as a serious artifact.",
+      "description": "Rank the risks that would most undermine sharing llmsorting widely as a serious artifact.",
       "items": [
         {
           "id": "overclaiming_evidence",

@@ -293,11 +293,11 @@ fn judge_show_prompt_prints_seriate_evidence_bytes_before_missing_key_failure() 
 
     assert!(!output.status.success());
     let stderr = String::from_utf8(output.stderr).unwrap();
-    let rendered = ratiometer::seriate::instrument::Instrument::render(
-        &ratiometer::seriate::instrument::ratio_letter::RatioLetterInstrument,
-        &ratiometer::seriate::Attribute::new("judge", "shininess"),
-        &ratiometer::seriate::Entity::new("dull TIN spoon"),
-        &ratiometer::seriate::Entity::new("shiny GOLD ring"),
+    let rendered = llmsorting::seriate::instrument::Instrument::render(
+        &llmsorting::seriate::instrument::ratio_letter::RatioLetterInstrument,
+        &llmsorting::seriate::Attribute::new("judge", "shininess"),
+        &llmsorting::seriate::Entity::new("dull TIN spoon"),
+        &llmsorting::seriate::Entity::new("shiny GOLD ring"),
     );
     let expected_prompt = format!(
         "--- system ---\n{}\n--- user ---\n{}\n---",
@@ -725,7 +725,7 @@ async fn draws_measure_context_sensitivity_and_keep_the_prefix_stable() {
     };
     let (sys0, key0, user0) = parts(&seen[0]);
     assert!(
-        sys0 >= ratiometer::rerank::sampling::CACHE_FLOOR_CHARS,
+        sys0 >= llmsorting::rerank::sampling::CACHE_FLOOR_CHARS,
         "system must be padded past the cache floor: {sys0}"
     );
     assert!(!key0.is_empty(), "prompt_cache_key must be sent");

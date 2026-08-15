@@ -1,5 +1,5 @@
-use ratiometer::cache::{CachedJudgement, PairwiseCacheKey, SqlitePairwiseCache};
-use ratiometer::PairwiseCache;
+use llmsorting::cache::{CachedJudgement, PairwiseCacheKey, SqlitePairwiseCache};
+use llmsorting::PairwiseCache;
 use tempfile::tempdir;
 
 #[derive(Debug, serde::Deserialize)]

@@ -1,6 +1,6 @@
 # Worked Example: Three Proposals, Two Attributes, One Gate
 
-This example is deliberately small. The point is not to demonstrate a heroic benchmark; it is to show the moving parts of a `ratiometer` rerank run without pretending that a synthetic transcript is a real model result.
+This example is deliberately small. The point is not to demonstrate a heroic benchmark; it is to show the moving parts of a `llmsorting` rerank run without pretending that a synthetic transcript is a real model result.
 
 We will rank three proposal drafts for review priority. The utility is a weighted combination of two attributes:
 

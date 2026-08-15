@@ -10,7 +10,7 @@ use std::io::{BufWriter, Write};
 use std::path::PathBuf;
 use std::time::Instant;
 
-use ratiometer::rating_engine::{
+use llmsorting::rating_engine::{
     plan_edges_for_rater, AttributeParams, Config, Observation, PlannerMode, RaterParams,
     RatingEngine,
 };

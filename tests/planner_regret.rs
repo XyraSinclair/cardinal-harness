@@ -6,14 +6,14 @@
 
 use std::collections::HashMap;
 
-use rand::rngs::StdRng;
-use rand::{Rng, SeedableRng};
-use ratiometer::rating_engine::{
+use llmsorting::rating_engine::{
     AttributeParams, Config, Observation, PlannerMode, RaterParams, RatingEngine,
 };
-use ratiometer::trait_search::{
+use llmsorting::trait_search::{
     AttributeConfig, TopKConfig, TraitSearchConfig, TraitSearchManager,
 };
+use rand::rngs::StdRng;
+use rand::{Rng, SeedableRng};
 
 const N: usize = 20;
 const TARGET_TAU: f64 = 0.85;

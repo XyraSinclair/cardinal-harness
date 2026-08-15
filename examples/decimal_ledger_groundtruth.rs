@@ -28,9 +28,9 @@ use std::collections::BTreeMap;
 
 use std::collections::HashMap;
 
-use ratiometer::gateway::{TokenAlternative, TokenLogprob};
-use ratiometer::rating_engine::{AttributeParams, Observation, RaterParams, RatingEngine};
-use ratiometer::rerank::decimal_ledger::{analyze, extract_trajectory, DrawTrajectory, NodeObs};
+use llmsorting::gateway::{TokenAlternative, TokenLogprob};
+use llmsorting::rating_engine::{AttributeParams, Observation, RaterParams, RatingEngine};
+use llmsorting::rerank::decimal_ledger::{analyze, extract_trajectory, DrawTrajectory, NodeObs};
 
 const TREE_PATH: &str = "notes/decimal-pmf-2026-08-10/groundtruth_tree.json";
 const LN10: f64 = std::f64::consts::LN_10;

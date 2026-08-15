@@ -1,4 +1,4 @@
-//! Minimal end-to-end example for `ratiometer`.
+//! Minimal end-to-end example for `llmsorting`.
 //!
 //! This ranks three entities by "clarity of explanation" and returns
 //! quantitative scores with uncertainty estimates.
@@ -9,12 +9,12 @@
 
 use std::sync::Arc;
 
-use ratiometer::gateway::NoopUsageSink;
-use ratiometer::rerank::{
+use llmsorting::gateway::NoopUsageSink;
+use llmsorting::rerank::{
     ModelLadderPolicy, MultiRerankAttributeSpec, MultiRerankEntity, MultiRerankRequest,
     MultiRerankTopKSpec, RerankRunOptions,
 };
-use ratiometer::{Attribution, ProviderGateway, SqlitePairwiseCache};
+use llmsorting::{Attribution, ProviderGateway, SqlitePairwiseCache};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -92,9 +92,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // -- Run it --------------------------------------------------------------
 
-    let resp = ratiometer::rerank::multi_rerank(
+    let resp = llmsorting::rerank::multi_rerank(
         req,
-        ratiometer::rerank::RerankExecution::new(
+        llmsorting::rerank::RerankExecution::new(
             Arc::new(gateway),
             Attribution::new("example::quickstart"),
         )

@@ -13,7 +13,7 @@ latency, tokens) as one JSON line on stderr.
 Exit codes: 0 ok · 2 quota/session-limit (pause; retry after the reset
 the CLI names) · 1 anything else. Transient failures retry (--retries).
 
-Why this exists for ratiometer: the engine treats judgments as
+Why this exists for llmsorting: the engine treats judgments as
 noisy measurements; this is an elicitation channel with zero marginal
 API cost. The `structured_output` field of the print-mode JSON envelope
 carries the schema-validated object — the harness enforces the schema

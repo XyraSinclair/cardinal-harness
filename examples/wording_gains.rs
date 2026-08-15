@@ -7,9 +7,9 @@
 
 use std::sync::Arc;
 
-use ratiometer::gain_calibration::{solve_with_template_gains, GainObservation};
-use ratiometer::gateway::{Attribution, NoopUsageSink, ProviderGateway};
-use ratiometer::rerank::{
+use llmsorting::gain_calibration::{solve_with_template_gains, GainObservation};
+use llmsorting::gateway::{Attribution, NoopUsageSink, ProviderGateway};
+use llmsorting::rerank::{
     compare_pair, core_pairs, HigherRanked, PairwiseComparisonAttribute, PairwiseComparisonEntity,
     PairwiseComparisonRequest, PairwiseComparisonSpec, PairwiseJudgement, CORPUS,
     PRIMARY_ATTRIBUTE, WORDING_SLUGS,

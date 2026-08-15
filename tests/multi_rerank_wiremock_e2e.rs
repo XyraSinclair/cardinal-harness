@@ -1,9 +1,9 @@
 use std::sync::Arc;
 use std::time::Duration;
 
-use ratiometer::gateway::openrouter::OpenRouterAdapter;
-use ratiometer::gateway::{Attribution, GatewayConfig, NoopUsageSink, ProviderGateway};
-use ratiometer::rerank::{
+use llmsorting::gateway::openrouter::OpenRouterAdapter;
+use llmsorting::gateway::{Attribution, GatewayConfig, NoopUsageSink, ProviderGateway};
+use llmsorting::rerank::{
     multi_rerank, MultiRerankAttributeSpec, MultiRerankEntity, MultiRerankRequest,
     MultiRerankTopKSpec,
 };
@@ -188,7 +188,7 @@ async fn multi_rerank_runs_end_to_end_against_wiremock_gateway() {
 
     let resp = multi_rerank(
         req,
-        ratiometer::rerank::RerankExecution::new(gateway, Attribution::new("test")),
+        llmsorting::rerank::RerankExecution::new(gateway, Attribution::new("test")),
     )
     .await
     .unwrap();
@@ -226,7 +226,7 @@ async fn multi_rerank_runs_end_to_end_with_ordinal_prompt_template() {
 
     let resp = multi_rerank(
         test_request("ordinal_v1"),
-        ratiometer::rerank::RerankExecution::new(gateway, Attribution::new("test")),
+        llmsorting::rerank::RerankExecution::new(gateway, Attribution::new("test")),
     )
     .await
     .unwrap();

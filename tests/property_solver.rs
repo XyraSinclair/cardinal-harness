@@ -26,10 +26,10 @@
 
 use std::collections::{HashMap, HashSet};
 
+use llmsorting::prompts::RATIO_LADDER;
+use llmsorting::rating_engine::{AttributeParams, Config, Observation, RaterParams, RatingEngine};
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
-use ratiometer::prompts::RATIO_LADDER;
-use ratiometer::rating_engine::{AttributeParams, Config, Observation, RaterParams, RatingEngine};
 
 // ---------------------------------------------------------------------
 // Shared test harness

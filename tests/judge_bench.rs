@@ -6,9 +6,9 @@
 use std::sync::Arc;
 use std::time::Duration;
 
-use ratiometer::gateway::openrouter::OpenRouterAdapter;
-use ratiometer::gateway::{GatewayConfig, NoopUsageSink, ProviderGateway};
-use ratiometer::rerank::{run_judge_bench, JudgeBenchOptions, JudgeBenchReport, CORPUS};
+use llmsorting::gateway::openrouter::OpenRouterAdapter;
+use llmsorting::gateway::{GatewayConfig, NoopUsageSink, ProviderGateway};
+use llmsorting::rerank::{run_judge_bench, JudgeBenchOptions, JudgeBenchReport, CORPUS};
 use serde_json::json;
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, Request, Respond, ResponseTemplate};
@@ -52,7 +52,7 @@ fn depth_of(text: &str) -> Option<f64> {
         return Some(DEPTHS[k]);
     }
     let norm = normalize(text);
-    ratiometer::rerank::HARMONIC_BLOCK
+    llmsorting::rerank::HARMONIC_BLOCK
         .iter()
         .position(|&t| t == norm)
         .map(|k| HARMONIC_DEPTHS[k])
@@ -60,7 +60,7 @@ fn depth_of(text: &str) -> Option<f64> {
 
 fn harmonic_index(text: &str) -> Option<usize> {
     let norm = normalize(text);
-    ratiometer::rerank::HARMONIC_BLOCK
+    llmsorting::rerank::HARMONIC_BLOCK
         .iter()
         .position(|&t| t == norm)
 }

@@ -1,4 +1,4 @@
-use ratiometer::rerank::{
+use llmsorting::rerank::{
     validate_multi_rerank_request, MultiRerankAttributeSpec, MultiRerankEntity, MultiRerankRequest,
 };
 

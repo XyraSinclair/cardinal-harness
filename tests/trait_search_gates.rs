@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
-use ratiometer::rating_engine::{AttributeParams, Observation, RaterParams, RatingEngine};
-use ratiometer::trait_search::{
+use llmsorting::rating_engine::{AttributeParams, Observation, RaterParams, RatingEngine};
+use llmsorting::trait_search::{
     AttributeConfig, GateSpec, TopKConfig, TraitSearchConfig, TraitSearchManager,
 };
 

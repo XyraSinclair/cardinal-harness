@@ -33,11 +33,11 @@
 
 use std::collections::HashSet;
 
-use ratiometer::rerank::evaluation::{
+use llmsorting::rerank::evaluation::{
     run_likert_baseline_case, run_synthetic_case_with_config, synthetic_cases, LikertEvalConfig,
     PairwiseEvalConfig, SyntheticAttribute, SyntheticCase, SyntheticPairwiseMode,
 };
-use ratiometer::rerank::types::MultiRerankTopKSpec;
+use llmsorting::rerank::types::MultiRerankTopKSpec;
 
 // =============================================================================
 // Local synthetic-case builders (independent of the checked-in suite, so

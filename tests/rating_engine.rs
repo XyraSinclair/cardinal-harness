@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use ratiometer::rating_engine::{
+use llmsorting::rating_engine::{
     plan_edges_for_rater, AttributeParams, Config, EngineSpec, Observation, PlannerMode,
     RaterParams, RatingEngine,
 };

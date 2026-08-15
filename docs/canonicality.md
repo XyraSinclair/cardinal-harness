@@ -1,7 +1,7 @@
 # Canonicality — the denominator for this repo
 
 Precommitted 2026-07-09 (canonicalize drive, step 2). "Canonical" for
-ratiometer means exactly the rows below; the drive is scored against
+llmsorting means exactly the rows below; the drive is scored against
 this list, and every row is labeled **covered** / **named-gap** /
 **ruled-out**. Deleting a row to hide it is a defect class of its own.
 

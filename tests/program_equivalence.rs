@@ -15,7 +15,7 @@
 
 use std::collections::HashMap;
 
-use ratiometer::rating_engine::{
+use llmsorting::rating_engine::{
     spectral_diagnostics, AttributeParams, Config, Observation, RaterParams, RatingEngine,
 };
 

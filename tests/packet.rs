@@ -5,7 +5,7 @@
 //! form. Plus: tamper-evidence (one flipped byte = a different packet;
 //! conflicting entity content = refusal to fuse) and serde round-trip.
 
-use ratiometer::packet::{entity_text_hash, fuse, JudgmentPacket, PacketError, PacketObservation};
+use llmsorting::packet::{entity_text_hash, fuse, JudgmentPacket, PacketError, PacketObservation};
 
 fn entities(n: usize) -> Vec<(String, String)> {
     (0..n)

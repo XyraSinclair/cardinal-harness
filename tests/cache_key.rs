@@ -1,4 +1,4 @@
-use ratiometer::cache::PairwiseCacheKey;
+use llmsorting::cache::PairwiseCacheKey;
 
 #[test]
 fn pairwise_cache_key_is_stable_and_sensitive_to_inputs() {

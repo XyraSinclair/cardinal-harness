@@ -12,9 +12,9 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 use std::time::Duration;
 
-use ratiometer::gateway::openrouter::OpenRouterAdapter;
-use ratiometer::gateway::{Attribution, GatewayConfig, NoopUsageSink, ProviderGateway};
-use ratiometer::rerank::{
+use llmsorting::gateway::openrouter::OpenRouterAdapter;
+use llmsorting::gateway::{Attribution, GatewayConfig, NoopUsageSink, ProviderGateway};
+use llmsorting::rerank::{
     sort_documents, sort_texts, RerankDocument, RerankExecution, RerankRunOptions, SortOptions,
     SortedTexts,
 };
@@ -132,16 +132,16 @@ fn doc(id: &str, text: &str) -> RerankDocument {
 }
 
 fn ids_by_rank(sorted: &SortedTexts) -> Vec<String> {
-    let mut items: Vec<&ratiometer::rerank::SortedItem> = sorted.items.iter().collect();
+    let mut items: Vec<&llmsorting::rerank::SortedItem> = sorted.items.iter().collect();
     items.sort_by_key(|i| i.rank);
     items.into_iter().map(|i| i.id.clone()).collect()
 }
 
-fn mean_std(items: &[ratiometer::rerank::SortedItem]) -> f64 {
+fn mean_std(items: &[llmsorting::rerank::SortedItem]) -> f64 {
     items.iter().map(|i| i.latent_std).sum::<f64>() / items.len() as f64
 }
 
-fn latent_mean_of(items: &[ratiometer::rerank::SortedItem], id: &str) -> f64 {
+fn latent_mean_of(items: &[llmsorting::rerank::SortedItem], id: &str) -> f64 {
     items
         .iter()
         .find(|i| i.id == id)
@@ -283,7 +283,7 @@ async fn pure_position_bias_order_is_not_a_function_of_input_order() {
 
     let orders_agree = order_by_id_a == order_by_id_b;
 
-    let spread = |items: &[ratiometer::rerank::SortedItem]| -> f64 {
+    let spread = |items: &[llmsorting::rerank::SortedItem]| -> f64 {
         let means: Vec<f64> = items.iter().map(|i| i.latent_mean).collect();
         means.iter().cloned().fold(f64::MIN, f64::max)
             - means.iter().cloned().fold(f64::MAX, f64::min)

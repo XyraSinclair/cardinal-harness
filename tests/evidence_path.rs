@@ -7,15 +7,15 @@ use std::process::{Command, Stdio};
 use std::sync::{mpsc, Arc};
 use std::time::Duration;
 
-use ratiometer::gateway::openrouter::OpenRouterAdapter;
-use ratiometer::gateway::{Attribution, GatewayConfig, NoopUsageSink, ProviderGateway};
-use ratiometer::prompts::PromptInstance;
-use ratiometer::rerank::{
+use llmsorting::gateway::openrouter::OpenRouterAdapter;
+use llmsorting::gateway::{Attribution, GatewayConfig, NoopUsageSink, ProviderGateway};
+use llmsorting::prompts::PromptInstance;
+use llmsorting::rerank::{
     compare_pair, sort_texts, PairwiseComparisonAttribute, PairwiseComparisonEntity,
     PairwiseComparisonRequest, PairwiseComparisonSpec, RerankExecution, RerankRunOptions,
     SortOptions,
 };
-use ratiometer::{ComparisonTrace, SqlitePairwiseCache, TraceError, TraceSink};
+use llmsorting::{ComparisonTrace, SqlitePairwiseCache, TraceError, TraceSink};
 use serde_json::json;
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, Request, Respond, ResponseTemplate};
@@ -168,19 +168,19 @@ fn evidence_spec(slug: &str) -> PairwiseComparisonSpec<'_> {
 #[test]
 fn evidence_prompt_instances_are_rendered_by_the_requested_seriate_instrument() {
     for slug in ["ratio_letter_v1", "ordinal_letter_v1"] {
-        let instrument: Box<dyn ratiometer::seriate::instrument::Instrument> = match slug {
+        let instrument: Box<dyn llmsorting::seriate::instrument::Instrument> = match slug {
             "ratio_letter_v1" => {
-                Box::new(ratiometer::seriate::instrument::ratio_letter::RatioLetterInstrument)
+                Box::new(llmsorting::seriate::instrument::ratio_letter::RatioLetterInstrument)
             }
             "ordinal_letter_v1" => {
-                Box::new(ratiometer::seriate::instrument::ordinal::OrdinalInstrument)
+                Box::new(llmsorting::seriate::instrument::ordinal::OrdinalInstrument)
             }
             _ => unreachable!(),
         };
         let expected = instrument.render(
-            &ratiometer::seriate::Attribute::new("brightness", "brightness <with literal markup>"),
-            &ratiometer::seriate::Entity::new("alpha & amber"),
-            &ratiometer::seriate::Entity::new("beta > blue"),
+            &llmsorting::seriate::Attribute::new("brightness", "brightness <with literal markup>"),
+            &llmsorting::seriate::Entity::new("alpha & amber"),
+            &llmsorting::seriate::Entity::new("beta > blue"),
         );
         let actual = evidence_spec(slug).prompt_instance();
         let canonical = evidence_spec("canonical_v2").prompt_instance();
@@ -260,12 +260,12 @@ async fn evidence_trace_identity_matches_the_exact_provider_prompt_and_seriate_t
     assert_eq!(events.len(), requests.len());
     assert!(!events.is_empty());
 
-    let instrument = ratiometer::seriate::instrument::ratio_letter::RatioLetterInstrument;
-    let expected_template_hash = ratiometer::seriate::instrument::Instrument::render(
+    let instrument = llmsorting::seriate::instrument::ratio_letter::RatioLetterInstrument;
+    let expected_template_hash = llmsorting::seriate::instrument::Instrument::render(
         &instrument,
-        &ratiometer::seriate::Attribute::new("fingerprint", "fingerprint"),
-        &ratiometer::seriate::Entity::new("A"),
-        &ratiometer::seriate::Entity::new("B"),
+        &llmsorting::seriate::Attribute::new("fingerprint", "fingerprint"),
+        &llmsorting::seriate::Entity::new("A"),
+        &llmsorting::seriate::Entity::new("B"),
     )
     .template
     .0
@@ -584,7 +584,7 @@ async fn evidence_moments_survive_the_cache_round_trip() {
         async move {
             let execution = RerankExecution::new(gateway, Attribution::new("test::evidence"))
                 .cache(&cache)
-                .run_options(ratiometer::rerank::RerankRunOptions {
+                .run_options(llmsorting::rerank::RerankRunOptions {
                     rng_seed: Some(seed),
                     cache_only: false,
                 });

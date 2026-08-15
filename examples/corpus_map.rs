@@ -6,9 +6,9 @@
 use std::io::Write;
 use std::sync::Arc;
 
-use ratiometer::cache::{PairwiseCache, SqlitePairwiseCache};
-use ratiometer::gateway::{Attribution, NoopUsageSink, ProviderGateway};
-use ratiometer::rerank::{
+use llmsorting::cache::{PairwiseCache, SqlitePairwiseCache};
+use llmsorting::gateway::{Attribution, NoopUsageSink, ProviderGateway};
+use llmsorting::rerank::{
     sort_documents, RerankDocument, RerankExecution, RerankRunOptions, SortOptions,
 };
 

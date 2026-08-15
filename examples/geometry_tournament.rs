@@ -41,8 +41,8 @@
 
 use std::collections::{BTreeMap, HashMap};
 
-use ratiometer::rating_engine::{AttributeParams, Observation, RaterParams, RatingEngine};
-use ratiometer::rerank::decimal_ledger::{analyze, DrawTrajectory, NodeObs};
+use llmsorting::rating_engine::{AttributeParams, Observation, RaterParams, RatingEngine};
+use llmsorting::rerank::decimal_ledger::{analyze, DrawTrajectory, NodeObs};
 
 const LN10: f64 = std::f64::consts::LN_10;
 const JITTER: f64 = 0.015;

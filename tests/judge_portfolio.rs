@@ -5,7 +5,7 @@
 //! failed designs preceded this file's invariants (raw-correlation PR,
 //! then eigen loadings) — both caught by these planted cases.
 
-use ratiometer::rerank::judge_geometry;
+use llmsorting::rerank::judge_geometry;
 
 struct Lcg(u64);
 impl Lcg {

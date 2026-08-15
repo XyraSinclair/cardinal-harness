@@ -1,6 +1,6 @@
 # Algorithm and design decisions
 
-This document explains not just *what* ratiometer does, but *why* each design choice was made.
+This document explains not just *what* llmsorting does, but *why* each design choice was made.
 
 This is the core engine document. Research notes and archived derivations were
 moved out of this repo to keep it focused.

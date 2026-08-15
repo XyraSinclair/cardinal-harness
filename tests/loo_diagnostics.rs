@@ -5,7 +5,7 @@
 
 use std::collections::HashMap;
 
-use ratiometer::rating_engine::{AttributeParams, Config, Observation, RaterParams, RatingEngine};
+use llmsorting::rating_engine::{AttributeParams, Config, Observation, RaterParams, RatingEngine};
 
 fn engine(n: usize) -> RatingEngine {
     let mut raters = HashMap::new();

@@ -6,9 +6,9 @@
 
 use std::sync::Arc;
 
-use ratiometer::gateway::{Attribution, NoopUsageSink, ProviderGateway};
-use ratiometer::repeat_pooling::{pool_repeats, RepeatDraws};
-use ratiometer::rerank::{nonce_draws, CORPUS, PRIMARY_ATTRIBUTE};
+use llmsorting::gateway::{Attribution, NoopUsageSink, ProviderGateway};
+use llmsorting::repeat_pooling::{pool_repeats, RepeatDraws};
+use llmsorting::rerank::{nonce_draws, CORPUS, PRIMARY_ATTRIBUTE};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

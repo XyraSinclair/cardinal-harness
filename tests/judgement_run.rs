@@ -2,15 +2,15 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 use std::time::Duration;
 
-use ratiometer::gateway::{
+use llmsorting::gateway::{
     Attribution, ChatGateway, ChatRequest, ChatResponse, FinishReason, ProviderError,
 };
-use ratiometer::judgement_run::edge::RerankJudgementResponse;
-use ratiometer::judgement_run::{
+use llmsorting::judgement_run::edge::RerankJudgementResponse;
+use llmsorting::judgement_run::{
     execute_judgement_run, JudgementCandidate, JudgementPrivacy, JudgementProviderCallOutcome,
     JudgementRunRequest, JudgementRunStore, JudgementRunTerminal, JUDGEMENT_RUN_SCHEMA,
 };
-use ratiometer::rerank::RerankExecution;
+use llmsorting::rerank::RerankExecution;
 
 #[derive(Default)]
 struct CountingGateway {

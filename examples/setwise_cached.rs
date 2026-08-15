@@ -41,16 +41,16 @@ use rand::seq::SliceRandom;
 use rand::{Rng, SeedableRng};
 use serde::{Deserialize, Serialize};
 
-use ratiometer::gateway::{
+use llmsorting::gateway::{
     Attribution, ChatGateway, ChatModel, ChatRequest, ChatResponse, FinishReason, Message,
     NoopUsageSink, ProviderError, ProviderGateway,
 };
-use ratiometer::rating_engine::{
+use llmsorting::rating_engine::{
     AttributeParams, EngineSpec, Observation, RaterParams, RatingEngine,
 };
-use ratiometer::rerank::sort::{sort_documents, SortOptions, SortedTexts};
-use ratiometer::rerank::types::RerankDocument;
-use ratiometer::rerank::{JsonlTraceSink, RerankExecution, RerankRunOptions};
+use llmsorting::rerank::sort::{sort_documents, SortOptions, SortedTexts};
+use llmsorting::rerank::types::RerankDocument;
+use llmsorting::rerank::{JsonlTraceSink, RerankExecution, RerankRunOptions};
 
 const SLOT_LETTERS: [char; 8] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 const SETWISE_MAX_OUTPUT_TOKENS: u32 = 400;
@@ -399,13 +399,13 @@ impl ChatGateway for SyntheticJudge {
         let system = req
             .messages
             .iter()
-            .find(|m| matches!(m.role, ratiometer::gateway::Role::System))
+            .find(|m| matches!(m.role, llmsorting::gateway::Role::System))
             .map(|m| m.content.clone())
             .unwrap_or_default();
         let user = req
             .messages
             .iter()
-            .filter(|m| matches!(m.role, ratiometer::gateway::Role::User))
+            .filter(|m| matches!(m.role, llmsorting::gateway::Role::User))
             .map(|m| m.content.as_str())
             .collect::<Vec<_>>()
             .join("\n");
@@ -818,7 +818,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let trace_path = args.out_dir.join("trace.jsonl");
     let mut trace = std::io::BufWriter::new(std::fs::File::create(&trace_path)?);
-    let attribution = Attribution::new("ratiometer::example::setwise_cached");
+    let attribution = Attribution::new("llmsorting::example::setwise_cached");
 
     // --- setwise arm ------------------------------------------------------
     // Per (k, attribute): observations, usage, per-pair oriented means for

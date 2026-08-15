@@ -1,5 +1,5 @@
-use ratiometer::rating_engine::Observation;
-use ratiometer::{ComparisonTrace, JsonlTraceSink, TraceSink};
+use llmsorting::rating_engine::Observation;
+use llmsorting::{ComparisonTrace, JsonlTraceSink, TraceSink};
 use tempfile::tempdir;
 
 fn make_trace(comparison_index: usize) -> ComparisonTrace {

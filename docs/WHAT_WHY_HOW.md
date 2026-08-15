@@ -87,7 +87,7 @@ see probes — but it can't fix it).
 ## How to use it
 
 ```bash
-cargo install ratiometer --locked
+cargo install llmsorting --locked
 export OPENROUTER_API_KEY=...
 # or, with a Claude Code subscription and no API key:
 #   --model claude-code/<model>  (21/21 decisive-pair agreement with the
@@ -113,7 +113,7 @@ cardinal explain my-ranking.txt --propose 3
 
 The install command pulls the released crate from crates.io. A source
 install of current `main`
-(`cargo install --git https://github.com/XyraSinclair/ratiometer --locked`)
+(`cargo install --git https://github.com/XyraSinclair/llmsorting --locked`)
 and tagged binaries from GitHub Releases remain available.
 
 Every run prints its evidence summary: comparisons, cost, order flips,

@@ -11,8 +11,8 @@ use std::f64::consts::PI;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 
-use ratiometer::rating_engine::{AttributeParams, Observation, RaterParams, RatingEngine};
-use ratiometer::trait_search::{
+use llmsorting::rating_engine::{AttributeParams, Observation, RaterParams, RatingEngine};
+use llmsorting::trait_search::{
     AttributeConfig, TopKConfig, TraitSearchConfig, TraitSearchManager,
 };
 

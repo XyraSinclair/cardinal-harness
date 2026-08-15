@@ -15,14 +15,14 @@
 use std::collections::HashMap;
 use std::collections::HashSet;
 
-use rand::rngs::StdRng;
-use rand::{Rng, SeedableRng};
-use ratiometer::rating_engine::{
+use llmsorting::rating_engine::{
     AttributeParams, Observation, PlannerMode, RaterParams, RatingEngine,
 };
-use ratiometer::trait_search::{
+use llmsorting::trait_search::{
     AttributeConfig, TopKConfig, TraitSearchConfig, TraitSearchManager,
 };
+use rand::rngs::StdRng;
+use rand::{Rng, SeedableRng};
 
 const ATTR: &str = "quality";
 const N: usize = 24;

@@ -2,9 +2,9 @@ use std::sync::atomic::AtomicBool;
 use std::sync::Arc;
 use std::time::Duration;
 
-use ratiometer::gateway::openrouter::OpenRouterAdapter;
-use ratiometer::gateway::{Attribution, GatewayConfig, NoopUsageSink, ProviderGateway};
-use ratiometer::rerank::{
+use llmsorting::gateway::openrouter::OpenRouterAdapter;
+use llmsorting::gateway::{Attribution, GatewayConfig, NoopUsageSink, ProviderGateway};
+use llmsorting::rerank::{
     multi_rerank, MultiRerankAttributeSpec, MultiRerankEntity, MultiRerankRequest,
     MultiRerankTopKSpec, RerankStopReason,
 };
@@ -70,7 +70,7 @@ async fn multi_rerank_honors_cancel_flag_before_any_comparisons() {
     let cancel_flag = AtomicBool::new(true);
     let resp = multi_rerank(
         req,
-        ratiometer::rerank::RerankExecution::new(gateway, Attribution::new("test"))
+        llmsorting::rerank::RerankExecution::new(gateway, Attribution::new("test"))
             .cancel_flag(&cancel_flag),
     )
     .await

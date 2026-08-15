@@ -6,9 +6,9 @@ use std::process::{Command, Stdio};
 use std::sync::Arc;
 use std::time::Duration;
 
-use ratiometer::gateway::openrouter::OpenRouterAdapter;
-use ratiometer::gateway::{Attribution, GatewayConfig, NoopUsageSink, ProviderGateway};
-use ratiometer::rerank::{sort_texts, RerankExecution, SortError, SortOptions};
+use llmsorting::gateway::openrouter::OpenRouterAdapter;
+use llmsorting::gateway::{Attribution, GatewayConfig, NoopUsageSink, ProviderGateway};
+use llmsorting::rerank::{sort_texts, RerankExecution, SortError, SortOptions};
 use serde_json::json;
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, Request, Respond, ResponseTemplate};

@@ -16,7 +16,7 @@ import urllib.request
 
 BASE = "https://manifund.org/api/v0"
 OUT_DIR = pathlib.Path(__file__).resolve().parent.parent / "data" / "manifund"
-UA = "ratiometer-research (contact: xyraward@gmail.com; approved by Austin)"
+UA = "llmsorting-research (contact: xyraward@gmail.com; approved by Austin)"
 
 
 def paginate(surface: str, out_path: pathlib.Path) -> int:

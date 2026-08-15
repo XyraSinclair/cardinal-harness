@@ -3,9 +3,9 @@
 use std::sync::Arc;
 use std::time::Duration;
 
-use ratiometer::gateway::openrouter::OpenRouterAdapter;
-use ratiometer::gateway::{Attribution, GatewayConfig, NoopUsageSink, ProviderGateway};
-use ratiometer::rerank::{
+use llmsorting::gateway::openrouter::OpenRouterAdapter;
+use llmsorting::gateway::{Attribution, GatewayConfig, NoopUsageSink, ProviderGateway};
+use llmsorting::rerank::{
     multi_rerank, MultiRerankAttributeSpec, MultiRerankEntity, MultiRerankRequest,
     MultiRerankTopKSpec, RerankExecution,
 };

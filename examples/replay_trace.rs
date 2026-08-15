@@ -14,10 +14,10 @@
 //!
 //! Usage: cargo run --example replay_trace -- <trace.jsonl>
 
-use ratiometer::rating_engine::Observation;
-use ratiometer::rerank::decimal_ledger::{analyze, GRAMMAR_VERSION};
-use ratiometer::rerank::multi::EVIDENCE_VAR_FLOOR;
-use ratiometer::rerank::ComparisonTrace;
+use llmsorting::rating_engine::Observation;
+use llmsorting::rerank::decimal_ledger::{analyze, GRAMMAR_VERSION};
+use llmsorting::rerank::multi::EVIDENCE_VAR_FLOOR;
+use llmsorting::rerank::ComparisonTrace;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let path = std::env::args()

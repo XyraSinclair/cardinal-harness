@@ -44,7 +44,8 @@ pub struct PromptInstance {
 }
 // FROZEN: this domain-separation string is baked into every content-addressed
 // prompt digest (cache keys, packet ids). The crate was renamed to `ratiometer`
-// (2026-08-12) but this constant keeps the historical name deliberately —
+// (2026-08-12) and again to `llmsorting` (2026-08-15), but this constant keeps
+// the original name deliberately —
 // changing it would silently invalidate all existing caches and packet ids.
 const RENDERED_PROMPT_DIGEST_DOMAIN: &[u8] = b"cardinal-harness/rendered-prompt/v1\0";
 

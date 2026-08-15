@@ -5,9 +5,9 @@
 
 use std::collections::HashMap;
 
-use ratiometer::rating_engine::{AttributeParams, Config, Observation, RaterParams, RatingEngine};
-use ratiometer::repeat_pooling::RepeatDraws;
-use ratiometer::rerank::stochastic_transitivity;
+use llmsorting::rating_engine::{AttributeParams, Config, Observation, RaterParams, RatingEngine};
+use llmsorting::repeat_pooling::RepeatDraws;
+use llmsorting::rerank::stochastic_transitivity;
 
 fn draws(i: usize, j: usize, d: Vec<f64>) -> RepeatDraws {
     RepeatDraws { i, j, draws: d }

@@ -2,17 +2,17 @@ use std::collections::HashMap;
 use std::sync::Mutex;
 use std::time::Duration;
 
-use ratiometer::cache::{CachedJudgement, PairwiseCacheKey, SqlitePairwiseCache};
-use ratiometer::gateway::openrouter::OpenRouterAdapter;
-use ratiometer::gateway::{GatewayConfig, NoopUsageSink, ProviderGateway};
-use ratiometer::prompts::prompt_by_slug;
-use ratiometer::rating_engine::{Observation, RatingEngine};
-use ratiometer::rerank::{
+use llmsorting::cache::{CachedJudgement, PairwiseCacheKey, SqlitePairwiseCache};
+use llmsorting::gateway::openrouter::OpenRouterAdapter;
+use llmsorting::gateway::{GatewayConfig, NoopUsageSink, ProviderGateway};
+use llmsorting::prompts::prompt_by_slug;
+use llmsorting::rating_engine::{Observation, RatingEngine};
+use llmsorting::rerank::{
     multi_rerank, MultiRerankAttributeSpec, MultiRerankEntity, MultiRerankMeta, MultiRerankRequest,
     MultiRerankTopKSpec, RerankExecution, RerankRunOptions, WarmStartData, WarmStartError,
     WarmStartProvider,
 };
-use ratiometer::{
+use llmsorting::{
     Attribution, ComparisonEvent, ComparisonObserver, ComparisonTrace, ObserverError,
     PairwiseCache, TraceError, TraceSink,
 };
@@ -119,7 +119,7 @@ fn replay_trace(
 
 fn assert_live_matches_replay(
     req: &MultiRerankRequest,
-    response: &ratiometer::rerank::MultiRerankResponse,
+    response: &llmsorting::rerank::MultiRerankResponse,
     replayed: &ReplayPosterior,
 ) {
     for (entity_index, requested) in req.entities.iter().enumerate() {
@@ -455,11 +455,11 @@ async fn cached_evidence_replays_bitwise_and_naive_confidence_reconstruction_div
     let cache = SqlitePairwiseCache::new(dir.path().join("cache.sqlite")).unwrap();
     let model = "openai/gpt-5-mini";
     let prompt_slug = "ratio_letter_v1";
-    let template_hash = ratiometer::seriate::instrument::Instrument::render(
-        &ratiometer::seriate::instrument::ratio_letter::RatioLetterInstrument,
-        &ratiometer::seriate::Attribute::new("fingerprint", "fingerprint"),
-        &ratiometer::seriate::Entity::new("A"),
-        &ratiometer::seriate::Entity::new("B"),
+    let template_hash = llmsorting::seriate::instrument::Instrument::render(
+        &llmsorting::seriate::instrument::ratio_letter::RatioLetterInstrument,
+        &llmsorting::seriate::Attribute::new("fingerprint", "fingerprint"),
+        &llmsorting::seriate::Entity::new("A"),
+        &llmsorting::seriate::Entity::new("B"),
     )
     .template
     .0

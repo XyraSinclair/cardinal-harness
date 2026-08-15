@@ -1,11 +1,11 @@
 #![forbid(unsafe_code)]
 
-//! # ratiometer
+//! # llmsorting
 //!
 //! The instrument that turns an LLM's felt sense into calibrated measurement.
 //!
 //! Instead of asking an LLM to "rate this 1–10" (unreliable, miscalibrated),
-//! ratiometer asks pairwise ratio questions: "how many times more attribute
+//! llmsorting asks pairwise ratio questions: "how many times more attribute
 //! does A have than B?" A robust statistical solver (IRLS with Huber loss) combines
 //! these noisy observations into globally consistent scores with uncertainty
 //! estimates. The system selects the most informative pairs to query and stops

@@ -8,7 +8,7 @@
 //! projection zero, so residual = μ exactly and every energy is
 //! hand-checkable.
 
-use ratiometer::rating_engine::{compute_hodge_split, Config};
+use llmsorting::rating_engine::{compute_hodge_split, Config};
 
 fn cfg() -> Config {
     Config::default()
@@ -91,7 +91,7 @@ fn solver_summary_split_sums_to_hcr_on_a_planted_cyclic_judge() {
     // local + harmonic ≈ hcr must hold on real solver residuals (which
     // are only approximately w-orthogonal to gradients after IRLS
     // reweighting — hence the honest tolerance).
-    use ratiometer::rating_engine::{AttributeParams, Observation, RaterParams, RatingEngine};
+    use llmsorting::rating_engine::{AttributeParams, Observation, RaterParams, RatingEngine};
     use std::collections::HashMap;
 
     let n = 6;
@@ -152,7 +152,7 @@ fn atlas_winner_c8_134_hosts_both_diagnostics_at_the_same_budget() {
         split.harmonic_dim, 1,
         "the strictly-better design: {split:?}"
     );
-    let spectral = ratiometer::rating_engine::spectral_diagnostics(&edges, &ones, n, 256).unwrap();
+    let spectral = llmsorting::rating_engine::spectral_diagnostics(&edges, &ones, n, 256).unwrap();
     assert!((spectral.fiedler_value - 4.0).abs() < 1e-9, "{spectral:?}");
 }
 
@@ -163,7 +163,7 @@ fn jcb_graph_design_cannot_host_harmonic_disagreement() {
     // any future corpus/pair-design change that silently loses this
     // property (or gains it) surfaces. Values are irrelevant to the
     // dimension computation; use a generic flow.
-    let pairs = ratiometer::rerank::core_pairs();
+    let pairs = llmsorting::rerank::core_pairs();
     let m = pairs.len();
     let flow: Vec<f64> = (0..m).map(|k| ((k * 7 % 11) as f64 - 5.0) / 10.0).collect();
     let lam = vec![1.0; m];

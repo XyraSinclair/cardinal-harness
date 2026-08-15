@@ -11,7 +11,7 @@
 
 use std::collections::HashMap;
 
-use ratiometer::rating_engine::{AttributeParams, Config, Observation, RaterParams, RatingEngine};
+use llmsorting::rating_engine::{AttributeParams, Config, Observation, RaterParams, RatingEngine};
 
 /// The repo's ladder (src/prompts.rs).
 const REPO_LADDER: [f64; 17] = [
