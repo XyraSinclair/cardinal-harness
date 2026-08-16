@@ -156,6 +156,45 @@ subtle-attribute ranking matters, and treat low cross-model ρ as the signal
 that an attribute needs rephrasing. Both stay on disk; swap is one launch
 script either way.
 
+## Dense pair + logprob harnessing (2026-08-15 evening, operator decree)
+
+A4B retired from the judge slot (kept on disk). The standing pair is the two
+DENSE models — qwen3.8:27b and gemma4:31b — on the theory that a dense model
+carries one coherent latent per subtle attribute where a sparse MoE may route
+different aspects to different experts.
+
+Logprobs are now first-class: `--template canonical_bucket_v1` makes every
+judgment a single structured emission whose answer-token logprobs yield a full
+posterior (direction PMF, ratio-bucket PMF, signed-ln-ratio distribution,
+entropy). `judge_and_land.py --template canonical_bucket_v1` lands
+dir_prob/entropy/top_prob/neighborhood_prob plus the serialized PMF into
+`ratiometer.judgments`. Verified: 2,750/2,806 qwen judgments carry the PMF.
+
+**Highdim pilot** (12 fascinating attributes: self-containedness, high-status,
+low-status, poshness, technical calmness, earnestness, intellectual density,
+legibility-to-an-outsider, coiled potential energy, craftedness, institutional
+insiderness, rewards-a-careful-re-read; bare + simple-elaborated forms; both
+judges; all landed with PMFs):
+
+- Mean bare cross-judge agreement 0.757 — the fascinating tier sits where the
+  subtle Manifund tier does, well below concrete attributes.
+- **Elaboration rescues the vaguest attributes**: institutional insiderness
+  0.625→0.833, coiled potential energy 0.647→0.854. Mean effect +0.034
+  (8/12 improved). Counterexample: earnestness 0.870→0.756 — elaborating an
+  attribute both judges already shared *overwrote* the shared construct.
+  Doctrine: elaborate where bare agreement is low; leave high-agreement
+  attributes bare.
+- **Entropy signatures differ by 4×**: qwen ~2.3 nats/judgment, gemma ~0.6.
+  Gemma commits hard; qwen spreads its PMF. Same rankings either way — but
+  qwen's posteriors carry more usable uncertainty for the solver.
+
+Lockstep doctrine (`scripts/dual_judge_lockstep.py`): both judges advance
+attribute-by-attribute together (per-attribute lag ≈ one cell wall, 30–60s).
+True lockstep needs both endpoints co-resident; the PRO 6000 currently hosts
+~36GB of production rerank/embed, so co-residence requires evicting those —
+Xyra's call, flagged, not taken. Until then: alternating sweeps per model
+(one full sweep apart), swap = one launch script.
+
 ## Production doctrine going forward
 
 - Measurement runs bypass the pairwise cache (independence) but always
