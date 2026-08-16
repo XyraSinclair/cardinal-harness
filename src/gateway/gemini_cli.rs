@@ -16,6 +16,28 @@
 //! `gemini-2.5-pro` natively and maps the flash family (`gemini-2.5-flash`,
 //! `gemini-3.7-flash`) onto `gemini-3.5-flash`; the served name is read back
 //! from the CLI's own stats and reported in `served_model`.
+//!
+//! ## Lean harness
+//!
+//! Left alone, the CLI ships its full coding-agent harness with every request:
+//! the interactive-agent system prompt plus all core tool declarations —
+//! measured at 7,098 prompt tokens for an 8-token prompt (2026-08-15, 0.54.4).
+//! Two levers strip that to ~136 tokens (−98%):
+//!
+//! 1. `GEMINI_SYSTEM_MD=<path>` replaces the entire agent system prompt with
+//!    the file's contents. The adapter writes [`SYSTEM_PROMPT`] into its
+//!    per-call scratch directory and points the env var there, so the judge
+//!    prompt is versioned here, not in the operator's config dir. (The CLI
+//!    substitutes only `${...}` placeholders in the file; plain prose is
+//!    inert.)
+//! 2. The provisioned home's `.gemini/settings.json` must carry
+//!    `"tools": {"core": []}` (no tool declarations sent) and
+//!    `"context": {"includeDirectoryTree": false}` (no directory listing in
+//!    the session-context message). These are home-side because they are
+//!    harness config, not judgment semantics.
+//!
+//! The residue is the CLI's small `<session_context>` block (date, OS, temp
+//! dir), which has no settings hook.
 
 use std::path::PathBuf;
 use std::process::Stdio;
@@ -29,6 +51,11 @@ use super::error::{ErrorContext, ProviderError};
 use super::types::{ChatRequest, ChatResponse, FinishReason, Message, Role};
 
 const PROVIDER: &str = "gemini-cli";
+/// Replaces the CLI's coding-agent system prompt via `GEMINI_SYSTEM_MD` (see
+/// module docs: "Lean harness"). Must stay free of `${...}` sequences — the
+/// CLI substitutes those as template placeholders.
+const SYSTEM_PROMPT: &str = "You are a precise evaluation model. Follow the user's instructions \
+     exactly and produce only the requested output, with no preamble or commentary.\n";
 const QUOTA_MARKERS: &[&str] = &[
     "resource_exhausted",
     "quota exceeded",
@@ -101,6 +128,17 @@ impl GeminiCliAdapter {
                 ))
             })?;
 
+        // Written per call into the scratch dir so the lean system prompt is
+        // guaranteed by the adapter itself, independent of home-dir state. The
+        // CLI fails fast ("missing system prompt file") rather than silently
+        // reverting to its agent prompt if this path is wrong.
+        let system_md = scratch.path().join("system.md");
+        std::fs::write(&system_md, SYSTEM_PROMPT).map_err(|error| {
+            ProviderError::config(format!(
+                "failed to write Gemini CLI system prompt: {error}"
+            ))
+        })?;
+
         let mut command = Command::new(&self.config.binary);
         command
             .arg("--skip-trust")
@@ -111,6 +149,7 @@ impl GeminiCliAdapter {
             // HOME carries the persistent OAuth session; CWD is a throwaway so no
             // repository GEMINI.md / settings can affect the judgment.
             .env("HOME", home)
+            .env("GEMINI_SYSTEM_MD", &system_md)
             .env("GEMINI_CLI_TRUST_WORKSPACE", "true")
             .current_dir(scratch.path())
             .stdin(Stdio::piped())

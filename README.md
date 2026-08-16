@@ -97,7 +97,12 @@ model-request allowance at $0 marginal cost; the CLI refreshes its own token,
 so the adapter carries no auth code. Point it at an operator-provisioned login
 with two env vars: `CARDINAL_GEMINI_CLI_BINARY` (the `gemini` executable) and
 `CARDINAL_GEMINI_CLI_HOME` (a directory used as the child's `HOME`, holding
-`.gemini/oauth_creds.json` for the subscription account). The CLI resolves the
+`.gemini/oauth_creds.json` for the subscription account). That home's
+`.gemini/settings.json` should also carry
+`"tools": {"core": []}, "context": {"includeDirectoryTree": false}` — combined
+with the adapter's own `GEMINI_SYSTEM_MD` override this strips the CLI's
+coding-agent harness from each request (7,098 → ~136 prompt tokens measured on
+0.54.4), so a judgement sends essentially only the judge prompt. The CLI resolves the
 `-m` slug against its own model table: on gemini-cli 0.54.4 an AI Pro session
 serves `gemini-2.5-pro` natively and maps the flash family onto
 `gemini-3.5-flash`; the actually-served name is reported back in each response.
