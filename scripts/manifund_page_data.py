@@ -8,7 +8,11 @@ deduped through the ReplacingMergeTree with FINAL. Proposal card metadata
 joins data/manifund.txt corpus lines back to data/manifund/projects.jsonl.
 
 Usage: python3 scripts/manifund_page_data.py [out.json]
-Default out: ~/projects/exopriors-core/web/static/manifund/data.json
+Default out: site/data/manifund.json — served at
+https://llmsorting.com/data/manifund.json (rsync site/ to
+colo2:/srv/llmsorting), which openpriors.com/manifund fetches cross-origin
+(CORS header set in /etc/caddy/llmsorting.caddy). Refresh = regenerate,
+commit, rsync; no exopriors-core deploy needed.
 """
 import datetime
 import json
@@ -41,8 +45,7 @@ def ch_query(query):
 
 
 def main():
-    out_path = sys.argv[1] if len(sys.argv) > 1 else os.path.expanduser(
-        "~/projects/exopriors-core/web/static/manifund/data.json")
+    out_path = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "site/data/manifund.json")
 
     corpus_lines = [l.rstrip("\n") for l in open(os.path.join(REPO, "data/manifund.txt")) if l.strip()]
     fable_names = {l.strip() for l in open(os.path.join(REPO, "batteries/fable_subtle_1000.txt")) if l.strip()}
