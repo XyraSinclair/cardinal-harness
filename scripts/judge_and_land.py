@@ -23,7 +23,8 @@ CARDINAL = os.path.expanduser("~/projects/llmsorting/target/release/cardinal")
 SSH = "/usr/bin/ssh"
 
 
-def run_cell(corpus, attr, model, budget, seed, outdir, idx, template=None, elaborate=False):
+def run_cell(corpus, attr, model, budget, seed, outdir, idx, template=None, elaborate=False,
+             concurrency=None):
     slug = f"a{idx:03d}"
     out = os.path.join(outdir, f"{slug}.json")
     trace = os.path.join(outdir, f"{slug}.trace.jsonl")
@@ -37,6 +38,8 @@ def run_cell(corpus, attr, model, budget, seed, outdir, idx, template=None, elab
         cmd += ["--template", template]
     if elaborate:
         cmd += ["--elaborate"]
+    if concurrency:
+        cmd += ["--concurrency", str(concurrency)]
     with open(out, "w") as fo, open(errf, "w") as fe:
         subprocess.run(cmd, stdout=fo, stderr=fe, env=env, check=True, timeout=3600)
     return out, trace
@@ -123,6 +126,9 @@ def main():
                     help="canonical_bucket_v1 lands a logprob posterior PMF")
     ap.add_argument("--elaborate", action="store_true",
                     help="expand each attribute into a rubric before judging")
+    ap.add_argument("--concurrency", type=int, default=None,
+                    help="judgements in flight (cardinal default 8); use 2 on the "
+                         "gemini-cli rail, whose 429 backoff punishes bursts")
     a = ap.parse_args()
     os.makedirs(a.outdir, exist_ok=True)
     corpus_lines = [l.rstrip("\n") for l in open(a.corpus) if l.strip()]
@@ -135,7 +141,8 @@ def main():
             continue
         t = time.time()
         out, trace = run_cell(a.corpus, attr, a.model, a.budget, a.seed, a.outdir, i,
-                              template=a.template, elaborate=a.elaborate)
+                              template=a.template, elaborate=a.elaborate,
+                              concurrency=a.concurrency)
         n = land(trace, corpus_lines, corpus_name, attr, a.seed, a.run_tag)
         landed_total += n
         print(f"[{i+1}/{len(attrs)}] {attr!r}: {n} judgments landed "

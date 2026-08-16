@@ -132,6 +132,12 @@ enum Commands {
         /// RNG seed for reproducible planning
         #[arg(long)]
         seed: Option<u64>,
+        /// Judgements in flight at once (default 8). Lower it for
+        /// rate-limited rails: a subscription CLI rail that 429s under a burst
+        /// backs off for minutes, so 8-wide bursts cost more wall-clock than
+        /// a 2-wide steady stream
+        #[arg(long)]
+        concurrency: Option<usize>,
         /// Serve judgements from cache only; error on any cache miss
         #[arg(long)]
         cache_only: bool,
@@ -673,6 +679,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             elaborate,
             prune_below,
             seed,
+            concurrency,
             cache_only,
             no_cache,
             cache,
@@ -763,6 +770,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 also_by,
                 prune_p_topk_below: prune_below,
                 prompt_template_slug: template,
+                comparison_concurrency: concurrency,
                 ..Default::default()
             };
             let criterion = if elaborate {
