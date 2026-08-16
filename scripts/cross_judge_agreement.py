@@ -11,7 +11,8 @@ Low agreement on a stable-per-judge attribute = the criterion is
 model-idiosyncratic (each judge reified a different construct) — the signal
 that an attribute needs sharper phrasing before its ranking is trusted.
 
-Usage: cross_judge_agreement.py <run_tag> [judgeA judgeB]
+Usage: cross_judge_agreement.py <run_tag>[,<run_tag>...] [judgeA judgeB]
+(multiple run_tags let two judges' sweeps land under different tags)
 """
 import subprocess, sys, json, collections, itertools
 
@@ -29,12 +30,13 @@ def q(sql):
 
 def main():
     run_tag = sys.argv[1]
+    tags = ",".join("'" + t.strip() + "'" for t in run_tag.split(",") if t.strip())
     # pull decisive judgments: attribute, model, unordered-pair key, direction
     # (winner entity hash). swapped is already folded into higher_ranked=A/B by
     # the judge; we map to the actual winning entity hash.
     rows = q("SELECT attribute, model, entity_a_hash, entity_b_hash, higher_ranked "
-             "FROM ratiometer.judgments WHERE run_tag = '" + run_tag +
-             "' AND refused = 0 AND higher_ranked IN ('A','B')")
+             "FROM ratiometer.judgments WHERE run_tag IN (" + tags +
+             ") AND refused = 0 AND higher_ranked IN ('A','B')")
     models = sorted({r[1] for r in rows})
     if len(sys.argv) >= 4:
         ja, jb = sys.argv[2], sys.argv[3]
