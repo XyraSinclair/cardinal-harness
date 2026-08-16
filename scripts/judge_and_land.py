@@ -121,11 +121,16 @@ def land(trace_path, corpus_lines, corpus_name, attr, seed, run_tag):
     return len(rows)
 
 
+def sql_str(s):
+    """ClickHouse string literal: single quotes (double quotes are identifiers)."""
+    return "'" + s.replace("\\", "\\\\").replace("'", "\\'") + "'"
+
+
 def ledger_done_attrs(run_tag, model, min_rows):
     """Attributes already landed (>= min_rows rows) for this run_tag+model —
     the resume set a supervisor restart must not re-buy."""
     q = ("SELECT attribute FROM ratiometer.judgments "
-         f"WHERE run_tag = {json.dumps(run_tag)} AND model = {json.dumps(model)} "
+         f"WHERE run_tag = {sql_str(run_tag)} AND model = {sql_str(model)} "
          f"GROUP BY attribute HAVING count() >= {int(min_rows)} FORMAT TSVRaw")
     proc = ch_run(q)
     if proc.returncode != 0:
