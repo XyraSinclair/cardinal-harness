@@ -106,8 +106,14 @@ coding-agent harness from each request (7,098 → ~136 prompt tokens measured on
 `-m` slug against its own model table: on gemini-cli 0.54.4 an AI Pro session
 serves `gemini-2.5-pro` natively and maps the flash family onto
 `gemini-3.5-flash`; the actually-served name is reported back in each response.
-Smoke-verified end to end (decisive pairs, both models, $0); no rail-fitness
-study yet.
+Rail-fitness verified at scale: 7,390 Manifund judgements (32 attributes,
+0 refusals, 0 errors, $0) with cross-judge direction agreement of **0.781
+vs gemma4-31b — at the 0.776 local-judge baseline**, so the subscription rail
+behaves as a genuine third judge
+([`notes/gemini-cli-vs-local-2026-08-15/RESULTS.md`](notes/gemini-cli-vs-local-2026-08-15/RESULTS.md)).
+Use `--concurrency 2` on this rail: the subscription's per-minute limit makes
+8-wide bursts back off for minutes, and a 2-wide steady stream is 4x faster
+end-to-end.
 
 Real output (preserved with full evidence under
 [`artifacts/live/sort-demo-2026-07-02/`](artifacts/live/sort-demo-2026-07-02/)):
