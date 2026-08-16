@@ -23,7 +23,7 @@ CARDINAL = os.path.expanduser("~/projects/llmsorting/target/release/cardinal")
 SSH = "/usr/bin/ssh"
 
 
-def run_cell(corpus, attr, model, budget, seed, outdir, idx):
+def run_cell(corpus, attr, model, budget, seed, outdir, idx, template=None, elaborate=False):
     slug = f"a{idx:03d}"
     out = os.path.join(outdir, f"{slug}.json")
     trace = os.path.join(outdir, f"{slug}.trace.jsonl")
@@ -33,9 +33,28 @@ def run_cell(corpus, attr, model, budget, seed, outdir, idx):
     cmd = [CARDINAL, "sort", corpus, "--by", attr, "--model", model,
            "--budget", str(budget), "--seed", str(seed),
            "--trace", trace, "--format", "json"]
+    if template:
+        cmd += ["--template", template]
+    if elaborate:
+        cmd += ["--elaborate"]
     with open(out, "w") as fo, open(errf, "w") as fe:
         subprocess.run(cmd, stdout=fo, stderr=fe, env=env, check=True, timeout=3600)
     return out, trace
+
+
+def _posterior_fields(d):
+    """Extract landable logprob-posterior scalars from a trace row."""
+    p = d.get("pairwise_logprob_posterior")
+    if not p:
+        return 0.0, 0.0, 0.0, 0.0, ""
+    chosen = d.get("higher_ranked") or p.get("selected_higher_ranked")
+    dir_prob = 0.0
+    for e in p.get("higher_ranked_distribution", {}).get("support", []):
+        if e.get("value") == chosen:
+            dir_prob = e.get("probability", 0.0)
+    conf = (p.get("confidence") or {}).get("Logprob") or {}
+    return (dir_prob, conf.get("entropy", 0.0), conf.get("top_prob", 0.0),
+            conf.get("neighborhood_prob", 0.0), json.dumps(p, ensure_ascii=False))
 
 
 def land(trace_path, corpus_lines, corpus_name, attr, seed, run_tag):
@@ -46,6 +65,7 @@ def land(trace_path, corpus_lines, corpus_name, attr, seed, run_tag):
             err = str(d["error"])
         else:
             err = ""
+        dp, ent, tp, nb, post = _posterior_fields(d)
         rows.append({
             "ts": (datetime.datetime.fromtimestamp(
                 d["timestamp_ms"] / 1000.0, datetime.timezone.utc)
@@ -67,6 +87,8 @@ def land(trace_path, corpus_lines, corpus_name, attr, seed, run_tag):
             "higher_ranked": d.get("higher_ranked") or "",
             "ratio": d.get("ratio") if d.get("ratio") is not None else 0.0,
             "confidence": d.get("confidence") if d.get("confidence") is not None else 0.0,
+            "dir_prob": dp, "entropy": ent, "top_prob": tp,
+            "neighborhood_prob": nb, "posterior": post,
             "swapped": bool(d.get("swapped")),
             "cached": bool(d.get("cached")),
             "refused": bool(d.get("refused")),
@@ -97,6 +119,10 @@ def main():
     ap.add_argument("--run-tag", required=True)
     ap.add_argument("--outdir", required=True)
     ap.add_argument("--start-at", type=int, default=0)
+    ap.add_argument("--template", default=None,
+                    help="canonical_bucket_v1 lands a logprob posterior PMF")
+    ap.add_argument("--elaborate", action="store_true",
+                    help="expand each attribute into a rubric before judging")
     a = ap.parse_args()
     os.makedirs(a.outdir, exist_ok=True)
     corpus_lines = [l.rstrip("\n") for l in open(a.corpus) if l.strip()]
@@ -108,7 +134,8 @@ def main():
         if i < a.start_at:
             continue
         t = time.time()
-        out, trace = run_cell(a.corpus, attr, a.model, a.budget, a.seed, a.outdir, i)
+        out, trace = run_cell(a.corpus, attr, a.model, a.budget, a.seed, a.outdir, i,
+                              template=a.template, elaborate=a.elaborate)
         n = land(trace, corpus_lines, corpus_name, attr, a.seed, a.run_tag)
         landed_total += n
         print(f"[{i+1}/{len(attrs)}] {attr!r}: {n} judgments landed "
