@@ -1,0 +1,1010 @@
+epistemic humility: how honestly the text represents the limits of what its author knows — claims sized to evidence, ignorance admitted plainly. Reward accurate self-limitation; do not reward performative self-effacement.
+calibration of stated confidence: how well the expressed certainty of each claim matches the strength of the support offered for it. Reward proportion between confidence and evidence; do not reward blanket hedging.
+falsifiability of core claims: how clearly the central claims could be proven wrong by some specifiable observation. Reward testable commitments; do not reward bold-sounding claims no result could touch.
+willingness to say what would change its mind: how explicitly the author names conditions under which they would abandon their position. Reward stated defeaters; do not reward token open-mindedness.
+liveness of its central hypothesis: how much the main idea still functions as a genuine open question the author is actively testing rather than a settled conclusion being defended. Reward live inquiry; do not reward manufactured suspense.
+evidence-to-assertion ratio: how much of the text is support versus bare claim. Reward grounded assertion; do not reward citation padding that supports nothing.
+awareness of its own weakest point: how clearly the text identifies the single place its argument is most vulnerable. Reward self-located weakness; do not reward decoy weaknesses offered to deflect.
+resistance to motivated reasoning: how little the conclusions appear driven by what the author wants to be true. Reward conclusions that cut against interest; do not reward mere contrarian posture.
+crux legibility: how easy it is to locate the exact proposition on which the whole argument turns. Reward a findable crux; do not reward a tidy summary that hides where disagreement would bite.
+degree to which uncertainty is quantified rather than gestured at: how often vague maybes become stated probabilities, ranges, or error bars. Reward numeric humility; do not reward false precision.
+honest accounting of prior failures: how forthrightly past mistakes, dead ends, and abandoned versions are reported. Reward disclosed scar tissue; do not reward ritual failure-listing without content.
+epistemic trespassing: how far the author ranges beyond their demonstrated competence while borrowing the authority of expertise. Reward staying within or clearly flagging departures from competence; penalize confident trespass.
+first-principles reasoning over deference to authority: how much conclusions are rebuilt from basics rather than inherited from named authorities. Reward independent derivation; do not reward reinventing wheels to avoid citation.
+reasoning transparency: how visible the actual chain from premises to conclusion is. Reward a followable chain; do not reward exhaustive logging of trivial steps.
+cherry-picking scent: how much the evidence seems selected after the conclusion — convenient windows, favorable subsets, missing counterexamples. Penalize selection artifacts; do not penalize legitimate focus.
+steelmanning of the opposition: how strong the best opposing case is made before being answered. Reward genuine strengthening; do not reward elaborate strawmen dressed as steel.
+base-rate awareness: how much the reasoning respects how often things like this actually happen. Reward reference-class thinking; do not reward base rates invoked to dodge specifics.
+numeracy under pressure: how soundly numbers are handled where they matter — magnitudes, denominators, compounding. Reward arithmetic integrity; do not reward decorative quantification.
+causal-claim discipline: how carefully the text distinguishes correlation, mechanism, and established cause. Reward earned causal language; do not reward timidity that refuses obvious causation.
+overfitting to a single anecdote: how much load one vivid story carries in the argument. Penalize anecdote as proof; do not penalize anecdote as illustration.
+robustness of the argument to one deleted premise: how well the conclusion survives if the shakiest single premise is removed. Reward redundant support; do not reward vagueness that makes premises unfindable.
+explicit consideration of alternatives: how seriously rival explanations or plans are enumerated and weighed. Reward real alternatives; do not reward strawman menus built to lose.
+distinguishing observation from interpretation: how cleanly what was seen is separated from what it is taken to mean. Reward the labeled seam; do not reward data dumps without any interpretation.
+self-skepticism: how actively the author tries to defeat their own position before the reader must. Reward internal red-teaming; do not reward self-flagellation that changes nothing.
+epistemic courage: how willing the text is to state an unpopular or costly conclusion its evidence supports. Reward conclusions held under social pressure; do not reward edginess for attention.
+comfort with inconclusiveness: how gracefully the text ends without forcing a verdict its evidence cannot support. Reward honest openness; do not reward chronic refusal to conclude.
+precision of its probability language: how consistently words like likely, plausible, and almost certain map to stable degrees of belief. Reward disciplined usage; do not reward mechanical percentage-sprinkling.
+appetite for disconfirming evidence: how eagerly the text seeks and engages the observations most dangerous to its thesis. Reward hunting falsifiers; do not reward listing weak objections to seem thorough.
+degree to which conclusions precede arguments: how much the reasoning reads as scaffolding erected under a pre-chosen verdict. Penalize verdict-first prose; do not penalize stating a thesis up front and then honestly testing it.
+inferential distance covered per paragraph: how far each unit of text actually moves the argument. Reward real forward motion; do not reward leaps that skip necessary steps.
+hedging density: how thickly qualifiers, maybes, and escape clauses coat the claims. Penalize armor that prevents any claim from being wrong; do not penalize honest, specific qualification.
+unearned certainty: how much confidence outruns the support provided. Penalize swagger past the evidence; do not penalize plain assertion of the well-established.
+conflation of is and ought: how often descriptive claims silently become prescriptive ones. Penalize the smuggled ought; do not penalize explicit, argued movement from facts to values.
+respect for measurement error: how seriously noise, instrument limits, and sampling variation are treated. Reward error-bar thinking; do not reward error talk used to dismiss inconvenient results.
+load-bearing-ness of its citations: how much the cited sources actually support the claims they decorate. Reward citations that hold weight; do not reward bibliography as ornament.
+willingness to quantify the embarrassing number: how readily the text states the figure that makes its own case look worst. Reward the disclosed bad number; do not reward burying it in an appendix gesture.
+sensitivity-analysis instinct: how naturally the text asks which assumptions, if moved, would change the answer. Reward assumption-wiggling; do not reward sensitivity theater over trivial parameters.
+survivorship-bias vulnerability: how much the argument rests on winners while the missing dead go uncounted. Penalize uncounted graveyards; do not penalize studying successes with the denominator stated.
+goodhart-awareness: how alert the text is to metrics corrupting the behavior they measure. Reward proxy suspicion; do not reward metric nihilism.
+metacognitive candor: how honestly the author reports what thinking process actually produced the work. Reward the real process disclosed; do not reward tidy origin myths.
+quiet prestige: how much standing the text carries without visibly reaching for it — assurance that never name-checks its own rank. Reward unforced authority; do not reward mere quietness.
+striving energy: how palpably the text is climbing — hunger for position, recognition, or entry. Reward legible drive; do not conflate it with the merit of what is sought.
+name-dropping density: how thickly known names are deployed to borrow standing. Penalize borrowed shine; do not penalize necessary attribution.
+credential leaning: how much the argument rests its weight on titles and degrees rather than content. Penalize authority as substitute; do not penalize relevant expertise stated once.
+outsider-artist energy: how much the work feels made outside institutions, by its own rules, with its own finish. Reward authentic self-taught shape; do not reward affected naivety.
+establishment coding: how thoroughly the text signals it belongs to incumbent institutions — their formats, cadences, and assurances. Score the signal itself, not its desirability.
+counter-signaling sophistication: how deliberately the text foregoes obvious status displays because it can afford to. Reward confident omission; do not reward plain absence of anything to display.
+social confidence: how at ease the authorial voice is in company — no flinching, no over-explaining its right to speak. Reward ease; do not reward volume.
+desperation to be taken seriously: how visibly the text needs the reader's respect. Penalize the neediness; do not penalize earnest care about the subject.
+having-nothing-to-prove energy: how settled the voice is — work presented because it matters, not to win standing. Reward secure presentation; do not reward complacency.
+class markers in diction: how strongly word choice, syntax, and reference place the author in a social class. Score marker strength, high or low, not which class.
+old-money understatement: how much the text minimizes its own scale and polish in the manner of secure inherited standing. Reward practiced understatement; do not reward simple modesty of small things.
+new-money exuberance: how much the text displays its recent gains — numbers, logos, velocity — with visible delight. Score the display energy; do not moralize it.
+scene-membership legibility: how clearly the text reveals which scene or community the author belongs to. Reward readable belonging; do not reward mere jargon density.
+gatekeeping posture: how much the text positions its author as deciding who belongs and who does not. Score the door-keeping stance; do not confuse it with quality standards honestly applied.
+deference to incumbents: how readily the text yields to established players' framings and verdicts. Score the yielding; distinguish it from evidence-based agreement.
+aspirational register: how much the prose is dressed for the position the author wants rather than the one they hold. Reward legible aspiration; do not reward the costume alone.
+self-mythologizing: how actively the author narrates themselves as a figure of story — origin, trials, destiny. Score the myth-making energy; do not reward or penalize the underlying biography.
+borrowed authority: how much of the text's force is rented from institutions, movements, or people not actually present in the work. Penalize rented force; do not penalize honest alliance.
+in-group shibboleth density: how many phrases exist mainly to prove insider membership to other insiders. Score shibboleth load; do not count genuinely necessary technical terms.
+prestige-economy fluency: how skillfully the text navigates who ranks whom — citations, venues, endorsements played correctly. Reward fluent play; do not reward the ranking obsession itself.
+cool-kid detachment: how much the voice performs unimpressibility — nothing earns open enthusiasm. Score the detachment; do not confuse it with earned critical judgment.
+eagerness to please: how much the text bends toward the reader's expected approval. Penalize shape-shifting for approval; do not penalize genuine service to the reader.
+comfort punching up: how freely the text challenges those with more power than its author. Reward upward challenge with content; do not reward safe ritual defiance.
+comfort punching down: how readily the text spends force on those with less standing. Penalize downward force; do not penalize criticizing weak arguments regardless of source.
+patronage-seeking posture: how visibly the text courts a patron — funder, sponsor, senior figure — as its real audience. Score the courtship; do not penalize honest fundraising framed as such.
+court-politics awareness: how attuned the text is to factions, alliances, and who must not be offended. Score the attunement; do not reward paranoia without object.
+reputational risk appetite: how much standing the author visibly wagers on the claims made. Reward staked reputation; do not reward recklessness with nothing at stake.
+embarrassability: how much the voice betrays fear of looking foolish. Penalize prose steered by embarrassment; do not penalize ordinary care.
+status-anxiety leakage: how much worry about rank seeps into word choice, comparisons, and defenses nobody asked for. Penalize the leak; do not penalize explicit, owned discussion of status.
+elite-overproduction vibes: how much the text feels like surplus credentialed talent competing for too few positions — polish without a post. Score the surplus feel; do not penalize polish itself.
+meritocratic earnestness: how sincerely the text believes good work will be recognized on its merits. Score the sincerity of that faith; do not score its correctness.
+aristocratic ease: how effortlessly the text assumes its place at the table — no application, no defense. Reward unlabored assumption; do not reward entitlement performing as ease.
+arriviste polish: how much the finish looks recently acquired and carefully maintained — correctness worn as protection. Score the acquired sheen; do not sneer at self-improvement.
+social-ladder awareness: how constantly the text tracks relative position — above, below, gaining, losing. Score the tracking intensity; do not reward oblivious egalitarian pose.
+economy of expression: how much meaning each word carries — nothing sayable in five words takes ten. Reward compression without loss; do not reward clipped prose that loses the point.
+load-bearing sentence fraction: how many sentences would be missed if deleted. Reward structural necessity; do not reward density that forbids any breathing room.
+structural inevitability: how much the piece's shape feels like the only shape it could have had — each part demanded by the whole. Reward earned inevitability; do not reward formula mistaken for form.
+how worked-over it reads: how many drafts the surface implies — smoothed seams, chosen words, settled rhythms. Score the visible revision; do not assume worked-over means better.
+first-draft freshness: how much the prose keeps the live heat of first composition — speed, surprise, unguardedness. Reward preserved vitality; do not reward unrevised sloppiness.
+architectural intentionality: how deliberately the large-scale structure was designed — sections placed, proportions chosen. Reward evident blueprint; do not reward rigid symmetry serving nothing.
+seams showing: how visibly the parts were joined — abrupt transitions, tonal patches, inconsistent conventions. Penalize careless joins; do not penalize deliberate exposed structure.
+ornamentation restraint: how much decorative language is held back where plainness serves. Reward chosen plainness; do not reward the absence of all pleasure in language.
+paragraph-level rhythm: how well paragraph lengths and shapes pace the reading — long thought, short punch. Reward controlled cadence; do not reward metronomic uniformity.
+control of emphasis: how reliably the text makes the important thing land as important. Reward aimed stress; do not reward italics and intensifiers doing structure's job.
+momentum management: how well the text builds, holds, and releases forward drive. Reward managed pull; do not reward breathless acceleration everywhere.
+precision of word choice: how often the word used is exactly the word meant — no near-misses, no approximations. Reward the exact word; do not reward thesaurus reach.
+cliche avoidance: how free the prose is of prefabricated phrases doing no work. Reward fresh phrasing; do not reward novelty that obscures.
+metaphor freshness: how alive the figurative language is — images that make the reader see, not skim. Reward working metaphor; do not reward ornament wearing metaphor's clothes.
+transitions earning their keep: how much each bridge between ideas does real logical work. Reward load-bearing bridges; do not reward however-sprinkling.
+throat-clearing fraction: how much text passes before the piece actually begins. Penalize preamble; do not penalize genuinely necessary setup.
+ending strength: how decisively the piece lands — final material that completes rather than trails off. Reward the stuck landing; do not reward a bolted-on twist.
+opening-hook honesty: how truthfully the opening's promise matches what the piece delivers. Reward kept promises; do not reward dull openings excused as honest.
+information-placement skill: how well the text puts each fact where the reader needs it — not before, not after. Reward timed disclosure; do not reward withholding as manipulation.
+redundancy discipline: how rarely the text repeats itself without new angle or force. Reward once-said-well; do not reward refusal to reinforce what genuinely needs it.
+signposting without condescension: how clearly the reader always knows where they are without being talked down to. Reward invisible orientation; do not reward roadmap paragraphs that replace the journey.
+density without airlessness: how much substance per page while leaving room to breathe. Reward rich but breathable prose; do not reward compression that suffocates.
+white-space instinct: how well the text uses pause, break, and silence as compositional material. Reward meaningful space; do not reward fragmentation as style.
+quotable-line frequency: how often a sentence could stand alone and be worth carrying away. Reward earned aphorism; do not reward fortune-cookie insertion.
+sentence-length variance control: how deliberately short and long sentences alternate to score the reading. Reward orchestrated variance; do not reward mechanical alternation.
+verb strength: how much of the action lives in strong verbs rather than weak verb-plus-noun constructions. Reward muscular verbs; do not reward violence of diction as vigor.
+nominalization disease: how much action has been embalmed into abstract nouns — utilization, implementation, facilitation. Penalize the embalming; do not penalize necessary technical nouns.
+passive-voice evasiveness: how often the passive hides who did what. Penalize agency concealment; do not penalize passives chosen for correct emphasis.
+list discipline: how well lists are used — parallel items, right lengths, genuinely enumerable content. Reward earned lists; do not reward prose shredded into bullets.
+title aptness: how precisely the title names what the piece actually is. Reward the fitted title; do not reward cleverness that misdirects.
+footnote self-indulgence: how much material lives in notes because the author could not bear to cut it. Penalize hoarding below the line; do not penalize scholarly apparatus doing its job.
+compression losslessness: how much could be reconstructed from this text alone — summary that preserves the mechanism, not just the headline. Reward lossless density; do not reward telegraphic gaps.
+evidence of killed darlings: how much the text implies good material was cut for the whole's sake. Reward the discipline visible in what remains; do not reward bareness mistaken for sacrifice.
+polish without sterility: how refined the surface is while keeping a live human pulse. Reward warm finish; do not reward lacquer over emptiness.
+craftsman's pride: how much care for the making itself shows in every joint — pride in workmanship independent of reception. Reward evident care; do not reward preciousness about trifles.
+earned warmth: how much the text's warmth arises from demonstrated care and specifics rather than warm-toned vocabulary. Reward warmth with receipts of attention; do not reward cozy diction alone.
+suppressed anger: how much contained fury pressurizes the prose from beneath a controlled surface. Score the pressure and the control together; do not reward open ranting.
+grief adjacency: how near the text stands to real loss — mourning felt in the cadence even when unnamed. Score the nearness; do not reward grief invoked as decoration.
+quiet joy: how much undemonstrative gladness suffuses the text — delight that does not perform. Reward the steady glow; do not reward exclamation.
+anxious energy: how much nervous charge runs through the prose — checking, re-checking, bracing. Score the charge; do not confuse it with rigor.
+serenity: how deeply untroubled the voice is — calm that comes from resolution, not distance. Reward settled calm; do not reward flatness posing as peace.
+wistfulness: how much gentle longing for something passed or passing colors the text. Score the shading; do not reward nostalgia kitsch.
+defiance: how much the text stands against pressure — refusal with its feet planted. Reward grounded refusal; do not reward theatrical rebellion.
+tenderness toward its subject: how gently and protectively the text handles what it describes. Reward care in the handling; do not reward sentimentality that blurs the subject.
+contempt leakage: how much disdain for people — readers, rivals, subjects — seeps through the civility. Penalize the seepage; do not penalize sharp judgment of work.
+bitterness residue: how much old injury flavors the prose — grievance dissolved into the style itself. Score the residue; distinguish it from legitimate stated grievance.
+hopefulness that survives contact with detail: how much optimism remains after the text has looked closely at the hard parts. Reward detail-tested hope; do not reward hope maintained by not looking.
+emotional flatness: how little affect the text carries anywhere. Score the flatness itself; do not assume it is a flaw in genres that demand it.
+forced cheerfulness: how much positivity is applied over material that does not support it. Penalize the applied coat; do not penalize genuine good spirits.
+melancholy undertow: how much a low sadness pulls beneath otherwise functional prose. Score the undertow; do not reward wallowing.
+exuberance discipline: how well high spirits are channeled rather than sprayed — energy with a nozzle. Reward channeled delight; do not reward suppression of all delight.
+awe capacity: how genuinely the text can be stopped by something larger than itself. Reward real awe; do not reward routine superlatives.
+dread proximity: how close the text stands to something feared — menace felt in the structure, not announced. Score the proximity; do not reward horror vocabulary.
+emotional granularity: how finely the text distinguishes feelings — not sad but rueful, not happy but relieved. Reward fine distinctions; do not reward emotion-word catalogs.
+sentimentality risk: how close the text comes to unearned feeling — emotion demanded rather than induced. Penalize the demand; do not penalize strong feeling honestly earned.
+stoic containment: how much is visibly held and borne without complaint. Reward the dignified hold; do not reward suppression that costs the reader the truth.
+vulnerability that isn't performance: how much real exposure the author risks with no applause line waiting. Reward costly openness; do not reward confession calibrated for effect.
+performed vulnerability: how much apparent self-exposure is staged for advantage. Penalize the staging; do not penalize genuine disclosure that happens to land well.
+resentment management: how well the text handles its grievances — named, sized, and set down rather than nursed. Reward clean handling; do not reward pretended absence of grievance.
+gratitude sincerity: how real the thanks feel — specific debts to specific people, not ritual acknowledgment. Reward specific gratitude; do not reward inflation of everyone into a blessing.
+longing: how much the text wants something it does not have — reach felt in the prose. Score the reach; do not reward want dressed as analysis.
+legibility of emotional stakes: how clearly the reader can tell what the author stands to feel if this goes well or badly. Reward readable stakes; do not reward melodrama.
+coldness as a choice: how deliberately the text withholds warmth for effect or discipline. Score the deliberateness; distinguish chosen cold from inability to warm.
+heat without light: how much intensity the text generates without adding understanding. Penalize heat that illuminates nothing; do not penalize passion accompanying substance.
+light without heat: how much clarity the text achieves with no felt investment. Score the cool clarity; note it as absence, not automatically as flaw.
+affect-content congruence: how well the emotional temperature matches what the content deserves. Reward fitted feeling; penalize both overheating and refrigeration of the material.
+emotional courage: how willing the text is to feel something in front of the reader when detachment would be safer. Reward the risk taken; do not reward feelings as spectacle.
+numbness scent: how much the prose smells of an author who has stopped feeling what they describe — burnout in the syntax. Score the scent; treat it as information, not accusation.
+catharsis delivery: how fully the text releases the tension it builds. Reward completed release; do not reward manufactured tension released on schedule.
+feeling earned by the material: how much the emotion arises from the facts presented rather than being injected around them. Reward emotion with a factual floor; do not reward affect floated free.
+urgency authenticity: how real the stated time pressure is — deadlines with mechanisms, windows that actually close. Reward documented urgency; penalize alarm as marketing.
+timelessness: how well the text would read in fifty years — concerns and language that do not expire. Reward durable address; do not reward antique styling.
+datedness risk: how soon the text will visibly age — references, tools, and assumptions with short shelf lives. Penalize fast decay; do not penalize being concretely of its moment on purpose.
+fashionable-jargon half-life: how much of the vocabulary will be embarrassing in five years. Penalize trend-borrowed language; do not penalize current terms of art used precisely.
+era legibility: how precisely a future reader could date the text from internal evidence. Score the datability; treat it as a descriptive reading, not a fault.
+futureproofing instinct: how much the text anticipates change and builds its claims to survive it. Reward change-resistant construction; do not reward vagueness as insurance.
+nostalgia load: how much backward longing the text carries. Score the load; do not automatically discount it — weigh whether the past invoked is real.
+presentism: how much the text treats current arrangements and values as permanent and obvious. Penalize the unexamined now; do not penalize deliberate focus on the present.
+long-now sensibility: how naturally the text thinks in decades and centuries — stewardship horizons, slow variables. Reward the long view held concretely; do not reward vague cosmic gesture.
+deadline scent: how much the prose smells of being finished against a clock — compression, elision, unsanded edges. Score the scent; it is evidence about process, not a verdict on quality.
+patience of composition: how much time the text visibly had — ideas ripened, examples aged, judgments settled. Reward ripeness; do not reward slowness worn as virtue.
+seasonal transience: how much the text is built for one season of attention — a moment's conversation, then compost. Score the transience; ephemerality executed well is its own craft.
+permanence ambition: how openly the text is trying to last — built for the shelf, not the feed. Score the ambition; do not confuse wanting to last with deserving to.
+archival self-awareness: how much the text knows it will be a record — writing for the future reader over its shoulder. Reward the double audience handled well; do not reward posterity posturing.
+trend-surfing: how much the text rides a current wave for lift it did not generate. Penalize borrowed momentum; do not penalize timely engagement with a real development.
+before-its-time-ness: how much the text arrives ahead of its audience's readiness. Score the earliness; reward it only where the text also builds the bridge back.
+five-year re-read survivability: how well the piece would hold on a re-read in five years — claims aged, bets settled, tone intact. Reward durable specifics; do not reward vagueness that survives by saying nothing.
+week-one obsolescence: how much of the value evaporates days after publication. Penalize designed evaporation; do not penalize honest news.
+historical rhyme awareness: how well the text hears echoes of prior episodes without collapsing into them. Reward calibrated rhyme; do not reward history as costume.
+generational coding: how strongly the text marks its author's generation — touchstones, humor, defaults. Score the marking; treat it as signal, not flaw.
+planning-horizon length: how far ahead the text's actual plans and commitments extend. Reward long horizons with mechanisms; do not reward decade talk with quarter plans.
+sense of its own moment: how accurately the text reads what its moment makes possible and impossible. Reward moment-fit; do not reward trend commentary.
+evergreen fraction: how much of the text would need no edits to republish in ten years. Score the fraction; do not reward the evergreen achieved by avoiding every specific.
+anachronism comfort: how freely the text uses old tools, forms, or standards without apology. Reward confident anachronism that works; do not reward mustiness.
+velocity of the underlying idea: how fast the thing the text is about is itself moving. Score the field's speed as reflected in the text's posture — provisional where fast, settled where slow.
+punctuality of the intervention: how well-timed this text is — arriving when it can still change the outcome. Reward the timely strike; penalize both the too-late postmortem posing as guidance and the premature verdict.
+ripeness: how fully matured the thinking is — questions closed that should be closed, open ones held open knowingly. Reward mature poise; do not reward overripeness curdling into rigidity.
+prematureness: how much the text ships conclusions before their supports exist. Penalize the early call; do not penalize clearly-labeled speculation.
+overdue-ness: how much the text says what should have been said long ago. Reward the debt finally paid; note who paid the cost of the delay.
+temporal humility: how honestly the text admits it cannot see far ahead. Reward stated horizon limits; do not reward fatalism about all foresight.
+sublimated ambition: how much personal drive has been converted into the work itself rather than displayed beside it. Reward conversion into craft; do not reward ambition merely hidden.
+need to be liked: how much the prose bends toward the reader's affection. Penalize the bend; do not penalize genuine warmth toward readers.
+need to be right: how much the text defends positions past the point evidence supports, because losing is intolerable. Penalize the grip; do not penalize firm defense of the well-supported.
+need to be interesting: how much the text sacrifices accuracy or proportion for effect. Penalize the sacrifice; do not penalize genuine flair on true material.
+exhaustion between the lines: how much depletion shows through the performance of energy. Score the visible tiredness; treat it as evidence about the author's situation, honestly read.
+obsessiveness: how far past reasonable diligence the attention goes — detail loved beyond duty. Score the excess attention; reward it where it produces what nothing else could.
+dilettante breadth: how wide the text ranges relative to how deep it goes. Score the width-to-depth ratio; do not penalize breadth that honestly labels its depth.
+monomania depth: how much one question has swallowed the author's whole field of view. Score the swallowing; reward its fruits, note its blindnesses.
+self-doubt management: how the author handles their own uncertainty about themselves — acknowledged and steered, or leaking and steering. Reward doubt held with hands on the wheel; do not reward its concealment.
+imposter-syndrome leakage: how much unearned-place anxiety shows in over-preparation, over-citation, over-apology. Score the leakage; read it as signal about author psychology, not competence.
+grandiosity containment: how well large self-belief is kept in service of the work rather than displayed. Reward contained scale of self; penalize the uncontained version.
+playfulness under discipline: how much genuine play survives inside rigorous work. Reward play that sharpens; do not reward whimsy that dodges the hard parts.
+discipline under playfulness: how much rigor operates beneath an apparently light surface. Reward the hidden spine; do not reward lightness that is only light.
+procrastination scars: how much the text shows work done in avoidance-shaped bursts — neglected middles, lavish introductions, rushed ends. Score the scar pattern; it is process evidence.
+flow-state evidence: how much of the text reads as written inside sustained absorption — long coherent runs, effortless transitions. Score the runs; do not confuse flow with lack of revision.
+implied hours of deliberate practice: how many hours of focused skill-building the performance implies. Score the implied investment; distinguish practiced skill from raw talent displayed.
+autodidact texture: how much the knowledge shows self-taught structure — idiosyncratic paths, original sources, occasional canonical gaps. Score the texture; reward its strengths without excusing its gaps.
+formal-training texture: how much the knowledge shows institutional shaping — canonical sequences, standard moves, disciplinary reflexes. Score the shaping; note both its reliability and its ruts.
+midlife-reinvention energy: how much the text carries the particular drive of someone who changed course with experience in hand. Reward experience redeployed; do not reward the narrative of reinvention alone.
+wunderkind energy: how much the text radiates early-arrival confidence — speed, fearlessness, unearned and earned certainty mixed. Score the radiation; separate the speed from the accuracy.
+veteran weariness: how much long experience shows as lowered expectations and conserved effort. Score the conservation; distinguish earned economy from disengagement.
+chip-on-shoulder torque: how much being underestimated powers the work. Score the torque; reward what it drives, note where it distorts aim.
+intrinsic-motivation purity: how much the work would clearly have been done with no audience and no reward. Reward the unwatched-hours signal; do not reward performed passion.
+mercenary undertone: how much the text serves a paying interest beneath its stated purpose. Penalize the hidden retainer; do not penalize honest commercial framing.
+calling versus career: how much the work reads as answering a vocation rather than advancing a position. Score the calling signal; do not romanticize it — a career honestly worked is not a fault.
+sincerity of stated motivation: how much the announced reasons for the work match the reasons the text actually betrays. Reward the match; penalize mission statements contradicted by the work's own choices.
+private-notebook intimacy: how much the text reads like thinking not originally meant for display. Reward the unguarded grain; penalize intimacy manufactured for publication.
+public-performance polish: how much the text is built for an audience watching — timed reveals, managed impressions. Score the performance layer; do not assume it falsifies the content.
+id visibility: how much raw want — appetite, aggression, desire — is visible through the civilized surface. Score the visibility; read it as candor or leakage by context.
+superego dominance: how much duty, propriety, and self-policing govern the prose. Score the governance; note what it protects and what it strangles.
+appetite disclosed: how openly the author says what they actually want — money, fame, the problem solved, the rival beaten. Reward named appetite; do not reward wants laundered into mission language.
+self-knowledge depth: how accurately the author's self-descriptions match what the text independently reveals. Reward the match; penalize self-portraits the evidence contradicts.
+predictability of its blind spots: how easily a reader can name what this author will systematically miss. Score the predictability; the most interesting authors surprise even in their failures.
+caffeination level: how much stimulant-paced urgency runs in the sentence rhythm — speed as texture. Score the pace signature; do not confuse velocity with insight.
+hunger: how much the author visibly wants it — the outcome, the standard, the win — with effort priced in. Reward hunger harnessed to work; do not reward want displayed instead of work.
+argumentative momentum: how much each point makes the next feel necessary — the argument pulling the reader forward under its own force. Reward compounding motion; do not reward speed that skips steps.
+burden-of-proof placement: how fairly the text assigns who must prove what. Reward burdens placed by reason; penalize burdens quietly shifted onto the opponent.
+concession strategy: how skillfully the text gives ground it cannot hold — concessions that strengthen the remaining position. Reward strategic honesty; do not reward concession as mere politeness ritual.
+objection anticipation: how well the text raises the reader's best objections before the reader can. Reward preempted objections answered squarely; do not reward weak objections planted for easy victories.
+motte-and-bailey risk: how much the text advances a bold claim but retreats to a trivial one under pressure. Penalize the oscillation; do not penalize honest distinction between strong and weak versions.
+rhetorical-question abuse: how often questions are deployed to imply what the author will not argue. Penalize implication by question; do not penalize genuine questions genuinely opened.
+load-bearing-ness of its analogies: how much argumentative weight the analogies actually carry versus decorate. Reward analogies that survive being pressed; penalize ones that collapse under one disanalogy.
+syllogistic tightness: how validly the conclusions follow from the stated premises. Reward airtight steps; do not reward formality draped over gaps.
+enthymeme reliance: how much the argument depends on unstated premises the reader must supply. Score the hidden premises; penalize ones the author should have had to defend.
+induction discipline: how carefully generalizations are sized to their instances. Reward fitted generalization; penalize the leap from three cases to a law.
+example-to-principle ratio: how well the text balances concrete instances against abstract claims. Reward mutual support; penalize principles with no instances and instances with no point.
+definition hygiene: how cleanly key terms are defined and then used consistently. Reward stable meanings; penalize definitions that drift when convenient.
+equivocation risk: how much the argument depends on one word quietly meaning two things. Penalize the double meaning; do not penalize acknowledged ambiguity handled openly.
+scope creep of claims: how much conclusions swell beyond what the argument established. Penalize the swelling; reward conclusions that end exactly where the evidence does.
+quantifier care: how precisely some, most, and all are chosen and respected. Reward exact quantifiers; penalize the slide from some to all across paragraphs.
+strawman temptation resisted: how consistently the text engages opponents' actual positions at strength. Reward the real target hit; penalize convenient reconstructions.
+adversarial-collaboration spirit: how much the text treats disagreement as a joint search for truth with shared standards. Reward the shared-standards posture; do not reward conflict-avoidance dressed as collaboration.
+dialectical fairness: how evenly the text applies its own standards to friend and foe. Reward symmetric standards; penalize rigor reserved for the other side.
+socratic patience: how willing the text is to proceed by questions and let the reader arrive. Reward guided arrival; do not reward questions that stall instead of steer.
+polemic heat: how much combative fire the prose carries. Score the temperature; judge separately whether the fire illuminates or only burns.
+persuasion versus demonstration balance: how much the text relies on moving the reader versus showing the thing. Reward demonstration wherever it is available; note where persuasion substitutes for it.
+appeal-to-consequences leakage: how much the argument treats an outcome's desirability as evidence of a claim's truth. Penalize the leak; do not penalize honest discussion of consequences as consequences.
+framing control: how much the text's framing predetermines the conclusion before evidence arrives. Score the control; reward frames argued for, penalize frames smuggled in.
+agenda-setting subtlety: how quietly the text decides which questions count as the questions. Score the quiet decisions; reward them made explicit.
+presupposition smuggling: how much contested content rides in as the unexamined background of innocent sentences. Penalize the contraband; do not penalize genuinely shared background.
+distinctiveness of rhetorical fingerprint: how recognizably this author argues — signature moves, characteristic structures. Score the distinctiveness; note whether the signature serves or performs.
+closing-argument energy: how much the ending gathers everything into a final press toward the verdict. Reward the earned summation; do not reward new evidence smuggled into the close.
+opening-statement fairness: how honestly the opening frames what the dispute is actually about. Reward the fair frame; penalize openings that decide the case in the description.
+cross-examination survivability: how well the claims would hold up under a hostile, competent questioner. Reward armored claims; penalize assertions that survive only unquestioned.
+tu-quoque avoidance: how cleanly the text refuses to answer charges by pointing at the accuser. Reward the charge answered on merits; penalize the deflecting finger.
+respect for the reader's time: how much the text gives per minute it asks — no padding, no detours without payoff. Reward high yield per minute; do not reward brevity that undershoots the material.
+trust extended to the reader: how much intelligence and goodwill the text assumes in its audience. Reward earned assumption of intelligence; do not reward obscurity excused as respect.
+condescension risk: how close the text comes to talking down — explanations of the obvious, applause for the reader's small steps. Penalize the pat on the head; do not penalize genuine care for beginners.
+flattery of the reader: how much the text courts agreement by complimenting its audience's discernment. Penalize the courtship; do not penalize warmth without agenda.
+fairness of assumed background: how reasonable the demanded prior knowledge is for the stated audience. Reward the fair floor; penalize both gatekeeping prerequisites and pandering to none.
+on-ramp gentleness: how smoothly a newcomer can enter the text's subject. Reward the graded entry; do not reward ramps so long the destination never arrives.
+expert-to-expert compression: how efficiently the text communicates when it can assume mastery. Reward dense peer-speech where peers are the audience; penalize it inflicted on general readers.
+generosity of explanation: how much the text gives beyond the minimum — the extra example, the anticipated confusion addressed. Reward the extra mile; do not reward burying the reader in unrequested help.
+hand-holding excess: how much the text walks the reader through steps they could take alone. Penalize the grip; do not penalize support where the terrain is genuinely hard.
+deliberate difficulty: how much the text's hardness is chosen — resistance meant to make the reader work productively. Score the choice; reward difficulty that pays, penalize difficulty as decoration.
+esotericism as filter: how much the text is written to be understood only by the initiated, on purpose. Score the filtering intent; judge separately whether the filter serves the material.
+invitation versus initiation: how much the text welcomes outsiders in versus requiring them to prove themselves first. Score where it sits; reward fit with the material's real demands.
+reader-as-peer stance: how much the text addresses the reader as an equal working the same problem. Reward the level gaze; do not reward false equality that withholds needed guidance.
+reader-as-student stance: how much the text takes responsibility for the reader's learning. Reward the accepted duty; penalize the lectern grip where no student asked.
+reader-as-jury stance: how much the text lays out evidence for the reader's independent verdict. Reward the trusted verdict; penalize closing arguments disguised as neutral presentation.
+parasocial warmth: how much one-sided intimacy the text cultivates with its audience. Score the cultivation; note where it serves connection and where it manufactures dependency.
+boundary maintenance: how clearly the text keeps appropriate distance — personal where personal serves, professional where it does not. Reward calibrated distance; do not reward coldness as professionalism.
+direct-address comfort: how naturally the text speaks straight to the reader when it does. Reward unforced address; penalize the salesman's second person.
+second-person risk tolerance: how boldly the text uses you — putting the reader inside the scene or argument. Score the boldness; reward it where it lands, note where it presumes.
+inclusion cost of its inside jokes: how much a reader outside the circle loses when the text laughs within it. Score the exclusion cost; reward jokes that also work from outside.
+glossary conscience: how faithfully the text defines what its audience cannot be assumed to know. Reward the kept faith; penalize terms dropped as status markers.
+curiosity contagion: how much the text makes the reader want to go find out more. Reward the transmitted itch; do not reward cliffhangers that withhold what the text owed.
+homework assigned honestly: how clearly the text says what work it leaves the reader and why. Reward the honest assignment; penalize gaps disguised as exercises.
+payoff-per-page fairness: how evenly the text delivers value across its length. Reward steady payment; penalize front-loaded promises with hollow middles.
+cliffhanger ethics: how fairly suspense is used — tension in service of the material, not the metrics. Reward earned suspense; penalize the withheld answer as retention device.
+spoiler discipline: how carefully the text protects discoveries the reader deserves to make. Reward guarded discovery; do not reward coyness about what should be stated.
+reread invitation: how much the text is built to give more on the second pass. Reward layered construction; do not reward obscurity marketed as depth.
+skimmability by design: how well the text serves the reader who must move fast — structure, signposts, extractable core. Reward the fast path provided; do not reward texts that are only skimmable.
+deep-read reward: how much the text gives the reader who slows all the way down. Reward buried craft that patient attention finds; do not reward difficulty with nothing beneath.
+exit-ramp courtesy: how gracefully the text lets a reader leave early with something whole. Reward the partial gift; do not reward hostage structures where nothing makes sense until the end.
+bureaucratic sediment: how much accumulated procedure and boilerplate silts the prose — language that exists because a process demanded it. Penalize the silt; do not penalize necessary compliance handled crisply.
+startup metabolism: how fast the text's underlying organization visibly moves — decisions, cycles, learning loops. Score the metabolic rate; do not confuse velocity with direction.
+committee-authorship scent: how much the text smells of many hands and no owner — averaged positions, sanded edges, orphaned pronouns. Penalize the averaging; do not penalize genuine collaboration with a controlling mind.
+single-author voice clarity: how unmistakably one mind is speaking. Reward the single throat; do not reward idiosyncrasy performed to prove singularity.
+compliance-driven prose fraction: how much text exists to satisfy rules rather than readers. Score the fraction; reward it quarantined, penalize it metastasized.
+mission-statement contamination: how much aspirational corporate language has leaked into working prose. Penalize the leak; do not penalize a mission stated once, plainly, where it belongs.
+org-chart legibility: how much the surrounding organization's structure can be read from the text — who approves, who fears whom, where power sits. Score the legibility; it is diagnostic reading, not praise or blame.
+founder-authored directness: how much the text carries the unmediated voice of the person who owns the outcome. Reward the unmediated stake; do not reward bluntness performed as authenticity.
+middle-management filtration: how much the content has been softened, hedged, and rerouted by layers between author and truth. Penalize the filtration; distinguish it from legitimate synthesis.
+legal-review flattening: how much liability caution has ironed the meaning out of the words. Score the flattening; do not blame prudence for existing, only for governing.
+PR-polish opacity: how much public-relations smoothing prevents the reader from learning anything real. Penalize the gloss; do not penalize good news delivered clearly.
+internal-memo candor: how much the text speaks with the frankness of a document never meant for outsiders. Reward the candor; note whether it was chosen or leaked.
+external-facing guardedness: how visibly the text watches what it says because outsiders are reading. Score the guardedness; reward what remains honest inside it.
+process maturity: how much the described work rests on repeatable, improvable process rather than heroics. Reward real process; do not reward process theater with stages and no substance.
+institutional memory depth: how much the text knows about what was tried before — its own organization's history at hand. Reward the deep file; penalize the eternal present that repeats old failures.
+personnel-dependence risk: how much of the plan lives inside specific irreplaceable people. Score the concentration honestly stated; penalize it unstated.
+key-person concentration: how much authority, knowledge, and momentum route through one person. Score the routing; reward plans that name and mitigate it.
+succession thoughtfulness: how seriously the text plans for its own people leaving. Reward the prepared handoff; do not reward succession language with no mechanism.
+governance seriousness: how real the oversight is — bodies with teeth, decisions with owners, dissent with channels. Reward functioning governance; penalize its ornamental double.
+accountability plumbing: how traceably outcomes connect to the people responsible for them. Reward the traceable pipe; penalize diffusion where everyone owns everything and no one owns anything.
+budget-line honesty: how specifically the money is accounted — real categories, real numbers, real tradeoffs. Reward the itemized truth; penalize round numbers hiding soft thinking.
+overhead candor: how openly the text admits what fraction feeds the machine rather than the mission. Reward the stated fraction; do not punish overhead itself — punish its concealment.
+audit-trail instinct: how naturally the work leaves records that would let an outsider verify what happened. Reward the trail left unprompted; do not reward documentation performed only where auditors look.
+coalition breadth: how wide a range of genuinely different parties the effort has actually assembled. Reward real breadth; penalize letterhead coalitions of the like-minded.
+stakeholder-management sophistication: how skillfully the text handles the parties who could help or block it. Score the skill; note where management shades into manipulation.
+empire-building scent: how much the proposal grows its author's domain beyond what the mission needs. Penalize the surplus acquisition; do not penalize scale the work genuinely requires.
+sinecure comfort: how much the arrangement described would keep paying whether or not the work succeeds. Penalize the decoupling; reward structures where reward tracks results.
+skunkworks energy: how much the work runs outside normal channels on speed and belief. Score the outside-channel energy; note both its freedom and its missing guardrails.
+official-channel fatigue: how visibly the author has been worn down by proper procedure. Score the fatigue; read it as evidence about the institution as much as the author.
+institutional courage: how much the institution behind the text risks by saying it. Reward the institutional neck extended; distinguish it from an individual's courage borrowed by the letterhead.
+moonshot sincerity: how genuinely the outsized ambition is meant — a real plan aimed at a real long shot, with the audacity priced. Reward sincere reach with scaffolding; penalize moonshot as branding.
+incrementalism honesty: how openly modest work presents itself as modest. Reward the honest small step; do not penalize smallness — penalize small work sold as revolution.
+risk-appetite legibility: how clearly the reader can tell how much risk the author is actually taking and accepting. Reward stated appetite; penalize risk posture that cannot be located.
+downside acknowledgment: how squarely the text faces what happens if it is wrong or the plan fails. Reward the faced downside with magnitudes; penalize the single throwaway risk paragraph.
+upside-modeling discipline: how rigorously the best case is estimated rather than gestured at. Reward disciplined optimism with assumptions shown; penalize hockey sticks drawn free-hand.
+variance embrace: how comfortably the text accepts wide outcome spreads in exchange for expected value. Reward knowing variance-seeking; do not reward gambling narrated as strategy.
+ruin-risk awareness: how clearly the text distinguishes recoverable losses from game-ending ones. Reward the absorbing-barrier check; penalize expected-value talk blind to ruin.
+optionality preservation: how much the plan keeps future choices open at reasonable cost. Reward cheap options held; penalize optionality hoarding that defers every commitment.
+burned-boats commitment: how much the author has deliberately foreclosed retreat. Score the foreclosure; reward it where commitment itself changes the odds, note where it is theater.
+pivot readiness: how prepared the plan is to change shape when evidence demands. Reward hinges built in; penalize pivot language that means drift.
+sunk-cost vulnerability: how much the argument leans on what has already been spent. Penalize the backward lean; reward decisions argued from the future alone.
+theory-of-victory clarity: how specifically the text explains the causal path from actions to the win condition. Reward the traced path; penalize mission statements standing in for mechanism.
+endgame specificity: how concretely the text describes what done looks like. Reward the pictured end state; penalize efforts defined only by their continuing.
+milestone believability: how much the intermediate targets look like real checkpoints rather than decoration. Reward checkable milestones with dates and owners; penalize round-number pageantry.
+scope sanity: how well the undertaking's size matches the team, time, and money behind it. Reward the fitted scope; penalize the plan that needs three miracles.
+boiling-the-ocean risk: how much the approach requires changing everything to change anything. Penalize the total prerequisite; reward footholds that pay their own way.
+minimum-viable honesty: how truly the described minimum would test the idea. Reward the real test; penalize minimums so minimal they can only succeed.
+stretch-goal calibration: how thoughtfully the ambitious targets sit above the expected ones. Reward calibrated stretch; penalize stretch goals that are the plan.
+moonshot-to-milestone ratio: how much grand vision rests on how little near-term deliverable. Score the ratio; reward visions with dense first miles.
+ambition-to-resources ratio: how far the aims outrun the means, and whether the text knows it. Score the gap and the awareness together; reward the named gap with a bridging plan.
+bet-sizing wisdom: how well the stakes placed match the confidence held and the bankroll available. Reward proportionate stakes; penalize all-in reasoning at coin-flip confidence.
+kelly-criterion instinct: how naturally the text sizes commitments to edge and repeatability rather than conviction alone. Reward edge-proportional sizing; do not demand the formula — reward the instinct.
+asymmetry hunting: how actively the text seeks positions with capped downside and open upside. Reward found asymmetries stated honestly; penalize asymmetry claims with hidden tail costs.
+cheap-experiment bias: how strongly the text prefers learning by small cheap tests before committing. Reward the test-first reflex; note where cheapness substitutes for the decisive expensive test.
+expensive-conviction bias: how readily the text commits big on inner certainty without cheap tests first. Score the reflex; reward it only where testing is truly impossible and the reasoning shows it.
+irreversibility caution: how carefully one-way doors are identified and treated differently from two-way doors. Reward the door taxonomy applied; penalize haste at hinges that cannot swing back.
+first-mover conviction: how much the plan depends on being first, and how honestly that dependence is examined. Reward examined firstness; penalize first-mover advantage assumed as law.
+fast-follower realism: how honestly the text weighs letting others find the mines first. Reward the deliberate second position argued; do not reward timidity dressed as strategy.
+contrarian courage: how much the position stands against the field's consensus with real stakes attached. Reward staked heterodoxy with reasons; penalize contrarianism as identity.
+consensus comfort: how much the text shelters inside what everyone already believes. Score the shelter; penalize safety mistaken for evidence, but do not penalize agreement reached independently.
+operational specificity: how executably concrete the plan is — steps a competent stranger could follow. Reward the executable plan; penalize strategy that dissolves at the level of Tuesday morning.
+named-owner accountability: how consistently each commitment has a person's name on it. Reward the named necks; penalize the passive voice of responsibility.
+date-stamped commitment: how many promises carry actual dates. Reward the dated promise; penalize timelines of soons and eventuallys.
+number-bearing claim fraction: how much of the argument carries actual quantities. Reward load-bearing numbers; do not reward numerals sprinkled as seasoning.
+gears-level mechanism: how much the text explains the internal gears — what pushes what, through what linkage. Reward the opened gearbox; penalize black boxes with confident labels.
+abstraction-altitude control: how deliberately the text chooses and holds its level of generality. Reward controlled altitude; penalize unannounced climbing to escape hard specifics.
+agility on the ladder of abstraction: how fluently the text moves between principle and instance, each illuminating the other. Reward the round trips; penalize residence at either extreme.
+example vividness: how much the examples are seen rather than merely cited. Reward the visible instance; do not reward vividness on unrepresentative cases.
+case-study depth: how far into one real case the text actually descends. Reward the deep core sample; penalize case studies that are anecdotes in academic dress.
+prototype evidence: how much something has actually been built and shown. Reward the existing artifact; weight a crude working thing above a polished description.
+demo-over-memo spirit: how much the text prefers showing the thing to describing it. Reward the shown thing; do not penalize necessary description of the unshowable.
+artifact concreteness: how tangible the promised deliverables are — files, tools, datasets, not vibes. Reward the touchable output; penalize deliverables that are themselves plans.
+verb actionability: how much the stated actions are actions — verbs someone can do Monday, not aspirations. Reward doable verbs; penalize explore, engage, and address as load-bearers.
+checklist readiness: how directly the text's guidance could become a checklist without loss. Score the convertibility; do not reward material falsely flattened to check items.
+measurable-outcome discipline: how consistently success is defined in observables. Reward the observable bar; penalize success defined so any outcome clears it.
+proxy-metric awareness: how alert the text is to gaps between its metrics and what they stand for. Reward the named gap; penalize metrics worshipped as the thing itself.
+deliverable crispness: how sharply each promised output is specified — format, size, owner, date. Reward crisp edges; penalize deliverables that blur when approached.
+timeline granularity: how finely the schedule resolves — weeks and dependencies, not quarters and hope. Reward the resolved schedule; do not reward granularity theater on a fantasy plan.
+budget-line specificity: how exactly the money maps to activities. Reward the mapped dollar; penalize budgets that are one number and a request for trust.
+failure-mode enumeration: how thoroughly the ways this fails are listed and sized. Reward the honest catalog; penalize the token risks section with three soft entries.
+dependency mapping: how clearly the text knows what must happen first, and what breaks if it does not. Reward the drawn graph; penalize plans whose steps secretly all depend on step zero.
+critical-path clarity: how clearly the text identifies the sequence that actually gates the outcome. Reward the named path; penalize effort lavished visibly off it.
+resource-requirement honesty: how truthfully the text states what it really needs — people, compute, permissions, time. Reward the full bill; penalize the lowball that plans its own crisis.
+who-does-what-when completeness: how fully the plan assigns every task a person and a time. Reward the complete matrix; penalize the plan where the crucial rows are blank.
+handoff explicitness: how precisely the text defines what crosses each boundary between people or phases. Reward the specified handoff; penalize the gap where work is thrown over walls.
+definition-of-done clarity: how unambiguously the text states when a thing counts as finished. Reward the bright line; penalize done that drifts on inspection.
+acceptance-test thinking: how naturally the text states, in advance, the test its own output must pass. Reward the pre-stated test; penalize criteria invented after the result.
+edge-case appetite: how eagerly the text hunts its own boundary conditions. Reward the sought edge; do not reward edge-case obsession that never ships the center.
+implementation-detail respect: how seriously the text treats the small technical choices where plans actually live or die. Reward the honored detail; penalize hand-waving above the level where failure happens.
+ground-contact frequency: how often the text touches actual reality — a user, a measurement, a deployed thing. Reward frequent touches; penalize long glides on pure reasoning.
+genuine surprise content: how much the text contains that a well-read reader would not have predicted. Reward the real novelty; do not reward surprise from mere obscurity.
+recombination cleverness: how ingeniously existing pieces are joined into something with new properties. Reward the fertile joint; do not reward collage without synthesis.
+first-principles freshness: how much the text rebuilds its subject from the ground and finds something new in the rebuilding. Reward the fresh derivation; penalize first-principles as slogan over received conclusions.
+derivative-work honesty: how openly the text acknowledges what it borrows. Reward the named debts; penalize influence laundered as invention.
+completeness of influence digestion: how fully absorbed the influences are — nutrients, not visible chunks. Reward full metabolism; penalize prose that is pastiche of its sources.
+idea-provenance candor: how traceably the text says where its ideas came from. Reward the traced lineage; do not demand ancestry for the genuinely original.
+novelty-for-its-own-sake risk: how much newness is pursued as terminal value. Penalize novelty worship; do not penalize genuine exploration at the frontier.
+old-idea-new-clothes detection: how much the contribution is a rename of something known. Penalize the rebrand; credit honest revival that says it is one.
+frontier proximity: how close the work stands to the actual current edge of its field. Reward true edge contact; penalize frontier claims checkable as interior.
+adjacent-possible instinct: how well the text finds what has just now become possible. Reward the ripe adjacency seized; penalize both the stale and the premature reach.
+paradigm loyalty: how much the work operates devotedly inside its field's ruling framework. Score the loyalty; note what it enables and what it forecloses.
+paradigm defection: how much the work breaks from the ruling framework, and at what argumentative cost. Score the defection; reward the paid cost — arguments, not just attitude.
+heterodoxy authenticity: how real the unorthodoxy is — positions actually held against pressure, not staged. Reward costly heterodoxy; penalize the safe transgression industry.
+contrarian-by-reflex risk: how much the text disagrees as a habit rather than a finding. Penalize the reflex; reward disagreement that arrives with receipts.
+originality per paragraph: how densely new thought is distributed through the text rather than concentrated in one claim. Reward distributed originality; do not reward relentless novelty that never consolidates.
+surprise per page: how regularly the text earns a raised eyebrow. Score the rate; reward surprises that survive a second look.
+predictability of its next move: how easily a reader can finish the author's sentences. Penalize the foreseeable march; do not penalize the clarity that makes good structure feel inevitable.
+template escape velocity: how fully the text breaks free of its genre's default shape when the material demands it. Reward the earned escape; do not reward format-breaking as decoration.
+genre-subversion intent: how deliberately the text plays against its genre's expectations. Score the deliberateness; reward subversion that pays off in meaning.
+format innovation: how much the form itself — structure, medium, presentation — is part of the contribution. Reward form that carries content; penalize innovation that obstructs it.
+remix ethics: how fairly the text transforms what it takes — credit given, value added, sources left standing. Reward the ethical transform; penalize extraction that impoverishes its sources.
+homage versus theft: how clearly borrowing announces itself as tribute rather than passing as original. Reward the open homage; penalize the unmarked lift.
+invention density: how many distinct new moves, tools, or coinages the text introduces. Score the count that survives scrutiny; do not reward neologism spray.
+discovery versus invention balance: how much the text finds what was there versus makes what was not. Score the mix honestly claimed; penalize discoveries dressed as inventions and inventions dressed as discoveries.
+discipline of its unprecedented-ness claims: how carefully the text checks before calling itself the first. Reward the checked claim; penalize first-ever assertions with unsearched priors.
+moral seriousness without sanctimony: how gravely the text treats what matters morally while never performing its own virtue. Reward the grave and plain; penalize gravity that curdles into display.
+sanctimony risk: how close the text comes to preaching its own goodness. Penalize the pulpit self-portrait; do not penalize strong moral claims argued on their merits.
+righteousness comfort: how much the text enjoys being on the right side. Score the enjoyment; penalize positions held for the pleasure of holding them.
+guilt mobilization: how much the text moves its reader by inducing guilt. Score the mechanism; penalize guilt as lever where argument was available.
+shame avoidance: how much the text steers around naming shameful things — its own or its field's. Penalize the steering; reward the named shame handled with proportion.
+duty framing: how much the text casts its case as obligation — what the reader owes. Score the framing; reward duties argued from shared premises, penalize duties asserted from height.
+care framing: how much the text grounds its case in attention to particular vulnerable others. Score the framing; reward care that stays concrete, penalize care as mood lighting.
+harm-accounting completeness: how fully the text counts the harms on all sides of its proposal — including its own side's. Reward the complete ledger; penalize harm accounting that stops at the convenient boundary.
+beneficiary-voice presence: how much the people served actually speak in the text rather than being spoken for. Reward the direct voice; penalize beneficiaries as props in their own story.
+victim-instrumentalization risk: how much suffering is deployed as rhetorical fuel. Penalize the deployment; do not penalize testimony presented with dignity and consent.
+moral-circle radius: how wide the text draws the boundary of who counts. Score the radius and its consistency; reward boundaries argued rather than assumed.
+future-generations weight: how seriously people not yet born figure in the text's calculations. Score the weight given; reward it made concrete rather than invoked as halo.
+animal-inclusion instinct: how naturally nonhuman animals enter the moral accounting where relevant. Score the inclusion; do not reward it as reflex where genuinely irrelevant.
+demandingness acknowledged: how honestly the text admits how much its own position asks of people. Reward the admitted cost; penalize ethics priced only for others.
+supererogation clarity: how clearly the text separates the required from the admirable-but-optional. Reward the marked line; penalize heroism quietly rebranded as duty.
+moral-licensing risk: how much displayed virtue is spent as permission for later laxity. Penalize the visible license; note the pattern, not just the single act.
+virtue-signaling cost awareness: how conscious the text is of the difference between signaling that costs and signaling that pays. Reward costly signals honestly borne; penalize free virtue display.
+integrity under trade-offs: how well stated values survive when they become expensive in the text's own reasoning. Reward values that still bind under pressure; penalize principles with convenient exceptions.
+clean-hands preoccupation: how much the text prioritizes its own moral purity over outcomes. Score the preoccupation; penalize purity purchased with others' losses.
+dirty-hands realism: how honestly the text accepts that acting in the world sometimes means choosing among wrongs. Reward the acknowledged compromise contained and named; penalize realism as blanket permission.
+moral-luck awareness: how much the text separates the quality of decisions from the fortune of outcomes. Reward decision-graded judgment; penalize verdicts that just track how things happened to land.
+complicity mapping: how honestly the text traces its own entanglement in what it criticizes. Reward the drawn map including the author's position; penalize critique from an assumed clean outside.
+moral courage on display: how much the moral stand costs the author here, in this text, before this audience. Reward the priced stand; do not reward courage claimed against absent enemies.
+ethics-washing scent: how much moral language functions as coating over unchanged conduct. Penalize the coating; reward ethics talk accompanied by verifiable changed behavior.
+deontological rigidity: how much rule-following persists when the rules visibly defeat their own point. Score the rigidity; distinguish principled constancy from rule worship.
+consequentialist coldness: how much the arithmetic of outcomes overrides everything persons are owed. Score the coldness; distinguish honest tradeoff acceptance from cruelty by spreadsheet.
+moral-uncertainty handling: how the text acts when it does not know which moral framework is right. Reward hedged, humble action under stated uncertainty; penalize certainty adopted for convenience.
+values-pluralism respect: how seriously the text treats reasonable people holding different deep values. Reward engagement across frameworks; penalize pluralism as excuse to never judge.
+care in handling sacred values: how deftly the text touches what some hold beyond trade — neither mocking nor capitulating. Reward the careful touch; penalize both desecration for effect and taboo-driven silence.
+moral imagination: how vividly the text can inhabit moral situations far from its author's own. Reward the inhabited distance; do not reward imaginative flourish that flattens real others into characters.
+working-memory load imposed: how many things the reader must hold in mind at once to follow the text. Score the load; reward material whose inherent load is honored, penalize load created by poor arrangement.
+chunking assistance: how well the text groups its content into graspable units. Reward natural chunks; do not reward fragmentation that destroys the connections.
+prerequisite stack height: how tall the tower of prior knowledge is beneath this text. Score the height honestly stated; penalize unstated prerequisites discovered by falling.
+notation burden: how much special symbolism the reader must learn to proceed. Score the burden; reward notation that repays its cost, penalize notation as gatekeeping.
+formalism payoff ratio: how much the formal machinery actually buys relative to what it costs the reader. Reward machinery that earns its keep; penalize rigor costumes on simple ideas.
+cognitive-load budgeting: how deliberately the text spends the reader's limited attention — hard parts cushioned, easy parts brisk. Reward the managed budget; penalize uniform density indifferent to difficulty.
+attention span demanded: how long the text requires unbroken concentration. Score the demand; reward it matched to real necessity, penalize length that is only unedited.
+skim resistance: how much the text's value refuses to yield to fast reading. Score the resistance; note whether it comes from depth or from disorganization.
+deep-work requirement: how much the text demands the reader's full undistracted capacity. Score the demand honestly signaled; reward texts that deserve the depth they require.
+distraction fragility: how completely comprehension collapses if attention lapses briefly. Penalize needless fragility; reward structures that let a returning reader reattach.
+concept-introduction pacing: how well new ideas are spaced against the reader's absorption rate. Reward the humane cadence; penalize five new concepts in one paragraph.
+spaced-repetition friendliness: how naturally the text's key ideas return at intervals that fix them in memory. Reward the built-in returns; do not reward mere repetition without development.
+mental-model transferability: how well the models the text builds apply beyond its own examples. Reward the portable model; penalize machinery that works only in the demonstration.
+insight-per-effort ratio: how much understanding the reader gains per unit of work invested. Reward the high yield; do not reward ease achieved by teaching less.
+aha-moment density: how often the text produces the click of sudden understanding. Reward engineered clicks; do not reward withholding that manufactures relief.
+confusion-then-clarity design: how deliberately the text lets productive confusion form before resolving it. Reward the managed fog with a lighthouse; penalize confusion the author simply shares.
+deliberate-ambiguity fraction: how much ambiguity is chosen and load-bearing rather than accidental. Score the chosen fraction; penalize ambiguity from imprecision claiming to be depth.
+garden-path risk: how often the text leads readers to a parse or expectation it must then undo. Penalize the needless backtrack; permit the deliberate one that teaches.
+backtracking cost: how expensive it is when a reader must re-read to recover the thread. Penalize high-cost recovery; reward texts whose threads can be re-caught locally.
+glossary dependence: how often the reader must leave the text to look things up. Score the exits demanded; penalize the unnecessary ones, not the subject's real vocabulary.
+diagram necessity: how much the text needs a figure it does or does not provide. Reward the figure supplied where words strain; penalize both the missing diagram and the decorative one.
+worked-example sufficiency: how completely the examples actually exercise the method being taught. Reward examples worked to the end; penalize examples that stop before the hard step.
+exercise-to-exposition ratio: how much the text asks the reader to do versus watch. Score the ratio against the material's nature; reward doing where doing teaches.
+mastery-gradient steepness: how sharply difficulty rises across the text. Score the gradient; reward climbs with switchbacks, penalize cliffs without warning.
+plateau-warning honesty: how honestly the text warns where progress will feel stuck. Reward the forecast plateau; penalize the pretense that mastery is linear.
+primary-source proximity: how close the text stands to original evidence rather than summaries of summaries. Reward first-hand contact; penalize citation chains that never reach ground.
+anecdote-to-data ratio: how the balance sits between story and systematic evidence. Score the ratio against the claim's needs; penalize stories where distributions were required.
+n-of-one candor: how honestly single-case evidence is labeled as such. Reward the labeled case; penalize the one patient, one user, one run quietly universalized.
+effect-size emphasis over significance: how much the text cares about how big rather than merely whether. Reward magnitude thinking; penalize asterisk worship.
+replication awareness: how much the text knows whether its cited findings have survived replication. Reward the checked foundation; penalize load placed on famously fragile results.
+preregistration spirit: how much the analysis was committed before the results were seen. Reward the tied hands; penalize gardens of forking paths presented as a single road.
+data-availability instinct: how readily the underlying data is shared or its absence explained. Reward the open drawer; penalize trust-me datasets.
+methods transparency: how completely a competent reader could redo what was done. Reward the reproducible recipe; penalize methods sections that are mood descriptions.
+instrument-validity care: how seriously the text asks whether its measures measure what they claim. Reward the interrogated instrument; penalize proxies treated as the thing.
+confound acknowledgment: how honestly rival explanations for the pattern are surfaced. Reward the named confounds with triage; penalize the clean story with obvious lurking variables.
+natural-experiment cleverness: how ingeniously the text finds identification in the world's accidents. Reward the clever lever honestly stress-tested; penalize cuteness that outruns validity.
+triangulation breadth: how many independent kinds of evidence converge on the conclusion. Reward genuine independence of sources; penalize one source wearing three costumes.
+converging-evidence architecture: how deliberately the case is built so no single pillar carries it. Reward the distributed load; penalize apparent convergence that shares one upstream assumption.
+cherry-picked-window risk: how much the result depends on where the time window or sample boundary was drawn. Penalize the convenient frame; reward boundaries justified before the peek.
+denominator visibility: how consistently rates come with their denominators. Reward the visible base; penalize numerators marching alone.
+absolute-versus-relative honesty: how honestly the text chooses between absolute and relative figures. Reward the choice that informs; penalize the doubled risk of one in a million.
+graph integrity: how honestly the figures represent the data — axes, scales, baselines. Reward the honest picture; penalize truncation and aspect tricks that argue silently.
+axis honesty: how fairly the chart axes are chosen and labeled. Reward zero-baselines where they belong and stated departures where not; penalize the quiet log scale.
+outlier-handling candor: how openly outliers are reported, kept, or removed with reasons. Reward the disclosed decision; penalize the dataset quietly cleaned toward the thesis.
+missing-data disclosure: how honestly the text reports what could not be measured or was lost. Reward the mapped holes; penalize completeness implied by silence.
+publication-bias awareness: how much the text remembers the studies that were never published. Reward the file-drawer correction; penalize literatures read at face value.
+conflicts-of-interest disclosure: how fully the text discloses who pays and who benefits. Reward the complete disclosure; penalize interests discovered by the reader.
+evidence-hierarchy respect: how appropriately the text weights kinds of evidence by their reliability. Reward calibrated weighting; penalize both hierarchy worship and its inversion.
+mechanistic-plus-statistical coverage: how well the text pairs a mechanism with population-level evidence. Reward the pincer; penalize correlations without gears and gears without counts.
+checkable-detail density: how many specific claims a motivated reader could independently verify. Reward the dense checkable surface; penalize prose that offers nothing to grab.
+unit-economics awareness: how clearly the text understands what one unit costs and returns. Reward the known unit; penalize businesses and programs described only in aggregates.
+opportunity-cost fluency: how naturally the text weighs what else the same resources could do. Reward the counterfactual spend; penalize proposals priced against zero.
+marginal thinking: how well the text reasons about the next unit rather than the average. Reward marginal reasoning; penalize averages hiding the decision-relevant margin.
+fixed-versus-variable clarity: how cleanly the text separates costs that scale from costs that do not. Reward the separation; penalize projections that scale the unscalable.
+break-even realism: how honestly the text computes when it stops losing. Reward the sober crossover; penalize break-even points that assume the best case of every variable.
+cost-disease awareness: how much the text understands why some costs rise without productivity gains. Reward the named disease where relevant; penalize plans that assume services get cheaper like chips.
+cheap-to-try instinct: how strongly the text seeks ways to test at low cost before spending big. Reward the cheap probe found; do not reward cheapness that tests nothing.
+capital-efficiency pride: how much the text values output per dollar as a craft. Reward the demonstrated efficiency; penalize frugality theater that starves the mission.
+burn-rate candor: how openly the text states how fast the money goes and what happens at zero. Reward the stated runway; penalize burn hidden behind growth talk.
+revenue-model believability: how plausibly the text explains who pays, why, and how much. Reward the traced dollar; penalize models where revenue is a later miracle.
+willingness-to-pay evidence: how much actual payment behavior backs the demand claims. Reward money that has moved; penalize surveys of hypothetical enthusiasm.
+market-size honesty: how honestly the addressable market is estimated. Reward the bottom-up count; penalize the top-down sliver of a trillion.
+TAM inflation risk: how much the total addressable market has been stretched to impress. Penalize the stretch; reward markets sized by who can actually be reached and served.
+competitive-moat realism: how honestly the text assesses what stops others from copying this. Reward the named moat with mechanism; penalize moats that are adjectives.
+commodity-trap awareness: how alert the text is to its offering becoming undifferentiated. Reward the seen trap and the plan around it; penalize differentiation asserted against gravity.
+pricing-power insight: how well the text understands who sets prices in its market and why. Reward the located power; penalize price assumptions that ignore the powerful.
+incentive-design sophistication: how skillfully the text arranges rewards so desired behavior is individually rational. Reward the aligned mechanism; penalize designs that assume people ignore their incentives.
+principal-agent awareness: how clearly the text sees where agents' interests diverge from principals'. Reward the named divergence with mitigation; penalize trust as the entire control system.
+externality accounting: how fully costs and benefits landing on third parties are counted. Reward the full ledger; penalize gains booked while harms are exported.
+public-goods framing fitness: how correctly the text identifies what is actually nonrival and nonexcludable. Reward the fitted frame; penalize public-good language draped over private benefit.
+funding-model sustainability: how plausibly the funding continues after the current push. Reward the durable engine; penalize plans that are one grant deep forever.
+grant-dependence honesty: how openly the text admits its reliance on continued philanthropy. Reward the admitted dependence with a path; do not punish dependence itself — punish its denial.
+cross-subsidy clarity: how transparently one activity's surplus funds another's deficit. Reward the mapped flows; penalize hidden subsidies that distort what looks viable.
+scale-economics understanding: how well the text knows what actually gets cheaper with size here. Reward the mechanism named; penalize scale as incantation.
+diseconomies-of-scale caution: how honestly the text anticipates what gets worse with size — coordination, quality, culture. Reward the anticipated drag; penalize growth curves with no friction term.
+protagonist energy: how much the author moves as the main actor of their account — initiative taken, outcomes owned. Reward the acting center; penalize the hero edit that erases everyone else.
+main-character restraint: how well the author resists making everything about themselves. Reward the camera pointed at the work; do not reward self-erasure that hides needed context.
+locus-of-control placement: how much the text locates outcomes in what the author can affect versus outside forces. Reward the internal locus with realism; penalize both helplessness and omnipotence.
+victimhood-framing avoidance: how much the text explains setbacks without settling into victim identity. Reward injury named and then worked past; do not penalize naming real injustice.
+agency attributed to others: how much the text treats other people as actors with their own plans rather than scenery. Reward the peopled world; penalize casts of NPCs around one mind.
+empowerment authenticity: how really the text's talk of empowering others transfers actual power — decisions, budgets, credit. Reward transferred control; penalize empowerment as vocabulary.
+learned-helplessness scent: how much the prose has stopped believing its actions matter. Score the scent; read it as diagnostic of history, and note where it forecloses available moves.
+initiative density: how many things the author visibly started without being asked. Reward the unprompted starts; do not reward starting as a substitute for finishing.
+permission-asking reflex: how much the text waits for authorization it does not need. Penalize the unneeded wait; do not penalize legitimate consent-seeking.
+forgiveness-over-permission calibration: how wisely the text chooses when to act first and explain after. Reward the calibrated choice with stakes weighed; penalize the doctrine applied to irreversible things.
+bottleneck self-identification: how honestly the author recognizes when they themselves are the constraint. Reward the mirror check; penalize bottleneck hunts that only ever find others.
+delegation maturity: how well the text gives real work away with authority to do it. Reward the genuine handoff; penalize delegation of tasks while hoarding decisions.
+control-surrender wisdom: how wisely the text lets go of what it cannot or should not control. Reward the chosen release; distinguish it from abdication.
+leverage awareness: how well the text finds the points where small force moves large outcomes. Reward the located fulcrum; penalize effort applied where effort cannot matter.
+force-multiplier instinct: how naturally the text builds things that make everyone else more effective. Reward the multiplier built; do not reward tools nobody asked for.
+veto-player mapping: how clearly the text knows who can block it and what they need. Reward the mapped vetoes; penalize plans that discover their blockers late.
+coalition-math realism: how honestly the text counts the support it actually has versus needs. Reward the real count; penalize coalitions of the enthusiastic imagined.
+power-analysis candor: how frankly the text discusses who holds power in its situation and how it moves. Reward the frank map; penalize power blindness and power obsession alike.
+soft-power fluency: how skillfully the text works through attraction, legitimacy, and relationship. Reward the fluent draw; distinguish it from ingratiation.
+hard-power realism: how honestly the text acknowledges where budgets, votes, and enforcement decide things. Reward the acknowledged steel; penalize the pretense that persuasion settles everything.
+theory-of-change ownership: how much the author owns their causal story rather than borrowing the field's boilerplate. Reward the owned mechanism; penalize inherited logic models recited.
+bystander-assumption avoidance: how much the text refuses to assume someone else will handle it. Reward the stepped-up default; do not reward hero syndrome that crowds out those responsible.
+responsibility absorption: how much blame and burden the author takes rather than routes away. Reward absorbed responsibility with repair; penalize both deflection and performative self-blame.
+credit-sharing generosity: how readily credit flows to everyone who earned it. Reward the spread credit with names; penalize the we that means I and the I that means we.
+comfort behind the throne: how content the author is to wield influence without occupying the visible seat. Score the contentment; note both its humility and its unaccountability.
+rationalist coding: how strongly the text signals the rationalist scene — priors, updates, cruxes, calibration talk. Score the signal strength; do not score agreement with the scene.
+academic coding: how strongly the text carries academia's markers — literature positioning, hedged claims, citation reflexes. Score the marking; judge separately whether the form serves the content.
+hacker-culture coding: how strongly the text signals hacker culture — build-first pragmatism, irreverence, working code as argument. Score the signal; do not romanticize it.
+policy-wonk coding: how strongly the text speaks in policy's dialect — stakeholders, implementation windows, briefing structure. Score the dialect; note where it enables and where it deadens.
+artist-statement coding: how much the text sounds like gallery prose — interrogating, complicating, practices and gestures. Score the register; judge separately whether real work stands behind it.
+effective-altruism dialect: how strongly the text speaks EA — counterfactuals, cost-effectiveness, cause prioritization vocabulary. Score the dialect strength; do not score the movement's correctness.
+silicon-valley dialect: how strongly the text runs on startup idiom — scale, iterate, ship, disrupt. Score the idiom; note where it imports useful speed and where it imports category errors.
+east-coast-establishment dialect: how much the text carries institutional Atlantic prose — measured authority, credentialed gravity, the wise consensus voice. Score the register; judge its fit separately.
+continental-theory perfume: how much the text is scented with continental theory — dialectics, problematics, the apparatus of critique. Score the scent; distinguish working concepts from name-fog.
+analytic-philosophy dryness: how much the text has analytic philosophy's texture — numbered premises, necessary conditions, counterexample dueling. Score the texture; reward precision, note bloodlessness.
+engineering-culture pragmatism: how much the text breathes engineering — tolerances, tradeoffs, failure modes, what actually ships. Reward the load-rated thinking; note where it undervalues the unmeasurable.
+science-fair earnestness: how much the text has the bright, hopeful, poster-board energy of a first real project. Score the energy; treasure its sincerity, note its innocence of the field.
+zine energy: how much the text has the photocopied, self-published, nothing-to-lose voice. Score the energy; reward its freedom, note where craft would help it travel.
+substack-native voice: how much the text is shaped by the newsletter form — personal authority, recurring audience intimacy, the mid-length essay rhythm. Score the shaping; judge fit separately.
+twitter-native compression: how much the text thinks in feed-shaped units — quotable, compressed, ratio-aware. Score the compression; reward what survives expansion, note what only works small.
+longform-native patience: how much the text trusts the reader for ten thousand words — slow builds, held threads. Score the patience; reward it earned, penalize length as ambition.
+forum-native informality: how much the text carries forum culture — threaded replies in its bones, edits acknowledged, epistemic status headers. Score the texture; note its honesty and its insularity.
+seminar-room register: how much the text speaks as if among initiated peers around a table. Score the register; reward its precision, note the door it closes.
+boardroom register: how much the text performs executive summary — decisions framed, risks bulleted, asks explicit. Score the register; reward decision-readiness, penalize gloss over substance.
+lab-notebook register: how much the text records like a working scientist's notebook — dated, exact, unglamorous. Reward the honest record; do not reward disorder as authenticity.
+field-notes register: how much the text observes like an ethnographer on site — concrete, present-tense, judgment deferred. Reward the disciplined eye; note where deferral becomes evasion.
+manifesto register: how much the text declares like a manifesto — demands, wes, futures announced. Score the declaration energy; judge separately whether anything backs it.
+white-paper register: how much the text wears the white paper's neutral authority — sections, figures, measured recommendations. Score the costume; check whether the authority is earned.
+blog-post intimacy: how much the text has the direct, personal, thinking-out-loud closeness of a good blog. Score the closeness; reward its honesty, note where intimacy substitutes for rigor.
+conference-talk polish: how much the text has been shaped by live delivery — timed reveals, laugh lines, the closing slide. Score the stagecraft; check what remains when the lights are up.
+skin-in-the-game visibility: how much the author demonstrably loses if they are wrong — money, time, reputation on the same side as their claims. Reward the visible exposure; penalize advice from behind glass.
+track-record verifiability: how easily the author's past claims and results can actually be checked. Reward the auditable history; penalize track records that exist only as self-report.
+falsifiable-promise density: how many of the text's forward commitments could be checked and found broken. Reward promises with teeth; penalize aspirations engineered to be uncheckable.
+accountability invitation: how actively the text invites being held to account — named metrics, revisit dates, standing challenges. Reward the issued invitation; penalize accountability language with no mechanism.
+audit welcome-ness: how genuinely the text would welcome a hostile competent audit. Reward the open books posture with books actually open; penalize welcome extended only rhetorically.
+references offered unprompted: how readily the text volunteers ways to verify through others. Reward the unprompted referral; do not reward reference lists curated to friendlies.
+error-correction history: how visibly the author has publicly corrected themselves before. Reward the paper trail of fixed mistakes; penalize spotless records that imply hiding rather than perfection.
+public-changelog spirit: how openly changes, reversals, and updates are logged where anyone can see. Reward the running log; penalize silent edits.
+promise-keeping architecture: how much structure exists to ensure commitments are kept — reminders, escrow, third parties, defaults. Reward the built structure; penalize willpower as the entire system.
+under-promise discipline: how consistently the text commits to less than it expects to deliver. Reward the conservative bar; do not reward sandbagging that misleads planners.
+over-delivery evidence: how much history shows delivery beyond commitment. Reward the documented surplus; distinguish it from commitments set low for the purpose.
+incentive-alignment disclosure: how clearly the text explains why its own incentives point toward telling the truth here. Reward the shown alignment; penalize trust requested against the grain of interest.
+insurance against its own motivated cognition: how much the text builds external checks against its own wishful thinking — pre-commitments, adversarial review, tripwires. Reward the purchased insurance; penalize self-awareness offered as sufficient protection.
+adversarial-review invitation: how genuinely hostile reviewers were sought and their findings engaged. Reward the real red pen absorbed; penalize friendly review labeled adversarial.
+red-team welcome: how much the text wants its plan attacked before reality attacks it. Reward the standing invitation with attack surface exposed; penalize red-teaming as ritual.
+transparency depth versus transparency theater: how deep the openness goes when you follow it — raw records, or a lobby with glass walls and locked floors. Reward depth on follow-through; penalize the staged tour.
+verifiability of central claims: how checkable the load-bearing claims are, specifically — not the periphery. Reward verifiable cores; penalize texts checkable everywhere except where it matters.
+bus-factor honesty: how openly the text admits what dies if one person disappears. Reward the admitted fragility with mitigation; penalize resilience implied by silence.
+reputation collateral posted: how much standing the author has staked such that failure costs them visibly. Reward posted collateral; distinguish it from reputations too big to dent.
+long-game evidence: how much the record shows patient investment inconsistent with quick extraction. Reward the demonstrated long game; penalize long-term language from short-term behavior.
+repeated-game posture: how much the text behaves like it expects to deal with the same people again. Reward the repeat-player conduct; penalize end-game moves dressed in relationship language.
+self-imposed cost of betrayal: how much the author has arranged to lose if they defect on their commitments. Reward the engineered downside; penalize trust structures where betrayal stays free.
+character-reference quality: how much the people who vouch for this would themselves be believed, and on what knowledge. Reward informed vouchers with standing; penalize mutual-admiration references.
+vaporware scent: how much the described thing smells like it will never actually exist — demos always upcoming, screenshots not builds. Penalize the scent; do not penalize honest pre-announcement labeled as such.
+grift adjacency: how close the structure sits to known extraction patterns — money flowing to insiders, value perpetually deferred. Penalize the structural resemblance; do not convict on aesthetics alone.
+cargo-cult structure: how much the form of a successful thing is copied without the mechanism that made it work. Penalize the runway without radios; do not penalize honest emulation that includes the engine.
+buzzword load: how much of the text is current buzzwords per unit of content. Penalize the load; do not penalize technical terms used with precision.
+solution-in-search-of-problem risk: how much the offering exists because it could be built rather than because anyone needs it. Penalize the unfound problem; do not penalize research honestly labeled exploratory.
+demo-that-never-ships energy: how much polish lives in the presentation relative to the product. Penalize the gradient; reward rough demos of real things over smooth demos of nothing.
+perpetual-pivot scent: how much the history is pivots without accumulating learning or assets. Penalize the drift; distinguish it from disciplined search that compounds.
+moving-goalposts history: how often success criteria have been redefined after being missed. Penalize the relocated posts; do not penalize criteria updated openly for good reasons.
+accountability diffusion: how thoroughly responsibility has been spread until nobody holds it. Penalize the diffusion; reward structures where failure has an address.
+blame-preemption architecture: how much of the text exists to ensure failure will be attributable elsewhere. Penalize the pre-built excuse; distinguish it from honest risk assignment.
+excuse scaffolding: how much explanatory structure is erected in advance around outcomes that have not happened. Penalize the scaffolds; note them as prediction of failure by the author.
+complexity as concealment: how much complication functions to prevent understanding rather than serve the material. Penalize the fog machine; do not penalize irreducible complexity honestly managed.
+obfuscation instinct: how reflexively the text goes vague exactly where precision would be checkable. Penalize the targeted vagueness; the location of the fog is the tell.
+dazzle camouflage: how much impressive display is positioned to prevent the eye from finding the weak point. Penalize the dazzle; note what it is painted over.
+credential substitution for argument: how much who-I-am stands where here-is-why should be. Penalize the substitution; do not penalize credentials offered alongside argument.
+urgency manufacture: how much time pressure is created rather than reported. Penalize the manufactured clock; do not penalize real deadlines with real mechanisms.
+scarcity theater: how much limited availability is staged to force decisions. Penalize the staged scarcity; do not penalize true constraints stated plainly.
+FOMO leverage: how much the pitch works by fear of missing out rather than the thing's own merits. Penalize the leverage; note that real opportunities survive without it.
+testimonial dependence: how much the case rests on curated praise rather than verifiable results. Penalize the dependence; do not penalize testimony that is itself checkable.
+MLM structural echo: how much the value flows depend on recruitment rather than product. Penalize the echo; the question is where the money actually comes from.
+ponzi temporal signature: how much early participants are paid with later participants' contributions. Penalize the signature wherever the sustainability math requires perpetual inflow.
+regulatory-arbitrage scent: how much the model works only in gaps between rules. Score the scent; distinguish innovation the rules haven't met from evasion the rules already address.
+jurisdiction shopping: how much the structure has been placed where oversight is weakest. Penalize the placement when its purpose is escape; do not penalize legitimate domicile reasons stated.
+accountability-free upside: how much the author collects if right while bearing nothing if wrong. Penalize the one-way exposure; reward symmetric stakes.
+comfort with other people's money: how casually the text spends funds it did not earn and will not repay. Penalize the casualness; reward stewardship felt in the prose.
+density: how much substance per unit of text — mass that stays mass under compression. Reward true density; do not reward the merely difficult.
+porosity: how much space the text leaves for the reader's own thought to enter — gaps that admit, not gaps that lose. Reward productive porosity; penalize both the hermetic and the leaky.
+brittleness: how much the argument shatters rather than bends when one part fails. Penalize brittle wholes; reward structures that degrade gracefully.
+ductility: how far the text's ideas can be drawn into new shapes without breaking. Reward ductile concepts; penalize ones that snap outside their original form.
+viscosity: how much the prose resists flowing — thickness felt in the reading. Score the viscosity; some material wants honey, some wants water; judge the fit.
+temperature: how hot or cold the text runs — passion versus chill as a felt physical property. Score the temperature itself; judge separately whether it suits the material.
+luminosity: how much light the text throws on things outside itself — surroundings visible by its glow. Reward the cast light; do not reward brightness that illuminates only itself.
+opacity: how much the text resists being seen through — meaning withheld from even careful reading. Score the opacity; distinguish depth's darkness from mud.
+buoyancy: how much the text rises — lightness that keeps the reader afloat through difficult water. Reward buoyancy under load; do not reward the merely weightless.
+torque: how much twisting force the text applies to the reader's existing views — rotation, not just push. Reward applied torque with a fulcrum of evidence; penalize spin without grip.
+friction coefficient: how much the text resists the reader's motion through it — roughness felt sentence to sentence. Score the friction; some traction is chosen, some is failure to sand.
+elasticity: how much the text springs back when stretched by objections — resilience of shape under argument. Reward elastic recovery; penalize both rigidity and permanent deformation by the first push.
+tensile strength: how much pull the central thread bears before snapping — the through-line under load. Reward high-tensile threads; penalize arguments that part when gripped at both ends.
+fatigue resistance: how well the text survives repeated stress — rereading, quotation, being argued with — without cracking. Reward endurance under cycles; penalize pieces that only survive one reading.
+corrosion resistance: how well the text withstands its environment over time — hostile commentary, shifting context, slow rust. Reward the resistant surface; penalize claims that oxidize on exposure.
+crystallinity: how much the text has a regular internal lattice — ordered structure repeating at every scale. Score the crystallinity; reward order that clarifies, note where it forbids the amorphous truth.
+amorphousness: how much the text lacks fixed internal structure — glass, not crystal. Score the amorphousness; some material sets that way honestly; penalize formlessness in material that wanted form.
+granularity: how fine the grain of detail runs — the resolution at which the text engages its subject. Score the resolution; reward grain matched to purpose, penalize uniform coarseness.
+laminarity: how smoothly the flow of thought runs in parallel layers without churning. Reward laminar passages where clarity needs them; do not reward smoothness that never mixes.
+turbulence: how much productive churn the text generates — vortices of ideas colliding. Score the turbulence; reward it where mixing is the point, penalize it where it is just noise.
+resonance: how much the text rings at frequencies the reader already carries — sympathetic vibration with lived experience. Reward struck resonance; penalize pandering tuned to applause.
+damping: how well the text absorbs its own oscillations — hype self-corrected, alarm self-checked, swings settled. Reward critical damping; penalize both the undamped ring and the overdamped thud.
+impedance match with its audience: how well the text's output impedance meets the reader's input — maximum transfer, minimal reflection. Reward the matched load; penalize brilliance reflected unabsorbed.
+center-of-gravity height: how high the text's weight sits — top-heavy abstraction or low, stable groundedness. Score the height; low centers survive collisions, high centers reach further; judge the tradeoff.
+moment of inertia: how much the text resists changes to its own rotation — mass distributed far from its axis. Score the resistance to being spun; reward stability, note where it becomes inability to turn.
+surface tension: how much the text's surface holds together against penetration — polish that resists entry. Score the tension; note when it lets readers skate and when it keeps them out.
+capillary pull: how much the text draws the reader onward through narrow spaces by its own adhesion. Reward the pull felt in the small passages; do not reward suction toward nothing.
+phase-transition proximity: how close the text stands to changing state — an argument about to crystallize, a field about to melt. Score the felt proximity; reward texts that know they are near a boundary.
+entropy: how much disorder the text carries — information degraded, structure dissipating. Penalize unmanaged entropy; do not penalize the deliberate loosening that some endings need.
+negentropy hoard: how much concentrated order the text has gathered against the surrounding noise — structure banked and defended. Reward the hoard built honestly; note the energy spent to maintain it.
+stakes clarity: how clearly the reader knows what is at risk and for whom. Reward legible stakes early; penalize suspense about whether anything matters.
+protagonist believability: how much the central actor — person, team, idea — behaves like something real. Reward believable centers; penalize protagonists who are only virtues in sequence.
+antagonist fairness: how honestly the opposition — rival, obstacle, counterargument — is rendered at strength. Reward the worthy antagonist; penalize opposition built to lose.
+conflict authenticity: how real the central tension is — a genuine collision, not a staged misunderstanding. Reward authentic collision; penalize conflict manufactured for narrative shape.
+earned-ness of its resolution: how much the ending is paid for by what preceded it. Reward the settled debt; penalize resolutions that arrive by authorial fiat.
+chekhov-gun discipline: how much every introduced element eventually fires. Reward the kept inventory; penalize both the unfired arsenal and guns produced from nowhere in act three.
+subplot discipline: how well secondary threads serve the main one. Reward subplots that return with interest; penalize threads that wander off with the reader's attention.
+pacing control: how deliberately the speed of events and revelations is managed. Reward the controlled throttle; penalize uniform pace indifferent to what is happening.
+in-medias-res courage: how boldly the text starts inside the action and trusts the reader to catch up. Reward the confident cold open that pays its debts; penalize disorientation without payoff.
+exposition-smuggling skill: how invisibly necessary background is delivered inside forward motion. Reward the smuggled cargo; penalize both the info-dump and the withheld essential.
+show-don't-tell ratio: how much the text demonstrates rather than asserts its qualities and claims. Reward the demonstration; do not penalize efficient telling of what needn't be shown.
+unreliable-narrator awareness: how much the text knows its own account is partial and shows the reader where. Reward the marked partiality; penalize omniscience assumed by an interested party.
+dramatic-irony deployment: how skillfully the text lets the reader know more than its subjects. Reward the managed gap; penalize irony spent on making subjects look small.
+foreshadowing subtlety: how quietly the text plants what it will later need. Reward plants invisible until harvest; penalize both neon signposts and endings with no roots.
+twist fairness: how honestly a reversal was prepared — surprising yet inevitable in retrospect. Reward the fair twist; penalize surprise purchased by concealment the text's own rules forbid.
+denouement patience: how well the text lets consequences settle after the climax. Reward the settled dust shown; penalize both the abrupt cut and the ending that will not end.
+character-arc completeness: how fully the people in the account change, and whether the change is shown happening. Reward transformation with visible mechanism; penalize arcs asserted in the epilogue.
+world-building economy: how much world the text builds relative to how much it uses. Reward the load-bearing world; penalize lore that exists to be admired.
+lore restraint: how well the text resists explaining its own background beyond need. Reward the iceberg discipline; do not reward mystery that is merely missing work.
+canon consistency: how well the text stays consistent with its own established facts. Reward the kept ledger; penalize contradictions the text hopes nobody remembers.
+mythos ambition: how much the text reaches toward becoming a story people tell about the world. Score the reach; reward mythic resonance earned by substance, penalize myth-making as branding.
+origin-story polish: how visibly the founding narrative has been smoothed by retelling. Score the polish; note what the smoothing removed, and whether the working parts survive.
+hero's-journey template dependence: how much the account leans on the standard transformation arc. Score the dependence; penalize lives forced into the template, reward the template genuinely lived.
+anticlimax risk: how much the buildup exceeds what the payoff can honor. Penalize the unpayable promise; reward proportion between drumroll and reveal.
+narrative-fallacy self-awareness: how much the text knows that its tidy story was imposed on messier events. Reward the confessed imposition; penalize causal arcs drawn through noise with a straight face.
+second-order-effect anticipation: how far the text traces what its proposal causes after the first effect — reactions, adaptations, side markets. Reward the traced second ring; penalize plans that stop at the splash.
+third-order humility: how honestly the text admits that effects beyond the second ring exceed anyone's foresight. Reward the stated horizon; penalize confident chains four causes deep.
+game-theoretic literacy: how well the text reasons about others as strategic players who anticipate and respond. Reward the strategic model; penalize plans that assume opponents hold still.
+commitment-device usage: how skillfully the text binds its own future self to keep promises credible. Reward the working device; penalize commitments that cost nothing to break.
+credible-threat architecture: how much the text's deterrents would actually be executed if tested. Reward credibility built on demonstrated willingness; penalize bluffs the structure reveals.
+schelling-point instinct: how well the text finds the solutions people converge on without communication. Reward the found focal point; do not reward convention mistaken for necessity.
+focal-point design: how deliberately the text creates new points for others to coordinate on — standards, defaults, salient numbers. Reward the built landmark; penalize focal claims nobody else can see.
+coordination-problem diagnosis: how correctly the text identifies when failure is coordination, not will or knowledge. Reward the correct diagnosis; penalize moral exhortation aimed at equilibrium problems.
+mechanism-design taste: how elegantly the text builds rules under which self-interested behavior produces the desired outcome. Reward the elegant mechanism; penalize rules that need angels.
+incentive-compatibility checking: how rigorously the text verifies that telling the truth and cooperating are each player's best move. Reward the checked design; penalize systems that reward the behavior they forbid.
+defection robustness: how well the plan survives some parties cheating. Reward the cheat-tolerant design; penalize cooperation castles with no walls.
+exploitability audit: how honestly the text asks who could game this and how. Reward the adversarial walkthrough; penalize designs tested only against good faith.
+minimax prudence: how much the text weighs the worst case in choosing its path. Reward worst-case awareness; penalize both its neglect and paralysis in its name.
+maximin generosity: how much the text designs to raise the floor for the worst-off outcome or party. Reward the lifted floor; do not reward floor talk with ceiling behavior.
+negotiation-position awareness: how clearly the text knows what it holds, what it can concede, and what the other side values. Reward the mapped table; penalize negotiators who priced nothing in advance.
+BATNA candor: how honestly the text states its alternative if this deal or plan fails. Reward the stated alternative; penalize both bluffed strength and unexamined desperation.
+information-asymmetry ethics: how fairly the text uses what it knows that others do not. Score the use; reward disclosure where fairness demands it, penalize exploitation dressed as sophistication.
+signaling-versus-substance ratio: how much of the strategic behavior is signal management rather than capability building. Score the ratio; penalize the portfolio that is all flags.
+cheap-talk discount: how properly the text discounts costless statements — including its own. Reward the applied discount; penalize weight placed on words that cost nothing.
+costly-signal investment: how much the text proves commitment through what it visibly spent. Reward the burned bridge or paid price as evidence; penalize cost as spectacle without information.
+reputation-stake sizing: how well reputational bets are sized to the situation. Reward proportionate stakes; penalize both the reputation never risked and the one bet on trifles.
+iterated-game patience: how much strategy accounts for playing many rounds — cooperation built, punishment measured, forgiveness scheduled. Reward the long-run strategy; penalize single-round grabs in repeated settings.
+endgame awareness: how clearly the text sees how this phase ends and positions for what follows. Reward the played endgame; penalize midgame excellence that walks into a lost ending.
+board-state reading: how accurately the text reads the current position — who stands where, what is actually threatened. Reward the accurate read; penalize strategy launched from a misread board.
+tempo-sacrifice wisdom: how wisely the text gives up speed for position, or position for speed. Reward the justified exchange; penalize tempo lost to habit and position sold cheap.
+scenius acknowledgment: how much credit flows to the scene — the community of mutual influence that made the work possible. Reward the acknowledged ecosystem; penalize genius narratives scrubbed of their scenes.
+lineage gratitude: how specifically the text honors those whose work it builds on. Reward named ancestry; do not reward genuflection lists without engagement.
+mentorship pay-forward: how much the text invests in people coming up behind the author. Reward the visible investment; do not reward mentorship as brand.
+collaboration-credit precision: how exactly contributions are attributed — who did what, stated plainly. Reward the precise ledger; penalize both credit hoarding and vague collective attribution that erases the doers.
+rivalry sublimation: how well competitive heat is converted into better work rather than worse conduct. Reward the sublimated rivalry; penalize the feud wearing scholarship's clothes.
+community-building instinct: how naturally the text creates commons — shared vocabulary, gathering points, on-ramps. Reward the built commons; penalize community as audience capture.
+onboarding generosity: how much the text smooths the path for someone joining late. Reward the maintained welcome; penalize founding cohorts that pulled up the ladder.
+lurker respect: how much the text values the silent majority who read and never post. Reward design for the quiet; penalize contempt for those who don't perform membership.
+newcomer welcome: how genuinely first-timers are received — questions honored, jargon translated. Reward the real welcome; penalize hazing dressed as standards.
+elder respect: how much the text honors those who did the early work, including where they are now wrong. Reward honor with honesty; penalize both ancestor worship and casual dismissal.
+succession planning: how seriously the text prepares for its own leaders' replacement. Reward the named plan; penalize institutions designed around one irreplaceable person.
+knowledge-transfer diligence: how much effort goes into moving know-how out of heads and into forms others can use. Reward the transferred craft; penalize expertise hoarded as job security.
+documentation as care: how much the documentation reads as written for the person who will need it, by someone who cared. Reward the caring document; penalize documentation as compliance artifact.
+bus-factor reduction effort: how actively the text works to make itself unnecessary. Reward the spread knowledge; penalize indispensability cultivated.
+translation across camps: how well the text carries ideas between communities that don't read each other. Reward the working bridge; penalize translation that flatters both sides into misunderstanding.
+bridge-building patience: how much slow trust-building across divides the text demonstrates or invests in. Reward the patient bridge; penalize unity declared without the work.
+feud avoidance: how well the text declines invitations to escalate personal conflict. Reward the declined feud; do not reward conflict-avoidance that abandons real disputes.
+dogpile resistance: how much the text refuses to join a pile-on even when the target is unpopular. Reward the resisted pile; penalize both joining and the counter-signal of defending the indefensible for attention.
+parasocial boundary health: how honestly the text manages one-way intimacy with its audience. Reward the honest boundary; penalize intimacy farmed for dependence.
+gift-economy fluency: how naturally the text gives value without immediate accounting — and how that gift circulates. Reward the genuine gift; penalize gifts that are invoices in disguise.
+orders-of-magnitude fluency: how comfortably the text moves between scales — knowing when thousands versus millions versus billions changes the nature of the thing. Reward the fluent scaling; penalize numbers treated as interchangeable bignesses.
+dimensional-analysis instinct: how naturally the text checks that its quantities have the right units and the equations balance. Reward the checked dimensions; penalize ratios of incommensurables.
+fermi-estimate courage: how willingly the text estimates the unestimated — decomposing, bounding, committing to a number. Reward the shown estimate; penalize both refusal to guess and guesses without decomposition.
+back-of-envelope honesty: how honestly rough calculations are labeled rough — and still done. Reward the labeled envelope; penalize precision cosplay and calculation avoidance alike.
+scaling-law awareness: how much the text knows what actually changes with size in its domain — what compounds, what saturates. Reward the known curve; penalize linear extrapolation through a knee.
+bottleneck-migration anticipation: how well the text foresees that relieving this constraint moves the constraint elsewhere. Reward the anticipated migration; penalize victory declared at the first bottleneck.
+throughput-versus-latency clarity: how cleanly the text distinguishes doing much from responding fast. Reward the separated concepts; penalize optimizing one while measuring the other.
+amortization instinct: how naturally the text spreads one-time costs across the uses that justify them. Reward the amortized view; penalize sticker-shock reasoning about investments and free-lunch reasoning about debts.
+batch-size wisdom: how well the text chooses how much to bundle — work, decisions, releases — against feedback speed. Reward the reasoned batch; penalize batching by habit in either direction.
+granularity-choice fitness: how well the text picks the size of its units of analysis for the question asked. Reward the fitted grain; penalize conclusions that dissolve at the next grain up or down.
+aggregation-level care: how carefully the text chooses and states the level at which it aggregates. Reward the stated level; penalize truths at one level silently exported to another.
+ecological-fallacy avoidance: how well the text resists inferring individual truths from group statistics. Reward the resisted inference; penalize group means worn as individual facts.
+simpson's-paradox vigilance: how alert the text is to aggregate trends that reverse within every subgroup. Reward the checked subgroups; penalize the aggregate story told unchecked.
+per-capita discipline: how consistently totals are normalized when comparison demands it. Reward the normalized comparison; penalize raw totals used to imply what only rates can show.
+stock-versus-flow clarity: how cleanly the text separates amounts held from rates of change. Reward the kept distinction; penalize wealth confused with income and reserves with replenishment.
+log-scale comfort: how naturally the text thinks in multiples and doublings where the phenomenon is multiplicative. Reward the log-native reading; penalize linear intuitions on exponential material.
+heavy-tail respect: how seriously the text treats domains where rare events carry most of the mass. Reward tail-aware planning; penalize averages quoted where the tail is the story.
+black-swan humility: how honestly the text admits which of its plans die on an unforeseen extreme. Reward the mapped exposure; penalize robustness claims never stress-tested at the tails.
+variance-versus-mean attention: how much the text cares about spread and not just center. Reward the reported spread; penalize means offered where the variance decides everything.
+respect for the law of small numbers: how properly the text distrusts patterns in tiny samples. Reward the withheld conclusion; penalize trends declared from a handful.
+curation ruthlessness: how mercilessly the text selects — keeping only what earns its place. Reward the visible cut; penalize completeness where selection was the job.
+omission wisdom: how much what is left out improves what remains. Reward the eloquent absence; do not reward gaps that are just missing work.
+restraint as signal: how much the text's holding-back communicates confidence and standards. Reward the meaningful restraint; distinguish it from having nothing to hold back.
+negative-space usage: how deliberately the text uses what it does not say — implication, silence, the unstated obvious. Reward the working silence; penalize silence that abandons the reader.
+less-is-more conviction: how deeply the text believes subtraction improves — and practices it. Reward the practiced subtraction; do not reward minimalism that undershoots the material.
+maximalism executed well: how successfully abundance — of detail, reference, ornament — is made to work as a system. Reward controlled maximalism; penalize hoarding presented as style.
+kitsch awareness: how much the text knows where sentimental mass-taste clichés lie, and either avoids or knowingly deploys them. Reward the aware navigation; penalize kitsch served straight.
+camp intentionality: how deliberate any over-the-top aesthetic is — exaggeration with a knowing wink. Reward the intentional wink; penalize accidental camp that thinks it is grand.
+irony-budget discipline: how much irony is spent and whether the text can still say anything sincerely afterward. Reward the managed budget; penalize irony as total shield.
+sincerity-budget courage: how much unprotected sincerity the text spends where irony was available. Reward the spent sincerity; do not reward earnestness as blanket evasion of wit.
+reference-quality curation: how good the taste in citations, allusions, and influences is — each reference a room the reader might enter. Reward doors worth opening; penalize name-dropping as furniture.
+influence-selection taste: how well-chosen the masters are — who the author decided to learn from. Score the chosen teachers; note what the selection reveals.
+quality-floor enforcement: how consistently nothing below a standard ships anywhere in the text. Reward the held floor; penalize brilliance beside carelessness.
+quality-ceiling ambition: how high the best moments reach. Reward the touched ceiling; do not let peaks excuse the floor.
+connoisseurship depth: how finely the text discriminates within its domain — differences invisible to outsiders, load-bearing to insiders. Reward the fine discrimination taught; penalize connoisseurship as gatekeeping.
+philistine honesty: how honestly the text admits what it does not appreciate rather than faking taste. Reward the admitted blind spot; do not reward pride in the blindness.
+acquired-taste patience: how much the text invests in tastes that repay slow acquisition — and helps the reader acquire them. Reward the taught palate; penalize difficulty declared refined without evidence.
+guilty-pleasure candor: how honestly the text owns enjoying what its milieu disdains. Reward the owned pleasure; do not reward transgression performed as personality.
+taste-versus-preference distinction: how clearly the text separates trained judgment from mere liking. Reward the marked distinction; penalize preferences enforced as standards.
+aesthetic-consistency discipline: how coherently every choice belongs to one governing sensibility. Reward the total coherence; do not reward uniformity where the material demanded range.
+larval promise: how much undeveloped capability the text shows — the shape of what this author will become. Score the visible potential; reward it named as potential, not graded as achievement.
+adolescent overreach: how much the text attempts beyond its current strength — ambition outrunning craft. Score the overreach; honor the reach while marking the gap.
+early-career hunger: how much the text carries the drive of someone with everything to prove and energy to prove it. Score the hunger; note what it powers and what it rushes.
+mid-career consolidation: how much the text works to secure and systematize earlier gains. Score the consolidation; reward the built foundation, note where safety replaced search.
+late-style freedom: how much the text shows the liberty of someone past needing approval — rules broken knowingly, economy earned. Reward the earned freedom; distinguish it from carelessness.
+juvenilia charm: how much early-work awkwardness carries genuine charm and signal. Score the charm honestly; do not grade juvenilia as mature work in either direction.
+apprentice diligence: how faithfully the text does the exercises — forms practiced, masters copied, fundamentals honored. Reward the visible diligence; note it as stage, not destination.
+journeyman reliability: how dependably competent the work is — professional, repeatable, unspectacular. Reward the reliability at its true worth; do not mistake it for mastery or dismiss it beneath one.
+master's economy: how much the text achieves with visibly little — the single line where others need ten. Reward the economy only mastery allows; distinguish it from thinness.
+post-mastery play: how much the text plays with what it has already mastered — rules bent by someone who could follow them perfectly. Reward the earned play; distinguish it from novice rule-breaking.
+growth-edge visibility: how clearly the text shows where this author is currently learning — the live frontier of their ability. Reward the visible edge worked honestly; penalize edges hidden behind polish.
+plateau honesty: how honestly the text admits where the author has stopped improving. Reward the admitted plateau; note whether the text seeks a way off it.
+second-act reinvention: how genuinely the text represents a real reinvention rather than the first act repeated in new clothes. Reward the true second act with carried-forward learning; penalize rebranding.
+comeback energy: how much the text carries return-from-setback drive — humility and hunger recombined. Score the energy; reward the integrated lesson, note unprocessed grievance.
+swan-song poignancy: how much the text carries valedictory weight — last words consciously chosen. Score the weight; reward the finishing spirit, penalize farewell as manipulation.
+premature-optimization scent: how much effort polishes parts whose requirements are not yet known. Penalize the early polish; do not penalize foundations properly overbuilt.
+premature-scaling scent: how much the text scales a process not yet proven at small size. Penalize the early multiplication; reward scale earned by a working unit.
+seasoning evidence: how much the judgment shows time under real conditions — heuristics with scars, confidence with calluses. Reward the seasoned call; distinguish it from mere age.
+weathering: how much exposure has shaped the text — positions eroded to their durable cores. Score the weathering; reward what survived it, note what it stripped.
+patina authenticity: how genuine the surface of age and use is — wear earned, not applied. Reward the true patina; penalize distressing applied for effect.
+wit density: how much sharp, compressed intelligence-as-humor the text carries per page. Reward wit that advances the argument; do not reward cleverness that stops the work to be admired.
+humor risk tolerance: how much the text is willing to risk a joke not landing. Reward the taken risk with real jokes; penalize both humorlessness as safety and recklessness that costs credibility.
+self-deprecation calibration: how precisely jokes at the author's expense are sized — disarming without groveling. Reward the calibrated cut; penalize self-deprecation as fishing or as armor.
+irony load: how much of the text means something other than what it says. Score the load; reward irony with a stable floor beneath it, penalize the load that makes every statement deniable.
+deadpan control: how steadily the text delivers absurdity with a straight face. Reward the held face that trusts the reader; penalize deadpan so complete the joke is lost to most.
+absurdism discipline: how purposefully the absurd is deployed — nonsense in service of sense. Reward disciplined absurdity; penalize randomness labeled surreal.
+pun forgiveness required: how much goodwill the wordplay demands of the reader. Score the demanded forgiveness; reward puns that repay it, penalize the groan spent for nothing.
+comic-timing precision: how exactly the funny lands where and when it should — setup, beat, release. Reward the precise beat; penalize jokes stepped on by their own explanations.
+levity-placement wisdom: how wisely lightness is positioned against heavy material. Reward relief that respects the weight; penalize jokes that puncture what needed its gravity.
+joke-tax fairness: how fairly the humor's cost — length, digression, tone risk — is balanced by what it pays. Reward jokes that cover their tax; penalize humor the text cannot afford.
+humor as argument: how much the comedy itself does argumentative work — the absurdity that exposes, the parody that clarifies. Reward the working joke; distinguish it from ridicule that merely asserts.
+humor as evasion: how much the jokes deflect exactly where seriousness was owed. Penalize the deflecting laugh; do not penalize levity that coexists with the hard answer given.
+satire fairness: how honestly the satire hits what its target actually is. Reward satire of the real thing; penalize the convenient caricature burned in effigy.
+parody accuracy: how precisely the imitation captures what it mocks. Reward the accurate ear; parody that misses its target's actual voice mocks only itself.
+whimsy authenticity: how genuine the playful strangeness is — native to the author, not applied. Reward native whimsy; penalize quirk as decoration.
+mischief energy: how much gleeful rule-testing animates the text. Score the mischief; reward it aimed at deserving targets, note where it is only self-delight.
+earned-ness of its gallows humor: how much the dark joke is earned by proximity to the darkness. Reward gallows humor from inside the situation; penalize dark jokes from tourists.
+in-joke generosity: how much the inside humor still gives outsiders something. Reward the double-audience joke; penalize laughter as a wall.
+laugh-line frequency: how often the text is actually funny. Score the rate honestly; do not reward frequency that dilutes, or penalize the single perfect joke.
+comedy-tragedy balance: how well the text holds both masks where the material contains both. Reward the held balance; penalize commitment to one that falsifies the other.
+touch-grass evidence: how much the text shows recent contact with the physical, social, unmediated world. Reward the fresh contact; penalize worldviews assembled entirely indoors.
+field-experience residue: how much time in the field has left traces in the text — details no desk produces. Reward the residue; it cannot be faked and cannot be footnoted.
+calluses visible: how much hard repeated practice shows in the hands of the prose — shortcuts earned, pains known. Reward the visible calluses; distinguish them from performed toughness.
+desk-research ceiling: how clearly the text has hit the limit of what reading alone can know. Score the ceiling honestly; penalize desk conclusions that needed a site visit.
+armchair altitude: how far above the ground the reasoning floats — comfort with abstraction untested by contact. Score the altitude; note where the view helps and where the ground disagrees.
+boots-on-ground credibility: how much the author has stood where they report from. Reward the standing; penalize dispatches from places the author has only mapped.
+practitioner fluency: how much the text speaks the working language of people who do this daily. Reward the fluent practice; penalize textbook dialect in a workshop subject.
+user-contact frequency: how often the text's claims have met actual users, customers, or subjects. Reward the frequent contact with what it changed; penalize products described without witnesses.
+customer-voice presence: how much the people served speak in their own words in the text. Reward the direct quotes with context; penalize the composite customer invented for convenience.
+real-name accountability: how much the author stands behind the text under their own name where it costs something. Reward the standing; do not penalize pseudonymity with its own earned track record.
+place attachment: how much the text is rooted in a particular place it knows and answers to. Reward the rooted account; penalize placelessness in material that lives somewhere.
+local-knowledge depth: how deep the text's knowledge of its particular context runs — the exceptions, histories, and micro-politics maps miss. Reward the deep local; penalize general models applied without local correction.
+terroir: how much the work tastes of where it was grown — conditions, community, and constraint expressed in the thing itself. Score the terroir; reward its honest expression, note where it limits transplant.
+embodied-knowledge scent: how much the knowing lives in the body of the practice — balance, timing, feel — and shows through the description. Reward the embodied trace; penalize kinesthetic subjects described purely propositionally.
+craft-apprenticeship residue: how much learning-under-a-master shows in the work's habits. Reward the transmitted craft; note the lineage it implies.
+tool-wear authenticity: how much the tools described show real use — workflows with worn grips, not showroom setups. Reward the worn tool; penalize stacks assembled for the screenshot.
+workshop-floor vocabulary: how naturally the text uses the words workers actually use, precisely. Reward the native precision; penalize both sanitized abstraction and slang worn as costume.
+lived-experience weight: how much weight the text gives to having been there, calibrated against its evidential limits. Reward experience weighted honestly; penalize both its dismissal and its treatment as trump.
+secondhand-knowledge honesty: how clearly the text marks what it knows only through others. Reward the marked secondhand; penalize borrowed experience worn as one's own.
+map-territory discipline: how consistently the text remembers its models are not the thing itself. Reward the kept distinction; penalize the map defended against the territory.
+self-awareness without self-absorption: how much the text knows itself while staying pointed at its subject. Reward the brief accurate mirror; penalize the mirror that becomes the view.
+fourth-wall discipline: how deliberately the text manages acknowledgment of its own artifice. Reward the controlled break that serves; penalize winking as habit.
+meta-commentary budget: how much text-about-the-text the piece spends. Score the budget; reward commentary that steers reading, penalize the essay about the essay.
+self-citation restraint: how much the author resists routing the reader back to their own prior work beyond need. Reward the restraint; do not penalize necessary continuity with one's own results.
+cartography of its own limitations: how precisely the text maps where it fails, thins, or does not apply. Reward the drawn map with borders in the right places; penalize limitation sections that list only flattering weaknesses.
+scope-disclaimer honesty: how honestly the stated scope matches what the text actually attempts. Reward the kept boundary; penalize disclaimers contradicted by the text's own reach.
+genre self-knowledge: how well the text knows what kind of thing it is — and either obeys or knowingly breaks its form. Reward the knowing relation to form; penalize genre confusion that is only confusion.
+audience self-knowledge: how accurately the text knows who is actually reading it. Reward the true address; penalize texts written for an imagined audience their real readers must overhear.
+purpose clarity to itself: how much the text knows what it is for. Reward the internal clarity felt in every choice; penalize texts that discover their purpose while spending the reader's time.
+mission drift within the document: how far the text ends from where it promised to go. Penalize the unacknowledged drift; do not penalize evolution the text itself marks and justifies.
+thesis fidelity: how faithfully the body serves the stated thesis. Reward the kept thread; penalize bodies that quietly argue something else.
+promise-keeping within the text: how completely the text delivers everything its own sentences promised. Reward the settled ledger; penalize the introduced point never returned to.
+title-content contract fulfillment: how honestly the content delivers what the title sold. Reward the honored contract; penalize titles writing checks the text cannot cash.
+abstract-body consistency: how accurately the summary matches what the full text establishes. Reward the faithful abstract; penalize summaries that promote the body's hedges to certainties.
+conclusion-introduction handshake: how well the ending answers the opening — questions posed, then actually answered or honestly returned. Reward the closed loop; penalize conclusions that greet a different introduction.
+internal-contradiction rate: how often the text disagrees with itself without noticing. Penalize the unnoticed contradiction; reward tensions the text itself surfaces and works.
+self-undermining risk: how much the text's own method or tone defeats its message. Penalize the performative contradiction; reward form that enacts what it argues.
+reflexivity depth: how deeply the text applies its own standards to itself. Reward the self-applied test passed or honestly failed; penalize critique that exempts the critic.
+navel-gaze risk: how much self-examination has replaced outward work. Penalize the inward spiral; do not penalize the necessary self-check that returns to the subject.
+exegesis invitation: how much the text rewards and invites close interpretive reading. Reward the layered text that repays exegesis; penalize obscurity daring the reader to find nothing.
+voice distinctiveness: how unmistakably this prose could be no one else's. Reward the singular voice; do not reward mannerism accumulated to simulate one.
+voice consistency: how stable the voice holds across the text's length and registers. Reward the held voice; penalize drift the text does not control.
+persona-author gap: how far the presented self stands from the evident actual author. Score the gap; reward personas worn knowingly, penalize masks that slip unacknowledged.
+ventriloquism skill: how convincingly the text speaks in voices not its own — quotation, pastiche, imagined interlocutors. Reward the true-thrown voice; penalize puppets who all sound like the author.
+register agility: how smoothly the text moves between formal and informal, technical and plain, as the moment demands. Reward the seamless shift; penalize register lurches that jar without purpose.
+code-switching smoothness: how naturally the text moves between community dialects it genuinely holds. Reward the earned switching; penalize borrowed codes worn briefly for access.
+idiolect strength: how much the author's personal language — coinages, constructions, private emphases — shapes the text. Score the idiolect; reward it where it sharpens, note where it excludes.
+house-style submission: how much the text has surrendered to an institutional style. Score the submission; note what the house gained and what the writer lost.
+style-guide independence: how much the text departs from convention deliberately and well. Reward the justified departure; penalize deviation that is only unfamiliarity with the rule.
+imitability resistance: how hard this text would be to fake convincingly. Reward the inimitable texture; note that resistance comes from depth, not surface tics.
+parody vulnerability: how easily the style could be parodied — tics prominent enough to exaggerate. Score the vulnerability; a style all signature is a style ready-made for mockery.
+whether you would know the author blind: how identifiable the authorship is with the name removed. Score the blind identifiability; treat it as the cleanest measure of voice.
+signature-move reliance: how much the text leans on the author's known moves. Score the reliance; reward the signature refreshed, penalize the greatest hits played again.
+tic frequency: how often involuntary verbal habits recur — pet words, reflex constructions. Penalize the unnoticed tic; distinguish it from the chosen refrain.
+verbal-fingerprint stability: how consistent the author's statistical signature is — rhythm, word choice, construction habits. Score the stability; note it as identity evidence, not quality.
+borrowed-voice scent: how much the prose smells of another writer worn secondhand. Penalize the undigested influence; reward influence metabolized past detection.
+translation survivability: how much of the text's value would survive into another language. Score the survivability; note what is load-bearing meaning versus untranslatable surface.
+read-aloud quality: how well the prose performs when spoken — breath, rhythm, emphasis landing where meant. Reward the speakable line; penalize sentences no mouth can honor.
+inner-voice intimacy: how much the text sounds like thought itself — the reader hearing their own mind think it. Reward the achieved intimacy; distinguish it from mumbled interiority.
+broadcast-voice projection: how well the voice carries to a large audience without losing its grain. Reward projection with grain intact; penalize the megaphone that flattens the voice.
+pulpit tendency: how much the voice climbs into the pulpit — elevation, cadence, moral altitude. Score the climb; note where the height serves and where it merely elevates the speaker.
+fireside register: how much the voice sits down with the reader — warmth, patience, story-pace. Score the register; reward its genuine comfort, note where coziness dulls the edge.
+control-room terseness: how much the voice speaks in operational shorthand — compressed, load-bearing, no wasted syllables. Score the terseness; reward it under real pressure, penalize it as affect.
+bedside manner: how the voice handles the reader at their most vulnerable — bad news delivered, fears addressed. Reward the honest gentleness; penalize both brutality and comforting falsehood.
+courtroom precision: how much the voice speaks as if under oath and cross-examination — every word chosen to be defensible. Score the precision; reward its rigor, note where defensiveness replaces candor.
+attention respect: how much the text treats reader attention as borrowed capital to be repaid. Reward the repaid loan; penalize attention taken and spent on nothing.
+clickbait residue: how much headline-trickery survives in the text — curiosity exploited, promises inflated. Penalize the residue; do not penalize genuine intrigue honestly satisfied.
+headline-body integrity: how honestly the title's claim survives contact with the body's content. Reward the integrity; penalize the headline the body quietly walks back.
+hook honesty: how truthfully the attention-grabbing opening represents what follows. Reward the honest hook; penalize bait that switches.
+curiosity-gap ethics: how fairly the text opens gaps it intends to close. Reward gaps opened and closed with value; penalize the gap held hostage.
+dwell time deserved: how much of the time readers spend the text actually earns. Reward earned minutes; penalize length engineered past its content.
+scroll-stopping without tricks: how much the text arrests attention by substance rather than manipulation. Reward the substantive arrest; penalize the pattern-interrupt with nothing behind it.
+notification worthiness: how much this text deserves to interrupt someone. Score the worthiness honestly; penalize interruptions that spent someone's focus on the ignorable.
+interruption justification: how well the text justifies the attention it demands right now versus later or never. Reward the justified now; penalize urgency borrowed from the medium.
+memorability per minute: how much of the text a reader still carries a week later, per minute spent. Reward the durable trace; distinguish memorable insight from memorable gimmick.
+quotability without context collapse: how well the text's best lines survive extraction without becoming false. Reward the extraction-safe line; penalize quotables that lie once separated.
+screenshot survivability: how well a fragment of this text behaves when it travels alone. Reward the fragment that carries its context; penalize passages that weaponize when cropped.
+virality-design scent: how much the text was shaped for sharing rather than reading. Penalize the shaped-to-spread scent; do not penalize genuine resonance that spreads.
+algorithm-shaped compromise: how much the text has bent itself to platform incentives — length, keywords, outrage cadence. Penalize the visible bend; note what the straight version would have said.
+engagement-bait absence: how free the text is of provocations that exist to generate response. Reward the clean absence; distinguish real provocation of thought from farming of reaction.
+outrage-fuel fraction: how much of the text's energy comes from stoking indignation. Penalize the stoking; do not penalize legitimate anger at legitimate targets, proportionately expressed.
+doomscroll contribution: how much the text adds to compulsive despair consumption without agency. Penalize the contribution; reward hard truths paired with tractable response.
+attention-restoration quality: how much reading this leaves attention better rather than more fragmented. Reward the restorative structure — sustained, coherent, complete; penalize the fragmenting form.
+calm-technology spirit: how much the text informs without seizing — present when needed, quiet otherwise. Reward the calm design; penalize the text that demands constant vigilance.
+deep-attention reward: how much the text gives back to fully-committed attention that skimming can never extract. Reward the deep payload; penalize depth claimed but not banked.
+feedback-loop identification: how well the text finds the loops — what feeds back into what, reinforcing or balancing. Reward the found loop with its sign; penalize linear stories told about circular systems.
+delay appreciation: how seriously the text treats the time between cause and visible effect. Reward the respected lag; penalize policies judged at the wrong moment and oscillations read as trends.
+stock-and-flow modeling: how cleanly the text thinks in reservoirs and rates when the system has both. Reward the working model; penalize interventions on flows expected to instantly move stocks.
+leverage-point targeting: how well the text aims at the places where small changes shift the whole system — rules, goals, paradigms — rather than parameters. Reward the high-leverage aim; penalize effort spent adjusting faucets on a structural problem.
+unintended-consequence appetite: how hungrily the text hunts its own proposal's side effects before critics do. Reward the self-run hunt with findings; penalize side effects discovered only by rebuttal.
+equilibrium-shift realism: how honestly the text estimates what it takes to move a system to a new stable state rather than a temporary displacement. Reward the reckoned activation energy; penalize pushes that will relax back unmentioned.
+path-dependence awareness: how much the text understands that where the system can go depends on where it has been. Reward the history-conditioned analysis; penalize clean-slate reasoning about grooved worlds.
+lock-in caution: how carefully the text treats choices that will be expensive to reverse once ecosystems form around them. Reward the flagged lock-in; penalize standards set casually that harden forever.
+hysteresis awareness: how much the text knows that undoing a change does not retrace the path — systems remember. Reward the remembered memory; penalize reversibility assumed symmetric.
+emergence respect: how seriously the text treats properties that exist only at the system level. Reward the level-respecting analysis; penalize both mysticism about emergence and denial of it.
+reductionism discipline: how skillfully the text decomposes without losing what mattered about the whole. Reward the faithful decomposition; penalize parts lists offered as explanations of dances.
+holism discipline: how rigorously the text handles wholes — system claims with mechanisms, not vibes. Reward the disciplined whole; penalize holism as excuse for never being specific.
+boundary-drawing judgment: how wisely the text draws its system boundary — wide enough to include what matters, tight enough to say anything. Reward the justified boundary; penalize conclusions that flip when the boundary moves an inch.
+exogeneity honesty: how honestly the text labels what it treats as outside the model — given, fixed, someone else's problem. Reward the labeled outside; penalize convenient exogeneity for what the argument most needed to examine.
+endogeneity vigilance: how alert the text is to its causes being caused by its effects. Reward the vigilance; penalize regressions and narratives where the arrow was assumed.
+root-cause depth: how far down the why-chain the text actually digs before acting. Reward the real root reached; penalize five-whys theater that stops at the comfortable level.
+symptom-treatment candor: how honestly the text admits when it is managing symptoms rather than curing causes. Reward the labeled palliative; symptom relief honestly named is legitimate — disguised, it compounds.
+intervention-point wisdom: how well the text chooses where in the system to act among the options it mapped. Reward the reasoned choice with alternatives shown; penalize the intervention chosen by availability.
+homeostasis respect: how much the text expects the system to fight back and restore its setpoint. Reward the anticipated compensation; penalize interventions that ignore the thermostat.
+cascade-risk mapping: how well the text traces how one failure propagates — dependencies, contagion paths, common-mode risks. Reward the traced cascade; penalize component reliability mistaken for system safety.
+single-point-of-failure hunting: how actively the text hunts the one thing whose loss stops everything. Reward the found and named point; penalize redundancy claimed while everything routes through one node.
+redundancy budgeting: how deliberately the text buys backup capacity — what is doubled, what is accepted bare, and why. Reward the reasoned budget; penalize both bare-everything efficiency and redundancy without analysis.
+graceful-degradation design: how well the described system fails — partial service, safe states, legible failure. Reward the designed descent; penalize systems that are fine until they are catastrophic.
+discipline of its antifragility claims: how rigorously any gains-from-disorder claim is backed by mechanism. Reward the shown mechanism; penalize antifragile as a compliment word for survived-so-far.
+slack appreciation: how much the text values unallocated capacity — the empty space that absorbs shocks and enables response. Reward the defended slack; penalize efficiency drives that consume the system's shock absorbers.
+maintenance glamour: how much the text makes upkeep visible and honorable rather than invisible until failure. Reward the honored maintenance; penalize innovation worship that starves the existing.
+janitorial respect: how much the text credits the unglamorous work that keeps everything running. Reward the named custodians; penalize systems described as self-cleaning.
+upkeep budgeting: how honestly ongoing costs are counted at decision time, not discovered later. Reward the lifetime cost stated; penalize purchase prices quoted for things that must be fed forever.
+deferred-maintenance honesty: how openly the text admits what has been postponed and what the postponement is costing. Reward the disclosed deferral with its compounding bill; penalize the backlog hidden until collapse.
+technical-debt candor: how honestly shortcuts are recorded as debts with interest rather than forgotten. Reward the kept register; penalize debt denial and debt panic alike.
+gardening patience: how much the text tends its systems like a garden — seasons respected, growth supported, forcing avoided. Reward the gardener's tempo; penalize construction metaphors applied to living things.
+pruning courage: how willingly the text cuts living but wrong growth — features, programs, prose — for the health of the whole. Reward the clean cut with reasons; penalize both hoarding and performative slashing.
+weeding diligence: how regularly small invasions are removed before they establish — errors, scope, bad patterns. Reward the steady weeding; penalize the neglect that makes every problem a clearance project.
+composting of failures: how well failures are broken down into nutrients for the next attempt — lessons extracted, residue discarded. Reward the working compost; penalize failures either buried whole or displayed untransformed.
+stewardship ethic: how much the text treats what it manages as held in trust for others and the future. Reward the felt trust; penalize extraction wearing stewardship's vocabulary.
+custodial pride: how much care for a thing's condition shows as pride rather than obligation. Reward the evident pride; it cannot be mandated and shows in details nobody required.
+repair-over-replace instinct: how naturally the text reaches for fixing before discarding. Reward the repair reflex with skill behind it; do not reward repair romanticism where replacement is honest.
+patch-quality conscience: how well even the quick fix is made — the patch that respects the fabric. Reward the conscientious patch; penalize the fix that makes the next fix harder.
+backward-compatibility care: how much the text protects those depending on what came before. Reward the protected dependents; penalize breaking changes narrated as progress.
+migration-path kindness: how gently users of the old way are led to the new one — bridges, timelines, translations. Reward the built path; penalize the cliff with a changelog.
+deprecation courtesy: how respectfully the text retires what people still use — warning, alternatives, dignity. Reward the courteous sunset; penalize the rug pulled with a shrug.
+sunsetting dignity: how well things are ended — completed, archived, credited, closed. Reward the dignified end; penalize projects abandoned to rot because ending felt like failing.
+legacy-system respect: how much the text honors the old system's embedded wisdom while replacing it. Reward the read-before-rewrite; penalize contempt for what worked for decades.
+refactoring appetite: how willingly the text restructures what works for what will keep working. Reward the timely restructure with behavior preserved; penalize both rot tolerance and perpetual rewriting.
+entropy-fighting stamina: how much sustained will the text shows for the fight that never ends — order maintained against constant decay. Reward the demonstrated stamina; note that everything unmaintained is already falling.
+bad-news delivery speed: how fast the text surfaces what its audience least wants to hear. Reward the prompt delivery; penalize bad news aged until it became worse news.
+hard-truth appetite: how much the text seeks out and states the truths that cost it something. Reward the sought hard truth; distinguish it from harshness enjoyed for its own sake.
+euphemism avoidance: how plainly the text names hard things — deaths, failures, firings — without softening fog. Reward the plain name; do not reward brutality mistaking itself for clarity.
+elephant-naming promptness: how quickly the text names what everyone sees and no one says. Reward the early naming; penalize the elephant acknowledged only after it charged.
+whistle-blowing spine: how much the text risks its own standing to report what its community would rather not know. Reward the costly report with evidence; distinguish it from grievance dressed as disclosure.
+self-incrimination honesty: how willingly the text includes facts that damage its own case or author. Reward the included damage; it is the strongest signal of a truthful ledger.
+awkwardness tolerance: how well the text sits in discomfort without smoothing it prematurely. Reward the held awkwardness where truth requires it; penalize comfort restored at accuracy's expense.
+taboo-topic composure: how steadily the text handles subjects its audience finds untouchable — neither flinching nor performing courage. Reward the level treatment; penalize both avoidance and transgression theater.
+third-rail touching judgment: how wisely the text chooses which untouchable subjects actually need touching, and how. Reward the justified touch with care shown; penalize both universal avoidance and grabbing rails for attention.
+sacred-cow inspection: how willingly the text examines its own community's protected beliefs. Reward the home-territory inspection; penalize courage reserved for other people's cows.
+emperor's-clothes candor: how readily the text says the celebrated thing is not working. Reward the plain report against consensus; distinguish it from reflexive debunking of everything admired.
+room-reading versus truth-telling balance: how wisely the text balances what this audience can hear against what must be said. Reward the calibrated truth fully delivered; penalize both the unread room and the truth trimmed to fit it.
+diplomatic honesty: how much the text achieves honesty and tact simultaneously rather than trading one for the other. Reward the both-at-once; penalize diplomacy that buries the message and honesty that needlessly burns the bridge.
+brutal-honesty restraint: how much the text resists using honesty as a license for cruelty. Reward the truth told with proportion; penalize brutal as the adjective doing the enjoying.
+candor with care: how well the text pairs full disclosure with visible concern for the person receiving it. Reward the paired delivery; the care does not dilute the candor and the candor does not excuse carelessness.
+dissent-expression skill: how effectively disagreement is voiced so it can actually be heard — specific, timely, addressed to the decision. Reward the skillful dissent; penalize both silence and dissent performed after the decision for the record.
+minority-report courage: how willingly the text files its disagreement formally when the group goes the other way. Reward the filed report with reasons; distinguish it from relitigating every settled question.
+career-risk truth-telling: how much professional cost the author accepts to say this. Reward the priced truth; note that the same words cost different speakers differently.
+retraction grace: how well the text takes things back — fully, promptly, without minimizing choreography. Reward the clean retraction; penalize the correction buried, hedged, or blamed on phrasing.
+apology quality: how completely any apology names the harm, owns the cause, and changes the behavior. Reward the complete apology; penalize the sorry-you-felt-that construction in all its costumes.
+pedagogical patience: how much the text tolerates the learner's pace — repetition without resentment, questions without contempt. Reward the patient teacher; penalize speed that serves the teacher's self-image.
+curse-of-knowledge resistance: how well the text remembers what it was like not to know. Reward the recovered beginner's view; penalize explanations that require the understanding they claim to build.
+beginner's-mind access: how freshly the text can still see its subject as strange and questionable. Reward the retained freshness; distinguish it from ignorance performing innocence.
+misconception anticipation: how well the text predicts the specific wrong ideas learners bring and addresses them directly. Reward the named misconception dismantled; penalize teaching that answers questions nobody has while missing the ones everybody has.
+error-driven teaching: how deliberately the text uses mistakes — the reader's or its own — as the engine of learning. Reward the productive error staged or harvested; penalize error avoidance that prevents the lesson.
+productive-struggle design: how well the text calibrates difficulty so the reader struggles enough to learn and not enough to quit. Reward the tuned struggle; penalize both the smoothed path that teaches nothing and the wall that teaches quitting.
+scaffolding-removal timing: how wisely support is withdrawn as competence grows. Reward the timed removal; penalize scaffolds left until they became load-bearing or removed while the arch was wet.
+transfer-distance ambition: how far from the teaching context the text aims its lessons to work. Reward the far-transfer design with the bridge built; penalize transfer claimed but never tested outside the example.
+first-principles rebuilding: how much the text teaches by reconstructing knowledge from the ground rather than delivering conclusions. Reward the rebuilt understanding; penalize derivation theater that arrives where it was always going without live reasoning.
+memorization honesty: how honestly the text admits what must simply be memorized versus what can be derived. Reward the honest split; penalize both memorization shame and understanding oversold where drill was needed.
+intuition-first sequencing: how well the text builds felt understanding before formal machinery. Reward the intuition that makes the formalism land; penalize intuition that must be unlearned when the formalism arrives.
+formalism-first courage: how deliberately the text starts with the rigorous version when intuition would mislead. Reward the justified formal start; penalize rigor-first as habit where intuition was available and true.
+motivation before mechanism: how well the text makes the reader want the answer before providing it. Reward the built want; penalize solutions to problems the reader was never made to feel.
+mechanism before motivation: how deliberately the text teaches the machinery first where premature why would distort. Score the choice; reward it made knowingly for this material rather than by template.
+socratic restraint: how much the text asks and waits where telling would be faster and shallower. Reward the productive question held open; penalize questioning as performance while the answer waits in the teacher's hand.
+telling when telling helps: how readily the text simply states what direct statement serves best. Reward the direct telling in its place; penalize discovery-learning purism that withholds the sentence that would end the confusion.
+feedback specificity: how precisely the text's corrections point to the exact gap — this step, this word, this assumption. Reward the located correction; penalize feedback that grades without informing.
+praise precision: how exactly the praise names what was good and why it worked. Reward the informative praise; penalize both generic applause and praise inflation that debases the currency.
+critique digestibility: how well criticism is portioned and sequenced so it can be metabolized rather than defended against. Reward the digestible critique with the whole truth still delivered; penalize both the flood and the sugar-coat.
+learning-in-public generosity: how much the text shares its own learning process — confusions, wrong turns, corrections — for others' benefit. Reward the public notebook; distinguish it from progress theater that curates the stumbles.
+triage clarity: how decisively the text sorts what must be done now, later, and never. Reward the explicit triage with reasons; penalize queues where everything is priority one.
+prioritization ruthlessness: how willingly the text lets genuinely good things die so the best thing lives. Reward the visible sacrifice of the good; penalize priority lists that decline to rank.
+constraint acknowledgment: how honestly the text names the limits it operates under — time, money, attention, politics. Reward the named constraints planned around; penalize plans written for a world without them.
+scarcity honesty: how truthfully the text represents what there is not enough of. Reward the honest shortage; penalize both manufactured scarcity and abundance assumed against evidence.
+trade-off explicitness: how openly the text states what it gave up to get what it chose. Reward the priced choice; penalize decisions presented as all-win.
+pareto-frontier awareness: how well the text knows when it is choosing between optima versus leaving free improvements unclaimed. Reward the frontier identified and the free wins taken; penalize agonized tradeoffs where dominance was available.
+satisficing wisdom: how wisely the text chooses good-enough where optimal is not worth its cost. Reward the reasoned enough; penalize both perfectionism on the trivial and satisficing on the crucial.
+optimization-target sanity: how sound the objective itself is before effort optimizes it. Reward the interrogated target; penalize brilliant optimization of the wrong function.
+good-enough courage: how bravely the text ships at sufficient rather than polishing past the point of return. Reward the shipped sufficient; distinguish it from lowered standards wearing pragmatism.
+perfectionism containment: how well the drive for perfection is confined to where perfection pays. Reward the contained drive; penalize the uniform polish that delays everything for the sake of anything.
+corner-cutting disclosure: how honestly the text says which corners were cut and why those. Reward the disclosed cut with its risk; penalize corners cut silently for the reader to find.
+quality-triangle honesty: how honestly the text admits it cannot have fast, cheap, and good at once. Reward the chosen two named; penalize plans that promise the triangle.
+deadline realism: how honestly the stated deadlines reflect what the work actually takes. Reward the realistic date with its buffer shown; penalize dates set by wish and defended by silence.
+scope-cut wisdom: how wisely the text chooses what to drop when something must go. Reward the cut that preserves the core; penalize the salami slice that keeps everything and finishes nothing.
+requirement-pushback spine: how firmly the text challenges demands that should not survive. Reward the pushed-back requirement with reasons; penalize both silent compliance and reflexive refusal.
+gold-plating avoidance: how well the text resists adding unrequested refinement to the already-sufficient. Reward the resisted plating; distinguish craft pride from effort the outcome never needed.
+bikeshedding resistance: how well attention stays on the reactor and off the bikeshed — weight of discussion matching weight of decision. Reward the proportioned attention; penalize the trivial debated because it is debatable.
+yak-shaving awareness: how conscious the text is of prerequisite chains that wander from the goal. Reward the noticed yak with a decision — shave or abandon; penalize the fifth prerequisite pursued without remembering why.
+rabbit-hole discipline: how well the text explores tangents with a rope tied to the entrance. Reward the bounded descent that returns with value; penalize the exploration that becomes the destination unannounced.
+essentialism: how completely the text has found the vital few things and released the trivial many. Reward the found essence carried lightly; penalize both the hoard and the minimalism that discarded something vital.
+jargon load: how much specialized vocabulary the text carries relative to need. Score the load; reward terms that compress meaning for the intended reader, penalize jargon as membership badge.
+acronym hospitality: how kindly the text treats readers meeting its acronyms — expanded on first use, kept few. Reward the hospitable expansion; penalize the alphabet soup served without a key.
+term-of-art precision: how correctly the text uses its field's technical terms in their load-bearing senses. Reward the exact usage; penalize terms of art used decoratively or wrongly for insiders to wince at.
+plain-language courage: how bravely the text says it simply when simplicity is available. Reward the plain saying; complexity of language should mark complexity of thought, not compensate for its absence.
+latinate-anglo balance: how well the text balances Latinate abstraction against Anglo-Saxon directness. Score the mix; reward the short strong word carrying the weight, note where the polysyllable earns its place.
+sentence-opening variety: how varied the sentence openings run — not every sentence the same subject-verb march. Reward the varied attack; do not reward variety achieved by contortion.
+adverb restraint: how sparingly adverbs prop up verbs that should stand alone. Reward the strong verb unpropped; penalize the modifier doing work the word choice refused.
+intensifier inflation: how much very, extremely, and incredibly have devalued the text's currency. Penalize the inflation; the unintensified sentence is the stronger claim.
+filler-phrase fraction: how much of the text is throat-clearing constructions — it is worth noting, in order to, the fact that. Penalize the filler; each phrase deleted without loss was a tax on the reader.
+nominal-style stiffness: how much action hides in noun constructions instead of verbs. Penalize the stiffened style; reward sentences where the doer does.
+verbal-style vigor: how much the prose runs on strong verbs in active clauses. Reward the vigorous line; do not reward action-movie prose applied to still material.
+concrete-noun density: how much of the text names things you could point to. Reward the pointable world; penalize abstraction stacked on abstraction with no floor.
+dead-metaphor reliance: how much the text leans on metaphors so worn they no longer picture anything. Penalize the dead weight; reward either the live image or the plain statement.
+mixed-metaphor risk: how often the text's images collide — bootstrapping the low-hanging fruit uphill. Penalize the collision; images must survive being seen.
+idiom freshness: how much the text's idiomatic language still has juice. Reward the fresh idiom or the twist that revives one; penalize phrase-book prose assembled from stock.
+punctuation confidence: how surely the text wields its commas, colons, and dashes — rhythm controlled, meaning disambiguated. Reward the confident hand; penalize both timid over-commaing and chaos.
+em-dash dependence: how much the text leans on the dash for effects other punctuation should share. Score the dependence; the dash is strong seasoning — penalize the dish that is mostly seasoning.
+parenthetical discipline: how well asides know their place — brief, genuinely parenthetical, not smuggled main points. Reward the disciplined aside; penalize the parenthesis where the thesis went to hide.
+footnote temperance: how moderately the text drinks from the footnote — apparatus serving, not sprawling. Reward the temperate note; penalize the basement apartment where half the essay lives.
+epigraph aptness: how precisely any opening quotation actually frames what follows. Reward the load-bearing epigraph; penalize borrowed profundity stapled to the front.
+bureaucratic wildness: how much untamed creative energy survives inside procedural form — the wild thing filed in triplicate. Score the coexistence; reward form channeling force, penalize either half alone.
+disciplined chaos: how much apparent disorder rests on rigorous underlying control — improvisation over mastered changes. Reward the load-bearing discipline beneath the surface storm; penalize chaos that is only chaos.
+cold passion: how much intense commitment burns without heat in the voice — fervor conducted through precision. Reward the cold burn; distinguish it from detachment with nothing beneath.
+humble swagger: how much earned confidence walks beside genuine modesty — sure of the work, unsure of nothing else it should be sure of. Reward the paired stance; penalize either humility or swagger performing the other.
+rigorous whimsy: how much genuine play is built on exact foundations — the joke that is also a proof. Reward the precise play; penalize whimsy used to excuse imprecision.
+patient urgency: how much the text holds real hurry and real patience at once — moving now, without panic, for as long as it takes. Reward the held tension; penalize urgency that burns out and patience that never starts.
+ambitious modesty: how much vast aim coexists with modest claims — the huge attempt described in exact, unpuffed terms. Reward the quiet vastness; penalize modesty that is secretly a boast.
+playful gravity: how much serious weight is carried with a light step — grave matter, unponderous manner. Reward the light-footed gravity; penalize play that drops the weight and gravity that cannot move.
+austere generosity: how much is given through restraint — the spare text that spends everything on the reader. Reward generosity in the economy itself; distinguish austerity that serves from stinginess.
+reckless precision: how much daring lives inside exactitude — bold bets stated to the decimal. Reward the precise gamble; the exactness makes the risk checkable, which is the courage.
+intimate formality: how much closeness is achieved through formal means — the bow that is warmer than the hug. Reward formality carrying feeling; penalize stiffness mistaken for depth and slouching mistaken for warmth.
+chaotic diligence: how much relentless thorough work proceeds without visible system — everything covered, nothing filed. Score the coexistence; reward the completeness, note the cost of the disorder.
+serene intensity: how much total engagement runs without agitation — the calm surface over full power. Reward the still intensity; distinguish it from low effort wearing calm.
+minimalist abundance: how much plenty is delivered through few elements — the small set that generates the large world. Reward the generative economy; penalize sparseness that is merely sparse.
+conservative radicalism: how much deep change is pursued through careful, tradition-respecting means — the revolution that conserves. Reward the paired method and aim; penalize radical costume on conservative content and the reverse.
+skeptical faith: how much sustained commitment coexists with sustained doubt — belief that keeps testing itself and working anyway. Reward the working doubt; penalize both credulity and the skepticism that excuses inaction.
+detached devotion: how much full dedication runs without clinging — the work served completely, outcomes held loosely. Reward the loose grip on results with the firm grip on standards; penalize detachment that stops caring.
+effortful ease: how much visible grace rests on invisible labor — the simple line that took a hundred drafts. Reward the concealed effort in the achieved ease; penalize ease that is actually effortlessness.
+complicated simplicity: how much a simple surface truthfully compresses genuine complexity — plain words over deep machinery, nothing false. Reward the honest compression; penalize simplicity purchased by omission.
+quiet loudness: how much force arrives without volume — the whisper that carries further than the shout. Reward the carrying whisper; penalize quietness with nothing to carry.
+spine of the argument visible through the prose: how clearly the skeletal logic shows through the writing's surface — every paragraph locatable on the spine. Reward the visible anatomy; penalize prose that must be dissected to find whether it has bones.
+gravitational pull on the reader's attention: how much the text bends attention toward itself without demanding it — the mass that curves the reading. Reward the felt pull from substance; distinguish it from the tricks that grab.
+willingness to bore the reader for the right reasons: how bravely the text includes the necessary dull part — the table, the derivation, the caveat — where excitement would falsify. Reward the chosen dullness that duty required; penalize boredom from mere failure of craft.
+smell of a real deadline survived: how much the text carries the compression marks of true time pressure met — decisions forced, scope cut, the thing shipped. Score the survival marks; distinguish the sprint's honest scars from chronic rush.
+confidence that comes from having checked: how much the certainty rests on verification actually performed — the calm of the person who ran the numbers twice. Reward checked confidence; penalize the identical tone produced without the checking.
+generosity toward its own predecessors: how kindly the text treats those who tried this before and got less far — their partial success honored, their errors explained without contempt. Reward the generous inheritance; penalize the past dismissed to inflate the present.
+appetite for being fact-checked: how much the text welcomes verification — claims stated checkably, sources reachable, corrections invited. Reward the checkable posture; penalize prose engineered to be difficult to verify.
+capacity to change a smart skeptic's mind: how much the text could actually move someone intelligent who arrived disagreeing. Reward the mind-changing machinery — shared premises, honest evidence, the skeptic's real objections met; penalize preaching that only confirms.
+residue of real conversations behind it: how much the text shows it was tested on real people before publication — objections absorbed, confusions fixed, examples that landed kept. Reward the conversational residue; penalize the text that meets its first reader in public.
+sense that the author would do this unpaid: how much the work radiates being its own reward — care beyond compensation, hours no invoice covers. Reward the unpaid-hours signal; distinguish it from martyrdom performed.
+distance between its stated and revealed priorities: how far what the text says it values sits from what its choices show it values — space given, care spent, corners cut. Penalize the measured gap; reward the text whose behavior is its mission statement.
+degree to which it would survive its author's absence: how well the work would continue to function, be maintained, and be understood with the author gone — documentation, succession, self-explaining structure. Reward the survivable work; penalize brilliance that dies with its keeper.
