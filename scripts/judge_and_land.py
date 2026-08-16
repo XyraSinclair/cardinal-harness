@@ -19,12 +19,25 @@ JSONEachRow on stdin (no shell interpolation of data).
 """
 import argparse, datetime, json, os, shlex, subprocess, sys, time
 
-CARDINAL = os.path.expanduser("~/projects/llmsorting/target/release/cardinal")
+CARDINAL = os.environ.get(
+    "CARDINAL_BIN", os.path.expanduser("~/projects/llmsorting/target/release/cardinal"))
 SSH = "/usr/bin/ssh"
+CH_LOCAL = "/data/clickhouse-twitter-lab/bin/clickhouse"
+
+
+def ch_run(query, payload=None):
+    """Run a clickhouse query against ratiometer's server: directly when the
+    binary is on this box (running ON colo2), else over ssh (running on the Mac)."""
+    if os.path.exists(CH_LOCAL):
+        cmd = [CH_LOCAL, "client", "--port", "19000", "--query", query]
+    else:
+        cmd = [SSH, "colo2",
+               f"{CH_LOCAL} client --port 19000 --query {shlex.quote(query)}"]
+    return subprocess.run(cmd, input=payload, capture_output=True, timeout=120)
 
 
 def run_cell(corpus, attr, model, budget, seed, outdir, idx, template=None, elaborate=False,
-             concurrency=None):
+             concurrency=None, no_cache=False):
     slug = f"a{idx:03d}"
     out = os.path.join(outdir, f"{slug}.json")
     trace = os.path.join(outdir, f"{slug}.trace.jsonl")
@@ -40,6 +53,8 @@ def run_cell(corpus, attr, model, budget, seed, outdir, idx, template=None, elab
         cmd += ["--elaborate"]
     if concurrency:
         cmd += ["--concurrency", str(concurrency)]
+    if no_cache:
+        cmd += ["--no-cache"]
     with open(out, "w") as fo, open(errf, "w") as fe:
         subprocess.run(cmd, stdout=fo, stderr=fe, env=env, check=True, timeout=3600)
     return out, trace
@@ -100,16 +115,22 @@ def land(trace_path, corpus_lines, corpus_name, attr, seed, run_tag):
             "error": err,
         })
     payload = "\n".join(json.dumps(r, ensure_ascii=False) for r in rows).encode()
-    # ssh joins argv with spaces and the remote shell re-splits, so the
-    # multi-word query must be quoted for the remote side.
-    query = shlex.quote("INSERT INTO ratiometer.judgments FORMAT JSONEachRow")
-    proc = subprocess.run(
-        [SSH, "colo2",
-         f"/data/clickhouse-twitter-lab/bin/clickhouse client --port 19000 --query {query}"],
-        input=payload, capture_output=True, timeout=120)
+    proc = ch_run("INSERT INTO ratiometer.judgments FORMAT JSONEachRow", payload)
     if proc.returncode != 0:
         raise RuntimeError(f"land failed: {proc.stderr.decode()[:500]}")
     return len(rows)
+
+
+def ledger_done_attrs(run_tag, model, min_rows):
+    """Attributes already landed (>= min_rows rows) for this run_tag+model —
+    the resume set a supervisor restart must not re-buy."""
+    q = ("SELECT attribute FROM ratiometer.judgments "
+         f"WHERE run_tag = {json.dumps(run_tag)} AND model = {json.dumps(model)} "
+         f"GROUP BY attribute HAVING count() >= {int(min_rows)} FORMAT TSVRaw")
+    proc = ch_run(q)
+    if proc.returncode != 0:
+        raise RuntimeError(f"ledger resume query failed: {proc.stderr.decode()[:500]}")
+    return {l for l in proc.stdout.decode().split("\n") if l.strip()}
 
 
 def main():
@@ -129,20 +150,31 @@ def main():
     ap.add_argument("--concurrency", type=int, default=None,
                     help="judgements in flight (cardinal default 8); use 2 on the "
                          "gemini-cli rail, whose 429 backoff punishes bursts")
+    ap.add_argument("--no-cache", action="store_true",
+                    help="fresh draws (repeat-draw phases need independent samples, "
+                         "not cache replays)")
+    ap.add_argument("--resume-ledger", action="store_true",
+                    help="skip attributes already landed (>= 90%% of budget rows) "
+                         "under this run_tag+model — idempotent supervisor restarts")
     a = ap.parse_args()
     os.makedirs(a.outdir, exist_ok=True)
     corpus_lines = [l.rstrip("\n") for l in open(a.corpus) if l.strip()]
     corpus_name = os.path.basename(a.corpus)
     attrs = [l.strip() for l in open(a.attributes) if l.strip()]
+    done = (ledger_done_attrs(a.run_tag, a.model, a.budget * 0.9)
+            if a.resume_ledger else set())
+    if done:
+        print(f"resume: {len(done)}/{len(attrs)} attributes already landed, skipping",
+              flush=True)
     landed_total = 0
     t0 = time.time()
     for i, attr in enumerate(attrs):
-        if i < a.start_at:
+        if i < a.start_at or attr in done:
             continue
         t = time.time()
         out, trace = run_cell(a.corpus, attr, a.model, a.budget, a.seed, a.outdir, i,
                               template=a.template, elaborate=a.elaborate,
-                              concurrency=a.concurrency)
+                              concurrency=a.concurrency, no_cache=a.no_cache)
         n = land(trace, corpus_lines, corpus_name, attr, a.seed, a.run_tag)
         landed_total += n
         print(f"[{i+1}/{len(attrs)}] {attr!r}: {n} judgments landed "

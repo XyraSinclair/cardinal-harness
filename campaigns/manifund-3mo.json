@@ -1,0 +1,164 @@
+{
+  "name": "manifund-3mo",
+  "description": "Three months of judging over the Manifund corpus on colo2's local GPUs. Phases run in order; a phase whose judge is not served or whose battery is not yet authored is skipped loudly and activates on a later pass. All phases land PMF posteriors (canonical_bucket_v1) into ratiometer.judgments, content-addressed, resumable from the ledger.",
+  "phases": [
+    {
+      "run_tag": "fable1000-gemma31b-2026-08-16",
+      "corpus": "data/manifund.txt",
+      "attributes": "batteries/fable_subtle_1000.txt",
+      "model": "gemma4-31b",
+      "base_url": "http://127.0.0.1:8023/v1",
+      "template": "canonical_bucket_v1",
+      "budget": 240,
+      "seed": 1,
+      "env": {"CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS": 1024}
+    },
+    {
+      "run_tag": "fable1000-40pool-seed2-gemma31b",
+      "corpus": "data/manifund.txt",
+      "attributes": "batteries/fable_subtle_1000.txt",
+      "model": "gemma4-31b",
+      "base_url": "http://127.0.0.1:8023/v1",
+      "template": "canonical_bucket_v1",
+      "budget": 240,
+      "seed": 2,
+      "no_cache": true,
+      "env": {"CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS": 1024}
+    },
+    {
+      "run_tag": "fable1000-40pool-seed3-gemma31b",
+      "corpus": "data/manifund.txt",
+      "attributes": "batteries/fable_subtle_1000.txt",
+      "model": "gemma4-31b",
+      "base_url": "http://127.0.0.1:8023/v1",
+      "template": "canonical_bucket_v1",
+      "budget": 240,
+      "seed": 3,
+      "no_cache": true,
+      "env": {"CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS": 1024}
+    },
+    {
+      "run_tag": "classic44-fullpool-gemma31b",
+      "corpus": "data/manifund_full.txt",
+      "attributes": "batteries/manifund_attributes.txt",
+      "model": "gemma4-31b",
+      "base_url": "http://127.0.0.1:8023/v1",
+      "template": "canonical_bucket_v1",
+      "budget": 5000,
+      "seed": 1,
+      "env": {"CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS": 1024}
+    },
+    {
+      "run_tag": "highdim-fullpool-gemma31b",
+      "corpus": "data/manifund_full.txt",
+      "attributes": "batteries/highdim_attributes.txt",
+      "model": "gemma4-31b",
+      "base_url": "http://127.0.0.1:8023/v1",
+      "template": "canonical_bucket_v1",
+      "budget": 5000,
+      "seed": 1,
+      "env": {"CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS": 1024}
+    },
+    {
+      "run_tag": "fable1000-elab-40pool-gemma31b",
+      "corpus": "data/manifund.txt",
+      "attributes": "batteries/fable_subtle_1000_elaborated.txt",
+      "model": "gemma4-31b",
+      "base_url": "http://127.0.0.1:8023/v1",
+      "template": "canonical_bucket_v1",
+      "budget": 240,
+      "seed": 1,
+      "env": {"CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS": 1024}
+    },
+    {
+      "run_tag": "fable1000-fullpool-gemma31b",
+      "corpus": "data/manifund_full.txt",
+      "attributes": "batteries/fable_subtle_1000.txt",
+      "model": "gemma4-31b",
+      "base_url": "http://127.0.0.1:8023/v1",
+      "template": "canonical_bucket_v1",
+      "budget": 5000,
+      "seed": 1,
+      "env": {"CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS": 1024}
+    },
+    {
+      "run_tag": "fable1000-40pool-qwen38",
+      "corpus": "data/manifund.txt",
+      "attributes": "batteries/fable_subtle_1000.txt",
+      "model": "qwen38-27b",
+      "base_url": "http://127.0.0.1:8025/v1",
+      "template": "canonical_bucket_v1",
+      "budget": 240,
+      "seed": 1,
+      "env": {"CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS": 1024}
+    },
+    {
+      "run_tag": "fable1000-40pool-a4b",
+      "corpus": "data/manifund.txt",
+      "attributes": "batteries/fable_subtle_1000.txt",
+      "model": "gemma4-26b-a4b",
+      "base_url": "http://127.0.0.1:8026/v1",
+      "template": "canonical_bucket_v1",
+      "budget": 240,
+      "seed": 1,
+      "env": {"CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS": 1024}
+    },
+    {
+      "run_tag": "fable1000-elab-fullpool-gemma31b",
+      "corpus": "data/manifund_full.txt",
+      "attributes": "batteries/fable_subtle_1000_elaborated.txt",
+      "model": "gemma4-31b",
+      "base_url": "http://127.0.0.1:8023/v1",
+      "template": "canonical_bucket_v1",
+      "budget": 5000,
+      "seed": 1,
+      "env": {"CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS": 1024}
+    },
+    {
+      "run_tag": "fable1000-fullpool-seed2-gemma31b",
+      "corpus": "data/manifund_full.txt",
+      "attributes": "batteries/fable_subtle_1000.txt",
+      "model": "gemma4-31b",
+      "base_url": "http://127.0.0.1:8023/v1",
+      "template": "canonical_bucket_v1",
+      "budget": 5000,
+      "seed": 2,
+      "no_cache": true,
+      "env": {"CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS": 1024}
+    },
+    {
+      "run_tag": "fable1000-fullpool-qwen38",
+      "corpus": "data/manifund_full.txt",
+      "attributes": "batteries/fable_subtle_1000.txt",
+      "model": "qwen38-27b",
+      "base_url": "http://127.0.0.1:8025/v1",
+      "template": "canonical_bucket_v1",
+      "budget": 5000,
+      "seed": 1,
+      "env": {"CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS": 1024}
+    },
+    {
+      "run_tag": "fable1000-fullpool-a4b",
+      "corpus": "data/manifund_full.txt",
+      "attributes": "batteries/fable_subtle_1000.txt",
+      "model": "gemma4-26b-a4b",
+      "base_url": "http://127.0.0.1:8026/v1",
+      "template": "canonical_bucket_v1",
+      "budget": 5000,
+      "seed": 1,
+      "env": {"CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS": 1024}
+    },
+    {
+      "run_tag": "fable1000-fullpool-seed3-gemma31b",
+      "corpus": "data/manifund_full.txt",
+      "attributes": "batteries/fable_subtle_1000.txt",
+      "model": "gemma4-31b",
+      "base_url": "http://127.0.0.1:8023/v1",
+      "template": "canonical_bucket_v1",
+      "budget": 5000,
+      "seed": 3,
+      "no_cache": true,
+      "env": {"CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS": 1024}
+    }
+  ]
+}

@@ -163,7 +163,49 @@ agreement, calls, tokens, cache_read/write tokens, nanodollars, pairwise-
 equivalent observations per dollar. Offline synthetic judge first ($0), then
 live under a hard cap.
 
-## 5. Deployment
+## 5. The Manifund campaign (three months of GPU work, scheduled)
+
+Operator mandate 2026-08-16: the local judges must never starve. The campaign
+is a manifest (`campaigns/manifund-3mo.json`) walked by a box-resident runner
+on colo2 (`scripts/campaign_runner.py`, idempotent via `--resume-ledger` —
+restarts re-buy nothing). Supply axes, all committed:
+
+| axis | size | file |
+|---|---|---|
+| attributes | 1,010 Fable-authored subtle attributes (~39 families) | `batteries/fable_subtle_1000.txt` |
+| entity pool | 40 curated → 1,263 full-corpus proposals | `data/manifund.txt`, `data/manifund_full.txt` |
+| judges | gemma4-31b (live) · qwen38-27b · gemma4-26b-a4b (lanes activate when served) | manifest `base_url` per phase |
+| phrasings | bare now; elaborated forms next Fable pass | `batteries/fable_subtle_1000_elaborated.txt` (pending) |
+| repeat draws | seeds 2–3 with `--no-cache` (independent samples, not cache replays) | manifest phases |
+
+Measured throughput: gemma4-31b 6.4 judgments/s (one 240-budget attribute
+≈ 38 s; one full-pool 5,000-budget attribute ≈ 13 min). Ladder ETAs at that
+rate: 40-pool passes ≈ 0.4 d each; full-pool passes ≈ 9 d each per judge per
+seed. The manifest as committed schedules ≈ 55–75 days on the gemma lane
+alone; the qwen and A4B lanes add ≈ 35 d when their serves are up.
+
+What the data is FOR (the fascinating part — each lands as an analysis over
+`ratiometer.judgments`, no new elicitation needed):
+
+1. **Attribute quality at scale.** Cross-judge direction agreement over 1,010
+   attributes ranks which subtle questions LLMs can actually answer — the
+   32-attribute pilot already separated 'technical depth' (0.94) from
+   'counterfactual impact' (0.62). Now with denominators in the thousands.
+2. **The geometry of judgment space.** 1,010 latent scores per proposal →
+   factor structure of what LLM judgment actually spans. Are 'poshness',
+   'institutional insiderness', and 'quiet prestige' one axis or three?
+   How many effective dimensions does a 31B judge have?
+3. **Elaboration effect at scale.** The 12-attribute pilot showed +0.2
+   agreement on the vaguest attributes and −0.1 on 'earnestness'. Over 1,010
+   attributes this becomes a rule for when elaboration helps, not an anecdote.
+4. **Grok-gauge distribution.** Curl, order-invariance, and WST (from the
+   seed-2/3 repeat draws) per attribute — the E2 gauge applied over a
+   thousand attributes instead of six cells.
+5. **Ground truth.** `data/manifund/ground_truth.csv` (funding outcomes):
+   which subtle attributes predict what actually got funded — and where the
+   judges and the funders disagree.
+
+## 6. Deployment
 
 Static site, `site/` → colo2 `/srv/llmsorting`, served by Caddy
 (`/etc/caddy/llmsorting.caddy`, `tls internal`, Cloudflare-proxied zone
