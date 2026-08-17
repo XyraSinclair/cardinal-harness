@@ -17,10 +17,10 @@ Three ledger-derived ingredients, all from ratiometer.judgments on colo2:
                    judge run tags), signed log2 margin.
 
 grant_score_G(p) = sum_a  w_G(a) * orient(a) * attr(a, p)
-  w_G(a)   = importance_G(a) shifted to >=0 and L1-normalized over attributes
-             the goal judged (a nonneg weight per goal).
-  orient(a)= tanh(polarity(a) / scale) in [-1, 1] — soft sign; goal-irrelevant
-             attributes get muted by small w_G anyway.
+  w_G(a)   = 2^importance_G(a), L1-normalized — margins are log2 ratios, so
+             exponentiation restores the elicited ratio scale. Parameter-free.
+  orient(a)= tanh(polarity(a) - median) in [-1, 1] — soft sign in units of
+             doublings; goal-irrelevant attributes get muted by small w_G.
 
 A goal is included only when its pass is essentially complete (>= MIN_FRAC of
 budget landed); until then the block is absent and the page shows what exists.
@@ -46,10 +46,10 @@ PROPOSAL_TAGS = [
     "manifund-gemini-flash-2026-08-15",
 ]
 BUDGET = 12000
-WEIGHT_TEMP = 0.30  # softmax temperature concentrating per-goal importance onto
-                    # each goal's distinctive attributes (see compose loop); lower
-                    # = sharper goal-conditioning. 0.30 gives an interpretable,
-                    # non-degenerate spread.
+# Unit discipline (operator standard 2026-08-17): everything is elicited ONLY
+# through pairwise ratio comparisons on a geometric ladder; margins are log2
+# ratios. Weights restore the elicited units — w = 2^margin, normalized — with
+# ZERO free parameters. No temperature, no Likert, no fitted constants.
 MIN_FRAC = 0.6  # landing is atomic per goal; usable rows are ~70-80% of budget
                 # after FINAL dedup + refusal/error filtering, so 0.6*budget=7200
                 # cleanly separates a landed goal (~8.3-9.7k) from an unlanded one (0)
@@ -128,12 +128,13 @@ def main():
         pol[row["entity"]] = row["score"]
     if pol and next(iter(pol_counts.values()), 0) >= MIN_FRAC * BUDGET:
         pol_ready = True
-    # center polarity on its median; scale by MAD for the tanh orientation
+    # center polarity on its median for the soft-sign orientation
     if pol:
         vals = sorted(pol.values())
         med = vals[len(vals) // 2]
-        mad = sorted(abs(v - med) for v in pol.values())[len(vals) // 2] or 1.0
-        orient = {e: math.tanh((v - med) / (1.5 * mad)) for e, v in pol.items()}
+        # Soft sign, no fitted constants: unit = one doubling (1 log2 margin).
+        # An attribute judged 2x more positive than the median gets orient 0.76.
+        orient = {e: math.tanh(v - med) for e, v in pol.items()}
     else:
         orient = {}
     # orientation keyed by short attribute name for the O(1) compose join
@@ -167,17 +168,17 @@ GROUP BY attribute, entity FORMAT JSONEachRow"""
     # --- compose per-goal grant rankings ---
     goals_out = []
     for goal_line, weights in imp_by_goal.items():
-        # Softmax-concentrated weights over the goal's judged attributes.
-        # L1-normalizing shifted margins over ~1010 attrs yields a near-uniform
-        # vector that WASHES OUT the goal-conditioning (all goals rank proposals
-        # near-identically). Softmax at WEIGHT_TEMP concentrates weight on each
-        # goal's distinctive top attributes; measured 2026-08-17: recovers a real
-        # ~30-position swing (careful_generalist top-10 -> nearterm_welfare last
-        # for scry) that flat weighting collapsed to 34-36. Top-40 attr overlap
-        # between goals is only 3-18% Jaccard, so the goals are genuinely distinct.
+        # Unit-honest AHP weights: margins are log2 of elicited importance
+        # ratios, so the ratio-scale priority is 2^margin; normalize to sum 1.
+        # No sharpening. Measured consequence (2026-08-17): with honest units the
+        # composed proposal ranking shifts only modestly across goals — judged
+        # importance is broad (top-40 attrs hold ~9% of mass) and proposal
+        # exhibition profiles are halo-correlated, so a general-quality factor
+        # dominates. The goal-conditioning lives in the importance vectors
+        # themselves (per-goal top attributes overlap 3-18% Jaccard), which the
+        # page surfaces directly.
         items = [(name_of.get(line, attr_name(line)), s) for line, s in weights.items()]
-        mx = max((s for _, s in items), default=0.0)
-        ex = [(n, math.exp((s - mx) / WEIGHT_TEMP)) for n, s in items]
+        ex = [(n, 2.0 ** s) for n, s in items]
         z = sum(e for _, e in ex) or 1.0
         w = {n: e / z for n, e in ex}
         # grant score per proposal
