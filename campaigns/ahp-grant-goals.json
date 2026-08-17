@@ -1,0 +1,17 @@
+{
+  "note": "AHP over the attributes themselves: entities = the 1,010 Fable attribute definitions (data/ahp_attributes.txt, rubric tails stripped so the attribute is the thing judged, not a rubric); criteria = grant-goal framings (batteries/grant_goals.txt). Each goal is one --by pass; cardinal's IRLS solve of the sampled pairwise-ratio graph yields an importance weight vector over attributes for that goal. Composed with per-attribute polarity, this gives per-goal grant scores. budget is per goal (per --attributes line): 12000 comparisons over 1010 entities ~= 24/entity, enough for a connected, well-scaled estimate; raise budget or add seeds for tighter weights (more runway).",
+  "phases": [
+    {
+      "run_tag": "ahp-grant-goals-gemma31b-2026-08-16",
+      "corpus": "data/ahp_attributes.txt",
+      "attributes": "batteries/grant_goals.txt",
+      "model": "gemma4-31b",
+      "base_url": "http://127.0.0.1:8023/v1",
+      "template": "canonical_bucket_v1",
+      "budget": 12000,
+      "seed": 1,
+      "outdir": "/tmp/campaign-ahp-grant-goals",
+      "env": { "CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS": 1024 }
+    }
+  ]
+}
