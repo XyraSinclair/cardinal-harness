@@ -134,9 +134,7 @@ impl GeminiCliAdapter {
         // reverting to its agent prompt if this path is wrong.
         let system_md = scratch.path().join("system.md");
         std::fs::write(&system_md, SYSTEM_PROMPT).map_err(|error| {
-            ProviderError::config(format!(
-                "failed to write Gemini CLI system prompt: {error}"
-            ))
+            ProviderError::config(format!("failed to write Gemini CLI system prompt: {error}"))
         })?;
 
         let mut command = Command::new(&self.config.binary);
@@ -343,7 +341,10 @@ fn map_messages(messages: &[Message]) -> String {
 
 fn classify_cli_error(message: String) -> ProviderError {
     let lowercase = message.to_ascii_lowercase();
-    if QUOTA_MARKERS.iter().any(|marker| lowercase.contains(marker)) {
+    if QUOTA_MARKERS
+        .iter()
+        .any(|marker| lowercase.contains(marker))
+    {
         let context = ErrorContext::new().with_code(message);
         return ProviderError::rate_limited_subscription(context);
     }
