@@ -46,7 +46,9 @@ PROPOSAL_TAGS = [
     "manifund-gemini-flash-2026-08-15",
 ]
 BUDGET = 12000
-MIN_FRAC = 0.8  # a goal counts once >=80% of its budget landed
+MIN_FRAC = 0.6  # landing is atomic per goal; usable rows are ~70-80% of budget
+                # after FINAL dedup + refusal/error filtering, so 0.6*budget=7200
+                # cleanly separates a landed goal (~8.3-9.7k) from an unlanded one (0)
 
 
 def ch_query(query):
@@ -148,7 +150,11 @@ FROM (
 GROUP BY attribute, entity FORMAT JSONEachRow"""
     prop_attr = {}
     for r in (json.loads(l) for l in ch_query(q).splitlines() if l.strip()):
-        prop_attr.setdefault(r["attribute"], {})[r["entity"]] = r["score"]
+        # proposal entities are stored as full "title — subtitle" text (and vary
+        # by corpus across the 4 judge tags); key by the short-title prefix so the
+        # join with the manifund.txt proposal list is corpus-independent.
+        p_key = r["entity"].split(" — ")[0].strip()
+        prop_attr.setdefault(r["attribute"], {})[p_key] = r["score"]
     # index proposal attr scores by short attribute name for join with corpus
     prop_by_name = {}
     for a_line, m in prop_attr.items():
