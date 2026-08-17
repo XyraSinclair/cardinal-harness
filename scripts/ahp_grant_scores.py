@@ -46,6 +46,10 @@ PROPOSAL_TAGS = [
     "manifund-gemini-flash-2026-08-15",
 ]
 BUDGET = 12000
+WEIGHT_TEMP = 0.30  # softmax temperature concentrating per-goal importance onto
+                    # each goal's distinctive attributes (see compose loop); lower
+                    # = sharper goal-conditioning. 0.30 gives an interpretable,
+                    # non-degenerate spread.
 MIN_FRAC = 0.6  # landing is atomic per goal; usable rows are ~70-80% of budget
                 # after FINAL dedup + refusal/error filtering, so 0.6*budget=7200
                 # cleanly separates a landed goal (~8.3-9.7k) from an unlanded one (0)
@@ -163,12 +167,19 @@ GROUP BY attribute, entity FORMAT JSONEachRow"""
     # --- compose per-goal grant rankings ---
     goals_out = []
     for goal_line, weights in imp_by_goal.items():
-        # nonneg L1-normalized weights over the goal's judged attributes
+        # Softmax-concentrated weights over the goal's judged attributes.
+        # L1-normalizing shifted margins over ~1010 attrs yields a near-uniform
+        # vector that WASHES OUT the goal-conditioning (all goals rank proposals
+        # near-identically). Softmax at WEIGHT_TEMP concentrates weight on each
+        # goal's distinctive top attributes; measured 2026-08-17: recovers a real
+        # ~30-position swing (careful_generalist top-10 -> nearterm_welfare last
+        # for scry) that flat weighting collapsed to 34-36. Top-40 attr overlap
+        # between goals is only 3-18% Jaccard, so the goals are genuinely distinct.
         items = [(name_of.get(line, attr_name(line)), s) for line, s in weights.items()]
-        lo = min((s for _, s in items), default=0.0)
-        shifted = [(n, s - lo) for n, s in items]
-        tot = sum(s for _, s in shifted) or 1.0
-        w = {n: s / tot for n, s in shifted}
+        mx = max((s for _, s in items), default=0.0)
+        ex = [(n, math.exp((s - mx) / WEIGHT_TEMP)) for n, s in items]
+        z = sum(e for _, e in ex) or 1.0
+        w = {n: e / z for n, e in ex}
         # grant score per proposal
         scores = {}
         for p in proposals:
