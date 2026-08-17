@@ -25,7 +25,7 @@
 //! Two levers strip that to ~136 tokens (−98%):
 //!
 //! 1. `GEMINI_SYSTEM_MD=<path>` replaces the entire agent system prompt with
-//!    the file's contents. The adapter writes [`SYSTEM_PROMPT`] into its
+//!    the file's contents. The adapter writes `SYSTEM_PROMPT` into its
 //!    per-call scratch directory and points the env var there, so the judge
 //!    prompt is versioned here, not in the operator's config dir. (The CLI
 //!    substitutes only `${...}` placeholders in the file; plain prose is
