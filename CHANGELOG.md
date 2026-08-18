@@ -7,6 +7,17 @@ Versioning once it reaches `1.0.0`.
 
 ## [Unreleased]
 
+## [0.13.1] - 2026-08-18
+
+### Changed
+
+- **Pointer release; the crate is now [`llmsort`](https://crates.io/crates/llmsort).**
+  The engine was extracted to [XyraSinclair/llmsort](https://github.com/XyraSinclair/llmsort)
+  (seeded from this repo at `0e30e1c`); this repo was renamed
+  `llmsorting` -> `llmsort-lab` and carries the research program with full
+  history. `llmsorting` is parked like `ratiometer` and `cardinal-harness`
+  before it; the in-tree lab crate is now `publish = false`.
+
 ## [0.13.0] - 2026-08-15
 
 ### Changed

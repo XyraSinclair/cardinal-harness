@@ -1,12 +1,13 @@
 [package]
 name = "llmsorting"
-version = "0.13.0"
+version = "0.13.1"
 edition = "2021"
+publish = false
 license = "MIT"
-description = "Readings, not rankings: pairwise LLM ratio judgements fitted into cardinal scores with uncertainty, active selection, and explicit cost and provenance. Formerly cardinal-harness."
+description = "RENAMED: this crate is now `llmsort`. llmsorting 0.13.1 is a pointer release; use llmsort >= 0.14"
 readme = "README.md"
-repository = "https://github.com/XyraSinclair/llmsorting"
-homepage = "https://github.com/XyraSinclair/llmsorting"
+repository = "https://github.com/XyraSinclair/llmsort-lab"
+homepage = "https://github.com/XyraSinclair/llmsort-lab"
 keywords = ["llm", "ranking", "sorting", "pairwise", "reranking"]
 categories = ["algorithms", "science", "command-line-utilities"]
 include = [

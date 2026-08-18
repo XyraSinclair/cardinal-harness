@@ -1,5 +1,11 @@
 # AGENTS.md
 
+**Engine extracted 2026-08-18:** the public crate + CLI are now
+[llmsort](https://github.com/XyraSinclair/llmsort) (seeded from this repo at
+`0e30e1c`). This repo (renamed `llmsort-lab`) is the research program; its
+in-tree crate is `publish = false` and keeps the research verbs, daemon, and
+full history. Fixes to promised engine surfaces belong in llmsort, not here.
+
 `llmsorting` is the pairwise-ratio elicitation engine behind the rest of
 the OpenPriors stack.
 

@@ -1,4 +1,11 @@
-# llmsorting
+# llmsort-lab
+
+**The engine moved.** As of 2026-08-18 the consumable crate + CLI live at
+[llmsort](https://github.com/XyraSinclair/llmsort) (crates.io: `llmsort`;
+extracted from this repo at `0e30e1c`). This repo is the research program —
+evidence packs, dated notes, research verbs, the benchmark sites, and the
+`cardinald` daemon — with full history. The in-tree crate remains for the
+research instruments and is no longer published (`publish = false`).
 
 [![CI](https://github.com/XyraSinclair/llmsorting/actions/workflows/ci.yml/badge.svg)](https://github.com/XyraSinclair/llmsorting/actions/workflows/ci.yml)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
