@@ -1,0 +1,135 @@
+# llmsort
+
+[![CI](https://github.com/XyraSinclair/llmsort/actions/workflows/ci.yml/badge.svg)](https://github.com/XyraSinclair/llmsort/actions/workflows/ci.yml)
+[![crates.io](https://img.shields.io/crates/v/llmsort.svg)](https://crates.io/crates/llmsort)
+[![docs.rs](https://img.shields.io/docsrs/llmsort)](https://docs.rs/llmsort)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+**Readings, not rankings.** A ranking tells you who is above whom; a
+*scaling* keeps the gaps — and gaps are where decisions live. llmsort turns
+noisy LLM pairwise **ratio** judgements ("how many times more of X does A
+have than B?") into globally consistent **cardinal scores with
+uncertainty**, spends each next comparison where it buys the most
+information, and stops when the top-k is certain enough — or the budget
+runs out. Every run returns evidence: comparisons, tokens, dollar cost,
+stop reason, and an optional per-judgement trace.
+
+```console
+$ llmsort sort ideas.txt --by "expected impact on retention"
+```
+
+## Why not just ask the model to sort?
+
+| Approach | What breaks |
+|---|---|
+| "Rate each item 1–10" | Miscalibrated, anchor-dependent; scores cluster at 7–8; no error bars |
+| "Sort this list" in one prompt | Position bias, context limits, silently dropped or hallucinated items |
+| "Which is better, A or B?" over pairs | Ordinal only — throws away *how much* better; naive schedules cost O(n²) |
+| Elo / Bradley–Terry over wins | Better aggregation, but still magnitude-blind and passive about which pair to ask next |
+
+llmsort treats each ratio answer as a noisy log-space measurement, fits
+latent scores over the whole comparison graph with a robust solver (IRLS,
+Huber loss), reads uncertainty off the posterior, and plans the next
+comparison by effective resistance on the graph. Default budget is 4·n
+comparisons — O(n), not O(n²).
+
+## Install
+
+```console
+$ cargo install llmsort          # CLI
+$ cargo add llmsort              # library
+$ export OPENROUTER_API_KEY=...  # any OpenRouter model slug works
+```
+
+## CLI
+
+```console
+$ llmsort sort ideas.txt --by "expected impact on retention"
+$ llmsort sort backlog.txt --by "user pain if unfixed" --top-k 5 --format csv
+$ llmsort judge "plan A" "plan B" --by "execution risk"
+$ llmsort judge @a.md @b.md --by "clarity" --spin     # does the belief survive framing?
+$ llmsort judge @a.md @b.md --by "clarity" --orbit    # order × polarity × wording group
+```
+
+`judge` is the audit instrument: one pairwise reading, plus probes that
+test whether the judgement is a *belief* (survives presentation order,
+polarity, paraphrase, who's asking) or an echo of how you asked. The
+probes report the invariant component and every named bias separately.
+
+## Library
+
+```rust,no_run
+use std::sync::Arc;
+use llmsort::gateway::NoopUsageSink;
+use llmsort::rerank::{sort_texts, RerankExecution, SortOptions};
+use llmsort::{Attribution, ProviderGateway};
+
+# async fn demo() -> Result<(), Box<dyn std::error::Error>> {
+let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
+let execution = RerankExecution::new(Arc::new(gateway), Attribution::new("app::sort"));
+
+let sorted = sort_texts(
+    vec![
+        "First essay...".into(),
+        "Second essay...".into(),
+        "Third essay...".into(),
+    ],
+    "clarity of explanation",
+    execution,
+    SortOptions::default(),
+)
+.await?;
+
+for item in &sorted.items {
+    println!("{:>2}. {:.3} ± {:.3}  {}", item.rank, item.latent_mean, item.latent_std, item.text);
+}
+println!("cost: ${:.4}", sorted.meta.provider_cost_nanodollars as f64 / 1e9);
+# Ok(())
+# }
+```
+
+## How it works
+
+Five nouns: an **attribute** (any nameable dimension) over entities, each
+holding a latent **magnitude** (only ratios are observable);
+**instruments** (elicitation modes) emit **evidence** in one currency —
+(E[log-ratio], honest variance) — which the solver fuses into a
+**scaling**: every entity placed on a shared log-ratio scale with a
+*reading* (magnitude ± uncertainty). A ranking is a scaling with the
+spacing deleted. `docs/ALGORITHM.md` has the rationale; `docs/MODEL.md`
+the observation model; `docs/WORKED_EXAMPLE.md` a full walkthrough.
+
+## What is promised
+
+The stability-promised surface is deliberately small: `sort_texts` /
+`sort_documents` (library), the CLI `sort` and `judge` verbs, and the
+judgement-packet format (`src/packet.rs` — content-addressed evidence
+that fuses byte-identically). Everything else is exposed for composition
+and may change shape.
+
+Use it for list work where "how much better?" carries information:
+prompts, research ideas, candidate plans, reviewer notes, backlog items.
+Do not use it for deterministic rankings, scalar metrics, or attributes
+too incoherent to compare.
+
+## Evidence
+
+The trade is explicit: this costs more than one-shot scoring, saves
+comparisons versus exhaustive pairwise judging, and returns uncertainty
+plus evidence instead of only a sorted list. The measured record — method
+comparisons, planner-regret benchmarks (which the planner has lost and
+then won), judge-coherence batteries, and every published number's
+replayable pack — lives in the research program:
+[llmsort-lab](https://github.com/XyraSinclair/llmsort-lab). The evidence
+culture applies to our own planner first.
+
+## Lineage
+
+`cardinal-harness` → `ratiometer` → `llmsorting` → `llmsort`. The parked
+crates.io names keep resolving. Extracted from
+[llmsort-lab](https://github.com/XyraSinclair/llmsort-lab), which carries
+the full pre-extraction history.
+
+## License
+
+MIT.

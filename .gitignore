@@ -1,0 +1,12 @@
+# Cargo
+target
+debug
+**/*.rs.bk
+*.pdb
+
+# Local pairwise cache (name kept from the cardinal era for cache continuity)
+.cardinal_pairwise_cache.sqlite
+.cardinal_pairwise_cache.lock
+.cardinal_pairwise_cache.sqlite-shm
+.cardinal_pairwise_cache.sqlite-wal
+.cardinal_pairwise_cache.sqlite-journal
