@@ -199,10 +199,76 @@ GROUP BY attribute, entity FORMAT JSONEachRow"""
             "landed": imp_counts.get(goal_line, 0),
             "topAttributes": [{"a": n, "w": round(wn, 4)} for n, wn in top_attrs],
             "ranking": [{"proposal": p, "score": s} for p, s in ranked],
+            "_w": w,  # full weight dict, consumed by the interior block below
         })
+
+    # --- AHP interior: full interpretability, all derived with zero parameters ---
+    # One aligned attribute index shared by every vector on the page.
+    attr_index = sorted({n for g in goals_out for n in g["_w"]})
+    pos = {n: i for i, n in enumerate(attr_index)}
+    for g in goals_out:
+        wv = [0.0] * len(attr_index)
+        for n, wn in g["_w"].items():
+            wv[pos[n]] = round(wn, 8)
+        g["w"] = wv
+        # Per-proposal score decomposition: every attribute's contribution is
+        # w * orient * exhibition; ship the top 14 by |contribution| plus the
+        # residual sum so the shown terms visibly reconstruct the total.
+        contribs = {}
+        for p in proposals:
+            terms = []
+            for n, wn in g["_w"].items():
+                pa = prop_by_name.get(n, {}).get(p)
+                if pa is None:
+                    continue
+                c = wn * orient_by_name.get(n, 0.0) * pa
+                terms.append((pos[n], c, pa))
+            terms.sort(key=lambda t: -abs(t[1]))
+            top = terms[:14]
+            rest = sum(c for _, c, _ in terms[14:])
+            contribs[p] = {
+                "t": [[i, round(c, 6), round(pa, 3)] for i, c, pa in top],
+                "rest": round(rest, 6),
+            }
+        g["contribs"] = contribs
+        del g["_w"]
+
+    orient_v = [round(orient_by_name.get(n, 0.0), 4) for n in attr_index]
+    pol_v = [round(next((v for e, v in pol.items()
+                         if name_of.get(e, attr_name(e)) == n), 0.0), 4)
+             for n in attr_index]
+
+    def pearson(xs, ys):
+        n = len(xs)
+        mx, my = sum(xs) / n, sum(ys) / n
+        sxy = sum((a - mx) * (b - my) for a, b in zip(xs, ys))
+        sx = math.sqrt(sum((a - mx) ** 2 for a in xs))
+        sy = math.sqrt(sum((b - my) ** 2 for b in ys))
+        return sxy / (sx * sy) if sx and sy else 0.0
+
+    def spearman_of_rankings(ra, rb):
+        pa = {r["proposal"]: i for i, r in enumerate(ra)}
+        pb = {r["proposal"]: i for i, r in enumerate(rb)}
+        shared = [p for p in pa if p in pb]
+        return pearson([pa[p] for p in shared], [pb[p] for p in shared])
+
+    slugs = [g["goal"] for g in goals_out]
+    n_g = len(goals_out)
+    rank_corr = [[round(spearman_of_rankings(goals_out[i]["ranking"], goals_out[j]["ranking"]), 3)
+                  for j in range(n_g)] for i in range(n_g)]
+    # weight vectors compared in log space (they live on a ratio scale)
+    logw = [[math.log2(x) if x > 0 else -30.0 for x in g["w"]] for g in goals_out]
+    weight_corr = [[round(pearson(logw[i], logw[j]), 3) for j in range(n_g)] for i in range(n_g)]
+    offdiag = [rank_corr[i][j] for i in range(n_g) for j in range(n_g) if i < j]
+    mean_rank_corr = round(sum(offdiag) / len(offdiag), 3) if offdiag else None
 
     out = {
         "importanceTag": IMPORTANCE_TAG,
+        "attrs": attr_index,
+        "orient": orient_v,
+        "polarityMargins": pol_v,
+        "corr": {"goals": slugs, "rank": rank_corr, "weight": weight_corr,
+                 "meanRankCorr": mean_rank_corr},
         "polarityTag": POLARITY_TAG,
         "polarityReady": pol_ready,
         "goalsComplete": len(goals_out),
