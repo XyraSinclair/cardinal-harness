@@ -1,0 +1,41 @@
+{
+  "name": "scryv2",
+  "description": "The revised scry.io proposal (fetched 2026-08-17, data/manifund/scry_v2_2026-08-17.json) against its original and against the slate. Phase 1 judges the actual rewrite: full text (title-blurb-description, one line, 8k cap) old vs new, every fable attribute, independent draws. Phase 2 isolates the blurb change in the slate's own one-line register. Phase 3 places the revised line in the 40-proposal pool (appended as line 41 so the original 40 keep their entity ids and texts byte-identical - pool-pool pairs replay from the content-addressed cache; only pairs touching the new entity buy GPU).",
+  "phases": [
+    {
+      "run_tag": "scryv2-fulltext-pair",
+      "corpus": "data/scryv2_fulltext_pair.txt",
+      "attributes": "batteries/fable_subtle_1000.txt",
+      "model": "gemma4-31b",
+      "base_url": "http://127.0.0.1:8023/v1",
+      "template": "canonical_bucket_v1",
+      "budget": 4,
+      "seed": 1,
+      "no_cache": true,
+      "env": { "CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS": 1024 }
+    },
+    {
+      "run_tag": "scryv2-line-pair",
+      "corpus": "data/scryv2_line_pair.txt",
+      "attributes": "batteries/fable_subtle_1000.txt",
+      "model": "gemma4-31b",
+      "base_url": "http://127.0.0.1:8023/v1",
+      "template": "canonical_bucket_v1",
+      "budget": 4,
+      "seed": 1,
+      "no_cache": true,
+      "env": { "CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS": 1024 }
+    },
+    {
+      "run_tag": "fable1000-41pool-scryv2",
+      "corpus": "data/manifund_41.txt",
+      "attributes": "batteries/fable_subtle_1000.txt",
+      "model": "gemma4-31b",
+      "base_url": "http://127.0.0.1:8023/v1",
+      "template": "canonical_bucket_v1",
+      "budget": 240,
+      "seed": 1,
+      "env": { "CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS": 1024 }
+    }
+  ]
+}
