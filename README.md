@@ -1,11 +1,28 @@
 # llmsort-lab
 
-**The engine moved.** As of 2026-08-18 the consumable crate + CLI live at
-[llmsort](https://github.com/XyraSinclair/llmsort) (crates.io: `llmsort`;
-extracted from this repo at `0e30e1c`). This repo is the research program —
-evidence packs, dated notes, research verbs, the benchmark sites, and the
-`cardinald` daemon — with full history. The in-tree crate remains for the
-research instruments and is no longer published (`publish = false`).
+> **Looking for the engine?** It is **[llmsort](https://github.com/XyraSinclair/llmsort)**
+> — `cargo install llmsort`, [crates.io](https://crates.io/crates/llmsort),
+> [docs.rs](https://docs.rs/llmsort). If an old link brought you here
+> (`cardinal-harness`, `ratiometer`, and `llmsorting` are all former names
+> of this repo), that is the maintained library and CLI, extracted from
+> this repo at `0e30e1c` on 2026-08-18.
+
+This repo is the **research archive** that produced the engine — every
+experiment, evidence pack, and structured judgement, with full history.
+Nothing here is a stability-promised surface; everything here is the
+receipts.
+
+## The archive
+
+| What | Where | Contents |
+|---|---|---|
+| Old experiments | [`artifacts/live/`](artifacts/live/) | 38 dated evidence packs (2026-06-30 → 2026-08-15): per-call JSONL traces, replayable judgement caches, RESULTS.md with denominators and errata-on-top |
+| Structured judgements | inside each pack | content-addressed judgement records and packets; `*-cache.sqlite` replays bit-identically through the engine |
+| Research threads | [`notes/`](notes/) | 25 dated investigation threads (logprob reality, decimal PMF ground truth, red teams, guardian panels, rename/reshape decisions) |
+| Documentation | [`docs/`](docs/) | the program-depth docs: FIRST_PRINCIPLES, MATH_FRONTIER, PRINCIPLES (the anti-slop rules and the evidence that earned them), BENCHMARK, EVALUATION, canonicality |
+| The program | [`PROGRAM.md`](PROGRAM.md) | the book of tricks: every method as a point in arity × scale × output-form, each rung PLANNED / IN FLIGHT / EXECUTED with its pack |
+| Research instruments | `src/`, `examples/`, `scripts/` | the in-tree research crate (`publish = false`): research verbs, the `cardinald` daemon, elicitation batteries, campaign runners |
+| Benchmark + hub sites | [`site/`](site/), [`www/`](www/) | pairwiseratio.org (Judge Coherence Benchmark) and llmsorting.com (program hub) |
 
 [![CI](https://github.com/XyraSinclair/llmsorting/actions/workflows/ci.yml/badge.svg)](https://github.com/XyraSinclair/llmsorting/actions/workflows/ci.yml)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
