@@ -101,6 +101,10 @@ on a later one)
 2. **E10 — family sweep instrument** (`cardinal family`): pair ×
    {A, A′, ¬A} × orders over a shared prefix; report cached-token
    fraction, pairwise-equivalent obs/$, and the reliability reading.
+   Mechanical gate, found 2026-08-19: `ratio_letter`'s user prompt
+   renders attribute FIRST, entities after — zero shared prefix across
+   attribute variants. E10 starts with an attribute-LAST prompt variant
+   (new slug; same alphabet, same PMF read) so the pair-prefix caches.
 3. Flip `sort` to the PMF rail by default where the matrix allows;
    JSON path demoted to explicit fallback.
 4. The deletion campaign, one room at a time, blind-defended
