@@ -19,8 +19,7 @@ new experiment *evidence* is archived there.
 
 ## Shape mandate (the crate — root package only)
 
-- ≤ 120 tracked files under `src/`, `tests/`, `examples/`, `docs/`; no
-  source file over 800 lines (grandfathered files may only shrink);
+- ≤ 120 tracked files under `src/`, `tests/`, `examples/`, `docs/`; no source file over 800 lines;
   ≤ 16 integration test suites in `tests/`.
 - The five rooms (see `src/lib.rs` docs): solve, evidence, elicit,
   gateway, run. Dependencies point one way; nothing in solve/ evidence

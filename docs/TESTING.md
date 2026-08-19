@@ -1,7 +1,8 @@
 # The test battery
 
-272 tests (`cargo test --all-targets`), 14 integration suites under
-`tests/`. The core suites were authored and then adversarially reviewed as
+406 tests across the workspace (`cargo test --workspace`): the engine's
+15 integration suites under `tests/` plus the research suites in
+`experiments/tests/` (never published, held to the same green-CI bar). The core suites were authored and then adversarially reviewed as
 a deliberate exercise: every assertion had to be falsifiable by a plausible
 implementation bug, every statistical claim had to hold over seeded
 ensembles (never a single draw), every suite had to survive a reviewer
@@ -25,10 +26,10 @@ the point of the battery: it is strong enough to find things.
 | `planner_efficiency` (13) | Active planning and stopping | ≥70% of exploitation proposals touch the boundary band; pruning changes `explore_pruned_count` but never the top-k set; answered proposals reduce top-k error; the critical straddling pair is proposed first; certified stopping fires well below n(n−1)/2 observations |
 
 The comparative research batteries — method dominance (cardinal vs Likert
-vs ordinal), planner regret vs uniform-random selection, live-provider
-evidence pins, and the judge-coherence benchmark — live in the research
-program, [llmsort-lab](https://github.com/XyraSinclair/llmsort-lab), where
-their evidence packs are.
+vs ordinal), planner regret vs uniform-random selection, and the
+judge-coherence benchmark — run from `experiments/tests/`; their evidence
+packs are archived in
+[llmsort-lab](https://github.com/XyraSinclair/llmsort-lab).
 
 ## A bug the battery found (fixed)
 
