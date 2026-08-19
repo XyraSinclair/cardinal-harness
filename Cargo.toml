@@ -28,7 +28,7 @@ include = [
 
 [[bin]]
 name = "llmsort"
-path = "src/bin/llmsort.rs"
+path = "src/bin/llmsort/main.rs"
 required-features = ["sqlite-store"]
 
 [features]

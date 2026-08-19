@@ -1,0 +1,271 @@
+use super::*;
+
+pub(super) async fn run(command: Commands) -> Result<(), Box<dyn std::error::Error>> {
+    match command {
+        Commands::Sort {
+            file,
+            by,
+            model,
+            policy,
+            policy_config,
+            budget,
+            top_k,
+            format,
+            scores,
+            reverse,
+            two_sided,
+            also_by,
+            no_counterbalance,
+            template,
+            elaborate,
+            prune_below,
+            seed,
+            concurrency,
+            cache_only,
+            no_cache,
+            cache,
+            trace,
+            quiet,
+            estimate,
+        } => {
+            if cache_only && no_cache {
+                return Err("--cache-only and --no-cache are mutually exclusive".into());
+            }
+            let raw = read_sort_input(file.as_deref())?;
+            let documents = parse_sort_items(&raw)?;
+            if documents.is_empty() {
+                return Err("no items to sort: input is empty".into());
+            }
+
+            if estimate {
+                let opts = llmsort::rerank::SortOptions {
+                    model: model.clone(),
+                    comparison_budget: budget,
+                    top_k,
+                    counterbalance: !no_counterbalance,
+                    two_sided,
+                    also_by: also_by.clone(),
+                    prune_p_topk_below: prune_below,
+                    prompt_template_slug: template.clone(),
+                    ..Default::default()
+                };
+                let simple = llmsort::rerank::sort::sort_request(documents.clone(), &by, &opts);
+                let multi = llmsort::rerank::simple::to_multi_request(&simple);
+                let charge = llmsort::rerank::estimate_max_rerank_charge(&multi);
+                println!(
+                    "worst case: {} comparisons · ~{} input + {} output tokens each · provider max ${:.4}",
+                    charge.comparison_budget,
+                    charge.input_tokens_per_comparison,
+                    charge.output_tokens_per_comparison,
+                    charge.provider_cost_max_nanodollars as f64 / 1e9,
+                );
+                eprintln!(
+                    "estimate only — no network, no cache; actual runs stop earlier on certified top-k or cache hits"
+                );
+                return Ok(());
+            }
+
+            let gateway = provider_gateway(cache_only)?;
+
+            let cache_store = if no_cache {
+                None
+            } else {
+                let cache_path = cache.unwrap_or_else(SqlitePairwiseCache::default_path);
+                Some(SqlitePairwiseCache::new(cache_path)?)
+            };
+            let policy_obj = load_policy(policy, policy_config)?;
+
+            let (trace_sink, trace_worker) = if let Some(path) = trace {
+                let (sink, worker) = JsonlTraceSink::new(path)?;
+                (Some(sink), Some(worker))
+            } else {
+                (None, None)
+            };
+            let trace_ref = trace_sink.as_ref().map(|sink| sink as &dyn TraceSink);
+
+            let gateway = Arc::new(gateway);
+            let mut execution = llmsort::rerank::RerankExecution::new(
+                gateway.clone(),
+                Attribution::new("llmsort::sort"),
+            )
+            .run_options(RerankRunOptions {
+                rng_seed: seed,
+                cache_only,
+            });
+            if let Some(store) = cache_store.as_ref() {
+                execution = execution.cache(store);
+            }
+            if let Some(policy) = policy_obj {
+                execution = execution.model_policy(policy);
+            }
+            if let Some(trace) = trace_ref {
+                execution = execution.trace(trace);
+            }
+
+            let opts = llmsort::rerank::SortOptions {
+                model: model.clone(),
+                comparison_budget: budget,
+                top_k,
+                counterbalance: !no_counterbalance,
+                two_sided,
+                also_by,
+                prune_p_topk_below: prune_below,
+                prompt_template_slug: template,
+                comparison_concurrency: concurrency,
+                ..Default::default()
+            };
+            let criterion = if elaborate {
+                let rubric = llmsort::rerank::elaborate_criterion(
+                    gateway.as_ref(),
+                    model.as_deref(),
+                    &by,
+                    Attribution::new("llmsort::sort::elaborate"),
+                )
+                .await?;
+                if !quiet {
+                    eprintln!(
+                        "elaborated criterion ({}, ${:.4}):
+{}
+",
+                        rubric.model_used,
+                        rubric.provider_cost_nanodollars as f64 / 1e9,
+                        rubric.elaborated
+                    );
+                }
+                rubric.elaborated
+            } else {
+                by.clone()
+            };
+            let mut sorted =
+                llmsort::rerank::sort_documents(documents, &criterion, execution, opts).await?;
+
+            drop(trace_sink);
+            if let Some(worker) = trace_worker {
+                worker.join()?;
+            }
+
+            // A sort where every comparison failed or was refused is not a
+            // sort; refuse to emit uninformative output on stdout.
+            if sorted.meta.comparisons_attempted > 0 && sorted.meta.comparisons_used == 0 {
+                return Err(format!(
+                    "all {} comparison attempts failed ({} refused); output would be \
+                     uninformative. Re-run with --trace <path> to see per-comparison \
+                     errors (bad model slug and invalid API key are the usual causes).",
+                    sorted.meta.comparisons_attempted, sorted.meta.comparisons_refused,
+                )
+                .into());
+            }
+
+            if reverse {
+                sorted.items.reverse();
+            }
+            let stdout = io::stdout();
+            let mut out = stdout.lock();
+            render_sorted(&mut out, &sorted, format, scores)?;
+
+            if !quiet {
+                let meta = &sorted.meta;
+                let cost_usd = meta.provider_cost_nanodollars as f64 / 1e9;
+                let estimate = if meta.provider_cost_is_estimate {
+                    "~"
+                } else {
+                    ""
+                };
+                let evidence = if meta.evidence_judgements > 0 {
+                    let residual = meta
+                        .evidence_order_residual_mean_abs
+                        .map(|r| format!(", order-residual {r:.3} nats"))
+                        .unwrap_or_default();
+                    format!(
+                        " · evidence: {}/{} logprob-mode, visible {:.2}{residual}",
+                        meta.logprob_mode_judgements,
+                        meta.evidence_judgements,
+                        meta.evidence_visible_mass_mean.unwrap_or(0.0)
+                    )
+                } else {
+                    String::new()
+                };
+                let frustration = meta
+                    .judgement_frustration_mean
+                    .map(|f| format!(" · frustration {f:.3}"))
+                    .unwrap_or_default();
+                let flips = if meta.pairs_counterbalanced > 0 {
+                    format!(
+                        " · order flips: {}/{}",
+                        meta.position_flips, meta.pairs_counterbalanced
+                    )
+                } else {
+                    String::new()
+                };
+                eprintln!(
+                    "sorted {} items by \"{by}\" · {} comparisons ({} cached, {} refused) · {estimate}${cost_usd:.4}{flips}{evidence}{frustration} · stop: {}",
+                    sorted.items.len(),
+                    meta.comparisons_used,
+                    meta.comparisons_cached,
+                    meta.comparisons_refused,
+                    serde_json::to_value(meta.stop_reason)?.as_str().unwrap_or("unknown"),
+                );
+                // Error budget, experimentalist-style: statistical and
+                // systematic components side by side, each in its native
+                // unit — never silently pooled.
+                {
+                    let stat = if sorted.items.is_empty() {
+                        None
+                    } else {
+                        Some(
+                            sorted.items.iter().map(|i| i.latent_std).sum::<f64>()
+                                / sorted.items.len() as f64,
+                        )
+                    };
+                    let mut parts: Vec<String> = Vec::new();
+                    if let Some(stat) = stat {
+                        parts.push(format!("stat ±{stat:.3} (posterior, mean)"));
+                    }
+                    if let Some(residual) = meta.evidence_order_residual_mean_abs {
+                        parts.push(format!("syst order {residual:.3} nats/pair"));
+                    }
+                    if let Some(hcr) = meta.judgement_frustration_mean {
+                        parts.push(format!("syst cyclic {:.1}% of energy", hcr * 100.0));
+                    }
+                    if meta.topk_error > 0.0 {
+                        parts.push(format!(
+                            "rank risk {:.3} (top-k flip probability)",
+                            meta.topk_error
+                        ));
+                    }
+                    if parts.len() > 1 {
+                        eprintln!("error budget: {}", parts.join(" · "));
+                    }
+                }
+                for probe in &sorted.probes {
+                    let kind = match probe.kind {
+                        llmsort::rerank::SortProbeKind::Opposite => "opposite",
+                        llmsort::rerank::SortProbeKind::Paraphrase => "paraphrase",
+                    };
+                    match probe.consistency {
+                        Some(c) => {
+                            let verdict = if c >= 0.7 {
+                                "consistent"
+                            } else if c >= 0.3 {
+                                "shaky"
+                            } else {
+                                "INCOHERENT for this judge"
+                            };
+                            eprintln!(
+                                "probe [{kind}] \"{}\": consistency {c:+.2} — {verdict}",
+                                probe.prompt
+                            );
+                        }
+                        None => eprintln!(
+                            "probe [{kind}] \"{}\": not enough shared scores to assess",
+                            probe.prompt
+                        ),
+                    }
+                }
+            }
+        }
+        _ => unreachable!(),
+    }
+
+    Ok(())
+}
