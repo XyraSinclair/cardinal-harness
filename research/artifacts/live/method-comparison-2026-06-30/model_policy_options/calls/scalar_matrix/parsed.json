@@ -1,0 +1,89 @@
+{
+  "scores": [
+    {
+      "attributes": {
+        "cost_discipline": {
+          "confidence": 0.8,
+          "score": 40
+        },
+        "public_receipt_credibility": {
+          "confidence": 0.9,
+          "score": 90
+        },
+        "route_freshness": {
+          "confidence": 0.7,
+          "score": 60
+        }
+      },
+      "id": "quality_only_opus_46"
+    },
+    {
+      "attributes": {
+        "cost_discipline": {
+          "confidence": 0.9,
+          "score": 80
+        },
+        "public_receipt_credibility": {
+          "confidence": 0.85,
+          "score": 75
+        },
+        "route_freshness": {
+          "confidence": 0.9,
+          "score": 85
+        }
+      },
+      "id": "sonnet_reference_then_fast"
+    },
+    {
+      "attributes": {
+        "cost_discipline": {
+          "confidence": 0.95,
+          "score": 90
+        },
+        "public_receipt_credibility": {
+          "confidence": 0.7,
+          "score": 50
+        },
+        "route_freshness": {
+          "confidence": 0.8,
+          "score": 70
+        }
+      },
+      "id": "deepseek_v4_flash_fast"
+    },
+    {
+      "attributes": {
+        "cost_discipline": {
+          "confidence": 0.85,
+          "score": 85
+        },
+        "public_receipt_credibility": {
+          "confidence": 0.8,
+          "score": 65
+        },
+        "route_freshness": {
+          "confidence": 0.85,
+          "score": 80
+        }
+      },
+      "id": "glm_5_2_logprob_candidate"
+    },
+    {
+      "attributes": {
+        "cost_discipline": {
+          "confidence": 0.75,
+          "score": 60
+        },
+        "public_receipt_credibility": {
+          "confidence": 0.85,
+          "score": 80
+        },
+        "route_freshness": {
+          "confidence": 0.8,
+          "score": 75
+        }
+      },
+      "id": "kimi_k2_thinking_diverse"
+    }
+  ]
+}

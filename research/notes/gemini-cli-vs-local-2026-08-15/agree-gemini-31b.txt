@@ -1,0 +1,44 @@
+judges: gemini-cli/gemini-2.5-flash  vs  gemma4-31b   (run_tag=manifund-relentless-2026-08-15,manifund-gemini-flash-2026-08-15)
+
+| attribute                                            | co-pairs | agreement |
+|------------------------------------------------------|----------|-----------|
+| counterfactual impact of a marginal dollar of fundin |       35 |     0.457 |
+| room for more funding in this exact niche            |       33 |     0.576 |
+| replaceability by work others would do anyway        |       37 |     0.622 |
+| information value of simply running the project      |       40 |     0.650 |
+| fundability by mainstream institutions               |       35 |     0.657 |
+| maturity of the underlying field                     |       36 |     0.667 |
+| existential seriousness                              |       38 |     0.711 |
+| legibility of the team\'s track record               |       41 |     0.756 |
+| expected long-run impact on humanity\'s trajectory   |       34 |     0.765 |
+| cost-effectiveness per dollar spent                  |       39 |     0.769 |
+| clarity of the writing itself                        |       45 |     0.778 |
+| urgency of doing this now rather than in five years  |       42 |     0.786 |
+| tractability of the plan as proposed by this specifi |       47 |     0.787 |
+| clarity of the theory of change                      |       48 |     0.792 |
+| robustness of the plan to its key assumptions being  |       36 |     0.806 |
+| downside risk if the project succeeds at the wrong t |       42 |     0.810 |
+| neglectedness of the problem the project addresses   |       32 |     0.812 |
+| potential to become financially self-sustaining      |       54 |     0.815 |
+| epistemic rigor of the underlying theory of change   |       44 |     0.818 |
+| technical depth                                      |       33 |     0.818 |
+| concreteness of proposed milestones                  |       45 |     0.822 |
+| scale of the problem the project addresses           |       42 |     0.833 |
+| sensitivity of the project\'s value to AI timelines  |       51 |     0.843 |
+| degree to which outputs are public goods             |       33 |     0.848 |
+| weirdness relative to mainstream research funding    |       41 |     0.854 |
+| interdisciplinarity                                  |       44 |     0.864 |
+| feasibility given the stated team and resources      |       46 |     0.870 |
+| speed to a first observable result                   |       39 |     0.872 |
+| ambition                                             |       33 |     0.879 |
+| empirical testability of its core claims             |       50 |     0.880 |
+| quality of quantitative reasoning in the proposal    |       44 |     0.886 |
+| probability of a net-negative outcome                |       46 |     0.891 |
+
+mean cross-judge agreement over 32 attributes: 0.781
+lowest (most model-idiosyncratic, rephrase candidates):
+  0.457  counterfactual impact of a marginal dollar of funding
+  0.576  room for more funding in this exact niche
+  0.622  replaceability by work others would do anyway
+  0.650  information value of simply running the project
+  0.657  fundability by mainstream institutions

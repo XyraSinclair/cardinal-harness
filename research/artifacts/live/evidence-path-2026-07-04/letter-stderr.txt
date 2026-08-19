@@ -1,0 +1,1 @@
+sorted 8 items by "usefulness as advice for a software engineer" · 63 comparisons (8 cached, 1 refused) · $0.0228 · order flips: 13/27 · evidence: 63/63 logprob-mode, visible 0.99 · stop: budget_exhausted

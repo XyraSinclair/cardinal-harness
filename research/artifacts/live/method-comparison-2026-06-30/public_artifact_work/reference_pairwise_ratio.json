@@ -1,0 +1,316 @@
+{
+  "attribute_scores": {
+    "dependency_audit_cleanup": {
+      "evidence_leverage": 0.0,
+      "implementation_tractability": 0.7539819110203617,
+      "shareability_gain": 0.0
+    },
+    "first_user_path": {
+      "evidence_leverage": 0.30034986734832014,
+      "implementation_tractability": 1.0,
+      "shareability_gain": 0.7566314675680561
+    },
+    "large_frozen_benchmark": {
+      "evidence_leverage": 0.9159567555343955,
+      "implementation_tractability": 0.0,
+      "shareability_gain": 1.0
+    },
+    "live_baseline_suite": {
+      "evidence_leverage": 1.0,
+      "implementation_tractability": 0.05959516292406785,
+      "shareability_gain": 0.45244018726613894
+    },
+    "portable_receipts": {
+      "evidence_leverage": 0.5712386574409196,
+      "implementation_tractability": 0.42282102482770695,
+      "shareability_gain": 0.3224847426003091
+    }
+  },
+  "extra": {
+    "pairs": [
+      {
+        "attribute": "evidence_leverage",
+        "confidence": 0.82,
+        "higher_id": "live_baseline_suite",
+        "left": "live_baseline_suite",
+        "ratio": 7.0,
+        "right": "portable_receipts"
+      },
+      {
+        "attribute": "evidence_leverage",
+        "confidence": 0.92,
+        "higher_id": "live_baseline_suite",
+        "left": "live_baseline_suite",
+        "ratio": 20.0,
+        "right": "dependency_audit_cleanup"
+      },
+      {
+        "attribute": "evidence_leverage",
+        "confidence": 0.85,
+        "higher_id": "live_baseline_suite",
+        "left": "live_baseline_suite",
+        "ratio": 18.0,
+        "right": "first_user_path"
+      },
+      {
+        "attribute": "evidence_leverage",
+        "confidence": 0.62,
+        "higher_id": "live_baseline_suite",
+        "left": "live_baseline_suite",
+        "ratio": 2.0,
+        "right": "large_frozen_benchmark"
+      },
+      {
+        "attribute": "evidence_leverage",
+        "confidence": 0.85,
+        "higher_id": "portable_receipts",
+        "left": "portable_receipts",
+        "ratio": 12.0,
+        "right": "dependency_audit_cleanup"
+      },
+      {
+        "attribute": "evidence_leverage",
+        "confidence": 0.72,
+        "higher_id": "portable_receipts",
+        "left": "portable_receipts",
+        "ratio": 4.0,
+        "right": "first_user_path"
+      },
+      {
+        "attribute": "evidence_leverage",
+        "confidence": 0.72,
+        "higher_id": "large_frozen_benchmark",
+        "left": "portable_receipts",
+        "ratio": 6.0,
+        "right": "large_frozen_benchmark"
+      },
+      {
+        "attribute": "evidence_leverage",
+        "confidence": 0.82,
+        "higher_id": "first_user_path",
+        "left": "dependency_audit_cleanup",
+        "ratio": 8.0,
+        "right": "first_user_path"
+      },
+      {
+        "attribute": "evidence_leverage",
+        "confidence": 0.85,
+        "higher_id": "large_frozen_benchmark",
+        "left": "dependency_audit_cleanup",
+        "ratio": 20.0,
+        "right": "large_frozen_benchmark"
+      },
+      {
+        "attribute": "evidence_leverage",
+        "confidence": 0.85,
+        "higher_id": "large_frozen_benchmark",
+        "left": "first_user_path",
+        "ratio": 18.0,
+        "right": "large_frozen_benchmark"
+      },
+      {
+        "attribute": "shareability_gain",
+        "confidence": 0.72,
+        "higher_id": "live_baseline_suite",
+        "left": "live_baseline_suite",
+        "ratio": 3.0,
+        "right": "portable_receipts"
+      },
+      {
+        "attribute": "shareability_gain",
+        "confidence": 0.72,
+        "higher_id": "live_baseline_suite",
+        "left": "live_baseline_suite",
+        "ratio": 4.0,
+        "right": "dependency_audit_cleanup"
+      },
+      {
+        "attribute": "shareability_gain",
+        "confidence": 0.78,
+        "higher_id": "first_user_path",
+        "left": "live_baseline_suite",
+        "ratio": 5.0,
+        "right": "first_user_path"
+      },
+      {
+        "attribute": "shareability_gain",
+        "confidence": 0.72,
+        "higher_id": "large_frozen_benchmark",
+        "left": "live_baseline_suite",
+        "ratio": 4.5,
+        "right": "large_frozen_benchmark"
+      },
+      {
+        "attribute": "shareability_gain",
+        "confidence": 0.72,
+        "higher_id": "portable_receipts",
+        "left": "portable_receipts",
+        "ratio": 4.0,
+        "right": "dependency_audit_cleanup"
+      },
+      {
+        "attribute": "shareability_gain",
+        "confidence": 0.72,
+        "higher_id": "first_user_path",
+        "left": "portable_receipts",
+        "ratio": 4.0,
+        "right": "first_user_path"
+      },
+      {
+        "attribute": "shareability_gain",
+        "confidence": 0.72,
+        "higher_id": "large_frozen_benchmark",
+        "left": "portable_receipts",
+        "ratio": 4.5,
+        "right": "large_frozen_benchmark"
+      },
+      {
+        "attribute": "shareability_gain",
+        "confidence": 0.85,
+        "higher_id": "first_user_path",
+        "left": "dependency_audit_cleanup",
+        "ratio": 8.0,
+        "right": "first_user_path"
+      },
+      {
+        "attribute": "shareability_gain",
+        "confidence": 0.78,
+        "higher_id": "large_frozen_benchmark",
+        "left": "dependency_audit_cleanup",
+        "ratio": 6.0,
+        "right": "large_frozen_benchmark"
+      },
+      {
+        "attribute": "shareability_gain",
+        "confidence": 0.82,
+        "higher_id": "large_frozen_benchmark",
+        "left": "first_user_path",
+        "ratio": 6.0,
+        "right": "large_frozen_benchmark"
+      },
+      {
+        "attribute": "implementation_tractability",
+        "confidence": 0.82,
+        "higher_id": "portable_receipts",
+        "left": "live_baseline_suite",
+        "ratio": 8.0,
+        "right": "portable_receipts"
+      },
+      {
+        "attribute": "implementation_tractability",
+        "confidence": 0.85,
+        "higher_id": "dependency_audit_cleanup",
+        "left": "live_baseline_suite",
+        "ratio": 18.0,
+        "right": "dependency_audit_cleanup"
+      },
+      {
+        "attribute": "implementation_tractability",
+        "confidence": 0.85,
+        "higher_id": "first_user_path",
+        "left": "live_baseline_suite",
+        "ratio": 18.0,
+        "right": "first_user_path"
+      },
+      {
+        "attribute": "implementation_tractability",
+        "confidence": 0.72,
+        "higher_id": "live_baseline_suite",
+        "left": "live_baseline_suite",
+        "ratio": 3.5,
+        "right": "large_frozen_benchmark"
+      },
+      {
+        "attribute": "implementation_tractability",
+        "confidence": 0.85,
+        "higher_id": "dependency_audit_cleanup",
+        "left": "portable_receipts",
+        "ratio": 8.0,
+        "right": "dependency_audit_cleanup"
+      },
+      {
+        "attribute": "implementation_tractability",
+        "confidence": 0.85,
+        "higher_id": "first_user_path",
+        "left": "portable_receipts",
+        "ratio": 8.0,
+        "right": "first_user_path"
+      },
+      {
+        "attribute": "implementation_tractability",
+        "confidence": 0.82,
+        "higher_id": "portable_receipts",
+        "left": "portable_receipts",
+        "ratio": 6.0,
+        "right": "large_frozen_benchmark"
+      },
+      {
+        "attribute": "implementation_tractability",
+        "confidence": 0.82,
+        "higher_id": "first_user_path",
+        "left": "dependency_audit_cleanup",
+        "ratio": 6.0,
+        "right": "first_user_path"
+      },
+      {
+        "attribute": "implementation_tractability",
+        "confidence": 0.85,
+        "higher_id": "dependency_audit_cleanup",
+        "left": "dependency_audit_cleanup",
+        "ratio": 8.0,
+        "right": "large_frozen_benchmark"
+      },
+      {
+        "attribute": "implementation_tractability",
+        "confidence": 0.85,
+        "higher_id": "first_user_path",
+        "left": "first_user_path",
+        "ratio": 18.0,
+        "right": "large_frozen_benchmark"
+      }
+    ]
+  },
+  "method": "reference_pairwise_ratio",
+  "metrics_vs_reference": {
+    "candidate_ranked_ids": [
+      "large_frozen_benchmark",
+      "live_baseline_suite",
+      "first_user_path",
+      "portable_receipts",
+      "dependency_audit_cleanup"
+    ],
+    "kendall_tau": 1.0,
+    "reference_ranked_ids": [
+      "large_frozen_benchmark",
+      "live_baseline_suite",
+      "first_user_path",
+      "portable_receipts",
+      "dependency_audit_cleanup"
+    ],
+    "topk_jaccard": 1.0
+  },
+  "model": "anthropic/claude-sonnet-4.6",
+  "ranked_ids": [
+    "large_frozen_benchmark",
+    "live_baseline_suite",
+    "first_user_path",
+    "portable_receipts",
+    "dependency_audit_cleanup"
+  ],
+  "usage": {
+    "calls": 30,
+    "completion_tokens": 4796,
+    "cost_is_estimate": false,
+    "cost_nanodollars": 92706000,
+    "cost_usd": 0.092706,
+    "latency_ms": 157468,
+    "prompt_tokens": 6922
+  },
+  "utility": {
+    "dependency_audit_cleanup": 0.15079638220407235,
+    "first_user_path": 0.5999784539555637,
+    "large_frozen_benchmark": 0.762180539990478,
+    "live_baseline_suite": 0.6202730981279622,
+    "portable_receipts": 0.45449126072406343
+  }
+}

@@ -14,6 +14,14 @@ Versioning once it reaches `1.0.0`.
   handful of `#[doc(hidden)] pub` seams (`rerank::gates` application frame,
   judgement-run instrumentation hooks, config builders) that the
   experiments crate consumes; these are not public API.
+- Everything is llmsort: the measured record folded in as `research/` —
+  replayable evidence packs (`research/artifacts/live/`), dated notes,
+  campaign definitions, and python analysis — with `PROGRAM.md` at the
+  root and the program docs (FIRST_PRINCIPLES, MATH_FRONTIER, PRINCIPLES,
+  …) merged into `docs/`. None of this ships in the published package
+  (the crates.io include-list is unchanged). The
+  [llmsort-lab](https://github.com/XyraSinclair/llmsort-lab) repo is
+  archived; it keeps only pre-extraction history.
 
 ## [0.14.0] - 2026-08-18
 

@@ -1,0 +1,46 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "I need to compare how much ranking information is extracted per provider call for these two judgment methods.\n\n**A (whole_list_sort):** In a single call, the model ranks all N items simultaneously. This produces a complete ordering of N items in one call. The information content of a full ranking of N items is log2(N!) bits. For even modest N (say 10 items), that's ~21.8 bits per call.\n\n**B (cardinal_pairwise_ratio):** Each call asks about a pair of items - which is better AND by how much (a ratio). This gives both ordinal (which is better) and cardinal (how much better) information. A single pairwise comparison yields ~1 bit of ordinal information plus some cardinal magnitude information. However, to cover N items, you need O(N\u00b2) calls for all pairs, or at minimum O(N log N) calls for a tournament-style approach.\n\n**Comparison:**\n- A extracts O(log N!) \u2248 O(N log N) bits of ordinal information in **one call**\n- B extracts ~1-2 bits of information per call (ordinal + some cardinal magnitude)\n\nThe cardinal information in B adds value per call compared to pure pairwise ordinal, but it's still just one comparison per call. Meanwhile, A gets the full ranking in one call.\n\nEven though B gets richer per-comparison information (cardinal ratio vs. just ordinal), A's single call produces an entire ranked list equivalent to O(N log N) bits, vastly outperforming B's single-call yield of ~1-2 bits.\n\nThe ratio depends on N. For typical list sizes (N=10-20), A yields roughly 10-30x more information per call. I'll estimate around 15x, capped reasonably.\n\n{\"higher_id\":\"A\",\"ratio\":15.0,\"confidence\":0.75}",
+        "reasoning": null,
+        "refusal": null,
+        "role": "assistant"
+      },
+      "native_finish_reason": "end_turn"
+    }
+  ],
+  "created": 1782861332,
+  "id": "gen-1782861331-5rCjxL4RIYzl1BZtKYm8",
+  "model": "anthropic/claude-4.6-sonnet-20260217",
+  "object": "chat.completion",
+  "provider": "Anthropic",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 428,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.007038,
+    "cost_details": {
+      "upstream_inference_completions_cost": 0.00642,
+      "upstream_inference_cost": 0.007038,
+      "upstream_inference_prompt_cost": 0.000618
+    },
+    "is_byok": false,
+    "prompt_tokens": 206,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 634
+  }
+}

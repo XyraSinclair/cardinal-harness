@@ -1,0 +1,109 @@
+{
+  "items": [
+    {
+      "id": "item-0001",
+      "text": "premature optimization is the root of all evil",
+      "rank": 1,
+      "latent_mean": 8.034633728091206,
+      "latent_std": 10.936716345544527,
+      "z_score": 3.501962942778721,
+      "percentile": 1.0
+    },
+    {
+      "id": "item-0000",
+      "text": "measure twice, cut once",
+      "rank": 2,
+      "latent_mean": -2.0825202096276776,
+      "latent_std": 13.011977977335658,
+      "z_score": 0.5711492487347349,
+      "percentile": 0.8571428571428571
+    },
+    {
+      "id": "item-0005",
+      "text": "a chain is only as strong as its weakest link",
+      "rank": 3,
+      "latent_mean": -4.750618790720197,
+      "latent_std": 10.708665974050897,
+      "z_score": 0.026126525747760785,
+      "percentile": 0.7142857142857143
+    },
+    {
+      "id": "item-0006",
+      "text": "don't put all your eggs in one basket",
+      "rank": 4,
+      "latent_mean": -6.39031796345685,
+      "latent_std": 11.88887696698902,
+      "z_score": -0.026126525747761063,
+      "percentile": 0.5714285714285714
+    },
+    {
+      "id": "item-0003",
+      "text": "if it ain't broke, don't fix it",
+      "rank": 5,
+      "latent_mean": -7.0106624138884825,
+      "latent_std": 10.976376041664645,
+      "z_score": 0.43028668365159056,
+      "percentile": 0.42857142857142855
+    },
+    {
+      "id": "item-0004",
+      "text": "too many cooks spoil the broth",
+      "rank": 6,
+      "latent_mean": -9.52420929249036,
+      "latent_std": 11.663718694404734,
+      "z_score": -0.7778322702184554,
+      "percentile": 0.2857142857142857
+    },
+    {
+      "id": "item-0007",
+      "text": "practice makes perfect",
+      "rank": 7,
+      "latent_mean": -9.785288090800687,
+      "latent_std": 12.194042708694457,
+      "z_score": -1.1156436027199035,
+      "percentile": 0.14285714285714285
+    },
+    {
+      "id": "item-0002",
+      "text": "a bird in the hand is worth two in the bush",
+      "rank": 8,
+      "latent_mean": -14.664750572579901,
+      "latent_std": 10.05340215784057,
+      "z_score": -1.9173232625977832,
+      "percentile": 0.0
+    }
+  ],
+  "meta": {
+    "topk_error": 5.626222593634807,
+    "tolerated_error": 0.1,
+    "comparisons_attempted": 120,
+    "comparisons_used": 120,
+    "comparisons_refused": 0,
+    "comparisons_cached": 18,
+    "comparison_budget": 120,
+    "latency_ms": 68918,
+    "model_used": "anthropic/claude-sonnet-4.6",
+    "rater_id_used": "anthropic/claude-sonnet-4.6",
+    "provider_input_tokens": 41504,
+    "provider_output_tokens": 14641,
+    "provider_cost_nanodollars": 344127000,
+    "provider_cost_is_estimate": false,
+    "pairs_counterbalanced": 51,
+    "position_flips": 11,
+    "stop_reason": "budget_exhausted"
+  },
+  "probes": [
+    {
+      "attribute_id": "sort_opposite",
+      "prompt": "lack of usefulness as advice for a software engineer",
+      "kind": "opposite",
+      "consistency": 0.8095238095238095
+    },
+    {
+      "attribute_id": "sort_alt1",
+      "prompt": "how much practical value it offers someone building software",
+      "kind": "paraphrase",
+      "consistency": 0.34731161595484505
+    }
+  ]
+}

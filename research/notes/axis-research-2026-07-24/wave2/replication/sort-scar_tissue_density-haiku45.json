@@ -1,0 +1,137 @@
+{
+  "items": [
+    {
+      "id": "item-0006",
+      "text": "The re-embedding pass billed out at $6,140 against a back-of-envelope estimate of $600; tokenizer overhead on Japanese text runs close to three characters per token, and nobody had checked what fraction of the corpus was Japanese.",
+      "rank": 1,
+      "latent_mean": 1.8822148918509602,
+      "latent_std": 1.6107718855779598,
+      "z_score": 1.0066749172169203,
+      "percentile": 0.9583333333333334
+    },
+    {
+      "id": "item-0009",
+      "text": "Hold the bisque ramp for a soak at 573 degrees; quartz inversion sits right there, and the schedule printed in the kiln manual assumes a clay body we don't use — a full shelf of cracked ware established that before anyone reread the appendix.",
+      "rank": 2,
+      "latent_mean": 1.8050421107936399,
+      "latent_std": 1.2431605237133714,
+      "z_score": 0.9121461751693517,
+      "percentile": 0.875
+    },
+    {
+      "id": "item-0003",
+      "text": "Chunk the uploads at 97 MB, not 100: the proxy kills requests at 120 seconds, and the last few megabytes of a 100 MB part kept crossing that line on hotel wifi, which is exactly where sales runs the demo.",
+      "rank": 3,
+      "latent_mean": 1.513857926889388,
+      "latent_std": 1.6206054176309845,
+      "z_score": 0.5554754133864858,
+      "percentile": 0.7916666666666666
+    },
+    {
+      "id": "item-0000",
+      "text": "Cap the reconnect backoff at 47 seconds, not the default 60: the load balancer recycles idle streams at 50, and a 60-second cap herds every client into the same retry slot.",
+      "rank": 4,
+      "latent_mean": 1.330385770656833,
+      "latent_std": 1.6643631156563634,
+      "z_score": 0.3307408386853809,
+      "percentile": 0.7083333333333334
+    },
+    {
+      "id": "item-0007",
+      "text": "The greenhouse fans run on a timer plus a humidity override; getting the override threshold right took a few tries because mornings behaved differently than the spec sheet suggested.",
+      "rank": 5,
+      "latent_mean": 1.3128554485392934,
+      "latent_std": 1.5205195892568373,
+      "z_score": 0.30926799198015653,
+      "percentile": 0.625
+    },
+    {
+      "id": "item-0010",
+      "text": "I spent an afternoon chasing a flaky test that turned out to be timezone-dependent; it only failed between 5 and 6 PM our time. Annoying, but a known class of bug once you've seen it.",
+      "rank": 6,
+      "latent_mean": 1.130902784529343,
+      "latent_std": 1.028272145465589,
+      "z_score": 0.08639463941444657,
+      "percentile": 0.5416666666666666
+    },
+    {
+      "id": "item-0005",
+      "text": "In fifteen years of consulting I've watched the same movie a hundred times: the startup that lost everything in one bad deploy, the bank that skipped code review, the team that never wrote tests. Every one of them paid ten times over for the shortcut.",
+      "rank": 7,
+      "latent_mean": 0.9898385019071934,
+      "latent_std": 1.6499700152926964,
+      "z_score": -0.08639463941444685,
+      "percentile": 0.4583333333333333
+    },
+    {
+      "id": "item-0001",
+      "text": "I'll never forget the night our main database crashed at 3 AM. We lost 10,000 records, traffic was up 500%, and I debugged for 48 hours straight before finding the missing index. That outage taught me more than any course ever did.",
+      "rank": 8,
+      "latent_mean": 0.5310473737782346,
+      "latent_std": 1.1986947332542788,
+      "z_score": -0.6483667183058741,
+      "percentile": 0.375
+    },
+    {
+      "id": "item-0002",
+      "text": "We migrated the billing service to Postgres last quarter; the tricky part was the JSON columns, which took about two weeks longer than planned. Nothing dramatic, just a lot of careful backfills.",
+      "rank": 9,
+      "latent_mean": 0.4883923068444981,
+      "latent_std": 1.4981760351768159,
+      "z_score": -0.7006148006473161,
+      "percentile": 0.2916666666666667
+    },
+    {
+      "id": "item-0011",
+      "text": "Switching the docs site to a static generator cut deploy times from around ten minutes to under two. Configuration was mostly straightforward; the search plugin needed some fiddling.",
+      "rank": 10,
+      "latent_mean": 0.4470980293524406,
+      "latent_std": 0.7359437378793493,
+      "z_score": -0.7511960554836304,
+      "percentile": 0.20833333333333334
+    },
+    {
+      "id": "item-0008",
+      "text": "Great bread starts with quality flour and patience. Respect the fermentation process, keep your tools clean, and the results will speak for themselves.",
+      "rank": 11,
+      "latent_mean": 0.2557598603594995,
+      "latent_std": 1.376853335549592,
+      "z_score": -0.9855656890873961,
+      "percentile": 0.125
+    },
+    {
+      "id": "item-0004",
+      "text": "Reliable systems come from good monitoring, thorough testing, and a culture of ownership. Invest in observability early and problems will surface before customers ever notice them.",
+      "rank": 12,
+      "latent_mean": 0.0,
+      "latent_std": 1.6643631156563634,
+      "z_score": -1.2988452876039762,
+      "percentile": 0.041666666666666664
+    }
+  ],
+  "meta": {
+    "topk_error": 9.296051783309208,
+    "tolerated_error": 0.1,
+    "comparisons_attempted": 24,
+    "comparisons_used": 24,
+    "comparisons_refused": 0,
+    "comparisons_cached": 0,
+    "comparison_budget": 24,
+    "latency_ms": 13748,
+    "model_used": "anthropic/claude-haiku-4.5",
+    "rater_id_used": "anthropic/claude-haiku-4.5",
+    "provider_input_tokens": 12508,
+    "provider_output_tokens": 6856,
+    "provider_cost_nanodollars": 46788000,
+    "provider_cost_is_estimate": false,
+    "entities_pruned": 0,
+    "pairs_counterbalanced": 12,
+    "position_flips": 1,
+    "evidence_judgements": 0,
+    "logprob_mode_judgements": 0,
+    "evidence_visible_mass_mean": null,
+    "evidence_order_residual_mean_abs": 0.3231600306573436,
+    "judgement_frustration_mean": 0.0069162355862130665,
+    "stop_reason": "budget_exhausted"
+  }
+}

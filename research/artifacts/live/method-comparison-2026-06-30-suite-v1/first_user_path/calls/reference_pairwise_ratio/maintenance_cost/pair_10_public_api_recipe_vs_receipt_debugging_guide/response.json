@@ -1,0 +1,46 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "I need to evaluate which item has lower maintenance cost (cheaper to maintain as code and models evolve).\n\n**A (public_api_recipe):** A minimal library example using specific API constructs (MultiRerankRequest, model policy, attribute runner, report emitter). This is tightly coupled to the library's API surface. As the library evolves, class names, method signatures, and report formats may change, requiring updates to this example. It's code-dependent and will need maintenance whenever the API changes.\n\n**B (receipt_debugging_guide):** A troubleshooting guide covering conceptual issues: cache misses, model refusals, cost estimates, non-convergence, inconsistent pairwise judgments. These are relatively stable, high-level concepts. While some details might evolve (e.g., specific error messages, cost structures), the core troubleshooting logic around these phenomena is fairly timeless. Conceptual documentation tends to age better than code examples tied to specific APIs.\n\n**Comparison:**\n- A is directly tied to specific API class names and method calls that will break or become outdated as the library evolves\n- B addresses conceptual/behavioral issues that are more stable across versions\n- B requires less frequent updates as models and code change\n- The gap is meaningful but not extreme \u2014 B is moderately more maintainable\n\nI'd estimate B is roughly 3-4x cheaper to maintain than A.\n\n```json\n{\"higher_id\":\"receipt_debugging_guide\",\"ratio\":3.5,\"confidence\":0.72}\n```",
+        "reasoning": null,
+        "refusal": null,
+        "role": "assistant"
+      },
+      "native_finish_reason": "end_turn"
+    }
+  ],
+  "created": 1782861951,
+  "id": "gen-1782861951-nmdNw94rprKjKC1q6ksN",
+  "model": "anthropic/claude-4.6-sonnet-20260217",
+  "object": "chat.completion",
+  "provider": "Anthropic",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 340,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.005751,
+    "cost_details": {
+      "upstream_inference_completions_cost": 0.0051,
+      "upstream_inference_cost": 0.005751,
+      "upstream_inference_prompt_cost": 0.000651
+    },
+    "is_byok": false,
+    "prompt_tokens": 217,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 557
+  }
+}

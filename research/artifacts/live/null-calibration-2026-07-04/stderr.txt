@@ -1,0 +1,2 @@
+null-pair calibration: identical text in both slots — a perfect judge answers parity; directional mass is pure position+letter artifact
+wrote 4 reports to artifacts/live/null-calibration-2026-07-04/reports.jsonl

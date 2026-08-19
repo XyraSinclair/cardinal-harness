@@ -6,8 +6,8 @@
 //! into the `llmsort` crate only after its evidence pack earns it.
 //!
 //! Evidence packs, campaign definitions, dated notes, and structured
-//! judgements live in the cold archive:
-//! <https://github.com/XyraSinclair/llmsort-lab>.
+//! judgements live in this repo's `research/` directory; `PROGRAM.md`
+//! at the repo root indexes every method as a rung with its pack.
 
 pub mod anp;
 pub mod bench;

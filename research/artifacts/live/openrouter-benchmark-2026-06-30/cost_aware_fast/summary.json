@@ -1,0 +1,174 @@
+{
+  "case_count": 3,
+  "cases": [
+    {
+      "cache_export": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/cost_aware_fast/public_evidence_surfaces/cache-export.jsonl",
+      "cache_rows": 45,
+      "case": "public_evidence_surfaces",
+      "comparison_budget": 72,
+      "comparisons_attempted": 45,
+      "comparisons_cached": 0,
+      "comparisons_refused": 0,
+      "comparisons_used": 45,
+      "description": "Rank current cardinal-harness documentation surfaces by public-release evidence value.",
+      "global_topk_error": 3.217605417196167,
+      "model_used": "deepseek/deepseek-v4-flash",
+      "policy": "cost_aware_fast_deepseek_v4_flash",
+      "provider_cost_is_estimate": false,
+      "provider_cost_nanodollars": 8822069,
+      "provider_cost_usd": 0.008822069,
+      "provider_input_tokens": 23718,
+      "provider_output_tokens": 21154,
+      "report": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/cost_aware_fast/public_evidence_surfaces/report.md",
+      "request": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/cost_aware_fast/public_evidence_surfaces/request.json",
+      "response": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/cost_aware_fast/public_evidence_surfaces/response.json",
+      "stop_reason": "no_new_pairs",
+      "top_entities": [
+        {
+          "id": "evaluation_doc",
+          "p_flip": 0.4508618930616959,
+          "rank": 1,
+          "u_mean": 3.211053629967467,
+          "u_std": 1.710162256794822
+        },
+        {
+          "id": "worked_example",
+          "p_flip": 0.45833780973416427,
+          "rank": 2,
+          "u_mean": 3.1361769348027586,
+          "u_std": 1.6203219068944716
+        },
+        {
+          "id": "readme",
+          "p_flip": 0.5,
+          "rank": 3,
+          "u_mean": 2.7824664280601716,
+          "u_std": 1.7611587453766686
+        }
+      ],
+      "trace": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/cost_aware_fast/public_evidence_surfaces/trace.jsonl",
+      "trace_cost_estimate_rows": 0,
+      "trace_cost_nanodollars": 8822069,
+      "trace_cost_usd": 0.008822069,
+      "trace_models": [
+        "deepseek/deepseek-v4-flash"
+      ],
+      "trace_rows": 45
+    },
+    {
+      "cache_export": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/cost_aware_fast/model_policy_live_routing/cache-export.jsonl",
+      "cache_rows": 45,
+      "case": "model_policy_live_routing",
+      "comparison_budget": 72,
+      "comparisons_attempted": 45,
+      "comparisons_cached": 0,
+      "comparisons_refused": 0,
+      "comparisons_used": 45,
+      "description": "Rank candidate OpenRouter routing policies for a real public benchmark run.",
+      "global_topk_error": 2.8783549449423718,
+      "model_used": "deepseek/deepseek-v4-flash",
+      "policy": "cost_aware_fast_deepseek_v4_flash",
+      "provider_cost_is_estimate": false,
+      "provider_cost_nanodollars": 6775553,
+      "provider_cost_usd": 0.006775553,
+      "provider_input_tokens": 24085,
+      "provider_output_tokens": 14294,
+      "report": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/cost_aware_fast/model_policy_live_routing/report.md",
+      "request": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/cost_aware_fast/model_policy_live_routing/request.json",
+      "response": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/cost_aware_fast/model_policy_live_routing/response.json",
+      "stop_reason": "no_new_pairs",
+      "top_entities": [
+        {
+          "id": "frontier_ladder_2026_06",
+          "p_flip": 0.433103356146072,
+          "rank": 1,
+          "u_mean": 3.028804817687789,
+          "u_std": 1.7545405040016273
+        },
+        {
+          "id": "quality_only_opus_46",
+          "p_flip": 0.5,
+          "rank": 2,
+          "u_mean": 2.4269146300816242,
+          "u_std": 1.8181880237896086
+        }
+      ],
+      "trace": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/cost_aware_fast/model_policy_live_routing/trace.jsonl",
+      "trace_cost_estimate_rows": 0,
+      "trace_cost_nanodollars": 6775553,
+      "trace_cost_usd": 0.006775553,
+      "trace_models": [
+        "deepseek/deepseek-v4-flash"
+      ],
+      "trace_rows": 45
+    },
+    {
+      "cache_export": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/cost_aware_fast/public_release_risks/cache-export.jsonl",
+      "cache_rows": 63,
+      "case": "public_release_risks",
+      "comparison_budget": 84,
+      "comparisons_attempted": 63,
+      "comparisons_cached": 0,
+      "comparisons_refused": 0,
+      "comparisons_used": 63,
+      "description": "Rank remaining public-release risks by credibility impact and actionability.",
+      "global_topk_error": 4.636453708763214,
+      "model_used": "deepseek/deepseek-v4-flash",
+      "policy": "cost_aware_fast_deepseek_v4_flash",
+      "provider_cost_is_estimate": false,
+      "provider_cost_nanodollars": 14262637,
+      "provider_cost_usd": 0.014262637,
+      "provider_input_tokens": 34936,
+      "provider_output_tokens": 37268,
+      "report": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/cost_aware_fast/public_release_risks/report.md",
+      "request": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/cost_aware_fast/public_release_risks/request.json",
+      "response": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/cost_aware_fast/public_release_risks/response.json",
+      "stop_reason": "no_new_pairs",
+      "top_entities": [
+        {
+          "id": "no_large_live_receipt",
+          "p_flip": 0.41182151408219114,
+          "rank": 1,
+          "u_mean": 4.83709324142081,
+          "u_std": 3.868887225832574
+        },
+        {
+          "id": "cache_provenance",
+          "p_flip": 0.4574566134331466,
+          "rank": 2,
+          "u_mean": 3.941927454913098,
+          "u_std": 3.49480119788175
+        },
+        {
+          "id": "provider_metadata_drift",
+          "p_flip": 0.5,
+          "rank": 3,
+          "u_mean": 3.1938605497375008,
+          "u_std": 3.5068214633671944
+        }
+      ],
+      "trace": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/cost_aware_fast/public_release_risks/trace.jsonl",
+      "trace_cost_estimate_rows": 0,
+      "trace_cost_nanodollars": 14262637,
+      "trace_cost_usd": 0.014262637,
+      "trace_models": [
+        "deepseek/deepseek-v4-flash"
+      ],
+      "trace_rows": 63
+    }
+  ],
+  "out_dir": "/Users/xyra/Documents/labs/cardinal-harness/artifacts/live/openrouter-benchmark-2026-06-30/cost_aware_fast",
+  "policy": "cost_aware_fast_deepseek_v4_flash",
+  "policy_config": "examples/model-policy-cost-aware-fast.json",
+  "totals": {
+    "comparisons_cached": 0,
+    "comparisons_refused": 0,
+    "comparisons_used": 153,
+    "provider_cost_nanodollars": 29860259,
+    "provider_cost_usd": 0.029860259,
+    "provider_input_tokens": 82739,
+    "provider_output_tokens": 72716,
+    "trace_cost_estimate_rows": 0,
+    "trace_rows": 153
+  }
+}

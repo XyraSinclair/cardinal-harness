@@ -1,0 +1,58 @@
+{
+  "attributes": [
+    {
+      "id": "public_readiness",
+      "prompt": "public-readiness for a serious technical reader deciding whether this artifact is worth sharing widely",
+      "prompt_template_slug": "canonical_v2",
+      "weight": 0.4
+    },
+    {
+      "id": "evidence_value",
+      "prompt": "strength of concrete, reproducible evidence rather than narrative assertion",
+      "prompt_template_slug": "canonical_bucket_v1",
+      "weight": 0.35
+    },
+    {
+      "id": "operator_reproducibility",
+      "prompt": "ability for another engineer to rerun, audit, and falsify the claim from the documented commands and artifacts",
+      "prompt_template_slug": "canonical_v2",
+      "weight": 0.25
+    }
+  ],
+  "comparison_budget": 72,
+  "comparison_concurrency": 4,
+  "entities": [
+    {
+      "id": "readme",
+      "text": "README.md: public entry point. States cardinal-harness is a canonical list-sorting/reranking engine, explains the tradeoff versus scalar scoring, gives CLI examples, links algorithm, prompt, model, worked-example, evaluation, and benchmark docs."
+    },
+    {
+      "id": "evaluation_doc",
+      "text": "docs/EVALUATION.md: checked-in evidence receipt. Separates synthetic/offline receipts from live LLM claims, lists reproducible commands, metric definitions, current cardinal-vs-Likert table, known gaps, and next empirical proof target."
+    },
+    {
+      "id": "prompts_doc",
+      "text": "docs/PROMPTS.md: prompt contract. Documents canonical_v2 and canonical_bucket_v1 output schemas, ratio ladder, refusal shape, OpenRouter logprob constraints, model-policy recipes, and experiment expansion commands."
+    },
+    {
+      "id": "worked_example",
+      "text": "docs/WORKED_EXAMPLE.md: concrete walkthrough. Shows request JSON, command lines, response interpretation, trace/report/cache receipts, replay, and what files to preserve for auditability."
+    },
+    {
+      "id": "model_doc",
+      "text": "docs/MODEL.md: mathematical contract. Explains Bradley-Terry style latent score fitting, ratio observations, uncertainty, top-k stopping, gates, assumptions, and failure modes."
+    },
+    {
+      "id": "benchmarks_doc",
+      "text": "docs/BENCHMARKS.md: scaling receipt. Reports local solver scaling, machine metadata, benchmark command, dense solver caveats, and what the numbers do and do not prove."
+    }
+  ],
+  "gates": [],
+  "max_pair_repeats": 1,
+  "randomize_presentation_order": true,
+  "rater_id": "live-openrouter-public_evidence_surfaces",
+  "topk": {
+    "k": 3,
+    "tolerated_error": 0.08
+  }
+}

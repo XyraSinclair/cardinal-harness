@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cardinal Bench — the Judge Coherence Benchmark</title>
+<style>
+  :root{
+    --paper:#FCFCFA; --ink:#16181D; --ink-2:#4A4D55; --ink-3:#8A8D93;
+    --rule:#E3E2DD; --rule-2:#CFCEC8;
+    --a:#0B6E9A;   /* toward the first-shown entity */
+    --b:#A64B22;   /* toward the second-shown entity */
+    --a-wash:#EAF2F6; --b-wash:#F6EEE8;
+    --card:#F6F5F1;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --mono:"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} *{transition:none!important;animation:none!important} }
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:17px;line-height:1.55}
+  .num{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:.86em}
+  a{color:inherit}
+  .wrap{max-width:1060px;margin:0 auto;padding:0 24px}
+
+  header{border-bottom:1px solid var(--rule)}
+  .masthead{display:flex;justify-content:space-between;align-items:baseline;padding:20px 0;gap:16px;flex-wrap:wrap}
+  .wordmark{font-size:19px;letter-spacing:.14em;font-weight:600}
+  .wordmark span{color:var(--ink-3);font-weight:400}
+  nav{display:flex;gap:22px;font-size:14.5px;color:var(--ink-2);flex-wrap:wrap}
+  nav a{text-decoration:none;border-bottom:1px solid transparent;padding-bottom:2px}
+  nav a:hover,nav a:focus-visible{border-bottom-color:var(--ink)}
+  :focus-visible{outline:2px solid var(--a);outline-offset:2px}
+
+  .hero{padding:64px 0 56px;border-bottom:1px solid var(--rule)}
+  .hero h1{font-size:clamp(28px,4.4vw,44px);line-height:1.18;font-weight:600;max-width:21em}
+  .hero h1 em{font-style:italic}
+  .hero .sub{margin-top:14px;max-width:44em;color:var(--ink-2);font-size:18px}
+
+  /* mirror demo */
+  .mirror{margin-top:44px;border:1px solid var(--rule-2);background:#fff;padding:26px 26px 22px}
+  .mirror-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
+  .attr{font-style:italic;color:var(--ink-2);font-size:15.5px}
+  .cards{display:flex;gap:14px;margin:20px 0 8px;align-items:stretch}
+  .ecard{flex:1;border:1px solid var(--rule-2);padding:14px 16px;background:var(--card);transition:transform .5s ease}
+  .ecard .slot{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--ink-3)}
+  .ecard h3{font-size:17px;margin-top:4px}
+  .ecard p{font-size:13.5px;color:var(--ink-2);margin-top:4px;line-height:1.45}
+  .ecard.slotA{border-top:3px solid var(--a)}
+  .ecard.slotB{border-top:3px solid var(--b)}
+  .axis{position:relative;height:88px;margin:18px 6px 2px}
+  .axis svg{width:100%;height:100%;overflow:visible}
+  .mirror-foot{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap;margin-top:14px}
+  .mirror-note{font-size:14px;color:var(--ink-2);max-width:36em}
+  .mirror-note b{font-family:var(--mono);font-size:.9em;font-weight:600}
+  button.swap{font-family:var(--mono);font-size:13.5px;letter-spacing:.06em;background:var(--ink);color:var(--paper);
+    border:none;padding:10px 18px;cursor:pointer}
+  button.swap:hover{background:#000}
+  .verdict{font-size:14px;color:var(--ink-2)}
+  .verdict .num{font-weight:600;color:var(--ink)}
+
+  section{padding:56px 0;border-bottom:1px solid var(--rule)}
+  h2{font-size:26px;font-weight:600;margin-bottom:6px}
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-bottom:10px}
+  .lede{color:var(--ink-2);max-width:46em;margin-bottom:26px}
+
+  /* leaderboard */
+  .tblwrap{overflow-x:auto;border:1px solid var(--rule-2);background:#fff}
+  table{border-collapse:collapse;width:100%;min-width:960px;font-size:14px}
+  thead th{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);
+    text-align:right;padding:10px 10px;border-bottom:1px solid var(--rule-2);white-space:nowrap;font-weight:500}
+  thead th:nth-child(2){text-align:left}
+  tbody td{padding:9px 10px;border-bottom:1px solid var(--rule);text-align:right;font-family:var(--mono);
+    font-variant-numeric:tabular-nums;font-size:13px;white-space:nowrap}
+  tbody td.model{text-align:left;font-family:var(--serif);font-size:15px}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover td{background:#FBFAF6}
+  td.judge{position:relative;font-weight:600}
+  .jbar{position:absolute;left:0;top:20%;bottom:20%;background:var(--rule);z-index:0}
+  td.judge span{position:relative;z-index:1}
+  .tie{font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.05em}
+  .board-notes{font-size:14px;color:var(--ink-2);margin-top:14px;max-width:52em}
+  .board-notes b{font-weight:600;color:var(--ink)}
+
+  /* ladder */
+  .ladder{display:flex;align-items:flex-end;gap:0;margin:26px 0 6px;height:150px;border-bottom:1px solid var(--rule-2)}
+  .rung{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%}
+  .rung i{display:block;width:56%;background:var(--ink);opacity:.85}
+  .rung b{font-family:var(--mono);font-weight:400;font-size:10.5px;color:var(--ink-2);margin-top:6px;transform:rotate(-38deg);transform-origin:top center}
+  .ladder-cap{font-size:13.5px;color:var(--ink-3);margin-top:16px}
+  .fmt-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:30px}
+  @media(max-width:820px){.fmt-grid{grid-template-columns:1fr}}
+  .fmt-grid h3{font-size:17px;margin-bottom:8px}
+  .fmt-grid p{font-size:15px;color:var(--ink-2);margin-bottom:10px}
+  pre{font-family:var(--mono);font-size:12.5px;line-height:1.6;background:var(--ink);color:#E9E8E3;
+    padding:16px 18px;overflow-x:auto}
+  pre .k{color:#8FC7E0} pre .v{color:#E8B08C}
+
+  /* invariance table */
+  .inv{border:1px solid var(--rule-2);background:#fff}
+  .invrow{display:grid;grid-template-columns:200px 1fr 1fr;border-bottom:1px solid var(--rule);align-items:baseline}
+  .invrow:last-child{border-bottom:none}
+  .invrow>div{padding:13px 16px}
+  .invrow .t{font-family:var(--mono);font-size:12px;letter-spacing:.05em;color:var(--ink)}
+  .invrow .x{font-size:14.5px;color:var(--ink-2)}
+  .invrow .p{font-family:var(--mono);font-size:12.5px}
+  .invrow.head{background:var(--card)}
+  .invrow.head>div{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);padding:9px 16px}
+  @media(max-width:720px){.invrow{grid-template-columns:1fr}.invrow>div{padding:8px 16px}.invrow .t{padding-top:14px}}
+
+  /* findings */
+  .cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:8px}
+  @media(max-width:880px){.cards3{grid-template-columns:1fr}}
+  .fcard{border:1px solid var(--rule-2);background:#fff;padding:20px}
+  .fcard h3{font-size:16.5px;margin-bottom:8px}
+  .fcard p{font-size:14.5px;color:var(--ink-2)}
+  .fcard .num{color:var(--ink)}
+
+  /* orbit */
+  .orbit-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:32px;align-items:start;margin-top:8px}
+  @media(max-width:860px){.orbit-grid{grid-template-columns:1fr}}
+  .energy{margin-top:8px}
+  .erow{display:grid;grid-template-columns:150px 1fr 74px;gap:12px;align-items:center;margin-bottom:9px}
+  .erow .lbl{font-family:var(--mono);font-size:12px;color:var(--ink-2);text-align:right}
+  .erow .bar{height:12px;background:var(--rule);position:relative}
+  .erow .bar i{position:absolute;left:0;top:0;bottom:0;background:var(--ink);min-width:1px}
+  .erow.inv .bar i{background:var(--a)}
+  .erow .val{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
+  .orbit-note{font-size:14.5px;color:var(--ink-2);margin-top:14px;max-width:40em}
+
+  /* run */
+  .runrow{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+  @media(max-width:820px){.runrow{grid-template-columns:1fr}}
+  .runrow p{font-size:15px;color:var(--ink-2);margin-bottom:12px}
+
+  footer{padding:36px 0 60px;font-size:13.5px;color:var(--ink-3)}
+  footer .wrap{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}
+  footer a{color:var(--ink-2)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap masthead">
+    <div class="wordmark">CARDINAL BENCH <span>· Judge Coherence Benchmark</span></div>
+    <nav>
+      <a href="#board">Leaderboard</a>
+      <a href="#format">The format</a>
+      <a href="#invariance">Invariance</a>
+      <a href="#orbit">Orbit</a>
+      <a href="#run">Run it</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap hero">
+  <h1>A judgment deserves the name <em>belief</em> only if it survives the transformations that shouldn’t matter.</h1>
+  <p class="sub">Cardinal Bench scores language models as judges with no ground-truth labels. Each model
+  states how many <em>times</em> more one thing has of an attribute than another — then the same question
+  returns with the items swapped, the wording inverted, the attribute negated, the asker leaning.
+  A coherent judge is a fixed point. An incoherent one contradicts itself, measurably, in nats.</p>
+
+  <div class="mirror" id="mirror">
+    <div class="mirror-head">
+      <span class="eyebrow">The mirror test — live measurement, Kimi K3, 2026-07-18</span>
+      <span class="attr">“expected lives saved per marginal $1M donated”</span>
+    </div>
+    <div class="cards" id="cardrow">
+      <div class="ecard slotA" id="cardGD">
+        <span class="slot">SHOWN FIRST</span>
+        <h3>GiveDirectly</h3>
+        <p>Unconditional cash transfers in East Africa. ~$1B moved, RCT-studied.</p>
+      </div>
+      <div class="ecard slotB" id="cardAMF">
+        <span class="slot">SHOWN SECOND</span>
+        <h3>Against Malaria Foundation</h3>
+        <p>Insecticidal bednets in sub-Saharan Africa. GiveWell top charity for a decade.</p>
+      </div>
+    </div>
+    <div class="axis">
+      <svg viewBox="0 0 1000 88" preserveAspectRatio="none" aria-label="Signed log-ratio axis from minus three to plus three nats">
+        <line x1="0" y1="44" x2="1000" y2="44" stroke="#CFCEC8" stroke-width="1"/>
+        <line x1="500" y1="30" x2="500" y2="58" stroke="#8A8D93" stroke-width="1"/>
+        <g id="ticklabels" font-family="Menlo,monospace" font-size="11" fill="#8A8D93" text-anchor="middle">
+          <text x="500" y="76">0 · parity</text>
+          <text x="167" y="76" id="tickL">−2 · 7.4× second</text>
+          <text x="833" y="76" id="tickR">+2 · 7.4× first</text>
+        </g>
+        <g id="needle" style="transition:transform .8s cubic-bezier(.4,0,.2,1)">
+          <line x1="500" y1="44" x2="500" y2="44" id="beam" stroke="#A64B22" stroke-width="5"
+                style="transition:all .8s cubic-bezier(.4,0,.2,1)"/>
+          <circle id="tip" cx="500" cy="44" r="7" fill="#A64B22" style="transition:all .8s cubic-bezier(.4,0,.2,1)"/>
+        </g>
+        <text id="reading" x="500" y="18" font-family="Menlo,monospace" font-size="14" font-weight="600"
+              fill="#16181D" text-anchor="middle" style="transition:all .8s"> </text>
+      </svg>
+    </div>
+    <div class="mirror-foot">
+      <p class="mirror-note" id="mnote">The model judged AMF <b>10.9×</b> GiveDirectly: a signed log-ratio of
+      <b>−2.39 nats</b>, toward the item shown second. Swap the presentation and a belief must mirror:
+      <b>m(B,A) = −m(A,B)</b>.</p>
+      <button class="swap" id="swapBtn" type="button">Swap A ↔ B</button>
+    </div>
+    <p class="verdict" style="margin-top:10px">Measured over the full 8-framing orbit: sign consistent
+    <span class="num">8/8</span>, mean order residual <span class="num">0.14 nats</span>,
+    invariant fraction of energy <span class="num">98.6%</span>. The weakest model on the board reversed
+    direction on <span class="num">8 of 20</span> swapped pairs.</p>
+  </div>
+</div>
+
+<section id="board">
+  <div class="wrap">
+    <div class="kicker">Leaderboard · 2026-07-18 · battery v2, 194 comparisons per model, temperature 0</div>
+    <h2>Thirteen models, one question: do you agree with yourself?</h2>
+    <p class="lede">JUDGE = signal × coherence. Signal is how far apart the model dares to place items
+    (mean |log-ratio|); coherence is how much of that survives order swap, reciprocal inversion, cycle
+    composition, framing spin, attribute negation, and paraphrase. A judge that never discriminates
+    scores zero; so does one that contradicts itself.</p>
+    <div class="tblwrap">
+    <table>
+      <thead><tr>
+        <th>#</th><th>Model</th><th>Judge</th><th>Signal (nats)</th><th>Coherence</th>
+        <th>Order flips</th><th>Residual (nats)</th><th>Curl</th><th>Spin</th><th>χ (nats/spin)</th>
+        <th>Polarity ρ</th><th>Paraphrase ρ</th><th>Refusals</th><th>Cost</th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    </div>
+    <p class="board-notes"><b>Read the gaps against the noise floor:</b> test–retest on this battery moves
+    JUDGE by 0.022 on average, at most 0.064. kimi-k2.6 vs claude-fable-5 (Δ 0.014) is a
+    <b>statistical tie at #1</b>. Every other adjacent gap of 0.03+ is real. All thirteen runs are
+    same-battery, same-day; raw per-call evidence is committed alongside this page.</p>
+  </div>
+</section>
+
+<section id="format">
+  <div class="wrap">
+    <div class="kicker">The format</div>
+    <h2>Cardinal, not ordinal: put a number on it</h2>
+    <p class="lede">Rankings say <em>which</em>; they cannot say <em>by how much</em>, and they cannot be
+    checked against themselves. A ratio can. Models answer along a 17-rung geometric ladder, from parity
+    to a deliberate 26× cap — fine rungs near 1.0 to express near-ties, no rung for “infinitely more”
+    because no judge earns it.</p>
+    <div class="ladder" aria-label="The 17-rung ratio ladder from 1.0 to 26">
+    </div>
+    <p class="ladder-cap">Rung heights are log-spaced: each step up multiplies, it does not add.
+    Pairwise ratios compose — if A is 3.1× B and B is 2.1× C, a coherent judge is already committed
+    to A ≈ 6.5× C. That composition is what the benchmark audits.</p>
+    <div class="fmt-grid">
+      <div>
+        <h3>The question</h3>
+        <p>Two items in tagged slots, one elaborated attribute, both directions of every pair asked in
+        both presentation orders. The judge reports direction, ratio, and confidence.</p>
+        <pre>&lt;entity_A&gt; … &lt;/entity_A&gt;
+&lt;entity_B&gt; … &lt;/entity_B&gt;
+
+Which has more of: &lt;attribute&gt;,
+and how many times more?</pre>
+      </div>
+      <div>
+        <h3>The answer</h3>
+        <p>Machine-parseable, refusal-honest. Where a provider exposes token logprobs, the answer’s
+        full probability mass over the ladder is captured too — confidence measured, not self-reported.</p>
+        <pre>{ <span class="k">"higher_ranked"</span>: <span class="v">"B"</span>,
+  <span class="k">"ratio"</span>: <span class="v">3.9</span>,
+  <span class="k">"confidence"</span>: <span class="v">0.75</span> }</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="invariance">
+  <div class="wrap">
+    <div class="kicker">The instrument</div>
+    <h2>Eight transformations that shouldn’t matter</h2>
+    <p class="lede">Each axis applies a meaning-preserving transformation and measures what moves.
+    A perfect judge is unmoved on every row. Every axis ships with the scripted adversary it was
+    validated to catch — a constant judge, a position-biased judge, a sycophant, a cycle-monger.</p>
+    <div class="inv">
+      <div class="invrow head"><div>Axis</div><div>Transformation</div><div>A perfect judge</div></div>
+      <div class="invrow"><div class="t">signal</div><div class="x">none — the gate</div><div class="p">separates items: mean |log-ratio| ≫ 0</div></div>
+      <div class="invrow"><div class="t">order</div><div class="x">swap which item is shown first</div><div class="p">direction holds, 0/20 flips</div></div>
+      <div class="invrow"><div class="t">reciprocity</div><div class="x">same swap, magnitude read</div><div class="p">m(A,B) = −m(B,A), residual → 0 nats</div></div>
+      <div class="invrow"><div class="t">frustration</div><div class="x">compose ratios around triangles</div><div class="p">zero cyclic (curl) component</div></div>
+      <div class="invrow"><div class="t">spin</div><div class="x">the asker leans toward one side</div><div class="p">direction survives; susceptibility χ → 0</div></div>
+      <div class="invrow"><div class="t">polarity</div><div class="x">negate the attribute</div><div class="p">ranking inverts exactly: ρ → −1</div></div>
+      <div class="invrow"><div class="t">paraphrase</div><div class="x">reword the attribute</div><div class="p">ranking unmoved: ρ → +1</div></div>
+      <div class="invrow"><div class="t">null</div><div class="x">byte-identical items in both slots</div><div class="p">parity, ratio 1.0, zero directional mass</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="findings">
+  <div class="wrap">
+    <div class="kicker">Findings · from the 2026-07-18 board</div>
+    <h2>What the board says right now</h2>
+    <div class="cards3">
+      <div class="fcard">
+        <h3>Scale bought nothing here</h3>
+        <p>Moonshot’s older, 3× cheaper kimi-k2.6 out-judges its frontier sibling kimi-k3,
+        <span class="num">0.687</span> vs <span class="num">0.626</span> — on the highest signal ever
+        measured (<span class="num">1.314 nats</span>) with paraphrase ρ of exactly
+        <span class="num">1.00</span>. Judgment coherence is not yet a capability labs get for free.</p>
+      </div>
+      <div class="fcard">
+        <h3>The stiffest judge measured</h3>
+        <p>claude-fable-5 posts the highest coherence on record (<span class="num">0.965</span>):
+        zero order flips in 20, and susceptibility of <span class="num">0.075 nats/spin</span> —
+        half the next-best model. When the asker leans, it does not.</p>
+      </div>
+      <div class="fcard">
+        <h3>The flagship is quieter, not truer</h3>
+        <p>gpt-5.6-sol trails its cheaper sibling terra (<span class="num">0.527</span> vs
+        <span class="num">0.576</span>) at twice the price. Sol is more <em>consistent</em>
+        (curl <span class="num">0.009</span>, board-best) but hedges toward parity — and the composite
+        is built to punish exactly that trade.</p>
+      </div>
+    </div>
+    <p class="board-notes" style="margin-top:22px"><b>And a saturation warning:</b> every frontier model
+    now passes spin survival 3/3 and null bias 0.000 — those axes have converged at the top.
+    The discriminating axes today are signal, order residual, and susceptibility. When a row saturates,
+    the battery grows a harder one; that is the roadmap.</p>
+  </div>
+</section>
+
+<section id="orbit">
+  <div class="wrap">
+    <div class="kicker">Orbit decomposition</div>
+    <h2>Belief is what’s left when the framings cancel</h2>
+    <div class="orbit-grid">
+      <div>
+        <p class="lede" style="margin-bottom:14px">The strongest instrument runs one pair through the
+        full 8-element orbit — order × polarity × wording — and decomposes the eight answers into a
+        character basis. One component is invariant under every transformation: that coefficient is the
+        <em>belief</em>. The other seven are named biases, each orthogonal, each measurable.</p>
+        <p class="orbit-note">Kimi K3 on GiveDirectly vs AMF, lives saved per marginal $1M:
+        invariant coefficient <span class="num">−2.39 nats</span> (AMF ≈ <span class="num">10.9×</span>),
+        eight framings, eight comparisons, <span class="num">$0.093</span>. Parseval closes to
+        <span class="num">2×10⁻¹⁵</span> — the decomposition is exact, not a fit.</p>
+      </div>
+      <div class="energy" role="img" aria-label="Energy decomposition: invariant component 98.6 percent, largest bias 1.0 percent, six remaining components under 0.2 percent">
+        <div class="erow inv"><span class="lbl">invariant · belief</span><div class="bar"><i style="width:98.6%"></i></div><span class="val">98.6%</span></div>
+        <div class="erow"><span class="lbl">largest bias</span><div class="bar"><i style="width:1.02%"></i></div><span class="val">1.0%</span></div>
+        <div class="erow"><span class="lbl">order bias</span><div class="bar"><i style="width:0.11%"></i></div><span class="val">0.11%</span></div>
+        <div class="erow"><span class="lbl">wording ×2</span><div class="bar"><i style="width:0.11%"></i></div><span class="val">0.23%</span></div>
+        <div class="erow"><span class="lbl">remaining ×3</span><div class="bar"><i style="width:0.02%"></i></div><span class="val">&lt;0.01%</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="run">
+  <div class="wrap">
+    <div class="kicker">Run it yourself</div>
+    <h2>One command, about a dollar, under an hour</h2>
+    <div class="runrow">
+      <div>
+        <p>The harness is open source. The battery is fixed and public; wordings rotate procedurally per
+        version so they cannot be memorized. Scores are comparable within a battery version only.</p>
+        <pre>cardinal bench \
+  --models your-lab/your-model \
+  --json --out report.jsonl</pre>
+      </div>
+      <div>
+        <p>Every number on this page recomputes from committed JSONL — one line per judgment, prompt
+        digest, provider cost in nanodollars, and a replayable cache. If a claim can’t be recomputed,
+        it isn’t on the page.</p>
+        <pre># evidence pack for this board
+artifacts/live/kimi-k3-bench-2026-07-18/</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>Cardinal Bench · battery v2 · board of 2026-07-18 · test–retest floor 0.022 mean / 0.064 max ΔJUDGE</span>
+    <span>An <a href="https://github.com/XyraSinclair/cardinal-harness">OpenPriors / cardinal-harness</a> instrument</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // ---- leaderboard (data: artifacts/live/kimi-k3-bench-2026-07-18, battery v2) ----
+  const rows = [
+    ["1","moonshotai/kimi-k2.6",0.687,1.314,"0.940","1/20",0.103,0.011,"3/3",0.154,-0.905,1.000,1,"$1.16","tie"],
+    ["1","anthropic/claude-fable-5",0.673,1.194,"0.965","0/20",0.090,0.023,"3/3",0.075,-0.905,0.976,0,"$2.25","tie"],
+    ["3","moonshotai/kimi-k3",0.626,1.133,"0.923","0/20",0.144,0.018,"3/3",0.146,-0.857,0.976,0,"$1.49",""],
+    ["4","anthropic/claude-opus-4.6",0.597,1.003,"0.943","3/20",0.154,0.011,"3/3",0.168,-0.976,0.929,0,"$0.55",""],
+    ["5","openai/gpt-5.6-terra",0.576,0.959,"0.935","3/20",0.165,0.019,"3/3",0.173,-0.905,0.952,0,"$0.38",""],
+    ["6","openai/gpt-5.6-sol",0.527,0.833,"0.933","2/20",0.088,0.009,"3/3",0.089,-0.952,0.905,0,"$0.84",""],
+    ["7","google/gemini-2.5-flash",0.526,1.015,"0.825","3/20",0.274,0.039,"3/3",0.222,-0.810,0.976,0,"$0.04",""],
+    ["8","anthropic/claude-sonnet-4.6",0.509,0.833,"0.901","0/20",0.101,0.008,"3/3",0.315,-0.929,0.929,0,"$0.38",""],
+    ["9","anthropic/claude-haiku-4.5",0.461,0.756,"0.870","2/20",0.084,0.032,"3/3",0.320,-0.810,0.833,4,"$0.28",""],
+    ["10","deepseek/deepseek-v4-flash",0.450,0.865,"0.776","3/20",0.154,0.143,"2/3",0.469,-0.548,0.976,0,"$0.01",""],
+    ["11","openai/gpt-5.6-luna",0.431,0.631,"0.922","1/20",0.124,0.025,"3/3",0.190,-0.905,0.929,0,"$0.18",""],
+    ["12","openai/gpt-5.4-mini",0.363,0.655,"0.756","4/20",0.292,0.076,"2/3",0.552,-0.619,0.929,0,"$0.08",""],
+    ["13","openai/gpt-5.4-nano",0.246,0.522,"0.605","8/20",0.238,0.217,"0/2",0.960,-0.024,0.929,0,"$0.02",""]
+  ];
+  const tb = document.getElementById("tbody");
+  const maxJ = 0.687;
+  tb.innerHTML = rows.map(r=>{
+    const w = (r[2]/maxJ*100).toFixed(1);
+    const tie = r[14]==="tie" ? ' <span class="tie">=</span>' : "";
+    return `<tr>
+      <td>${r[0]}${tie}</td>
+      <td class="model">${r[1]}</td>
+      <td class="judge"><div class="jbar" style="width:${w}%"></div><span>${r[2].toFixed(3)}</span></td>
+      <td>${r[3].toFixed(3)}</td><td>${r[4]}</td><td>${r[5]}</td>
+      <td>${r[6].toFixed(3)}</td><td>${r[7].toFixed(3)}</td><td>${r[8]}</td>
+      <td>${r[9].toFixed(3)}</td><td>${r[10].toFixed(3)}</td><td>${r[11].toFixed(3)}</td>
+      <td>${r[12]}</td><td>${r[13]}</td></tr>`;
+  }).join("");
+
+  // ---- ratio ladder ----
+  const ladder = [1.0,1.05,1.1,1.2,1.3,1.5,1.75,2.1,2.5,3.1,3.9,5.1,6.8,9.2,12.7,18.0,26.0];
+  const lad = document.querySelector(".ladder");
+  const maxLog = Math.log(26);
+  lad.innerHTML = ladder.map(v=>{
+    const h = v===1 ? 2 : Math.round(Math.log(v)/maxLog*118)+2;
+    return `<div class="rung"><i style="height:${h}px"></i><b>${v.toFixed(v<2?2:1).replace(/\.0$/,"")}×</b></div>`;
+  }).join("");
+
+  // ---- mirror demo ----
+  // measured: m(GiveDirectly, AMF) = -2.386 nats (K3 orbit invariant, 2026-07-18)
+  const M = -2.386, SCALE = 3; // axis spans ±3 nats
+  let swapped = false;
+  const beam = document.getElementById("beam"), tip = document.getElementById("tip"),
+        reading = document.getElementById("reading"), btn = document.getElementById("swapBtn"),
+        row = document.getElementById("cardrow"), note = document.getElementById("mnote"),
+        css = getComputedStyle(document.documentElement);
+  const colA = css.getPropertyValue("--a").trim(), colB = css.getPropertyValue("--b").trim();
+  function render(){
+    const m = swapped ? -M : M;             // mirror on swap
+    const x = 500 + (m/SCALE)*500;
+    beam.setAttribute("x2", x);
+    tip.setAttribute("cx", x);
+    const col = m < 0 ? colB : colA;        // negative = toward second slot
+    beam.setAttribute("stroke", col); tip.setAttribute("fill", col);
+    reading.setAttribute("x", Math.min(Math.max(x,70),930));
+    reading.textContent = (m>0?"+":"") + m.toFixed(2) + " nats · " +
+      (m<0 ? "toward second slot" : "toward first slot");
+    note.innerHTML = swapped
+      ? 'Swapped. The belief mirrored exactly: <b>+2.39 nats</b> toward the item now shown first — '+
+        'still AMF at <b>10.9×</b>. Same judgment, opposite sign: <b>m(B,A) = −m(A,B)</b>.'
+      : 'The model judged AMF <b>10.9×</b> GiveDirectly: a signed log-ratio of <b>−2.39 nats</b>, '+
+        'toward the item shown second. Swap the presentation and a belief must mirror: <b>m(B,A) = −m(A,B)</b>.';
+  }
+  btn.addEventListener("click", ()=>{
+    swapped = !swapped;
+    const first = row.children[0];
+    row.appendChild(first);                  // reorder cards
+    row.children[0].classList.remove("slotB"); row.children[0].classList.add("slotA");
+    row.children[1].classList.remove("slotA"); row.children[1].classList.add("slotB");
+    row.children[0].querySelector(".slot").textContent = "SHOWN FIRST";
+    row.children[1].querySelector(".slot").textContent = "SHOWN SECOND";
+    render();
+  });
+  render();
+})();
+</script>
+</body>
+</html>

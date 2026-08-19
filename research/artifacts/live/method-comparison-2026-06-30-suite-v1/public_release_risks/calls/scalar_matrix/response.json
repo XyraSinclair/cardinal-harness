@@ -1,0 +1,46 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "{\"scores\":[{\"id\":\"overclaiming_evidence\",\"attributes\":{\"trust_damage\":{\"score\":96,\"confidence\":0.97},\"fix_leverage\":{\"score\":88,\"confidence\":0.84},\"likelihood\":{\"score\":72,\"confidence\":0.73}}},{\"id\":\"unportable_artifacts\",\"attributes\":{\"trust_damage\":{\"score\":94,\"confidence\":0.95},\"fix_leverage\":{\"score\":95,\"confidence\":0.9},\"likelihood\":{\"score\":78,\"confidence\":0.82}}},{\"id\":\"security_advisory_noise\",\"attributes\":{\"trust_damage\":{\"score\":34,\"confidence\":0.82},\"fix_leverage\":{\"score\":22,\"confidence\":0.74},\"likelihood\":{\"score\":61,\"confidence\":0.7}}},{\"id\":\"opaque_failure_cases\",\"attributes\":{\"trust_damage\":{\"score\":83,\"confidence\":0.9},\"fix_leverage\":{\"score\":79,\"confidence\":0.86},\"likelihood\":{\"score\":69,\"confidence\":0.75}}},{\"id\":\"first_run_complexity\",\"attributes\":{\"trust_damage\":{\"score\":71,\"confidence\":0.88},\"fix_leverage\":{\"score\":86,\"confidence\":0.87},\"likelihood\":{\"score\":76,\"confidence\":0.8}}}]}",
+        "reasoning": null,
+        "refusal": null,
+        "role": "assistant"
+      },
+      "native_finish_reason": "completed"
+    }
+  ],
+  "created": 1782862522,
+  "id": "gen-1782862522-6R7dt1VILTEZNrjnBRcp",
+  "model": "openai/gpt-5.4-mini-20260317",
+  "object": "chat.completion",
+  "provider": "Azure",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 269,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.00147,
+    "cost_details": {
+      "upstream_inference_completions_cost": 0.0012105,
+      "upstream_inference_cost": 0.00147,
+      "upstream_inference_prompt_cost": 0.0002595
+    },
+    "is_byok": false,
+    "prompt_tokens": 346,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 615
+  }
+}

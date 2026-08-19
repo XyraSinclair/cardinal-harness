@@ -1,0 +1,83 @@
+{
+  "attribute_scores": {
+    "copy_paste_quickstart": {
+      "maintenance_cost": 1.0,
+      "misuse_prevention": 1.0,
+      "time_to_first_success": 1.0
+    },
+    "public_api_recipe": {
+      "maintenance_cost": 0.5,
+      "misuse_prevention": 0.5,
+      "time_to_first_success": 0.5
+    },
+    "receipt_debugging_guide": {
+      "maintenance_cost": 0.0,
+      "misuse_prevention": 0.0,
+      "time_to_first_success": 0.0
+    },
+    "when_not_to_use_cardinal": {
+      "maintenance_cost": 0.75,
+      "misuse_prevention": 0.75,
+      "time_to_first_success": 0.75
+    },
+    "worked_artifact_walkthrough": {
+      "maintenance_cost": 0.25,
+      "misuse_prevention": 0.25,
+      "time_to_first_success": 0.25
+    }
+  },
+  "extra": {
+    "confidence": 0.86,
+    "ranked_ids_raw": [
+      "copy_paste_quickstart",
+      "when_not_to_use_cardinal",
+      "public_api_recipe",
+      "worked_artifact_walkthrough",
+      "receipt_debugging_guide"
+    ]
+  },
+  "method": "list_sort",
+  "metrics_vs_reference": {
+    "candidate_ranked_ids": [
+      "copy_paste_quickstart",
+      "when_not_to_use_cardinal",
+      "public_api_recipe",
+      "worked_artifact_walkthrough",
+      "receipt_debugging_guide"
+    ],
+    "kendall_tau": 0.8,
+    "reference_ranked_ids": [
+      "copy_paste_quickstart",
+      "when_not_to_use_cardinal",
+      "worked_artifact_walkthrough",
+      "public_api_recipe",
+      "receipt_debugging_guide"
+    ],
+    "topk_jaccard": 0.5
+  },
+  "model": "openai/gpt-5.4-mini",
+  "ranked_ids": [
+    "copy_paste_quickstart",
+    "when_not_to_use_cardinal",
+    "public_api_recipe",
+    "worked_artifact_walkthrough",
+    "receipt_debugging_guide"
+  ],
+  "usage": {
+    "calls": 1,
+    "completion_tokens": 55,
+    "cost_is_estimate": false,
+    "cost_nanodollars": 521250,
+    "cost_usd": 0.00052125,
+    "latency_ms": 1593,
+    "prompt_tokens": 365,
+    "total_tokens": 420
+  },
+  "utility": {
+    "copy_paste_quickstart": 1.0,
+    "public_api_recipe": 0.5,
+    "receipt_debugging_guide": 0.0,
+    "when_not_to_use_cardinal": 0.75,
+    "worked_artifact_walkthrough": 0.25
+  }
+}

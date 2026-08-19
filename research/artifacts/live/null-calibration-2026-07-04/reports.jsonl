@@ -1,0 +1,4 @@
+{"cost_nanodollars":3172500,"logprob_mode":8,"mean_abs_bias_nats":0.0,"model":"openai/gpt-5.4-mini","nulls":8,"p_parity":1.0,"p_slot_a":0.0,"p_slot_b":0.0}
+{"cost_nanodollars":848000,"logprob_mode":8,"mean_abs_bias_nats":1.9924671929335713e-6,"model":"openai/gpt-5.4-nano","nulls":8,"p_parity":0.999866203539883,"p_slot_a":0.00007448000426780374,"p_slot_b":0.00005931645584926235}
+{"cost_nanodollars":448849,"logprob_mode":5,"mean_abs_bias_nats":0.00002814936111652055,"model":"deepseek/deepseek-v4-flash","nulls":8,"p_parity":0.9996203307088593,"p_slot_a":0.00036758785964488295,"p_slot_b":0.000012081431495864179}
+{"cost_nanodollars":4426000,"logprob_mode":0,"mean_abs_bias_nats":0.0,"model":"anthropic/claude-haiku-4.5","nulls":8,"p_parity":1.0,"p_slot_a":0.0,"p_slot_b":0.0}

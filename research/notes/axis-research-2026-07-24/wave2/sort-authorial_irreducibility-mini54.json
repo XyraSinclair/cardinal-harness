@@ -1,0 +1,137 @@
+{
+  "items": [
+    {
+      "id": "item-0004",
+      "text": "Eleven years fitting prosthetic eyes taught me one reliable tell: people who lost the eye in childhood still aim the empty socket at you when they concentrate, and people who lost it as adults never do. I stopped pointing this out to trainees because it made them stare.",
+      "rank": 1,
+      "latent_mean": 3.5424729663049286,
+      "latent_std": 2.285611226228048,
+      "z_score": 1.6597294070203392,
+      "percentile": 0.9583333333333334
+    },
+    {
+      "id": "item-0002",
+      "text": "I maintained the tide gauge at Bluff for nine years. After the 2016 quake the datum shifted four millimetres, and I spent two years arguing with Wellington that the sea had not risen, the mounting bolt had. I lost, and the correction now lives as a footnote in someone else's paper.",
+      "rank": 2,
+      "latent_mean": 3.3226072340978887,
+      "latent_std": 1.7578730212728388,
+      "z_score": 1.455139147351803,
+      "percentile": 0.875
+    },
+    {
+      "id": "item-0006",
+      "text": "Interpreting asylum intakes in Tigrinya, I learned that people who had actually been through it got the dates wrong and the smells right. The lawyers needed it the other way around, and I watched strong cases die on chronology while rehearsed ones sailed through.",
+      "rank": 3,
+      "latent_mean": 3.152826661845425,
+      "latent_std": 2.543961992132724,
+      "z_score": 1.297154312629605,
+      "percentile": 0.7916666666666666
+    },
+    {
+      "id": "item-0005",
+      "text": "Moving to Berlin at twenty-four, I learned loneliness has a sound: U-Bahn announcements in a language you don't speak yet. The language came eventually; the loneliness just changed registers instead of leaving.",
+      "rank": 4,
+      "latent_mean": 2.719704448559378,
+      "latent_std": 2.435649398156241,
+      "z_score": 0.8941238576564761,
+      "percentile": 0.7083333333333334
+    },
+    {
+      "id": "item-0010",
+      "text": "The summer I scored state biology exams, the answer key was wrong on question 31, and eight hundred students lost points for being right. When someone finally noticed, the memo we received was about scoring consistency, not the error. I still have my copy.",
+      "rank": 5,
+      "latent_mean": 2.096534879309394,
+      "latent_std": 2.016771412757541,
+      "z_score": 0.31424984677456613,
+      "percentile": 0.625
+    },
+    {
+      "id": "item-0008",
+      "text": "ok beekeeping update: the june swarm requeened herself in september, which every forum swears doesn't happen this far north, and i have the brood-pattern photos to prove it. nobody at the club believes me.",
+      "rank": 6,
+      "latent_mean": 1.8007165302029184,
+      "latent_std": 2.5015085866305977,
+      "z_score": 0.0389838821747691,
+      "percentile": 0.5416666666666666
+    },
+    {
+      "id": "item-0011",
+      "text": "There's a specific silence after you send a resignation email. I made tea I didn't drink and watched the cursor blink in an empty document until the reply came.",
+      "rank": 7,
+      "latent_mean": 1.7169274015072014,
+      "latent_std": 1.5178833189878433,
+      "z_score": -0.0389838821747691,
+      "percentile": 0.4583333333333333
+    },
+    {
+      "id": "item-0001",
+      "text": "so i did the thing again — you know the thing — where i open seventeen tabs about becoming A Person Who Runs and then order gear instead of running (classic me, honestly). anyway it's 2am and a kettlebell arrives thursday. we move.",
+      "rank": 8,
+      "latent_mean": 1.509776796584606,
+      "latent_std": 1.2901883075385727,
+      "z_score": -0.2317424154222304,
+      "percentile": 0.375
+    },
+    {
+      "id": "item-0000",
+      "text": "Night shifts change your relationship with time; the hours between three and five a.m. are their own country. You learn to talk softly and to check everything twice, because that's when the mistakes want to happen.",
+      "rank": 9,
+      "latent_mean": 1.4870363777591342,
+      "latent_std": 2.57788920760649,
+      "z_score": -0.2529029125391412,
+      "percentile": 0.2916666666666667
+    },
+    {
+      "id": "item-0007",
+      "text": "the moon: unpaid intern of the sky. me, also: that. anyway i've decided my personality this month is \"tired but whimsical,\" which — same as every month, but with intention now.",
+      "rank": 10,
+      "latent_mean": 1.2641967496781334,
+      "latent_std": 2.57788920760649,
+      "z_score": -0.46026045259727405,
+      "percentile": 0.20833333333333334
+    },
+    {
+      "id": "item-0003",
+      "text": "Third-quarter revenue rose four percent on stronger renewals. We expect the trend to continue as the new pricing takes effect across the remaining accounts.",
+      "rank": 11,
+      "latent_mean": 0.803745667018849,
+      "latent_std": 2.067993054350244,
+      "z_score": -0.8887210663559165,
+      "percentile": 0.125
+    },
+    {
+      "id": "item-0009",
+      "text": "Whisk the mustard into the vinegar before you add any oil, so the dressing emulsifies instead of splitting. Season it at the end, once it has come together.",
+      "rank": 12,
+      "latent_mean": 0.0,
+      "latent_std": 2.296369947636804,
+      "z_score": -1.6366254035720549,
+      "percentile": 0.041666666666666664
+    }
+  ],
+  "meta": {
+    "topk_error": 9.129981385409211,
+    "tolerated_error": 0.1,
+    "comparisons_attempted": 24,
+    "comparisons_used": 24,
+    "comparisons_refused": 0,
+    "comparisons_cached": 0,
+    "comparison_budget": 24,
+    "latency_ms": 5151,
+    "model_used": "openai/gpt-5.4-mini",
+    "rater_id_used": "openai/gpt-5.4-mini",
+    "provider_input_tokens": 11076,
+    "provider_output_tokens": 660,
+    "provider_cost_nanodollars": 11277000,
+    "provider_cost_is_estimate": false,
+    "entities_pruned": 0,
+    "pairs_counterbalanced": 12,
+    "position_flips": 1,
+    "evidence_judgements": 0,
+    "logprob_mode_judgements": 0,
+    "evidence_visible_mass_mean": null,
+    "evidence_order_residual_mean_abs": 0.47241512808532754,
+    "judgement_frustration_mean": 0.0002951410565859652,
+    "stop_reason": "budget_exhausted"
+  }
+}

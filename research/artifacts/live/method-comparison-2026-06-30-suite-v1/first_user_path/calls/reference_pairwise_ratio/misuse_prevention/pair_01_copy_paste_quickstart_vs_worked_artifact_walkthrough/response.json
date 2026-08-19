@@ -1,0 +1,46 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "I need to evaluate how strongly each item prevents users from applying cardinal ranking where it is the wrong tool.\n\n**Item A (copy_paste_quickstart):** A quickstart that shows one request JSON, one command, and top-k output. This is a minimal introduction that gets users running quickly. It doesn't address when cardinal ranking is inappropriate - it just shows how to use it. A user following this could easily misapply cardinal ranking without any guidance about its limitations or when other approaches are better.\n\n**Item B (worked_artifact_walkthrough):** This walks through a full workflow including \"decision caveats\" at the end. The mention of \"decision caveats\" suggests it addresses limitations and appropriate use cases. The walkthrough from \"messy shortlist to attributes, pairwise prompts\" suggests it's teaching a more nuanced approach - pairwise comparison is specifically an alternative to cardinal ranking. By including pairwise prompts as part of the workflow, it implicitly (and possibly explicitly) teaches when pairwise is more appropriate than cardinal ranking. The \"decision caveats\" section likely addresses misuse scenarios.\n\nItem B is substantially stronger on misuse prevention because:\n1. It includes \"decision caveats\" explicitly\n2. It teaches pairwise prompts as an alternative tool\n3. The full workflow context helps users understand when each approach applies\n\nItem A provides essentially no misuse prevention - it just shows the tool working.\n\nThe gap is significant. B clearly addresses caveats and alternatives; A has none of this. I'd estimate B is roughly 8-10x stronger on this attribute.\n\n```json\n{\"higher_id\":\"worked_artifact_walkthrough\",\"ratio\":9.0,\"confidence\":0.72}\n```",
+        "reasoning": null,
+        "refusal": null,
+        "role": "assistant"
+      },
+      "native_finish_reason": "end_turn"
+    }
+  ],
+  "created": 1782861824,
+  "id": "gen-1782861824-z9zW915rLXPVestI9iSF",
+  "model": "anthropic/claude-4.6-sonnet-20260217",
+  "object": "chat.completion",
+  "provider": "Anthropic",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 379,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.006345,
+    "cost_details": {
+      "upstream_inference_completions_cost": 0.005685,
+      "upstream_inference_cost": 0.006345,
+      "upstream_inference_prompt_cost": 0.00066
+    },
+    "is_byok": false,
+    "prompt_tokens": 220,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 599
+  }
+}

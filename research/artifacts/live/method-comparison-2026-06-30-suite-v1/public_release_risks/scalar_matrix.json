@@ -1,0 +1,102 @@
+{
+  "attribute_scores": {
+    "first_run_complexity": {
+      "fix_leverage": 0.86,
+      "likelihood": 0.76,
+      "trust_damage": 0.71
+    },
+    "opaque_failure_cases": {
+      "fix_leverage": 0.79,
+      "likelihood": 0.69,
+      "trust_damage": 0.83
+    },
+    "overclaiming_evidence": {
+      "fix_leverage": 0.88,
+      "likelihood": 0.72,
+      "trust_damage": 0.96
+    },
+    "security_advisory_noise": {
+      "fix_leverage": 0.22,
+      "likelihood": 0.61,
+      "trust_damage": 0.34
+    },
+    "unportable_artifacts": {
+      "fix_leverage": 0.95,
+      "likelihood": 0.78,
+      "trust_damage": 0.94
+    }
+  },
+  "extra": {
+    "confidence": {
+      "first_run_complexity": {
+        "fix_leverage": 0.87,
+        "likelihood": 0.8,
+        "trust_damage": 0.88
+      },
+      "opaque_failure_cases": {
+        "fix_leverage": 0.86,
+        "likelihood": 0.75,
+        "trust_damage": 0.9
+      },
+      "overclaiming_evidence": {
+        "fix_leverage": 0.84,
+        "likelihood": 0.73,
+        "trust_damage": 0.97
+      },
+      "security_advisory_noise": {
+        "fix_leverage": 0.74,
+        "likelihood": 0.7,
+        "trust_damage": 0.82
+      },
+      "unportable_artifacts": {
+        "fix_leverage": 0.9,
+        "likelihood": 0.82,
+        "trust_damage": 0.95
+      }
+    }
+  },
+  "method": "scalar_matrix",
+  "metrics_vs_reference": {
+    "candidate_ranked_ids": [
+      "unportable_artifacts",
+      "overclaiming_evidence",
+      "opaque_failure_cases",
+      "first_run_complexity",
+      "security_advisory_noise"
+    ],
+    "kendall_tau": 1.0,
+    "reference_ranked_ids": [
+      "unportable_artifacts",
+      "overclaiming_evidence",
+      "opaque_failure_cases",
+      "first_run_complexity",
+      "security_advisory_noise"
+    ],
+    "topk_jaccard": 1.0
+  },
+  "model": "openai/gpt-5.4-mini",
+  "ranked_ids": [
+    "unportable_artifacts",
+    "overclaiming_evidence",
+    "opaque_failure_cases",
+    "first_run_complexity",
+    "security_advisory_noise"
+  ],
+  "usage": {
+    "calls": 1,
+    "completion_tokens": 269,
+    "cost_is_estimate": false,
+    "cost_nanodollars": 1470000,
+    "cost_usd": 0.00147,
+    "latency_ms": 2739,
+    "prompt_tokens": 346,
+    "total_tokens": 615
+  },
+  "utility": {
+    "first_run_complexity": 0.7725000000000001,
+    "opaque_failure_cases": 0.7879999999999999,
+    "overclaiming_evidence": 0.884,
+    "security_advisory_noise": 0.35200000000000004,
+    "unportable_artifacts": 0.9115
+  }
+}

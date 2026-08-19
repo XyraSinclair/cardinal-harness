@@ -1,0 +1,46 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "I need to assess which item better improves confidence that a serious external reader would share the artifact.\n\n**A (live_baseline_suite):** A preserved real-LLM head-to-head suite with request/response/trace/cost artifacts is technically impressive and comprehensive. However, it's complex, requires significant context to understand, and is primarily useful to researchers/developers already invested in the problem. A serious external reader would need to understand the full context before finding it share-worthy. The artifact is dense and specialized.\n\n**B (first_user_path):** Compressing the first-time user path into one obvious command, one tiny request file, one expected output, and one explanation of when cardinal ranking is worth its cost \u2014 this is immediately legible, self-contained, and demonstrates value quickly. A serious external reader can grasp it in seconds, understand the \"aha\" moment, and share it because it solves a clear, relatable problem (onboarding friction). The clarity and accessibility dramatically increase shareability.\n\nShareability depends on: immediate comprehensibility, clear value proposition, low barrier to understanding, and emotional/practical resonance. B wins on all these dimensions. A is more like internal documentation or a research artifact \u2014 valuable but not inherently shareable to a broad serious audience.\n\nThe gap is meaningful but not extreme \u2014 A does have real value and some readers (researchers) might share it. But B is substantially more shareable.\n\n{\"higher_id\":\"B\",\"ratio\":4.0,\"confidence\":0.78}",
+        "reasoning": null,
+        "refusal": null,
+        "role": "assistant"
+      },
+      "native_finish_reason": "end_turn"
+    }
+  ],
+  "created": 1782860992,
+  "id": "gen-1782860992-I0yDEXdm7ays2SJdOmjt",
+  "model": "anthropic/claude-4.6-sonnet-20260217",
+  "object": "chat.completion",
+  "provider": "Anthropic",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 332,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.005703,
+    "cost_details": {
+      "upstream_inference_completions_cost": 0.00498,
+      "upstream_inference_cost": 0.005703,
+      "upstream_inference_prompt_cost": 0.000723
+    },
+    "is_byok": false,
+    "prompt_tokens": 241,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 573
+  }
+}

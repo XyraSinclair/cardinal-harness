@@ -1,0 +1,46 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "I need to compare how much ranking information is extracted per provider call for these two judgment methods.\n\n**Single Scalar Rating (A):**\n- Each call produces a numeric score (e.g., 1-10) for one item on one attribute\n- With N items, you need N calls to score all items\n- Each call gives you an absolute position on the scale, which implicitly encodes relationship to all other items\n- From N calls, you get a complete ranking of N items\n- Information per call: roughly log2(N) bits (position among N items)\n\n**Ordinal Pairwise (B):**\n- Each call compares exactly 2 items and returns a binary winner\n- Each call yields 1 bit of information (which of two items is better)\n- To rank N items, you need O(N log N) comparisons minimum\n- Information per call: 1 bit (binary choice between two items)\n\n**Comparison:**\n- Single scalar rating: Each call produces a score that can distinguish among many positions (e.g., 1-100 scale = ~6.6 bits, 1-10 scale = ~3.3 bits), and importantly, each score is comparable to all other scores, so each call contributes to the full ranking\n- Pairwise: Each call yields only 1 bit of ordering information\n\nWith a 1-10 scale, single scalar gives ~3.3x more information per call than pairwise's 1 bit. With 1-100 scale, ~6.6x more. Additionally, scalar ratings allow all N items to be ranked from N calls, while pairwise needs O(N log N) calls for the same ranking.\n\nThe ratio is roughly 3-7x depending on scale granularity, but also considering that scalar ratings rank N items in N calls vs pairwise needing N log N calls, the effective advantage is larger. I'd estimate around 5-7x more information per call for scalar ratings.\n\n```json\n{\"higher_id\":\"A\",\"ratio\":6.0,\"confidence\":0.75}\n```",
+        "reasoning": null,
+        "refusal": null,
+        "role": "assistant"
+      },
+      "native_finish_reason": "end_turn"
+    }
+  ],
+  "created": 1782849637,
+  "id": "gen-1782849637-9XgiGNVkGr2GILWIvPpp",
+  "model": "anthropic/claude-4.6-sonnet-20260217",
+  "object": "chat.completion",
+  "provider": "Anthropic",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 470,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.007692,
+    "cost_details": {
+      "upstream_inference_completions_cost": 0.00705,
+      "upstream_inference_cost": 0.007692,
+      "upstream_inference_prompt_cost": 0.000642
+    },
+    "is_byok": false,
+    "prompt_tokens": 214,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 684
+  }
+}

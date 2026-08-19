@@ -1,0 +1,317 @@
+{
+  "attribute_scores": {
+    "copy_paste_quickstart": {
+      "maintenance_cost": 1.0,
+      "misuse_prevention": 0.0,
+      "time_to_first_success": 1.0
+    },
+    "public_api_recipe": {
+      "maintenance_cost": 0.3048044199465022,
+      "misuse_prevention": 0.03317434541549897,
+      "time_to_first_success": 0.4977219014068629
+    },
+    "receipt_debugging_guide": {
+      "maintenance_cost": 0.49557117170638837,
+      "misuse_prevention": 0.12219186018297842,
+      "time_to_first_success": 0.1423595546016432
+    },
+    "when_not_to_use_cardinal": {
+      "maintenance_cost": 0.8698397221632462,
+      "misuse_prevention": 1.0,
+      "time_to_first_success": 0.0
+    },
+    "worked_artifact_walkthrough": {
+      "maintenance_cost": 0.0,
+      "misuse_prevention": 0.4718597993254988,
+      "time_to_first_success": 0.6583492116382819
+    }
+  },
+  "extra": {
+    "pairs": [
+      {
+        "attribute": "time_to_first_success",
+        "confidence": 0.85,
+        "higher_id": "copy_paste_quickstart",
+        "left": "copy_paste_quickstart",
+        "ratio": 8.0,
+        "right": "worked_artifact_walkthrough"
+      },
+      {
+        "attribute": "time_to_first_success",
+        "confidence": 0.92,
+        "higher_id": "copy_paste_quickstart",
+        "left": "copy_paste_quickstart",
+        "ratio": 20.0,
+        "right": "when_not_to_use_cardinal"
+      },
+      {
+        "attribute": "time_to_first_success",
+        "confidence": 0.85,
+        "higher_id": "copy_paste_quickstart",
+        "left": "copy_paste_quickstart",
+        "ratio": 6.0,
+        "right": "public_api_recipe"
+      },
+      {
+        "attribute": "time_to_first_success",
+        "confidence": 0.92,
+        "higher_id": "copy_paste_quickstart",
+        "left": "copy_paste_quickstart",
+        "ratio": 18.0,
+        "right": "receipt_debugging_guide"
+      },
+      {
+        "attribute": "time_to_first_success",
+        "confidence": 0.85,
+        "higher_id": "worked_artifact_walkthrough",
+        "left": "worked_artifact_walkthrough",
+        "ratio": 8.0,
+        "right": "when_not_to_use_cardinal"
+      },
+      {
+        "attribute": "time_to_first_success",
+        "confidence": 0.8,
+        "higher_id": "worked_artifact_walkthrough",
+        "left": "worked_artifact_walkthrough",
+        "ratio": 6.0,
+        "right": "public_api_recipe"
+      },
+      {
+        "attribute": "time_to_first_success",
+        "confidence": 0.85,
+        "higher_id": "worked_artifact_walkthrough",
+        "left": "worked_artifact_walkthrough",
+        "ratio": 8.0,
+        "right": "receipt_debugging_guide"
+      },
+      {
+        "attribute": "time_to_first_success",
+        "confidence": 0.82,
+        "higher_id": "public_api_recipe",
+        "left": "when_not_to_use_cardinal",
+        "ratio": 9.0,
+        "right": "public_api_recipe"
+      },
+      {
+        "attribute": "time_to_first_success",
+        "confidence": 0.78,
+        "higher_id": "receipt_debugging_guide",
+        "left": "when_not_to_use_cardinal",
+        "ratio": 4.0,
+        "right": "receipt_debugging_guide"
+      },
+      {
+        "attribute": "time_to_first_success",
+        "confidence": 0.85,
+        "higher_id": "public_api_recipe",
+        "left": "public_api_recipe",
+        "ratio": 8.0,
+        "right": "receipt_debugging_guide"
+      },
+      {
+        "attribute": "misuse_prevention",
+        "confidence": 0.72,
+        "higher_id": "worked_artifact_walkthrough",
+        "left": "copy_paste_quickstart",
+        "ratio": 9.0,
+        "right": "worked_artifact_walkthrough"
+      },
+      {
+        "attribute": "misuse_prevention",
+        "confidence": 0.95,
+        "higher_id": "when_not_to_use_cardinal",
+        "left": "copy_paste_quickstart",
+        "ratio": 20.0,
+        "right": "when_not_to_use_cardinal"
+      },
+      {
+        "attribute": "misuse_prevention",
+        "confidence": 0.3,
+        "higher_id": "public_api_recipe",
+        "left": "copy_paste_quickstart",
+        "ratio": 1.5,
+        "right": "public_api_recipe"
+      },
+      {
+        "attribute": "misuse_prevention",
+        "confidence": 0.6,
+        "higher_id": "receipt_debugging_guide",
+        "left": "copy_paste_quickstart",
+        "ratio": 4.0,
+        "right": "receipt_debugging_guide"
+      },
+      {
+        "attribute": "misuse_prevention",
+        "confidence": 0.85,
+        "higher_id": "when_not_to_use_cardinal",
+        "left": "worked_artifact_walkthrough",
+        "ratio": 18.0,
+        "right": "when_not_to_use_cardinal"
+      },
+      {
+        "attribute": "misuse_prevention",
+        "confidence": 0.72,
+        "higher_id": "worked_artifact_walkthrough",
+        "left": "worked_artifact_walkthrough",
+        "ratio": 9.0,
+        "right": "public_api_recipe"
+      },
+      {
+        "attribute": "misuse_prevention",
+        "confidence": 0.78,
+        "higher_id": "worked_artifact_walkthrough",
+        "left": "worked_artifact_walkthrough",
+        "ratio": 9.0,
+        "right": "receipt_debugging_guide"
+      },
+      {
+        "attribute": "misuse_prevention",
+        "confidence": 0.95,
+        "higher_id": "when_not_to_use_cardinal",
+        "left": "when_not_to_use_cardinal",
+        "ratio": 26.0,
+        "right": "public_api_recipe"
+      },
+      {
+        "attribute": "misuse_prevention",
+        "confidence": 0.92,
+        "higher_id": "when_not_to_use_cardinal",
+        "left": "when_not_to_use_cardinal",
+        "ratio": 20.0,
+        "right": "receipt_debugging_guide"
+      },
+      {
+        "attribute": "misuse_prevention",
+        "confidence": 0.4,
+        "higher_id": "receipt_debugging_guide",
+        "left": "public_api_recipe",
+        "ratio": 2.0,
+        "right": "receipt_debugging_guide"
+      },
+      {
+        "attribute": "maintenance_cost",
+        "confidence": 0.82,
+        "higher_id": "copy_paste_quickstart",
+        "left": "copy_paste_quickstart",
+        "ratio": 9.0,
+        "right": "worked_artifact_walkthrough"
+      },
+      {
+        "attribute": "maintenance_cost",
+        "confidence": 0.72,
+        "higher_id": "copy_paste_quickstart",
+        "left": "copy_paste_quickstart",
+        "ratio": 4.0,
+        "right": "when_not_to_use_cardinal"
+      },
+      {
+        "attribute": "maintenance_cost",
+        "confidence": 0.65,
+        "higher_id": "copy_paste_quickstart",
+        "left": "copy_paste_quickstart",
+        "ratio": 3.5,
+        "right": "public_api_recipe"
+      },
+      {
+        "attribute": "maintenance_cost",
+        "confidence": 0.6,
+        "higher_id": "receipt_debugging_guide",
+        "left": "copy_paste_quickstart",
+        "ratio": 3.0,
+        "right": "receipt_debugging_guide"
+      },
+      {
+        "attribute": "maintenance_cost",
+        "confidence": 0.72,
+        "higher_id": "when_not_to_use_cardinal",
+        "left": "worked_artifact_walkthrough",
+        "ratio": 3.0,
+        "right": "when_not_to_use_cardinal"
+      },
+      {
+        "attribute": "maintenance_cost",
+        "confidence": 0.75,
+        "higher_id": "public_api_recipe",
+        "left": "worked_artifact_walkthrough",
+        "ratio": 6.0,
+        "right": "public_api_recipe"
+      },
+      {
+        "attribute": "maintenance_cost",
+        "confidence": 0.6,
+        "higher_id": "worked_artifact_walkthrough",
+        "left": "worked_artifact_walkthrough",
+        "ratio": 2.5,
+        "right": "receipt_debugging_guide"
+      },
+      {
+        "attribute": "maintenance_cost",
+        "confidence": 0.78,
+        "higher_id": "when_not_to_use_cardinal",
+        "left": "when_not_to_use_cardinal",
+        "ratio": 4.0,
+        "right": "public_api_recipe"
+      },
+      {
+        "attribute": "maintenance_cost",
+        "confidence": 0.78,
+        "higher_id": "when_not_to_use_cardinal",
+        "left": "when_not_to_use_cardinal",
+        "ratio": 5.0,
+        "right": "receipt_debugging_guide"
+      },
+      {
+        "attribute": "maintenance_cost",
+        "confidence": 0.72,
+        "higher_id": "receipt_debugging_guide",
+        "left": "public_api_recipe",
+        "ratio": 3.5,
+        "right": "receipt_debugging_guide"
+      }
+    ]
+  },
+  "method": "reference_pairwise_ratio",
+  "metrics_vs_reference": {
+    "candidate_ranked_ids": [
+      "copy_paste_quickstart",
+      "when_not_to_use_cardinal",
+      "worked_artifact_walkthrough",
+      "public_api_recipe",
+      "receipt_debugging_guide"
+    ],
+    "kendall_tau": 1.0,
+    "reference_ranked_ids": [
+      "copy_paste_quickstart",
+      "when_not_to_use_cardinal",
+      "worked_artifact_walkthrough",
+      "public_api_recipe",
+      "receipt_debugging_guide"
+    ],
+    "topk_jaccard": 1.0
+  },
+  "model": "anthropic/claude-sonnet-4.6",
+  "ranked_ids": [
+    "copy_paste_quickstart",
+    "when_not_to_use_cardinal",
+    "worked_artifact_walkthrough",
+    "public_api_recipe",
+    "receipt_debugging_guide"
+  ],
+  "usage": {
+    "calls": 30,
+    "completion_tokens": 5837,
+    "cost_is_estimate": false,
+    "cost_nanodollars": 107229000,
+    "cost_usd": 0.107229,
+    "latency_ms": 169333,
+    "prompt_tokens": 6558,
+    "total_tokens": 12395
+  },
+  "utility": {
+    "copy_paste_quickstart": 0.65,
+    "public_api_recipe": 0.2869008864447954,
+    "receipt_debugging_guide": 0.22360376583129682,
+    "when_not_to_use_cardinal": 0.5674599305408116,
+    "worked_artifact_walkthrough": 0.4284906144192373
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "I need to assess which item better improves confidence that a serious external reader would share the artifact.\n\n**Shareability considerations:**\n\nA serious external reader would share something that:\n- Has broad applicability / general interest\n- Is well-documented and reproducible\n- Has clear statistical validity\n- Represents a definitive resource others can build on\n\n**Item A (live_baseline_suite):**\n- Preserved real-LLM comparisons with request/response/trace/cost artifacts\n- Compares three judgment methods on identical tasks\n- \"Live\" baseline suggests it's a starting point, not a final word\n- Rich raw artifacts are useful but the \"baseline\" framing suggests preliminary\n- Interesting methodologically but narrower scope\n\n**Item B (large_frozen_benchmark):**\n- \"Larger\" - more comprehensive coverage\n- \"Frozen\" - stable, citable, reproducible by others\n- Multiple task families - broader applicability\n- Repeated runs - statistical robustness\n- Equalized budgets - controls for confounds\n- Raw artifacts - transparency\n- Clear statistical report - digestible for readers\n- This is the kind of artifact that gets cited, shared, and built upon\n\n**Analysis:**\nB is substantially more shareable because:\n1. \"Frozen\" benchmarks are the standard shareable artifact in ML/AI research\n2. Statistical report makes findings accessible without requiring readers to dig through raw data\n3. Multiple task families means broader relevance to more readers\n4. Repeated runs + equalized budgets = credible, defensible claims\n5. The combination of raw artifacts + statistical summary serves both practitioners and researchers\n\nA is useful but positioned as a baseline/starting point, which signals \"work in progress\" rather than \"definitive resource.\" B is positioned as a complete, rigorous benchmark.\n\nThe gap is meaningful but not extreme - A still has real value and shareability. I'd estimate B is roughly 4-5x more shareable.\n\n```json\n{\"higher_id\":\"B\",\"ratio\":4.5,\"confidence\":0.72}\n```",
+        "reasoning": null,
+        "refusal": null,
+        "role": "assistant"
+      },
+      "native_finish_reason": "end_turn"
+    }
+  ],
+  "created": 1782861002,
+  "id": "gen-1782861002-h87j6WxbfjP1aBUeOfC7",
+  "model": "anthropic/claude-4.6-sonnet-20260217",
+  "object": "chat.completion",
+  "provider": "Anthropic",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 456,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.007545,
+    "cost_details": {
+      "upstream_inference_completions_cost": 0.00684,
+      "upstream_inference_cost": 0.007545,
+      "upstream_inference_prompt_cost": 0.000705
+    },
+    "is_byok": false,
+    "prompt_tokens": 235,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 691
+  }
+}

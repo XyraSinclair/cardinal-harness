@@ -1,0 +1,137 @@
+{
+  "items": [
+    {
+      "id": "item-0007",
+      "text": "Raising a datacenter's inlet air target from 20C to 27C cuts chiller energy by roughly a third and raises annual drive failure rates by a few tenths of a percent. At our fleet size that is about four million dollars a year against two hundred replacement drives. Take the trade or refuse it, but it is arithmetic, not philosophy.",
+      "rank": 1,
+      "latent_mean": 2.108280348813503,
+      "latent_std": 1.2076147252765927,
+      "z_score": 1.439690354736275,
+      "percentile": 0.9583333333333334
+    },
+    {
+      "id": "item-0002",
+      "text": "You cannot have a bounded-memory deduplicator with zero false positives over an unbounded key stream: the pigeonhole principle forces collisions once distinct keys exceed representable states. Any product claiming both is either quietly bounding the stream or lying about one of the two guarantees.",
+      "rank": 2,
+      "latent_mean": 1.7050202712338969,
+      "latent_std": 0.912870927615789,
+      "z_score": 0.7744353328813233,
+      "percentile": 0.875
+    },
+    {
+      "id": "item-0010",
+      "text": "Everyone rolls their eyes at the two-exit rule until they run the numbers. A single exit turns egress into a queue whose service rate is fixed by door width, so evacuation time scales with occupancy while smoke fills the volume at a rate set by fuel load, which does not care how orderly the queue is. Two exits halve the queue. That is the whole argument.",
+      "rank": 3,
+      "latent_mean": 1.611442901434899,
+      "latent_std": 0.9128709276157886,
+      "z_score": 0.6200614718127873,
+      "percentile": 0.7916666666666666
+    },
+    {
+      "id": "item-0004",
+      "text": "Cities that built rail before their sprawl tend to keep higher ridership decades later, probably because land use organized itself around the stations. Retrofitting rail into an already dispersed metro rarely reproduces that. The evidence here is mostly observational.",
+      "rank": 4,
+      "latent_mean": 1.4193288142449616,
+      "latent_std": 1.1547005352519373,
+      "z_score": 0.30313235242343645,
+      "percentile": 0.7083333333333334
+    },
+    {
+      "id": "item-0000",
+      "text": "Type systems catch a real class of bugs before runtime, mostly the ones where a value of the wrong shape reaches a function. They do not catch logic errors, and the annotation burden is real. Whether the trade pays depends on how much of your bug tail is shape errors.",
+      "rank": 5,
+      "latent_mean": 1.3687226580416734,
+      "latent_std": 1.2247448676663233,
+      "z_score": 0.21964776909180797,
+      "percentile": 0.625
+    },
+    {
+      "id": "item-0006",
+      "text": "Security is fundamentally about tradeoffs between usability and protection, and every organization must find its own balance point along that spectrum. There is no one-size-fits-all answer, which is why mature programs emphasize process over prescription.",
+      "rank": 6,
+      "latent_mean": 1.2677693495360556,
+      "latent_std": 1.2247448676663233,
+      "z_score": 0.05310587915484377,
+      "percentile": 0.5416666666666666
+    },
+    {
+      "id": "item-0008",
+      "text": "Good writing requires attention to the reader. Clarity matters, and revision is part of the process. Most experienced writers agree that first drafts are rarely finished work.",
+      "rank": 7,
+      "latent_mean": 1.203386578284808,
+      "latent_std": 1.1547005352519373,
+      "z_score": -0.05310587915484377,
+      "percentile": 0.4583333333333333
+    },
+    {
+      "id": "item-0009",
+      "text": "Going remote cut our hiring costs because we stopped competing on Bay Area salaries. Retention became harder to read, since the people who left rarely told us why. Both effects were large enough to notice within two quarters.",
+      "rank": 8,
+      "latent_mean": 1.036446067578234,
+      "latent_std": 1.0606601693491413,
+      "z_score": -0.3285063446935012,
+      "percentile": 0.375
+    },
+    {
+      "id": "item-0011",
+      "text": "Our onboarding rewrite cut time-to-first-commit from nine days to four. Some of that is the new documentation; some is that we hired more experienced people that quarter. We did not separate the two.",
+      "rank": 9,
+      "latent_mean": 0.7937258243511468,
+      "latent_std": 0.6770031997375351,
+      "z_score": -0.7289200471404034,
+      "percentile": 0.2916666666666667
+    },
+    {
+      "id": "item-0001",
+      "text": "Our review of the literature suggests that intervention effectiveness is context-dependent. Some approaches perform better under certain conditions, while others may be more appropriate elsewhere. Practitioners should consider local factors when selecting a strategy. Further research would help clarify these relationships.",
+      "rank": 10,
+      "latent_mean": 0.6421663604007852,
+      "latent_std": 0.6770031997375353,
+      "z_score": -0.9789465191576311,
+      "percentile": 0.20833333333333334
+    },
+    {
+      "id": "item-0005",
+      "text": "Let no one tell you the microbes are merely lucky! Every gram of amoxicillin poured into a feedlot is a tuition payment to the schoolhouse of resistance, and the arithmetic is merciless: a plasmid conferring resistance costs its host perhaps two percent of growth rate, a rounding error beside the hundredfold kill the drug inflicts on its naive neighbors. Selection does the rest, and it never rests.",
+      "rank": 11,
+      "latent_mean": 0.6016117373529091,
+      "latent_std": 1.2076147252765927,
+      "z_score": -1.0458491662135085,
+      "percentile": 0.125
+    },
+    {
+      "id": "item-0003",
+      "text": "Innovation is a journey rather than a destination, and the future belongs to those bold enough to imagine it. Every great leap began as someone's refusal to accept the world as given. That spirit is what we bring to our work each day.",
+      "rank": 12,
+      "latent_mean": 0.0,
+      "latent_std": 1.0606601693491415,
+      "z_score": -2.0383233825631244,
+      "percentile": 0.041666666666666664
+    }
+  ],
+  "meta": {
+    "topk_error": 9.192791267458997,
+    "tolerated_error": 0.1,
+    "comparisons_attempted": 24,
+    "comparisons_used": 24,
+    "comparisons_refused": 0,
+    "comparisons_cached": 0,
+    "comparison_budget": 24,
+    "latency_ms": 14036,
+    "model_used": "anthropic/claude-haiku-4.5",
+    "rater_id_used": "anthropic/claude-haiku-4.5",
+    "provider_input_tokens": 12656,
+    "provider_output_tokens": 6988,
+    "provider_cost_nanodollars": 47596000,
+    "provider_cost_is_estimate": false,
+    "entities_pruned": 0,
+    "pairs_counterbalanced": 12,
+    "position_flips": 1,
+    "evidence_judgements": 0,
+    "logprob_mode_judgements": 0,
+    "evidence_visible_mass_mean": null,
+    "evidence_order_residual_mean_abs": 0.22798508317063057,
+    "judgement_frustration_mean": 0.006474430136459995,
+    "stop_reason": "budget_exhausted"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "note": "Polarity axis: sort the 1,010 attributes by their net DIRECTIONAL value for existential philanthropy (batteries/polarity_axis.txt). One pairwise-ratio cardinal sort; the solved score IS a continuous signed orientation — top = good high-pole, bottom = bad high-pole (score should be flipped when composing), middle = orthogonal. Answers her 'attributes that have a pole very plausibly net-positive' selection with a graded axis rather than a brittle +1/-1/0 label. budget 12000 over 1010 entities ~= 24/entity. Composes with the AHP importance weights: grant score under goal G = sum over a of importance_G(a) * orient(a) * proposal_attribute_score(a), where orient(a) centers this polarity score.",
+  "phases": [
+    {
+      "run_tag": "ahp-polarity-gemma31b-2026-08-16",
+      "corpus": "data/ahp_attributes.txt",
+      "attributes": "batteries/polarity_axis.txt",
+      "model": "gemma4-31b",
+      "base_url": "http://127.0.0.1:8023/v1",
+      "template": "canonical_bucket_v1",
+      "budget": 12000,
+      "seed": 1,
+      "outdir": "/tmp/campaign-ahp-polarity",
+      "env": { "CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS": 1024 }
+    }
+  ]
+}

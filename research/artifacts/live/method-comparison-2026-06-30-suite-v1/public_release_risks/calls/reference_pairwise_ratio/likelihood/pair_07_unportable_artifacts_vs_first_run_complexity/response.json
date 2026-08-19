@@ -1,0 +1,46 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "I need to compare A (unportable_artifacts) and B (first_run_complexity) for likelihood of occurring during public sharing without additional work.\n\n**A (unportable_artifacts):** This risk occurs when a fresh clone fails because of missing paths, cache files, generated artifacts, or model metadata. This is very common in public releases - developers often commit code but forget to include generated files, have hardcoded paths, or reference local cache directories. This happens frequently without any additional work because the developer's environment has these artifacts but the cloned repo doesn't.\n\n**B (first_run_complexity):** This risk is about requiring too many concepts, flags, and files before seeing a useful result. This is also common but depends more on documentation quality and project design. Many projects have complex setup requirements, but this is often partially addressed through READMEs and getting-started guides. However, without additional work, many projects do have steep first-run complexity.\n\nComparing the two:\n- Unportable artifacts are extremely common in public releases - it's a very frequent failure mode where local environment assumptions break on fresh clones. Hardcoded paths, missing generated files, local cache references are endemic.\n- First-run complexity is also common but is somewhat more visible to developers during development (they notice when setup is hard) and may be partially mitigated.\n\nBoth are quite likely, but unportable artifacts tend to be slightly more insidious because developers don't notice them (their environment works fine). First-run complexity is also very likely but perhaps slightly less so as developers sometimes do address it.\n\nThese are fairly close in likelihood - both are high probability risks. I'd say A is slightly more likely than B, but not dramatically so.\n\n{\"higher_id\":\"A\",\"ratio\":1.3,\"confidence\":0.4}",
+        "reasoning": null,
+        "refusal": null,
+        "role": "assistant"
+      },
+      "native_finish_reason": "end_turn"
+    }
+  ],
+  "created": 1782862479,
+  "id": "gen-1782862479-NfNAPhh5EDSB9vSR7fzW",
+  "model": "anthropic/claude-4.6-sonnet-20260217",
+  "object": "chat.completion",
+  "provider": "Anthropic",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 396,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.006531,
+    "cost_details": {
+      "upstream_inference_completions_cost": 0.00594,
+      "upstream_inference_cost": 0.006531,
+      "upstream_inference_prompt_cost": 0.000591
+    },
+    "is_byok": false,
+    "prompt_tokens": 197,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 593
+  }
+}

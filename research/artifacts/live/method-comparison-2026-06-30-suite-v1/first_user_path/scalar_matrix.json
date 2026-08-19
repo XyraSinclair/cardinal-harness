@@ -1,0 +1,102 @@
+{
+  "attribute_scores": {
+    "copy_paste_quickstart": {
+      "maintenance_cost": 0.82,
+      "misuse_prevention": 0.2,
+      "time_to_first_success": 0.95
+    },
+    "public_api_recipe": {
+      "maintenance_cost": 0.76,
+      "misuse_prevention": 0.28,
+      "time_to_first_success": 0.88
+    },
+    "receipt_debugging_guide": {
+      "maintenance_cost": 0.6,
+      "misuse_prevention": 0.4,
+      "time_to_first_success": 0.42
+    },
+    "when_not_to_use_cardinal": {
+      "maintenance_cost": 0.9,
+      "misuse_prevention": 0.96,
+      "time_to_first_success": 0.18
+    },
+    "worked_artifact_walkthrough": {
+      "maintenance_cost": 0.68,
+      "misuse_prevention": 0.35,
+      "time_to_first_success": 0.72
+    }
+  },
+  "extra": {
+    "confidence": {
+      "copy_paste_quickstart": {
+        "maintenance_cost": 0.86,
+        "misuse_prevention": 0.93,
+        "time_to_first_success": 0.98
+      },
+      "public_api_recipe": {
+        "maintenance_cost": 0.84,
+        "misuse_prevention": 0.9,
+        "time_to_first_success": 0.93
+      },
+      "receipt_debugging_guide": {
+        "maintenance_cost": 0.82,
+        "misuse_prevention": 0.87,
+        "time_to_first_success": 0.9
+      },
+      "when_not_to_use_cardinal": {
+        "maintenance_cost": 0.92,
+        "misuse_prevention": 0.97,
+        "time_to_first_success": 0.95
+      },
+      "worked_artifact_walkthrough": {
+        "maintenance_cost": 0.8,
+        "misuse_prevention": 0.88,
+        "time_to_first_success": 0.89
+      }
+    }
+  },
+  "method": "scalar_matrix",
+  "metrics_vs_reference": {
+    "candidate_ranked_ids": [
+      "copy_paste_quickstart",
+      "public_api_recipe",
+      "when_not_to_use_cardinal",
+      "worked_artifact_walkthrough",
+      "receipt_debugging_guide"
+    ],
+    "kendall_tau": 0.6,
+    "reference_ranked_ids": [
+      "copy_paste_quickstart",
+      "when_not_to_use_cardinal",
+      "worked_artifact_walkthrough",
+      "public_api_recipe",
+      "receipt_debugging_guide"
+    ],
+    "topk_jaccard": 0.5
+  },
+  "model": "openai/gpt-5.4-mini",
+  "ranked_ids": [
+    "copy_paste_quickstart",
+    "public_api_recipe",
+    "when_not_to_use_cardinal",
+    "worked_artifact_walkthrough",
+    "receipt_debugging_guide"
+  ],
+  "usage": {
+    "calls": 1,
+    "completion_tokens": 288,
+    "cost_is_estimate": false,
+    "cost_nanodollars": 1579500,
+    "cost_usd": 0.0015795,
+    "latency_ms": 1844,
+    "prompt_tokens": 378,
+    "total_tokens": 666
+  },
+  "utility": {
+    "copy_paste_quickstart": 0.655,
+    "public_api_recipe": 0.6400000000000001,
+    "receipt_debugging_guide": 0.45799999999999996,
+    "when_not_to_use_cardinal": 0.633,
+    "worked_artifact_walkthrough": 0.5805
+  }
+}

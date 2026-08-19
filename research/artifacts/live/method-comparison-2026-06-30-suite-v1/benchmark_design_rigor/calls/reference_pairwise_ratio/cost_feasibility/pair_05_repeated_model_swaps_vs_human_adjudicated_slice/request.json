@@ -1,0 +1,18 @@
+{
+  "max_tokens": 800,
+  "messages": [
+    {
+      "content": "You are a rigorous structured-judgment engine. Judge only the stated attribute. Use the item text, not outside popularity. Return strict JSON only. Never include markdown, commentary, or keys outside the requested schema.",
+      "role": "system"
+    },
+    {
+      "content": "Case: benchmark_design_rigor\nAttribute cost_feasibility: how feasible this is to execute without excessive provider spend or manual effort\n\nA (repeated_model_swaps): Repeat the same suite across multiple candidate and reference models so method effects are separated from one model's quirks.\n\nB (human_adjudicated_slice): Collect a small human-adjudicated slice that can calibrate whether the live LLM reference itself is plausible.\n\nTask: Which item has more of this attribute, and how many times more? Use ratio=1 only for near ties; cap large gaps at 26. Output JSON exactly: {\"higher_id\":\"item id\",\"ratio\":1.0,\"confidence\":0.0}.",
+      "role": "user"
+    }
+  ],
+  "model": "anthropic/claude-sonnet-4.6",
+  "response_format": {
+    "type": "json_object"
+  },
+  "temperature": 0.1
+}

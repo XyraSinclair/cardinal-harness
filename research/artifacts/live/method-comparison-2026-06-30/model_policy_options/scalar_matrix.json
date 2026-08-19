@@ -1,0 +1,101 @@
+{
+  "attribute_scores": {
+    "deepseek_v4_flash_fast": {
+      "cost_discipline": 0.9,
+      "public_receipt_credibility": 0.5,
+      "route_freshness": 0.7
+    },
+    "glm_5_2_logprob_candidate": {
+      "cost_discipline": 0.85,
+      "public_receipt_credibility": 0.65,
+      "route_freshness": 0.8
+    },
+    "kimi_k2_thinking_diverse": {
+      "cost_discipline": 0.6,
+      "public_receipt_credibility": 0.8,
+      "route_freshness": 0.75
+    },
+    "quality_only_opus_46": {
+      "cost_discipline": 0.4,
+      "public_receipt_credibility": 0.9,
+      "route_freshness": 0.6
+    },
+    "sonnet_reference_then_fast": {
+      "cost_discipline": 0.8,
+      "public_receipt_credibility": 0.75,
+      "route_freshness": 0.85
+    }
+  },
+  "extra": {
+    "confidence": {
+      "deepseek_v4_flash_fast": {
+        "cost_discipline": 0.95,
+        "public_receipt_credibility": 0.7,
+        "route_freshness": 0.8
+      },
+      "glm_5_2_logprob_candidate": {
+        "cost_discipline": 0.85,
+        "public_receipt_credibility": 0.8,
+        "route_freshness": 0.85
+      },
+      "kimi_k2_thinking_diverse": {
+        "cost_discipline": 0.75,
+        "public_receipt_credibility": 0.85,
+        "route_freshness": 0.8
+      },
+      "quality_only_opus_46": {
+        "cost_discipline": 0.8,
+        "public_receipt_credibility": 0.9,
+        "route_freshness": 0.7
+      },
+      "sonnet_reference_then_fast": {
+        "cost_discipline": 0.9,
+        "public_receipt_credibility": 0.85,
+        "route_freshness": 0.9
+      }
+    }
+  },
+  "method": "scalar_matrix",
+  "metrics_vs_reference": {
+    "candidate_ranked_ids": [
+      "sonnet_reference_then_fast",
+      "glm_5_2_logprob_candidate",
+      "kimi_k2_thinking_diverse",
+      "quality_only_opus_46",
+      "deepseek_v4_flash_fast"
+    ],
+    "kendall_tau": 0.2,
+    "reference_ranked_ids": [
+      "sonnet_reference_then_fast",
+      "quality_only_opus_46",
+      "kimi_k2_thinking_diverse",
+      "deepseek_v4_flash_fast",
+      "glm_5_2_logprob_candidate"
+    ],
+    "topk_jaccard": 0.5
+  },
+  "model": "openai/gpt-4.1-mini",
+  "ranked_ids": [
+    "sonnet_reference_then_fast",
+    "glm_5_2_logprob_candidate",
+    "kimi_k2_thinking_diverse",
+    "quality_only_opus_46",
+    "deepseek_v4_flash_fast"
+  ],
+  "usage": {
+    "calls": 1,
+    "completion_tokens": 387,
+    "cost_is_estimate": false,
+    "cost_nanodollars": 781200,
+    "cost_usd": 0.0007812,
+    "latency_ms": 5992,
+    "prompt_tokens": 405
+  },
+  "utility": {
+    "deepseek_v4_flash_fast": 0.6699999999999999,
+    "glm_5_2_logprob_candidate": 0.7475,
+    "kimi_k2_thinking_diverse": 0.7275,
+    "quality_only_opus_46": 0.675,
+    "sonnet_reference_then_fast": 0.79
+  }
+}

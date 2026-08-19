@@ -1,0 +1,18 @@
+{
+  "max_tokens": 700,
+  "messages": [
+    {
+      "content": "You are a rigorous structured-judgment engine. Judge only the stated attribute. Use the item text, not outside popularity. Return strict JSON only. Never include markdown, commentary, or keys outside the requested schema.",
+      "role": "system"
+    },
+    {
+      "content": "Case: model_policy_options\nAttribute public_receipt_credibility: credibility as a judge model for evidence that will be shown to serious external readers\n\nA (sonnet_reference_then_fast): Use anthropic/claude-sonnet-4.6 for a frozen reference or disputed cases, then use a cheaper current model for repeated candidate-regime sweeps.\n\nB (deepseek_v4_flash_fast): Fixed deepseek/deepseek-v4-flash policy for cheap high-volume smoke tests, prompt iteration, and broad first-pass sweeps.\n\nTask: Which item has more of this attribute? Choose one item ID. Output JSON exactly: {\"higher_id\":\"item id\",\"confidence\":0.0}.",
+      "role": "user"
+    }
+  ],
+  "model": "openai/gpt-5.4-mini",
+  "response_format": {
+    "type": "json_object"
+  },
+  "temperature": 0.1
+}

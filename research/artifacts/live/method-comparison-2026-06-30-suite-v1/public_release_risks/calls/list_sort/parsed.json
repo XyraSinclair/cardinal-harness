@@ -1,0 +1,10 @@
+{
+  "confidence": "0.86",
+  "ranked_ids": [
+    "overclaiming_evidence",
+    "unportable_artifacts",
+    "opaque_failure_cases",
+    "first_run_complexity",
+    "security_advisory_noise"
+  ]
+}

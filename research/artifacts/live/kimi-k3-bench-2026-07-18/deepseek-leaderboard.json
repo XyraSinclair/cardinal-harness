@@ -1,0 +1,20 @@
+[
+  {
+    "coherence": 0.7764669993258551,
+    "coherence_harmonic": 0.6991393775484096,
+    "cost_nanodollars": 10112197,
+    "frustration": 0.14346522372724518,
+    "judge_score": 0.44958895591040776,
+    "model": "deepseek/deepseek-v4-flash",
+    "nuisance_drift_nats": 0.505343452182381,
+    "null_bias_nats": 0.0,
+    "order_flip_rate": 0.15,
+    "order_residual_nats": 0.15405015336144812,
+    "paraphrase_spearman": 0.9761904761904762,
+    "polarity_spearman": -0.5476190476190477,
+    "refusals": 0,
+    "signal_nats": 0.8651669970113908,
+    "spin_survival": 0.6666666666666666,
+    "susceptibility_nats": 0.46922190922646356
+  }
+]

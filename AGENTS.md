@@ -2,20 +2,26 @@
 
 `llmsort` is the engine: pairwise LLM ratio judgements fitted into cardinal
 scores with uncertainty, active pair selection, and explicit cost and
-provenance. This repo is a two-part workspace:
+provenance. This is the one repo — crate, research code, and the measured
+record all live here, in three parts:
 
 - **the crate** (root package, published to crates.io) — small, promised,
   under the shape mandate below;
-- **`experiments/`** (`llmsort-experiments`, never published) — the research
-  side: experimental verbs (`cardinal`), the `cardinald` daemon, live
-  batteries, instruments whose evidence is not yet in. An instrument
-  graduates into the crate only after its evidence pack earns it.
+- **`experiments/`** (`llmsort-experiments`, never published) — the living
+  research code: experimental verbs (`cardinal`), the `cardinald` daemon,
+  live batteries, instruments whose evidence is not yet in. An instrument
+  graduates into the crate only after its evidence pack earns it;
+- **`research/`** — the record: replayable evidence packs
+  (`research/artifacts/live/`, 38+ dated packs), dated investigation notes
+  (`research/notes/`), campaign definitions (`research/campaigns/`,
+  `research/batteries/`, `research/data/`), and python analysis
+  (`research/scripts/`, `research/examples/`). `PROGRAM.md` at the root is
+  the book of tricks — every method as a rung with its pack — and is
+  served at <https://llmsorting.com/PROGRAM.md>.
 
-Evidence packs, campaign definitions, python analysis, dated notes, and
-structured judgements live in the cold archive,
-[llmsort-lab](https://github.com/XyraSinclair/llmsort-lab), which also
-carries full pre-extraction history. New experiment *code* is written here;
-new experiment *evidence* is archived there.
+Pre-extraction history (the `llmsorting` era) lives in the archived
+[llmsort-lab](https://github.com/XyraSinclair/llmsort-lab) repo; nothing
+new lands there.
 
 ## Shape mandate (the crate — root package only)
 
@@ -30,10 +36,25 @@ new experiment *evidence* is archived there.
 - `#[doc(hidden)] pub` items are seams for `experiments/`, not public
   API — they may change without notice.
 
-`experiments/` is exempt from the file and suite ceilings but not from
-discipline: zero Python anywhere in this repo, CI green at every commit
-(fmt + clippy `-D warnings` + tests + docs run workspace-wide), and the
-crate must never depend on `experiments/` — the dependency points one way.
+`experiments/` and `research/` are exempt from the file and suite
+ceilings but not from discipline: CI green at every commit (fmt + clippy
+`-D warnings` + tests + docs run workspace-wide), python confined to
+`research/`, and the crate must never depend on `experiments/` — the
+dependency points one way.
+
+## Research norms
+
+- `docs/PRINCIPLES.md` is the anti-slop discipline: refutability,
+  scripted-pathology validation, denominators, mathematical register,
+  errata-on-top. Read it before substantial research work.
+- `research/notes/OPERATOR-QUEUE.md` caps operator decisions at five
+  open items; update item states in the same commit as the work.
+- Never publish claude.ai Artifacts from this repo (operator ban,
+  2026-07-08). Shareable pages are committed HTML served locally. The
+  public sites (llmsorting.com, pairwiseratio.org) live in
+  exopriors-core `sites/`.
+- Evidence packs are replayable and content-addressed; a published
+  number without its pack is slop.
 
 ## Core invariants (the embarrass-us list)
 
@@ -53,7 +74,7 @@ crate must never depend on `experiments/` — the dependency points one way.
 Fast direct-to-main: commit small coherent changes, push promptly, rebase
 not merge, stage only intended paths, never force-push main. Publishing to
 crates.io ships only the root package (`cargo publish -p llmsort`; the
-include-list excludes `experiments/` — verify with
+include-list excludes `experiments/` and `research/` — verify with
 `cargo package -p llmsort --list` when touching packaging). When changing
 public request/response shapes or CLI behavior, update examples, tests,
 and docs in the same change.

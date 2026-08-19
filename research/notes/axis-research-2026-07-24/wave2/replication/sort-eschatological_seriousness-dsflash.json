@@ -1,0 +1,137 @@
+{
+  "items": [
+    {
+      "id": "item-0010",
+      "text": "Their forecast puts a fifteen percent chance of irreversible collapse this century, which is high enough that the committee added an override: any single member can halt a launch, no quorum, no appeal, and they accepted that this will produce false stops.",
+      "rank": 1,
+      "latent_mean": 4.304085338059457,
+      "latent_std": 0.9128709276157886,
+      "z_score": 1.691924842500716,
+      "percentile": 0.9583333333333334
+    },
+    {
+      "id": "item-0006",
+      "text": "We took the reactor offline for fourteen months because the containment model had one unbounded failure mode, and an unbounded failure mode is not a number you multiply by a probability and move on from.",
+      "rank": 2,
+      "latent_mean": 3.721297191251521,
+      "latent_std": 1.2247448676663233,
+      "z_score": 1.10336434503309,
+      "percentile": 0.875
+    },
+    {
+      "id": "item-0005",
+      "text": "Existential risk is the defining challenge of our century, and our brand is built on facing it unflinchingly; that is why every deck we ship opens with the words that keep us honest about the stakes.",
+      "rank": 3,
+      "latent_mean": 3.2618152863614776,
+      "latent_std": 1.2076147252765927,
+      "z_score": 0.6393314027011646,
+      "percentile": 0.7916666666666666
+    },
+    {
+      "id": "item-0008",
+      "text": "He stopped taking clients whose work he could not defend to a jury that did not exist yet, which cut his income roughly in half and took two years to explain to his family.",
+      "rank": 4,
+      "latent_mean": 3.0981796484762985,
+      "latent_std": 1.1547005352519373,
+      "z_score": 0.4740750004139142,
+      "percentile": 0.7083333333333334
+    },
+    {
+      "id": "item-0000",
+      "text": "The seed vault's refrigeration contract runs on a five-year cycle, which is shorter than the failure horizon we are actually insuring against, so we moved the endowment into a perpetual trust and accepted a lower return to buy the extra two centuries.",
+      "rank": 5,
+      "latent_mean": 3.044660685911014,
+      "latent_std": 1.2247448676663233,
+      "z_score": 0.42002594776261537,
+      "percentile": 0.625
+    },
+    {
+      "id": "item-0009",
+      "text": "My climate anxiety is unbearable some nights, so I have started keeping the news off after eight and going for long walks by the reservoir instead.",
+      "rank": 6,
+      "latent_mean": 2.9683340551828543,
+      "latent_std": 1.0606601693491413,
+      "z_score": 0.3429433234892045,
+      "percentile": 0.5416666666666666
+    },
+    {
+      "id": "item-0007",
+      "text": "The catastrophe genre has always sold well, from Revelation through the nuclear novels to today's alignment thrillers, and readers return to it for the same reason they return to horror.",
+      "rank": 7,
+      "latent_mean": 2.2891742922821123,
+      "latent_std": 1.2076147252765927,
+      "z_score": -0.3429433234892045,
+      "percentile": 0.4583333333333333
+    },
+    {
+      "id": "item-0001",
+      "text": "We are the last generation, dancing on the lip of the abyss while the machine-gods stir beneath a bruised and dying sky; extinction hums in every server farm, and the countdown clock of our species ticks toward a silence no one will be left to hear.",
+      "rank": 8,
+      "latent_mean": 2.1031446869751367,
+      "latent_std": 0.6770031997375353,
+      "z_score": -0.5308154990694386,
+      "percentile": 0.375
+    },
+    {
+      "id": "item-0004",
+      "text": "Grandmother rewrote the will after the diagnosis, not to change who got what, but to add a clause requiring the orchard be kept as orchard, because she wanted the trees to outlive everyone who remembered planting them.",
+      "rank": 9,
+      "latent_mean": 1.9260640035426244,
+      "latent_std": 1.1547005352519373,
+      "z_score": -0.7096501162520258,
+      "percentile": 0.2916666666666667
+    },
+    {
+      "id": "item-0002",
+      "text": "I turned down the tenure track. The work only matters if there are people in 2200 to use it, and the department wanted six years of things that would matter until 2029.",
+      "rank": 10,
+      "latent_mean": 1.6393844100822188,
+      "latent_std": 0.912870927615789,
+      "z_score": -0.9991691894607667,
+      "percentile": 0.20833333333333334
+    },
+    {
+      "id": "item-0011",
+      "text": "Second-quarter margins came in ahead of plan, mostly on freight, and the board approved the dividend without discussion.",
+      "rank": 11,
+      "latent_mean": 1.60135371331788,
+      "latent_std": 0.6770031997375351,
+      "z_score": -1.0375765694482606,
+      "percentile": 0.125
+    },
+    {
+      "id": "item-0003",
+      "text": "The tide charts for the harbor were revised last spring, so the ferry schedule now shifts by eleven minutes in October.",
+      "rank": 12,
+      "latent_mean": 0.0,
+      "latent_std": 1.0606601693491415,
+      "z_score": -2.6547912353508787,
+      "percentile": 0.041666666666666664
+    }
+  ],
+  "meta": {
+    "topk_error": 6.684352089965834,
+    "tolerated_error": 0.1,
+    "comparisons_attempted": 24,
+    "comparisons_used": 24,
+    "comparisons_refused": 0,
+    "comparisons_cached": 0,
+    "comparison_budget": 24,
+    "latency_ms": 18716,
+    "model_used": "deepseek/deepseek-v4-flash",
+    "rater_id_used": "deepseek/deepseek-v4-flash",
+    "provider_input_tokens": 10796,
+    "provider_output_tokens": 4891,
+    "provider_cost_nanodollars": 2598509,
+    "provider_cost_is_estimate": false,
+    "entities_pruned": 0,
+    "pairs_counterbalanced": 12,
+    "position_flips": 2,
+    "evidence_judgements": 0,
+    "logprob_mode_judgements": 0,
+    "evidence_visible_mass_mean": null,
+    "evidence_order_residual_mean_abs": 0.7533186551246409,
+    "judgement_frustration_mean": 0.019545853569597975,
+    "stop_reason": "budget_exhausted"
+  }
+}

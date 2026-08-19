@@ -1,0 +1,18 @@
+{
+  "max_tokens": 1200,
+  "messages": [
+    {
+      "content": "You are a rigorous structured-judgment engine. Judge only the stated attribute. Use the item text, not outside popularity. Return strict JSON only. Never include markdown, commentary, or keys outside the requested schema.",
+      "role": "system"
+    },
+    {
+      "content": "Case: public_release_risks\nDescription: Rank the risks that would most undermine sharing cardinal-harness widely as a serious artifact.\n\nAttributes:\n- trust_damage (weight 0.45): how much this would damage trust from a careful external reader\n- fix_leverage (weight 0.35): how much fixing this would improve the overall release with one focused change\n- likelihood (weight 0.2): how likely this risk is to occur during public sharing without additional work\n\nItems:\n- overclaiming_evidence: The README or report implies method superiority beyond the checked receipt, making a careful reader distrust the whole project.\n- unportable_artifacts: A fresh clone cannot verify receipts because paths, cache files, generated artifacts, or model metadata are missing.\n- security_advisory_noise: Dependency audit warnings distract from the artifact's quality and make users hesitate before installing the crate.\n- opaque_failure_cases: Known cases where cardinal performs badly are buried instead of explained as useful constraints on the method.\n- first_run_complexity: The first real run requires too many concepts, flags, and files before the user sees a result worth caring about.\n\nTask: Return one global ranking that maximizes the weighted attributes. Output JSON exactly like this schema: {\"ranked_ids\": [\"best item id\", \"next item id\"], \"confidence\": \"number from 0 to 1\"}",
+      "role": "user"
+    }
+  ],
+  "model": "openai/gpt-5.4-mini",
+  "response_format": {
+    "type": "json_object"
+  },
+  "temperature": 0.1
+}

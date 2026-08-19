@@ -1,0 +1,18 @@
+{
+  "max_tokens": 700,
+  "messages": [
+    {
+      "content": "You are a rigorous structured-judgment engine. Judge only the stated attribute. Use the item text, not outside popularity. Return strict JSON only. Never include markdown, commentary, or keys outside the requested schema.",
+      "role": "system"
+    },
+    {
+      "content": "Case: first_user_path\nAttribute time_to_first_success: how much this reduces the time before a new user gets a meaningful successful run\n\nA (when_not_to_use_cardinal): A prominent section showing cases where scalar metrics, deterministic sorting, or whole-list ranking are cheaper and more appropriate.\n\nB (receipt_debugging_guide): A troubleshooting guide for cache misses, model refusals, cost estimates, non-convergence, and inconsistent pairwise judgments.\n\nTask: Which item has more of this attribute? Choose one item ID. Output JSON exactly: {\"higher_id\":\"item id\",\"confidence\":0.0}.",
+      "role": "user"
+    }
+  ],
+  "model": "openai/gpt-5.4-mini",
+  "response_format": {
+    "type": "json_object"
+  },
+  "temperature": 0.1
+}

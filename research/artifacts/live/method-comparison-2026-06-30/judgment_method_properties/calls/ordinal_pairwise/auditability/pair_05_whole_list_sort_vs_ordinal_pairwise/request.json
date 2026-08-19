@@ -1,0 +1,18 @@
+{
+  "max_tokens": 700,
+  "messages": [
+    {
+      "content": "You are a rigorous structured-judgment engine. Judge only the stated attribute. Use the item text, not outside popularity. Return strict JSON only. Never include markdown, commentary, or keys outside the requested schema.",
+      "role": "system"
+    },
+    {
+      "content": "Case: judgment_method_properties\nAttribute auditability: ability for another engineer to inspect individual judgments and understand why the final order changed\n\nA (whole_list_sort): Ask the model to directly return one ranked list after considering all attributes and weights at once.\n\nB (ordinal_pairwise): Ask pairwise questions that only choose which item is better on an attribute, then aggregate wins into a ranking.\n\nTask: Which item has more of this attribute? Choose one item ID. Output JSON exactly: {\"higher_id\":\"item id\",\"confidence\":0.0}.",
+      "role": "user"
+    }
+  ],
+  "model": "openai/gpt-4.1-mini",
+  "response_format": {
+    "type": "json_object"
+  },
+  "temperature": 0.1
+}

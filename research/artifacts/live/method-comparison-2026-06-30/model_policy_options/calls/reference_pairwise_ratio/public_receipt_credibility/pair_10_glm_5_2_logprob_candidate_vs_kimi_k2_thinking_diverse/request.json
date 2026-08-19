@@ -1,0 +1,18 @@
+{
+  "max_tokens": 800,
+  "messages": [
+    {
+      "content": "You are a rigorous structured-judgment engine. Judge only the stated attribute. Use the item text, not outside popularity. Return strict JSON only. Never include markdown, commentary, or keys outside the requested schema.",
+      "role": "system"
+    },
+    {
+      "content": "Case: model_policy_options\nAttribute public_receipt_credibility: credibility as a judge model for evidence that will be shown to serious external readers\n\nA (glm_5_2_logprob_candidate): Use z-ai/glm-5.2 when logprob support, low prompt cost, and large context matter more than maximum brand credibility.\n\nB (kimi_k2_thinking_diverse): Use moonshotai/kimi-k2-thinking as a diverse reasoning judge for contested comparisons or cross-model adjudication.\n\nTask: Which item has more of this attribute, and how many times more? Use ratio=1 only for near ties; cap large gaps at 26. Output JSON exactly: {\"higher_id\":\"item id\",\"ratio\":1.0,\"confidence\":0.0}.",
+      "role": "user"
+    }
+  ],
+  "model": "anthropic/claude-sonnet-4.6",
+  "response_format": {
+    "type": "json_object"
+  },
+  "temperature": 0.1
+}

@@ -1,0 +1,46 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "I need to compare how much ranking information is extracted per provider call between these two judgment methods.\n\n**A (ordinal_pairwise):** Each pairwise call yields a binary outcome (A > B or B > A). This is 1 bit of information per call. Aggregating wins gives a ranking, but each individual call contributes only ordinal preference data.\n\n**B (cardinal_pairwise_ratio):** Each pairwise call yields two pieces of information:\n1. Which item is better (ordinal, ~1 bit)\n2. How many times more it has the attribute (a continuous ratio/magnitude estimate)\n\nThe ratio information is substantially richer \u2014 it provides not just direction but magnitude, allowing a latent score model to be fit. This means each call contributes both the sign and the scale of the difference, which is considerably more information than just the sign alone.\n\n**Ratio estimation:**\n- B extracts the ordinal comparison PLUS a continuous magnitude estimate from each call\n- The magnitude estimate effectively encodes where on a scale the difference lies, which is much more informative for fitting a latent model\n- This could be roughly 3-5x more information per call (ordinal + continuous ratio vs. just ordinal), as the ratio provides log-scale information that would otherwise require many pairwise comparisons to triangulate\n- I'd estimate roughly 4x more information per call for B vs A\n\n{\"higher_id\":\"B\",\"ratio\":4.0,\"confidence\":0.78}",
+        "reasoning": null,
+        "refusal": null,
+        "role": "assistant"
+      },
+      "native_finish_reason": "end_turn"
+    }
+  ],
+  "created": 1782849710,
+  "id": "gen-1782849710-kIeinW6vlhoHk618Mlvq",
+  "model": "anthropic/claude-4.6-sonnet-20260217",
+  "object": "chat.completion",
+  "provider": "Anthropic",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 333,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.005631,
+    "cost_details": {
+      "upstream_inference_completions_cost": 0.004995,
+      "upstream_inference_cost": 0.005631,
+      "upstream_inference_prompt_cost": 0.000636
+    },
+    "is_byok": false,
+    "prompt_tokens": 212,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 545
+  }
+}

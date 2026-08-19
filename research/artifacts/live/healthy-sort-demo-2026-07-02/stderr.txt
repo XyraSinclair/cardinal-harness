@@ -1,0 +1,3 @@
+sorted 8 items by "usefulness as advice for a software engineer" · 120 comparisons (18 cached, 0 refused) · $0.3441 · order flips: 11/51 · stop: budget_exhausted
+probe [opposite] "lack of usefulness as advice for a software engineer": consistency +0.81 — consistent
+probe [paraphrase] "how much practical value it offers someone building software": consistency +0.35 — shaky

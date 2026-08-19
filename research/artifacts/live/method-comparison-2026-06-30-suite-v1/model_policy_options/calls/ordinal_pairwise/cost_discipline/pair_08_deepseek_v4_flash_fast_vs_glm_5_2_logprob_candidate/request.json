@@ -1,0 +1,18 @@
+{
+  "max_tokens": 700,
+  "messages": [
+    {
+      "content": "You are a rigorous structured-judgment engine. Judge only the stated attribute. Use the item text, not outside popularity. Return strict JSON only. Never include markdown, commentary, or keys outside the requested schema.",
+      "role": "system"
+    },
+    {
+      "content": "Case: model_policy_options\nAttribute cost_discipline: ability to support many repeated live benchmark runs without wasting provider spend\n\nA (deepseek_v4_flash_fast): Fixed deepseek/deepseek-v4-flash policy for cheap high-volume smoke tests, prompt iteration, and broad first-pass sweeps.\n\nB (glm_5_2_logprob_candidate): Use z-ai/glm-5.2 when logprob support, low prompt cost, and large context matter more than maximum brand credibility.\n\nTask: Which item has more of this attribute? Choose one item ID. Output JSON exactly: {\"higher_id\":\"item id\",\"confidence\":0.0}.",
+      "role": "user"
+    }
+  ],
+  "model": "openai/gpt-5.4-mini",
+  "response_format": {
+    "type": "json_object"
+  },
+  "temperature": 0.1
+}

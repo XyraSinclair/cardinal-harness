@@ -1,0 +1,46 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "I need to evaluate which item has lower maintenance cost (cheaper to maintain as code and models evolve).\n\n**A (copy_paste_quickstart):**\n- Single request JSON, one command, one expected output\n- Very minimal - just a snapshot of one interaction\n- When models/APIs change, only one example needs updating\n- The \"expected top-k output\" could become stale as models evolve, but it's just one small piece\n- Extremely simple structure = very low maintenance burden\n\n**B (worked_artifact_walkthrough):**\n- Multi-step guided walkthrough covering: messy shortlist \u2192 attributes \u2192 pairwise prompts \u2192 cache reuse \u2192 report reading \u2192 decision caveats\n- Each step has specific prompts, expected behaviors, and outputs\n- As code evolves: cache reuse mechanics may change, pairwise prompt formats may shift, report structure may change\n- As models evolve: expected outputs at each stage could drift, caveats may need updating\n- Many more touchpoints that can break or become outdated\n- Much higher surface area for maintenance\n\n**Ratio assessment:**\nA is dramatically cheaper to maintain - it has maybe 1 example to keep current vs. B's many interconnected steps, each of which can become stale independently. The ratio is large but not extreme - I'd estimate around 8-10x easier to maintain A vs B.\n\n```json\n{\"higher_id\":\"A\",\"ratio\":9.0,\"confidence\":0.82}\n```",
+        "reasoning": null,
+        "refusal": null,
+        "role": "assistant"
+      },
+      "native_finish_reason": "end_turn"
+    }
+  ],
+  "created": 1782861889,
+  "id": "gen-1782861889-Z0KypYLms45S3tb5Lxlf",
+  "model": "anthropic/claude-4.6-sonnet-20260217",
+  "object": "chat.completion",
+  "provider": "Anthropic",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 328,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.005571,
+    "cost_details": {
+      "upstream_inference_completions_cost": 0.00492,
+      "upstream_inference_cost": 0.005571,
+      "upstream_inference_prompt_cost": 0.000651
+    },
+    "is_byok": false,
+    "prompt_tokens": 217,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 545
+  }
+}

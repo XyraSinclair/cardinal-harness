@@ -1,0 +1,7 @@
+{
+  "name": "quality_only_opus_46",
+  "policy": {
+    "type": "fixed",
+    "model": "anthropic/claude-opus-4.6"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "confidence": 0.9,
+  "ranked_ids": [
+    "bandit_policy_cardinal",
+    "cardinal_pairwise_ratio",
+    "ordinal_pairwise",
+    "whole_list_sort",
+    "single_scalar_rating"
+  ]
+}

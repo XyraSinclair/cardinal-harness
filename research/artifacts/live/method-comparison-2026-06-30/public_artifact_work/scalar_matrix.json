@@ -1,0 +1,101 @@
+{
+  "attribute_scores": {
+    "dependency_audit_cleanup": {
+      "evidence_leverage": 0.2,
+      "implementation_tractability": 0.9,
+      "shareability_gain": 0.3
+    },
+    "first_user_path": {
+      "evidence_leverage": 0.5,
+      "implementation_tractability": 0.85,
+      "shareability_gain": 0.75
+    },
+    "large_frozen_benchmark": {
+      "evidence_leverage": 0.85,
+      "implementation_tractability": 0.55,
+      "shareability_gain": 0.8
+    },
+    "live_baseline_suite": {
+      "evidence_leverage": 0.9,
+      "implementation_tractability": 0.6,
+      "shareability_gain": 0.85
+    },
+    "portable_receipts": {
+      "evidence_leverage": 0.7,
+      "implementation_tractability": 0.75,
+      "shareability_gain": 0.8
+    }
+  },
+  "extra": {
+    "confidence": {
+      "dependency_audit_cleanup": {
+        "evidence_leverage": 0.7,
+        "implementation_tractability": 0.95,
+        "shareability_gain": 0.7
+      },
+      "first_user_path": {
+        "evidence_leverage": 0.75,
+        "implementation_tractability": 0.9,
+        "shareability_gain": 0.85
+      },
+      "large_frozen_benchmark": {
+        "evidence_leverage": 0.85,
+        "implementation_tractability": 0.75,
+        "shareability_gain": 0.8
+      },
+      "live_baseline_suite": {
+        "evidence_leverage": 0.9,
+        "implementation_tractability": 0.8,
+        "shareability_gain": 0.85
+      },
+      "portable_receipts": {
+        "evidence_leverage": 0.8,
+        "implementation_tractability": 0.9,
+        "shareability_gain": 0.85
+      }
+    }
+  },
+  "method": "scalar_matrix",
+  "metrics_vs_reference": {
+    "candidate_ranked_ids": [
+      "live_baseline_suite",
+      "large_frozen_benchmark",
+      "portable_receipts",
+      "first_user_path",
+      "dependency_audit_cleanup"
+    ],
+    "kendall_tau": 0.6,
+    "reference_ranked_ids": [
+      "large_frozen_benchmark",
+      "live_baseline_suite",
+      "first_user_path",
+      "portable_receipts",
+      "dependency_audit_cleanup"
+    ],
+    "topk_jaccard": 0.5
+  },
+  "model": "openai/gpt-4.1-mini",
+  "ranked_ids": [
+    "live_baseline_suite",
+    "large_frozen_benchmark",
+    "portable_receipts",
+    "first_user_path",
+    "dependency_audit_cleanup"
+  ],
+  "usage": {
+    "calls": 1,
+    "completion_tokens": 364,
+    "cost_is_estimate": false,
+    "cost_nanodollars": 749200,
+    "cost_usd": 0.0007492,
+    "latency_ms": 6109,
+    "prompt_tokens": 417
+  },
+  "utility": {
+    "dependency_audit_cleanup": 0.375,
+    "first_user_path": 0.6575,
+    "large_frozen_benchmark": 0.7725,
+    "live_baseline_suite": 0.8225,
+    "portable_receipts": 0.745
+  }
+}

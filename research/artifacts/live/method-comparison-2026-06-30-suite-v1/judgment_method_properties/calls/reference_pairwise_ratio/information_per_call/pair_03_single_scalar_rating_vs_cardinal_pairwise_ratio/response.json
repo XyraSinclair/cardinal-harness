@@ -1,0 +1,46 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "I need to compare how much ranking information is extracted per provider call for these two judgment methods.\n\n**A (single_scalar_rating):**\n- Each call produces one score for one item on one attribute\n- To rank N items on K attributes, you need N\u00d7K calls\n- Each call gives a single scalar value\n- Information per call: one data point (a score for one item-attribute pair)\n\n**B (cardinal_pairwise_ratio):**\n- Each call asks about a pair of items: which is better AND how many times more\n- This gives two pieces of information: direction (which is better) + magnitude (ratio)\n- The ratio information is richer than a simple ordinal comparison\n- However, you still need O(N\u00b2) comparisons for N items, which is more calls total\n- But per call, you get: a comparison direction + a cardinal magnitude estimate\n- This is more information than a single scalar rating per call because:\n  1. It captures relative ordering (ordinal info)\n  2. It captures magnitude of difference (cardinal info)\n  3. Pairwise comparisons are generally more reliable/informative than absolute ratings\n\n**Analysis:**\n- A single scalar rating gives one absolute score per call - but absolute scores suffer from scale inconsistency, anchoring issues, and don't directly encode relative information\n- A cardinal pairwise ratio gives both ordinal AND cardinal relative information per call\n- The pairwise ratio encodes more bits of ranking-relevant information per call: you learn the direction of preference AND the magnitude\n- A scalar rating technically gives a number that could be used for ranking, but the information is noisier and less directly useful for ranking purposes\n- The pairwise ratio method extracts richer comparative information per call\n\nHowever, I should consider: single scalar ratings can be compared across all items simultaneously - one call gives a score that can be compared to ALL other items' scores. A pairwise call only directly compares 2 items. So per call, a scalar rating's information can be used to rank against all N items, while a pairwise call only directly informs one pair.\n\nBut the question is about information *extracted* per call. A scalar rating gives ~log2(10) \u2248 3.3 bits (for 1-10 scale). A cardinal pairwise ratio gives the ordinal bit PLUS the magnitude ratio, which is substantially more information about the relative standing of two items.\n\nOn balance, B extracts more ranking-relevant information per call because it captures both direction and magnitude of difference, which is more directly useful for fitting a latent score model accurately. The cardinal magnitude information is particularly valuable.\n\nI'd say B has moderately more information per call - perhaps 2-3x more due to the dual information (ordinal + cardinal ratio) versus a single scalar.\n\n{\"higher_id\":\"B\",\"ratio\":2.5,\"confidence\":0.6}",
+        "reasoning": null,
+        "refusal": null,
+        "role": "assistant"
+      },
+      "native_finish_reason": "end_turn"
+    }
+  ],
+  "created": 1782861294,
+  "id": "gen-1782861294-TkhK6AkUMKG6HG5ptPWV",
+  "model": "anthropic/claude-4.6-sonnet-20260217",
+  "object": "chat.completion",
+  "provider": "Anthropic",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 642,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.01029,
+    "cost_details": {
+      "upstream_inference_completions_cost": 0.00963,
+      "upstream_inference_cost": 0.01029,
+      "upstream_inference_prompt_cost": 0.00066
+    },
+    "is_byok": false,
+    "prompt_tokens": 220,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 862
+  }
+}

@@ -1,0 +1,137 @@
+{
+  "items": [
+    {
+      "id": "item-0010",
+      "text": "I love suspension bridges, genuinely, absurdly! But here is the part that keeps me up: the main cable is easy, it is a catenary and it wants to be one. The deck's torsional stiffness is the hard thing, because aeroelastic flutter is not a strength failure, it is an energy feedback where wind extracts work from the deck's own twisting each cycle. Adding steel raises stiffness and mass together, and mass shifts the coupled frequency toward the twisting mode you were trying to escape.",
+      "rank": 1,
+      "latent_mean": 2.450110597490487,
+      "latent_std": 1.4583688055332726,
+      "z_score": 0.9369749225677019,
+      "percentile": 0.9583333333333334
+    },
+    {
+      "id": "item-0011",
+      "text": "Protein structure prediction is largely solved for the easy cases, meaning single domains with deep homology. The residual difficulty is disordered regions that fold only on binding. There the target is not a structure but a conditional ensemble, and the standard accuracy metric assumes a single reference conformation, so a model that correctly predicts a two-state distribution scores worse than one that confidently predicts the wrong single state. The benchmark penalizes the right answer, so progress here cannot be read off the leaderboard.",
+      "rank": 2,
+      "latent_mean": 2.2787324924947714,
+      "latent_std": 1.063541091993404,
+      "z_score": 0.7668242632550273,
+      "percentile": 0.875
+    },
+    {
+      "id": "item-0005",
+      "text": "Ice sheet models are boring in the interior, where the flow law does what the flow law says. Everything difficult happens at the grounding line, the moving boundary where ice starts to float. There the stress balance changes character within a few kilometers, and a model whose grid is coarser than that transition will report a stable margin no matter how the ocean warms. Refining the grid is not enough, because the boundary migrates between timesteps; the discretization has to track it, or you are measuring your mesh instead of the ice.",
+      "rank": 3,
+      "latent_mean": 2.089858424187834,
+      "latent_std": 1.725147037188531,
+      "z_score": 0.579302950364469,
+      "percentile": 0.7916666666666666
+    },
+    {
+      "id": "item-0002",
+      "text": "Register allocation is graph coloring; that part you can read anywhere. What decides whether a compiler is good is what happens when coloring fails and you must choose a value to spill. The obvious heuristic, spill the longest live range, is wrong inside loops: a range spanning a loop body pays its reload once per iteration, not once. So the cost model must weight references by loop depth, and loop depth depends on the schedule you have not built yet. That circularity is the actual problem.",
+      "rank": 4,
+      "latent_mean": 2.0102383330072127,
+      "latent_std": 1.1911553236840795,
+      "z_score": 0.5002531148603554,
+      "percentile": 0.7083333333333334
+    },
+    {
+      "id": "item-0009",
+      "text": "Rook and pawn endings are where amateurs bleed rating points. The principles are memorable enough: rook behind the pawn, king activity, the Lucena and Philidor positions. The trouble is that real endings arrive one tempo off the textbook, and then you must decide which principle to break. Study helps; I still lose these.",
+      "rank": 5,
+      "latent_mean": 1.912549017369509,
+      "latent_std": 1.707938526680599,
+      "z_score": 0.4032634704482247,
+      "percentile": 0.625
+    },
+    {
+      "id": "item-0000",
+      "text": "Firing a kiln to cone 10 is mostly patience: you ramp slowly, watch the cones, learn the smell of a reduction atmosphere. Where it gets genuinely hard is the last hundred degrees, when the kiln's own thermal mass starts fighting your burner adjustments and you have to anticipate rather than react. I never fully solved that part; I just got better at guessing early.",
+      "rank": 6,
+      "latent_mean": 1.6870652512871964,
+      "latent_std": 1.8511864543918808,
+      "z_score": 0.179394666062918,
+      "percentile": 0.5416666666666666
+    },
+    {
+      "id": "item-0007",
+      "text": "Claim drafting is a strange craft: you write the broadest sentence you can defend, then narrow it in dependent claims. The interesting pressure is prior art you have not found yet, which is why practitioners write fallback positions. Whether that actually helps at litigation depends heavily on the examiner and the forum.",
+      "rank": 7,
+      "latent_mean": 1.325687657566501,
+      "latent_std": 1.8511864543918808,
+      "z_score": -0.179394666062918,
+      "percentile": 0.4583333333333333
+    },
+    {
+      "id": "item-0004",
+      "text": "Contact tracing works better than people expect, at least early on. The math is not complicated: if you find and isolate contacts faster than the generation interval, the effective reproduction number falls. Of course this gets harder once case counts grow, since tracer capacity is finite and delays compound. Different jurisdictions handled that scaling problem differently.",
+      "rank": 8,
+      "latent_mean": 0.9200195887286766,
+      "latent_std": 1.5833619605221503,
+      "z_score": -0.582157255698163,
+      "percentile": 0.375
+    },
+    {
+      "id": "item-0008",
+      "text": "Central banks adjust short-term interest rates in response to inflation and employment data. Communication about future policy is also considered a tool. Analysts follow the published statements closely. Views differ on the appropriate pace of adjustment.",
+      "rank": 9,
+      "latent_mean": 0.40077772725522975,
+      "latent_std": 1.8319544269348713,
+      "z_score": -1.0976801988107399,
+      "percentile": 0.2916666666666667
+    },
+    {
+      "id": "item-0006",
+      "text": "Sourdough is ALIVE and it is wonderful, from the first bubbly starter to the last crackling crust! Every stage thrills me, the stretch, the fold, the smell at 4am, the oven spring, ALL of it! Bread is chemistry you can eat and I will never stop marveling at it! Bake more bread!",
+      "rank": 10,
+      "latent_mean": 0.39202920441900635,
+      "latent_std": 1.804938614037677,
+      "z_score": -1.1063660629042458,
+      "percentile": 0.20833333333333334
+    },
+    {
+      "id": "item-0003",
+      "text": "A sloop carries one mast and two sails. The mainsail is attached along the mast and boom; the headsail sets forward of the mast. Sail area is reduced by reefing. Most cruising boats in this size range use a similar arrangement.",
+      "rank": 11,
+      "latent_mean": 0.3231730788464966,
+      "latent_std": 1.4097074945620922,
+      "z_score": -1.1747290265638788,
+      "percentile": 0.125
+    },
+    {
+      "id": "item-0001",
+      "text": "Consensus is the beating heart of distributed systems and it is GLORIOUS! Watching a cluster elect a leader in milliseconds still gives me chills, every single time!! The proof that this terminates under partial synchrony is straightforward once you have seen it, so we will skip the boring math and trust the paper. Just use Raft, it works!",
+      "rank": 12,
+      "latent_mean": 0.0,
+      "latent_std": 0.8697274981233839,
+      "z_score": -1.4955874725083773,
+      "percentile": 0.041666666666666664
+    }
+  ],
+  "meta": {
+    "topk_error": 8.4632172761433,
+    "tolerated_error": 0.1,
+    "comparisons_attempted": 24,
+    "comparisons_used": 24,
+    "comparisons_refused": 0,
+    "comparisons_cached": 0,
+    "comparison_budget": 24,
+    "latency_ms": 8597,
+    "model_used": "anthropic/claude-opus-4.6",
+    "rater_id_used": "anthropic/claude-opus-4.6",
+    "provider_input_tokens": 14032,
+    "provider_output_tokens": 653,
+    "provider_cost_nanodollars": 86485000,
+    "provider_cost_is_estimate": false,
+    "entities_pruned": 0,
+    "pairs_counterbalanced": 12,
+    "position_flips": 1,
+    "evidence_judgements": 0,
+    "logprob_mode_judgements": 0,
+    "evidence_visible_mass_mean": null,
+    "evidence_order_residual_mean_abs": 0.23015580947305367,
+    "judgement_frustration_mean": 0.0035347621166348436,
+    "stop_reason": "budget_exhausted"
+  }
+}

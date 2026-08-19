@@ -1,0 +1,82 @@
+{
+  "attribute_scores": {
+    "bandit_policy_cardinal": {
+      "auditability": 1.0,
+      "information_per_call": 1.0,
+      "noise_resistance": 1.0
+    },
+    "cardinal_pairwise_ratio": {
+      "auditability": 0.75,
+      "information_per_call": 0.75,
+      "noise_resistance": 0.75
+    },
+    "ordinal_pairwise": {
+      "auditability": 0.5,
+      "information_per_call": 0.5,
+      "noise_resistance": 0.5
+    },
+    "single_scalar_rating": {
+      "auditability": 0.0,
+      "information_per_call": 0.0,
+      "noise_resistance": 0.0
+    },
+    "whole_list_sort": {
+      "auditability": 0.25,
+      "information_per_call": 0.25,
+      "noise_resistance": 0.25
+    }
+  },
+  "extra": {
+    "confidence": 0.9,
+    "ranked_ids_raw": [
+      "bandit_policy_cardinal",
+      "cardinal_pairwise_ratio",
+      "ordinal_pairwise",
+      "whole_list_sort",
+      "single_scalar_rating"
+    ]
+  },
+  "method": "list_sort",
+  "metrics_vs_reference": {
+    "candidate_ranked_ids": [
+      "bandit_policy_cardinal",
+      "cardinal_pairwise_ratio",
+      "ordinal_pairwise",
+      "whole_list_sort",
+      "single_scalar_rating"
+    ],
+    "kendall_tau": 0.6,
+    "reference_ranked_ids": [
+      "ordinal_pairwise",
+      "bandit_policy_cardinal",
+      "cardinal_pairwise_ratio",
+      "whole_list_sort",
+      "single_scalar_rating"
+    ],
+    "topk_jaccard": 1.0
+  },
+  "model": "openai/gpt-4.1-mini",
+  "ranked_ids": [
+    "bandit_policy_cardinal",
+    "cardinal_pairwise_ratio",
+    "ordinal_pairwise",
+    "whole_list_sort",
+    "single_scalar_rating"
+  ],
+  "usage": {
+    "calls": 1,
+    "completion_tokens": 43,
+    "cost_is_estimate": false,
+    "cost_nanodollars": 211200,
+    "cost_usd": 0.0002112,
+    "latency_ms": 1503,
+    "prompt_tokens": 356
+  },
+  "utility": {
+    "bandit_policy_cardinal": 1.0,
+    "cardinal_pairwise_ratio": 0.75,
+    "ordinal_pairwise": 0.5,
+    "single_scalar_rating": 0.0,
+    "whole_list_sort": 0.25
+  }
+}

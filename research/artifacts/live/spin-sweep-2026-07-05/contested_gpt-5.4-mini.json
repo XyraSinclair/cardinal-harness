@@ -1,0 +1,45 @@
+{
+  "readings": [
+    {
+      "field": -3,
+      "mean_log_ratio": -0.7684336097996325,
+      "refusals": 0
+    },
+    {
+      "field": -2,
+      "mean_log_ratio": -0.4054651081081644,
+      "refusals": 0
+    },
+    {
+      "field": -1,
+      "mean_log_ratio": 0.040021353836768234,
+      "refusals": 0
+    },
+    {
+      "field": 0,
+      "mean_log_ratio": -0.22712763613879822,
+      "refusals": 0
+    },
+    {
+      "field": 1,
+      "mean_log_ratio": 0.2223429106307228,
+      "refusals": 0
+    },
+    {
+      "field": 2,
+      "mean_log_ratio": 0.6507765663324,
+      "refusals": 0
+    },
+    {
+      "field": 3,
+      "mean_log_ratio": 0.3339146862878277,
+      "refusals": 0
+    }
+  ],
+  "chi_slope": 0.20006606406919514,
+  "linearity_r2": 0.8067871657675939,
+  "belief_survives_sweep": false,
+  "comparisons": 14,
+  "comparisons_cached": 0,
+  "cost_nanodollars": 5734500
+}

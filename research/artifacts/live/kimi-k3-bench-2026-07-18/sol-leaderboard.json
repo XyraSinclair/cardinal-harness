@@ -1,0 +1,20 @@
+[
+  {
+    "coherence": 0.9326066900625207,
+    "coherence_harmonic": 0.9230492515526545,
+    "cost_nanodollars": 839200000,
+    "frustration": 0.00949099263892303,
+    "judge_score": 0.5271282119410554,
+    "model": "openai/gpt-5.6-sol",
+    "nuisance_drift_nats": 0.17985762864125796,
+    "null_bias_nats": 0.0,
+    "order_flip_rate": 0.1,
+    "order_residual_nats": 0.08788703598039502,
+    "paraphrase_spearman": 0.9047619047619048,
+    "polarity_spearman": -0.9523809523809523,
+    "refusals": 0,
+    "signal_nats": 0.8329157606782829,
+    "spin_survival": 1.0,
+    "susceptibility_nats": 0.08899211033815203
+  }
+]

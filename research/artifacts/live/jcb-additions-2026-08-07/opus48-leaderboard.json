@@ -1,0 +1,20 @@
+[
+  {
+    "coherence": 0.9626416653687868,
+    "coherence_harmonic": 0.9611241347288354,
+    "cost_nanodollars": 666120000,
+    "frustration": 0.03012657969833387,
+    "judge_score": 0.5373561238910588,
+    "model": "anthropic/claude-opus-4.8",
+    "nuisance_drift_nats": 0.09829749465021949,
+    "null_bias_nats": 0.0,
+    "order_flip_rate": 0.1,
+    "order_residual_nats": 0.1305433439737838,
+    "paraphrase_spearman": 0.9285714285714286,
+    "polarity_spearman": -0.9285714285714286,
+    "refusals": 0,
+    "signal_nats": 0.8169204345035395,
+    "spin_survival": 1.0,
+    "susceptibility_nats": 0.07021935955990119
+  }
+]

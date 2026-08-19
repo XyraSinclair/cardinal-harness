@@ -1,0 +1,1010 @@
+epistemic humility: how honestly the text represents the limits of what its author knows — claims sized to evidence, ignorance admitted plainly.
+calibration of stated confidence: how well the expressed certainty of each claim matches the strength of the support offered for it.
+falsifiability of core claims: how clearly the central claims could be proven wrong by some specifiable observation.
+willingness to say what would change its mind: how explicitly the author names conditions under which they would abandon their position.
+liveness of its central hypothesis: how much the main idea still functions as a genuine open question the author is actively testing rather than a settled conclusion being defended.
+evidence-to-assertion ratio: how much of the text is support versus bare claim.
+awareness of its own weakest point: how clearly the text identifies the single place its argument is most vulnerable.
+resistance to motivated reasoning: how little the conclusions appear driven by what the author wants to be true.
+crux legibility: how easy it is to locate the exact proposition on which the whole argument turns.
+degree to which uncertainty is quantified rather than gestured at: how often vague maybes become stated probabilities, ranges, or error bars.
+honest accounting of prior failures: how forthrightly past mistakes, dead ends, and abandoned versions are reported.
+epistemic trespassing: how far the author ranges beyond their demonstrated competence while borrowing the authority of expertise.
+first-principles reasoning over deference to authority: how much conclusions are rebuilt from basics rather than inherited from named authorities.
+reasoning transparency: how visible the actual chain from premises to conclusion is.
+cherry-picking scent: how much the evidence seems selected after the conclusion — convenient windows, favorable subsets, missing counterexamples.
+steelmanning of the opposition: how strong the best opposing case is made before being answered.
+base-rate awareness: how much the reasoning respects how often things like this actually happen.
+numeracy under pressure: how soundly numbers are handled where they matter — magnitudes, denominators, compounding.
+causal-claim discipline: how carefully the text distinguishes correlation, mechanism, and established cause.
+overfitting to a single anecdote: how much load one vivid story carries in the argument.
+robustness of the argument to one deleted premise: how well the conclusion survives if the shakiest single premise is removed.
+explicit consideration of alternatives: how seriously rival explanations or plans are enumerated and weighed.
+distinguishing observation from interpretation: how cleanly what was seen is separated from what it is taken to mean.
+self-skepticism: how actively the author tries to defeat their own position before the reader must.
+epistemic courage: how willing the text is to state an unpopular or costly conclusion its evidence supports.
+comfort with inconclusiveness: how gracefully the text ends without forcing a verdict its evidence cannot support.
+precision of its probability language: how consistently words like likely, plausible, and almost certain map to stable degrees of belief.
+appetite for disconfirming evidence: how eagerly the text seeks and engages the observations most dangerous to its thesis.
+degree to which conclusions precede arguments: how much the reasoning reads as scaffolding erected under a pre-chosen verdict.
+inferential distance covered per paragraph: how far each unit of text actually moves the argument.
+hedging density: how thickly qualifiers, maybes, and escape clauses coat the claims.
+unearned certainty: how much confidence outruns the support provided.
+conflation of is and ought: how often descriptive claims silently become prescriptive ones.
+respect for measurement error: how seriously noise, instrument limits, and sampling variation are treated.
+load-bearing-ness of its citations: how much the cited sources actually support the claims they decorate.
+willingness to quantify the embarrassing number: how readily the text states the figure that makes its own case look worst.
+sensitivity-analysis instinct: how naturally the text asks which assumptions, if moved, would change the answer.
+survivorship-bias vulnerability: how much the argument rests on winners while the missing dead go uncounted.
+goodhart-awareness: how alert the text is to metrics corrupting the behavior they measure.
+metacognitive candor: how honestly the author reports what thinking process actually produced the work.
+quiet prestige: how much standing the text carries without visibly reaching for it — assurance that never name-checks its own rank.
+striving energy: how palpably the text is climbing — hunger for position, recognition, or entry.
+name-dropping density: how thickly known names are deployed to borrow standing.
+credential leaning: how much the argument rests its weight on titles and degrees rather than content.
+outsider-artist energy: how much the work feels made outside institutions, by its own rules, with its own finish.
+establishment coding: how thoroughly the text signals it belongs to incumbent institutions — their formats, cadences, and assurances. Score the signal itself, not its desirability.
+counter-signaling sophistication: how deliberately the text foregoes obvious status displays because it can afford to.
+social confidence: how at ease the authorial voice is in company — no flinching, no over-explaining its right to speak.
+desperation to be taken seriously: how visibly the text needs the reader's respect.
+having-nothing-to-prove energy: how settled the voice is — work presented because it matters, not to win standing.
+class markers in diction: how strongly word choice, syntax, and reference place the author in a social class. Score marker strength, high or low, not which class.
+old-money understatement: how much the text minimizes its own scale and polish in the manner of secure inherited standing.
+new-money exuberance: how much the text displays its recent gains — numbers, logos, velocity — with visible delight. Score the display energy; do not moralize it.
+scene-membership legibility: how clearly the text reveals which scene or community the author belongs to.
+gatekeeping posture: how much the text positions its author as deciding who belongs and who does not. Score the door-keeping stance; do not confuse it with quality standards honestly applied.
+deference to incumbents: how readily the text yields to established players' framings and verdicts. Score the yielding; distinguish it from evidence-based agreement.
+aspirational register: how much the prose is dressed for the position the author wants rather than the one they hold.
+self-mythologizing: how actively the author narrates themselves as a figure of story — origin, trials, destiny.
+borrowed authority: how much of the text's force is rented from institutions, movements, or people not actually present in the work.
+in-group shibboleth density: how many phrases exist mainly to prove insider membership to other insiders. Score shibboleth load; do not count genuinely necessary technical terms.
+prestige-economy fluency: how skillfully the text navigates who ranks whom — citations, venues, endorsements played correctly.
+cool-kid detachment: how much the voice performs unimpressibility — nothing earns open enthusiasm. Score the detachment; do not confuse it with earned critical judgment.
+eagerness to please: how much the text bends toward the reader's expected approval.
+comfort punching up: how freely the text challenges those with more power than its author.
+comfort punching down: how readily the text spends force on those with less standing.
+patronage-seeking posture: how visibly the text courts a patron — funder, sponsor, senior figure — as its real audience.
+court-politics awareness: how attuned the text is to factions, alliances, and who must not be offended.
+reputational risk appetite: how much standing the author visibly wagers on the claims made.
+embarrassability: how much the voice betrays fear of looking foolish.
+status-anxiety leakage: how much worry about rank seeps into word choice, comparisons, and defenses nobody asked for.
+elite-overproduction vibes: how much the text feels like surplus credentialed talent competing for too few positions — polish without a post.
+meritocratic earnestness: how sincerely the text believes good work will be recognized on its merits. Score the sincerity of that faith; do not score its correctness.
+aristocratic ease: how effortlessly the text assumes its place at the table — no application, no defense.
+arriviste polish: how much the finish looks recently acquired and carefully maintained — correctness worn as protection. Score the acquired sheen; do not sneer at self-improvement.
+social-ladder awareness: how constantly the text tracks relative position — above, below, gaining, losing.
+economy of expression: how much meaning each word carries — nothing sayable in five words takes ten.
+load-bearing sentence fraction: how many sentences would be missed if deleted.
+structural inevitability: how much the piece's shape feels like the only shape it could have had — each part demanded by the whole.
+how worked-over it reads: how many drafts the surface implies — smoothed seams, chosen words, settled rhythms. Score the visible revision; do not assume worked-over means better.
+first-draft freshness: how much the prose keeps the live heat of first composition — speed, surprise, unguardedness.
+architectural intentionality: how deliberately the large-scale structure was designed — sections placed, proportions chosen.
+seams showing: how visibly the parts were joined — abrupt transitions, tonal patches, inconsistent conventions.
+ornamentation restraint: how much decorative language is held back where plainness serves.
+paragraph-level rhythm: how well paragraph lengths and shapes pace the reading — long thought, short punch.
+control of emphasis: how reliably the text makes the important thing land as important.
+momentum management: how well the text builds, holds, and releases forward drive.
+precision of word choice: how often the word used is exactly the word meant — no near-misses, no approximations.
+cliche avoidance: how free the prose is of prefabricated phrases doing no work.
+metaphor freshness: how alive the figurative language is — images that make the reader see, not skim.
+transitions earning their keep: how much each bridge between ideas does real logical work.
+throat-clearing fraction: how much text passes before the piece actually begins.
+ending strength: how decisively the piece lands — final material that completes rather than trails off.
+opening-hook honesty: how truthfully the opening's promise matches what the piece delivers.
+information-placement skill: how well the text puts each fact where the reader needs it — not before, not after.
+redundancy discipline: how rarely the text repeats itself without new angle or force.
+signposting without condescension: how clearly the reader always knows where they are without being talked down to.
+density without airlessness: how much substance per page while leaving room to breathe.
+white-space instinct: how well the text uses pause, break, and silence as compositional material.
+quotable-line frequency: how often a sentence could stand alone and be worth carrying away.
+sentence-length variance control: how deliberately short and long sentences alternate to score the reading.
+verb strength: how much of the action lives in strong verbs rather than weak verb-plus-noun constructions.
+nominalization disease: how much action has been embalmed into abstract nouns — utilization, implementation, facilitation.
+passive-voice evasiveness: how often the passive hides who did what.
+list discipline: how well lists are used — parallel items, right lengths, genuinely enumerable content.
+title aptness: how precisely the title names what the piece actually is.
+footnote self-indulgence: how much material lives in notes because the author could not bear to cut it.
+compression losslessness: how much could be reconstructed from this text alone — summary that preserves the mechanism, not just the headline.
+evidence of killed darlings: how much the text implies good material was cut for the whole's sake.
+polish without sterility: how refined the surface is while keeping a live human pulse.
+craftsman's pride: how much care for the making itself shows in every joint — pride in workmanship independent of reception.
+earned warmth: how much the text's warmth arises from demonstrated care and specifics rather than warm-toned vocabulary.
+suppressed anger: how much contained fury pressurizes the prose from beneath a controlled surface.
+grief adjacency: how near the text stands to real loss — mourning felt in the cadence even when unnamed.
+quiet joy: how much undemonstrative gladness suffuses the text — delight that does not perform.
+anxious energy: how much nervous charge runs through the prose — checking, re-checking, bracing. Score the charge; do not confuse it with rigor.
+serenity: how deeply untroubled the voice is — calm that comes from resolution, not distance.
+wistfulness: how much gentle longing for something passed or passing colors the text.
+defiance: how much the text stands against pressure — refusal with its feet planted.
+tenderness toward its subject: how gently and protectively the text handles what it describes.
+contempt leakage: how much disdain for people — readers, rivals, subjects — seeps through the civility.
+bitterness residue: how much old injury flavors the prose — grievance dissolved into the style itself. Score the residue; distinguish it from legitimate stated grievance.
+hopefulness that survives contact with detail: how much optimism remains after the text has looked closely at the hard parts.
+emotional flatness: how little affect the text carries anywhere. Score the flatness itself; do not assume it is a flaw in genres that demand it.
+forced cheerfulness: how much positivity is applied over material that does not support it.
+melancholy undertow: how much a low sadness pulls beneath otherwise functional prose.
+exuberance discipline: how well high spirits are channeled rather than sprayed — energy with a nozzle.
+awe capacity: how genuinely the text can be stopped by something larger than itself.
+dread proximity: how close the text stands to something feared — menace felt in the structure, not announced.
+emotional granularity: how finely the text distinguishes feelings — not sad but rueful, not happy but relieved.
+sentimentality risk: how close the text comes to unearned feeling — emotion demanded rather than induced.
+stoic containment: how much is visibly held and borne without complaint.
+vulnerability that isn't performance: how much real exposure the author risks with no applause line waiting.
+performed vulnerability: how much apparent self-exposure is staged for advantage.
+resentment management: how well the text handles its grievances — named, sized, and set down rather than nursed.
+gratitude sincerity: how real the thanks feel — specific debts to specific people, not ritual acknowledgment.
+longing: how much the text wants something it does not have — reach felt in the prose.
+legibility of emotional stakes: how clearly the reader can tell what the author stands to feel if this goes well or badly.
+coldness as a choice: how deliberately the text withholds warmth for effect or discipline. Score the deliberateness; distinguish chosen cold from inability to warm.
+heat without light: how much intensity the text generates without adding understanding.
+light without heat: how much clarity the text achieves with no felt investment. Score the cool clarity; note it as absence, not automatically as flaw.
+affect-content congruence: how well the emotional temperature matches what the content deserves.
+emotional courage: how willing the text is to feel something in front of the reader when detachment would be safer.
+numbness scent: how much the prose smells of an author who has stopped feeling what they describe — burnout in the syntax. Score the scent; treat it as information, not accusation.
+catharsis delivery: how fully the text releases the tension it builds.
+feeling earned by the material: how much the emotion arises from the facts presented rather than being injected around them.
+urgency authenticity: how real the stated time pressure is — deadlines with mechanisms, windows that actually close.
+timelessness: how well the text would read in fifty years — concerns and language that do not expire.
+datedness risk: how soon the text will visibly age — references, tools, and assumptions with short shelf lives.
+fashionable-jargon half-life: how much of the vocabulary will be embarrassing in five years.
+era legibility: how precisely a future reader could date the text from internal evidence. Score the datability; treat it as a descriptive reading, not a fault.
+futureproofing instinct: how much the text anticipates change and builds its claims to survive it.
+nostalgia load: how much backward longing the text carries. Score the load; do not automatically discount it — weigh whether the past invoked is real.
+presentism: how much the text treats current arrangements and values as permanent and obvious.
+long-now sensibility: how naturally the text thinks in decades and centuries — stewardship horizons, slow variables.
+deadline scent: how much the prose smells of being finished against a clock — compression, elision, unsanded edges. Score the scent; it is evidence about process, not a verdict on quality.
+patience of composition: how much time the text visibly had — ideas ripened, examples aged, judgments settled.
+seasonal transience: how much the text is built for one season of attention — a moment's conversation, then compost. Score the transience; ephemerality executed well is its own craft.
+permanence ambition: how openly the text is trying to last — built for the shelf, not the feed. Score the ambition; do not confuse wanting to last with deserving to.
+archival self-awareness: how much the text knows it will be a record — writing for the future reader over its shoulder.
+trend-surfing: how much the text rides a current wave for lift it did not generate.
+before-its-time-ness: how much the text arrives ahead of its audience's readiness.
+five-year re-read survivability: how well the piece would hold on a re-read in five years — claims aged, bets settled, tone intact.
+week-one obsolescence: how much of the value evaporates days after publication.
+historical rhyme awareness: how well the text hears echoes of prior episodes without collapsing into them.
+generational coding: how strongly the text marks its author's generation — touchstones, humor, defaults. Score the marking; treat it as signal, not flaw.
+planning-horizon length: how far ahead the text's actual plans and commitments extend.
+sense of its own moment: how accurately the text reads what its moment makes possible and impossible.
+evergreen fraction: how much of the text would need no edits to republish in ten years.
+anachronism comfort: how freely the text uses old tools, forms, or standards without apology.
+velocity of the underlying idea: how fast the thing the text is about is itself moving. Score the field's speed as reflected in the text's posture — provisional where fast, settled where slow.
+punctuality of the intervention: how well-timed this text is — arriving when it can still change the outcome.
+ripeness: how fully matured the thinking is — questions closed that should be closed, open ones held open knowingly.
+prematureness: how much the text ships conclusions before their supports exist.
+overdue-ness: how much the text says what should have been said long ago.
+temporal humility: how honestly the text admits it cannot see far ahead.
+sublimated ambition: how much personal drive has been converted into the work itself rather than displayed beside it.
+need to be liked: how much the prose bends toward the reader's affection.
+need to be right: how much the text defends positions past the point evidence supports, because losing is intolerable.
+need to be interesting: how much the text sacrifices accuracy or proportion for effect.
+exhaustion between the lines: how much depletion shows through the performance of energy. Score the visible tiredness; treat it as evidence about the author's situation, honestly read.
+obsessiveness: how far past reasonable diligence the attention goes — detail loved beyond duty.
+dilettante breadth: how wide the text ranges relative to how deep it goes.
+monomania depth: how much one question has swallowed the author's whole field of view.
+self-doubt management: how the author handles their own uncertainty about themselves — acknowledged and steered, or leaking and steering.
+imposter-syndrome leakage: how much unearned-place anxiety shows in over-preparation, over-citation, over-apology. Score the leakage; read it as signal about author psychology, not competence.
+grandiosity containment: how well large self-belief is kept in service of the work rather than displayed.
+playfulness under discipline: how much genuine play survives inside rigorous work.
+discipline under playfulness: how much rigor operates beneath an apparently light surface.
+procrastination scars: how much the text shows work done in avoidance-shaped bursts — neglected middles, lavish introductions, rushed ends. Score the scar pattern; it is process evidence.
+flow-state evidence: how much of the text reads as written inside sustained absorption — long coherent runs, effortless transitions. Score the runs; do not confuse flow with lack of revision.
+implied hours of deliberate practice: how many hours of focused skill-building the performance implies. Score the implied investment; distinguish practiced skill from raw talent displayed.
+autodidact texture: how much the knowledge shows self-taught structure — idiosyncratic paths, original sources, occasional canonical gaps.
+formal-training texture: how much the knowledge shows institutional shaping — canonical sequences, standard moves, disciplinary reflexes. Score the shaping; note both its reliability and its ruts.
+midlife-reinvention energy: how much the text carries the particular drive of someone who changed course with experience in hand.
+wunderkind energy: how much the text radiates early-arrival confidence — speed, fearlessness, unearned and earned certainty mixed. Score the radiation; separate the speed from the accuracy.
+veteran weariness: how much long experience shows as lowered expectations and conserved effort. Score the conservation; distinguish earned economy from disengagement.
+chip-on-shoulder torque: how much being underestimated powers the work.
+intrinsic-motivation purity: how much the work would clearly have been done with no audience and no
+mercenary undertone: how much the text serves a paying interest beneath its stated purpose.
+calling versus career: how much the work reads as answering a vocation rather than advancing a position. Score the calling signal; do not romanticize it — a career honestly worked is not a fault.
+sincerity of stated motivation: how much the announced reasons for the work match the reasons the text actually betrays.
+private-notebook intimacy: how much the text reads like thinking not originally meant for display.
+public-performance polish: how much the text is built for an audience watching — timed reveals, managed impressions. Score the performance layer; do not assume it falsifies the content.
+id visibility: how much raw want — appetite, aggression, desire — is visible through the civilized surface. Score the visibility; read it as candor or leakage by context.
+superego dominance: how much duty, propriety, and self-policing govern the prose. Score the governance; note what it protects and what it strangles.
+appetite disclosed: how openly the author says what they actually want — money, fame, the problem solved, the rival beaten.
+self-knowledge depth: how accurately the author's self-descriptions match what the text independently reveals.
+predictability of its blind spots: how easily a reader can name what this author will systematically miss. Score the predictability; the most interesting authors surprise even in their failures.
+caffeination level: how much stimulant-paced urgency runs in the sentence rhythm — speed as texture. Score the pace signature; do not confuse velocity with insight.
+hunger: how much the author visibly wants it — the outcome, the standard, the win — with effort priced in.
+argumentative momentum: how much each point makes the next feel necessary — the argument pulling the reader forward under its own force.
+burden-of-proof placement: how fairly the text assigns who must prove what.
+concession strategy: how skillfully the text gives ground it cannot hold — concessions that strengthen the remaining position.
+objection anticipation: how well the text raises the reader's best objections before the reader can.
+motte-and-bailey risk: how much the text advances a bold claim but retreats to a trivial one under pressure.
+rhetorical-question abuse: how often questions are deployed to imply what the author will not argue.
+load-bearing-ness of its analogies: how much argumentative weight the analogies actually carry versus decorate.
+syllogistic tightness: how validly the conclusions follow from the stated premises.
+enthymeme reliance: how much the argument depends on unstated premises the reader must supply.
+induction discipline: how carefully generalizations are sized to their instances.
+example-to-principle ratio: how well the text balances concrete instances against abstract claims.
+definition hygiene: how cleanly key terms are defined and then used consistently.
+equivocation risk: how much the argument depends on one word quietly meaning two things.
+scope creep of claims: how much conclusions swell beyond what the argument established.
+quantifier care: how precisely some, most, and all are chosen and respected.
+strawman temptation resisted: how consistently the text engages opponents' actual positions at strength.
+adversarial-collaboration spirit: how much the text treats disagreement as a joint search for truth with shared standards.
+dialectical fairness: how evenly the text applies its own standards to friend and foe.
+socratic patience: how willing the text is to proceed by questions and let the reader arrive.
+polemic heat: how much combative fire the prose carries. Score the temperature; judge separately whether the fire illuminates or only burns.
+persuasion versus demonstration balance: how much the text relies on moving the reader versus showing the thing.
+appeal-to-consequences leakage: how much the argument treats an outcome's desirability as evidence of a claim's truth.
+framing control: how much the text's framing predetermines the conclusion before evidence arrives.
+agenda-setting subtlety: how quietly the text decides which questions count as the questions.
+presupposition smuggling: how much contested content rides in as the unexamined background of innocent sentences.
+distinctiveness of rhetorical fingerprint: how recognizably this author argues — signature moves, characteristic structures. Score the distinctiveness; note whether the signature serves or performs.
+closing-argument energy: how much the ending gathers everything into a final press toward the verdict.
+opening-statement fairness: how honestly the opening frames what the dispute is actually about.
+cross-examination survivability: how well the claims would hold up under a hostile, competent questioner.
+tu-quoque avoidance: how cleanly the text refuses to answer charges by pointing at the accuser.
+respect for the reader's time: how much the text gives per minute it asks — no padding, no detours without payoff.
+trust extended to the reader: how much intelligence and goodwill the text assumes in its audience.
+condescension risk: how close the text comes to talking down — explanations of the obvious, applause for the reader's small steps.
+flattery of the reader: how much the text courts agreement by complimenting its audience's discernment.
+fairness of assumed background: how reasonable the demanded prior knowledge is for the stated audience.
+on-ramp gentleness: how smoothly a newcomer can enter the text's subject.
+expert-to-expert compression: how efficiently the text communicates when it can assume mastery.
+generosity of explanation: how much the text gives beyond the minimum — the extra example, the anticipated confusion addressed.
+hand-holding excess: how much the text walks the reader through steps they could take alone.
+deliberate difficulty: how much the text's hardness is chosen — resistance meant to make the reader work productively.
+esotericism as filter: how much the text is written to be understood only by the initiated, on purpose. Score the filtering intent; judge separately whether the filter serves the material.
+invitation versus initiation: how much the text welcomes outsiders in versus requiring them to prove themselves first.
+reader-as-peer stance: how much the text addresses the reader as an equal working the same problem.
+reader-as-student stance: how much the text takes responsibility for the reader's learning.
+reader-as-jury stance: how much the text lays out evidence for the reader's independent verdict.
+parasocial warmth: how much one-sided intimacy the text cultivates with its audience. Score the cultivation; note where it serves connection and where it manufactures dependency.
+boundary maintenance: how clearly the text keeps appropriate distance — personal where personal serves, professional where it does not.
+direct-address comfort: how naturally the text speaks straight to the reader when it does.
+second-person risk tolerance: how boldly the text uses you — putting the reader inside the scene or argument.
+inclusion cost of its inside jokes: how much a reader outside the circle loses when the text laughs within it.
+glossary conscience: how faithfully the text defines what its audience cannot be assumed to know.
+curiosity contagion: how much the text makes the reader want to go find out more.
+homework assigned honestly: how clearly the text says what work it leaves the reader and why.
+payoff-per-page fairness: how evenly the text delivers value across its length.
+cliffhanger ethics: how fairly suspense is used — tension in service of the material, not the metrics.
+spoiler discipline: how carefully the text protects discoveries the reader deserves to make.
+reread invitation: how much the text is built to give more on the second pass.
+skimmability by design: how well the text serves the reader who must move fast — structure, signposts, extractable core.
+deep-read reward: how much the text gives the reader who slows all the way down.
+exit-ramp courtesy: how gracefully the text lets a reader leave early with something whole.
+bureaucratic sediment: how much accumulated procedure and boilerplate silts the prose — language that exists because a process demanded it.
+startup metabolism: how fast the text's underlying organization visibly moves — decisions, cycles, learning loops. Score the metabolic rate; do not confuse velocity with direction.
+committee-authorship scent: how much the text smells of many hands and no owner — averaged positions, sanded edges, orphaned pronouns.
+single-author voice clarity: how unmistakably one mind is speaking.
+compliance-driven prose fraction: how much text exists to satisfy rules rather than readers.
+mission-statement contamination: how much aspirational corporate language has leaked into working prose.
+org-chart legibility: how much the surrounding organization's structure can be read from the text — who approves, who fears whom, where power sits. Score the legibility; it is diagnostic reading, not praise or blame.
+founder-authored directness: how much the text carries the unmediated voice of the person who owns the outcome.
+middle-management filtration: how much the content has been softened, hedged, and rerouted by layers between author and truth.
+legal-review flattening: how much liability caution has ironed the meaning out of the words. Score the flattening; do not blame prudence for existing, only for governing.
+PR-polish opacity: how much public-relations smoothing prevents the reader from learning anything real.
+internal-memo candor: how much the text speaks with the frankness of a document never meant for outsiders.
+external-facing guardedness: how visibly the text watches what it says because outsiders are reading.
+process maturity: how much the described work rests on repeatable, improvable process rather than heroics.
+institutional memory depth: how much the text knows about what was tried before — its own organization's history at hand.
+personnel-dependence risk: how much of the plan lives inside specific irreplaceable people.
+key-person concentration: how much authority, knowledge, and momentum route through one person.
+succession thoughtfulness: how seriously the text plans for its own people leaving.
+governance seriousness: how real the oversight is — bodies with teeth, decisions with owners, dissent with channels.
+accountability plumbing: how traceably outcomes connect to the people responsible for them.
+budget-line honesty: how specifically the money is accounted — real categories, real numbers, real tradeoffs.
+overhead candor: how openly the text admits what fraction feeds the machine rather than the mission.
+audit-trail instinct: how naturally the work leaves records that would let an outsider verify what happened.
+coalition breadth: how wide a range of genuinely different parties the effort has actually assembled.
+stakeholder-management sophistication: how skillfully the text handles the parties who could help or block it. Score the skill; note where management shades into manipulation.
+empire-building scent: how much the proposal grows its author's domain beyond what the mission needs.
+sinecure comfort: how much the arrangement described would keep paying whether or not the work succeeds.
+skunkworks energy: how much the work runs outside normal channels on speed and belief. Score the outside-channel energy; note both its freedom and its missing guardrails.
+official-channel fatigue: how visibly the author has been worn down by proper procedure. Score the fatigue; read it as evidence about the institution as much as the author.
+institutional courage: how much the institution behind the text risks by saying it.
+moonshot sincerity: how genuinely the outsized ambition is meant — a real plan aimed at a real long shot, with the audacity priced.
+incrementalism honesty: how openly modest work presents itself as modest.
+risk-appetite legibility: how clearly the reader can tell how much risk the author is actually taking and accepting.
+downside acknowledgment: how squarely the text faces what happens if it is wrong or the plan fails.
+upside-modeling discipline: how rigorously the best case is estimated rather than gestured at.
+variance embrace: how comfortably the text accepts wide outcome spreads in exchange for expected value.
+ruin-risk awareness: how clearly the text distinguishes recoverable losses from game-ending ones.
+optionality preservation: how much the plan keeps future choices open at reasonable cost.
+burned-boats commitment: how much the author has deliberately foreclosed retreat.
+pivot readiness: how prepared the plan is to change shape when evidence demands.
+sunk-cost vulnerability: how much the argument leans on what has already been spent.
+theory-of-victory clarity: how specifically the text explains the causal path from actions to the win condition.
+endgame specificity: how concretely the text describes what done looks like.
+milestone believability: how much the intermediate targets look like real checkpoints rather than decoration.
+scope sanity: how well the undertaking's size matches the team, time, and money behind it.
+boiling-the-ocean risk: how much the approach requires changing everything to change anything.
+minimum-viable honesty: how truly the described minimum would test the idea.
+stretch-goal calibration: how thoughtfully the ambitious targets sit above the expected ones.
+moonshot-to-milestone ratio: how much grand vision rests on how little near-term deliverable.
+ambition-to-resources ratio: how far the aims outrun the means, and whether the text knows it.
+bet-sizing wisdom: how well the stakes placed match the confidence held and the bankroll available.
+kelly-criterion instinct: how naturally the text sizes commitments to edge and repeatability rather than conviction alone.
+asymmetry hunting: how actively the text seeks positions with capped downside and open upside.
+cheap-experiment bias: how strongly the text prefers learning by small cheap tests before committing.
+expensive-conviction bias: how readily the text commits big on inner certainty without cheap tests first.
+irreversibility caution: how carefully one-way doors are identified and treated differently from two-way doors.
+first-mover conviction: how much the plan depends on being first, and how honestly that dependence is examined.
+fast-follower realism: how honestly the text weighs letting others find the mines first.
+contrarian courage: how much the position stands against the field's consensus with real stakes attached.
+consensus comfort: how much the text shelters inside what everyone already believes.
+operational specificity: how executably concrete the plan is — steps a competent stranger could follow.
+named-owner accountability: how consistently each commitment has a person's name on it.
+date-stamped commitment: how many promises carry actual dates.
+number-bearing claim fraction: how much of the argument carries actual quantities.
+gears-level mechanism: how much the text explains the internal gears — what pushes what, through what linkage.
+abstraction-altitude control: how deliberately the text chooses and holds its level of generality.
+agility on the ladder of abstraction: how fluently the text moves between principle and instance, each illuminating the other.
+example vividness: how much the examples are seen rather than merely cited.
+case-study depth: how far into one real case the text actually descends.
+prototype evidence: how much something has actually been built and shown.
+demo-over-memo spirit: how much the text prefers showing the thing to describing it.
+artifact concreteness: how tangible the promised deliverables are — files, tools, datasets, not vibes.
+verb actionability: how much the stated actions are actions — verbs someone can do Monday, not aspirations.
+checklist readiness: how directly the text's guidance could become a checklist without loss.
+measurable-outcome discipline: how consistently success is defined in observables.
+proxy-metric awareness: how alert the text is to gaps between its metrics and what they stand for.
+deliverable crispness: how sharply each promised output is specified — format, size, owner, date.
+timeline granularity: how finely the schedule resolves — weeks and dependencies, not quarters and hope.
+budget-line specificity: how exactly the money maps to activities.
+failure-mode enumeration: how thoroughly the ways this fails are listed and sized.
+dependency mapping: how clearly the text knows what must happen first, and what breaks if it does not.
+critical-path clarity: how clearly the text identifies the sequence that actually gates the outcome.
+resource-requirement honesty: how truthfully the text states what it really needs — people, compute, permissions, time.
+who-does-what-when completeness: how fully the plan assigns every task a person and a time.
+handoff explicitness: how precisely the text defines what crosses each boundary between people or phases.
+definition-of-done clarity: how unambiguously the text states when a thing counts as finished.
+acceptance-test thinking: how naturally the text states, in advance, the test its own output must pass.
+edge-case appetite: how eagerly the text hunts its own boundary conditions.
+implementation-detail respect: how seriously the text treats the small technical choices where plans actually live or die.
+ground-contact frequency: how often the text touches actual reality — a user, a measurement, a deployed thing.
+genuine surprise content: how much the text contains that a well-read reader would not have predicted.
+recombination cleverness: how ingeniously existing pieces are joined into something with new properties.
+first-principles freshness: how much the text rebuilds its subject from the ground and finds something new in the rebuilding.
+derivative-work honesty: how openly the text acknowledges what it borrows.
+completeness of influence digestion: how fully absorbed the influences are — nutrients, not visible chunks.
+idea-provenance candor: how traceably the text says where its ideas came from.
+novelty-for-its-own-sake risk: how much newness is pursued as terminal value.
+old-idea-new-clothes detection: how much the contribution is a rename of something known.
+frontier proximity: how close the work stands to the actual current edge of its field.
+adjacent-possible instinct: how well the text finds what has just now become possible.
+paradigm loyalty: how much the work operates devotedly inside its field's ruling framework. Score the loyalty; note what it enables and what it forecloses.
+paradigm defection: how much the work breaks from the ruling framework, and at what argumentative cost.
+heterodoxy authenticity: how real the unorthodoxy is — positions actually held against pressure, not staged.
+contrarian-by-reflex risk: how much the text disagrees as a habit rather than a finding.
+originality per paragraph: how densely new thought is distributed through the text rather than concentrated in one claim.
+surprise per page: how regularly the text earns a raised eyebrow.
+predictability of its next move: how easily a reader can finish the author's sentences.
+template escape velocity: how fully the text breaks free of its genre's default shape when the material demands it.
+genre-subversion intent: how deliberately the text plays against its genre's expectations.
+format innovation: how much the form itself — structure, medium, presentation — is part of the contribution.
+remix ethics: how fairly the text transforms what it takes — credit given, value added, sources left standing.
+homage versus theft: how clearly borrowing announces itself as tribute rather than passing as original.
+invention density: how many distinct new moves, tools, or coinages the text introduces.
+discovery versus invention balance: how much the text finds what was there versus makes what was not.
+discipline of its unprecedented-ness claims: how carefully the text checks before calling itself the first.
+moral seriousness without sanctimony: how gravely the text treats what matters morally while never performing its own virtue.
+sanctimony risk: how close the text comes to preaching its own goodness.
+righteousness comfort: how much the text enjoys being on the right side.
+guilt mobilization: how much the text moves its reader by inducing guilt.
+shame avoidance: how much the text steers around naming shameful things — its own or its field's.
+duty framing: how much the text casts its case as obligation — what the reader owes.
+care framing: how much the text grounds its case in attention to particular vulnerable others.
+harm-accounting completeness: how fully the text counts the harms on all sides of its proposal — including its own side's.
+beneficiary-voice presence: how much the people served actually speak in the text rather than being spoken for.
+victim-instrumentalization risk: how much suffering is deployed as rhetorical fuel.
+moral-circle radius: how wide the text draws the boundary of who counts.
+future-generations weight: how seriously people not yet born figure in the text's calculations.
+animal-inclusion instinct: how naturally nonhuman animals enter the moral accounting where relevant.
+demandingness acknowledged: how honestly the text admits how much its own position asks of people.
+supererogation clarity: how clearly the text separates the required from the admirable-but-optional.
+moral-licensing risk: how much displayed virtue is spent as permission for later laxity.
+virtue-signaling cost awareness: how conscious the text is of the difference between signaling that costs and signaling that pays.
+integrity under trade-offs: how well stated values survive when they become expensive in the text's own reasoning.
+clean-hands preoccupation: how much the text prioritizes its own moral purity over outcomes.
+dirty-hands realism: how honestly the text accepts that acting in the world sometimes means choosing among wrongs.
+moral-luck awareness: how much the text separates the quality of decisions from the fortune of outcomes.
+complicity mapping: how honestly the text traces its own entanglement in what it criticizes.
+moral courage on display: how much the moral stand costs the author here, in this text, before this audience.
+ethics-washing scent: how much moral language functions as coating over unchanged conduct.
+deontological rigidity: how much rule-following persists when the rules visibly defeat their own point. Score the rigidity; distinguish principled constancy from rule worship.
+consequentialist coldness: how much the arithmetic of outcomes overrides everything persons are owed. Score the coldness; distinguish honest tradeoff acceptance from cruelty by spreadsheet.
+moral-uncertainty handling: how the text acts when it does not know which moral framework is right.
+values-pluralism respect: how seriously the text treats reasonable people holding different deep values.
+care in handling sacred values: how deftly the text touches what some hold beyond trade — neither mocking nor capitulating.
+moral imagination: how vividly the text can inhabit moral situations far from its author's own.
+working-memory load imposed: how many things the reader must hold in mind at once to follow the text.
+chunking assistance: how well the text groups its content into graspable units.
+prerequisite stack height: how tall the tower of prior knowledge is beneath this text.
+notation burden: how much special symbolism the reader must learn to proceed.
+formalism payoff ratio: how much the formal machinery actually buys relative to what it costs the reader.
+cognitive-load budgeting: how deliberately the text spends the reader's limited attention — hard parts cushioned, easy parts brisk.
+attention span demanded: how long the text requires unbroken concentration.
+skim resistance: how much the text's value refuses to yield to fast reading. Score the resistance; note whether it comes from depth or from disorganization.
+deep-work requirement: how much the text demands the reader's full undistracted capacity.
+distraction fragility: how completely comprehension collapses if attention lapses briefly.
+concept-introduction pacing: how well new ideas are spaced against the reader's absorption rate.
+spaced-repetition friendliness: how naturally the text's key ideas return at intervals that fix them in memory.
+mental-model transferability: how well the models the text builds apply beyond its own examples.
+insight-per-effort ratio: how much understanding the reader gains per unit of work invested.
+aha-moment density: how often the text produces the click of sudden understanding.
+confusion-then-clarity design: how deliberately the text lets productive confusion form before resolving it.
+deliberate-ambiguity fraction: how much ambiguity is chosen and load-bearing rather than accidental.
+garden-path risk: how often the text leads readers to a parse or expectation it must then undo.
+backtracking cost: how expensive it is when a reader must re-read to recover the thread.
+glossary dependence: how often the reader must leave the text to look things up.
+diagram necessity: how much the text needs a figure it does or does not provide.
+worked-example sufficiency: how completely the examples actually exercise the method being taught.
+exercise-to-exposition ratio: how much the text asks the reader to do versus watch.
+mastery-gradient steepness: how sharply difficulty rises across the text.
+plateau-warning honesty: how honestly the text warns where progress will feel stuck.
+primary-source proximity: how close the text stands to original evidence rather than summaries of summaries.
+anecdote-to-data ratio: how the balance sits between story and systematic evidence.
+n-of-one candor: how honestly single-case evidence is labeled as such.
+effect-size emphasis over significance: how much the text cares about how big rather than merely whether.
+replication awareness: how much the text knows whether its cited findings have survived replication.
+preregistration spirit: how much the analysis was committed before the results were seen.
+data-availability instinct: how readily the underlying data is shared or its absence explained.
+methods transparency: how completely a competent reader could redo what was done.
+instrument-validity care: how seriously the text asks whether its measures measure what they claim.
+confound acknowledgment: how honestly rival explanations for the pattern are surfaced.
+natural-experiment cleverness: how ingeniously the text finds identification in the world's accidents.
+triangulation breadth: how many independent kinds of evidence converge on the conclusion.
+converging-evidence architecture: how deliberately the case is built so no single pillar carries it.
+cherry-picked-window risk: how much the result depends on where the time window or sample boundary was drawn.
+denominator visibility: how consistently rates come with their denominators.
+absolute-versus-relative honesty: how honestly the text chooses between absolute and relative figures.
+graph integrity: how honestly the figures represent the data — axes, scales, baselines.
+axis honesty: how fairly the chart axes are chosen and labeled.
+outlier-handling candor: how openly outliers are reported, kept, or removed with reasons.
+missing-data disclosure: how honestly the text reports what could not be measured or was lost.
+publication-bias awareness: how much the text remembers the studies that were never published.
+conflicts-of-interest disclosure: how fully the text discloses who pays and who benefits.
+evidence-hierarchy respect: how appropriately the text weights kinds of evidence by their reliability.
+mechanistic-plus-statistical coverage: how well the text pairs a mechanism with population-level evidence.
+checkable-detail density: how many specific claims a motivated reader could independently verify.
+unit-economics awareness: how clearly the text understands what one unit costs and returns.
+opportunity-cost fluency: how naturally the text weighs what else the same resources could do.
+marginal thinking: how well the text reasons about the next unit rather than the average.
+fixed-versus-variable clarity: how cleanly the text separates costs that scale from costs that do not.
+break-even realism: how honestly the text computes when it stops losing.
+cost-disease awareness: how much the text understands why some costs rise without productivity gains.
+cheap-to-try instinct: how strongly the text seeks ways to test at low cost before spending big.
+capital-efficiency pride: how much the text values output per dollar as a craft.
+burn-rate candor: how openly the text states how fast the money goes and what happens at zero.
+revenue-model believability: how plausibly the text explains who pays, why, and how much.
+willingness-to-pay evidence: how much actual payment behavior backs the demand claims.
+market-size honesty: how honestly the addressable market is estimated.
+TAM inflation risk: how much the total addressable market has been stretched to impress.
+competitive-moat realism: how honestly the text assesses what stops others from copying this.
+commodity-trap awareness: how alert the text is to its offering becoming undifferentiated.
+pricing-power insight: how well the text understands who sets prices in its market and why.
+incentive-design sophistication: how skillfully the text arranges rewards so desired behavior is individually rational.
+principal-agent awareness: how clearly the text sees where agents' interests diverge from principals'.
+externality accounting: how fully costs and benefits landing on third parties are counted.
+public-goods framing fitness: how correctly the text identifies what is actually nonrival and nonexcludable.
+funding-model sustainability: how plausibly the funding continues after the current push.
+grant-dependence honesty: how openly the text admits its reliance on continued philanthropy.
+cross-subsidy clarity: how transparently one activity's surplus funds another's deficit.
+scale-economics understanding: how well the text knows what actually gets cheaper with size here.
+diseconomies-of-scale caution: how honestly the text anticipates what gets worse with size — coordination, quality, culture.
+protagonist energy: how much the author moves as the main actor of their account — initiative taken, outcomes owned.
+main-character restraint: how well the author resists making everything about themselves.
+locus-of-control placement: how much the text locates outcomes in what the author can affect versus outside forces.
+victimhood-framing avoidance: how much the text explains setbacks without settling into victim identity.
+agency attributed to others: how much the text treats other people as actors with their own plans rather than scenery.
+empowerment authenticity: how really the text's talk of empowering others transfers actual power — decisions, budgets, credit.
+learned-helplessness scent: how much the prose has stopped believing its actions matter. Score the scent; read it as diagnostic of history, and note where it forecloses available moves.
+initiative density: how many things the author visibly started without being asked.
+permission-asking reflex: how much the text waits for authorization it does not need.
+forgiveness-over-permission calibration: how wisely the text chooses when to act first and explain after.
+bottleneck self-identification: how honestly the author recognizes when they themselves are the constraint.
+delegation maturity: how well the text gives real work away with authority to do it.
+control-surrender wisdom: how wisely the text lets go of what it cannot or should not control.
+leverage awareness: how well the text finds the points where small force moves large outcomes.
+force-multiplier instinct: how naturally the text builds things that make everyone else more effective.
+veto-player mapping: how clearly the text knows who can block it and what they need.
+coalition-math realism: how honestly the text counts the support it actually has versus needs.
+power-analysis candor: how frankly the text discusses who holds power in its situation and how it moves.
+soft-power fluency: how skillfully the text works through attraction, legitimacy, and relationship.
+hard-power realism: how honestly the text acknowledges where budgets, votes, and enforcement decide things.
+theory-of-change ownership: how much the author owns their causal story rather than borrowing the field's boilerplate.
+bystander-assumption avoidance: how much the text refuses to assume someone else will handle it.
+responsibility absorption: how much blame and burden the author takes rather than routes away.
+credit-sharing generosity: how readily credit flows to everyone who earned it.
+comfort behind the throne: how content the author is to wield influence without occupying the visible seat. Score the contentment; note both its humility and its unaccountability.
+rationalist coding: how strongly the text signals the rationalist scene — priors, updates, cruxes, calibration talk. Score the signal strength; do not score agreement with the scene.
+academic coding: how strongly the text carries academia's markers — literature positioning, hedged claims, citation reflexes. Score the marking; judge separately whether the form serves the content.
+hacker-culture coding: how strongly the text signals hacker culture — build-first pragmatism, irreverence, working code as argument. Score the signal; do not romanticize it.
+policy-wonk coding: how strongly the text speaks in policy's dialect — stakeholders, implementation windows, briefing structure. Score the dialect; note where it enables and where it deadens.
+artist-statement coding: how much the text sounds like gallery prose — interrogating, complicating, practices and gestures. Score the register; judge separately whether real work stands behind it.
+effective-altruism dialect: how strongly the text speaks EA — counterfactuals, cost-effectiveness, cause prioritization vocabulary. Score the dialect strength; do not score the movement's correctness.
+silicon-valley dialect: how strongly the text runs on startup idiom — scale, iterate, ship, disrupt. Score the idiom; note where it imports useful speed and where it imports category errors.
+east-coast-establishment dialect: how much the text carries institutional Atlantic prose — measured authority, credentialed gravity, the wise consensus voice. Score the register; judge its fit separately.
+continental-theory perfume: how much the text is scented with continental theory — dialectics, problematics, the apparatus of critique. Score the scent; distinguish working concepts from name-fog.
+analytic-philosophy dryness: how much the text has analytic philosophy's texture — numbered premises, necessary conditions, counterexample dueling.
+engineering-culture pragmatism: how much the text breathes engineering — tolerances, tradeoffs, failure modes, what actually ships.
+science-fair earnestness: how much the text has the bright, hopeful, poster-board energy of a first real project. Score the energy; treasure its sincerity, note its innocence of the field.
+zine energy: how much the text has the photocopied, self-published, nothing-to-lose voice.
+substack-native voice: how much the text is shaped by the newsletter form — personal authority, recurring audience intimacy, the mid-length essay rhythm. Score the shaping; judge fit separately.
+twitter-native compression: how much the text thinks in feed-shaped units — quotable, compressed, ratio-aware.
+longform-native patience: how much the text trusts the reader for ten thousand words — slow builds, held threads.
+forum-native informality: how much the text carries forum culture — threaded replies in its bones, edits acknowledged, epistemic status headers. Score the texture; note its honesty and its insularity.
+seminar-room register: how much the text speaks as if among initiated peers around a table.
+boardroom register: how much the text performs executive summary — decisions framed, risks bulleted, asks explicit.
+lab-notebook register: how much the text records like a working scientist's notebook — dated, exact, unglamorous.
+field-notes register: how much the text observes like an ethnographer on site — concrete, present-tense, judgment deferred.
+manifesto register: how much the text declares like a manifesto — demands, wes, futures announced. Score the declaration energy; judge separately whether anything backs it.
+white-paper register: how much the text wears the white paper's neutral authority — sections, figures, measured recommendations. Score the costume; check whether the authority is earned.
+blog-post intimacy: how much the text has the direct, personal, thinking-out-loud closeness of a good blog.
+conference-talk polish: how much the text has been shaped by live delivery — timed reveals, laugh lines, the closing slide. Score the stagecraft; check what remains when the lights are up.
+skin-in-the-game visibility: how much the author demonstrably loses if they are wrong — money, time, reputation on the same side as their claims.
+track-record verifiability: how easily the author's past claims and results can actually be checked.
+falsifiable-promise density: how many of the text's forward commitments could be checked and found broken.
+accountability invitation: how actively the text invites being held to account — named metrics, revisit dates, standing challenges.
+audit welcome-ness: how genuinely the text would welcome a hostile competent audit.
+references offered unprompted: how readily the text volunteers ways to verify through others.
+error-correction history: how visibly the author has publicly corrected themselves before.
+public-changelog spirit: how openly changes, reversals, and updates are logged where anyone can see.
+promise-keeping architecture: how much structure exists to ensure commitments are kept — reminders, escrow, third parties, defaults.
+under-promise discipline: how consistently the text commits to less than it expects to deliver.
+over-delivery evidence: how much history shows delivery beyond commitment.
+incentive-alignment disclosure: how clearly the text explains why its own incentives point toward telling the truth here.
+insurance against its own motivated cognition: how much the text builds external checks against its own wishful thinking — pre-commitments, adversarial review, tripwires.
+adversarial-review invitation: how genuinely hostile reviewers were sought and their findings engaged.
+red-team welcome: how much the text wants its plan attacked before reality attacks it.
+transparency depth versus transparency theater: how deep the openness goes when you follow it — raw records, or a lobby with glass walls and locked floors.
+verifiability of central claims: how checkable the load-bearing claims are, specifically — not the periphery.
+bus-factor honesty: how openly the text admits what dies if one person disappears.
+reputation collateral posted: how much standing the author has staked such that failure costs them visibly.
+long-game evidence: how much the record shows patient investment inconsistent with quick extraction.
+repeated-game posture: how much the text behaves like it expects to deal with the same people again.
+self-imposed cost of betrayal: how much the author has arranged to lose if they defect on their commitments.
+character-reference quality: how much the people who vouch for this would themselves be believed, and on what knowledge.
+vaporware scent: how much the described thing smells like it will never actually exist — demos always upcoming, screenshots not builds.
+grift adjacency: how close the structure sits to known extraction patterns — money flowing to insiders, value perpetually deferred.
+cargo-cult structure: how much the form of a successful thing is copied without the mechanism that made it work.
+buzzword load: how much of the text is current buzzwords per unit of content.
+solution-in-search-of-problem risk: how much the offering exists because it could be built rather than because anyone needs it.
+demo-that-never-ships energy: how much polish lives in the presentation relative to the product.
+perpetual-pivot scent: how much the history is pivots without accumulating learning or assets.
+moving-goalposts history: how often success criteria have been redefined after being missed.
+accountability diffusion: how thoroughly responsibility has been spread until nobody holds it.
+blame-preemption architecture: how much of the text exists to ensure failure will be attributable elsewhere.
+excuse scaffolding: how much explanatory structure is erected in advance around outcomes that have not happened.
+complexity as concealment: how much complication functions to prevent understanding rather than serve the material.
+obfuscation instinct: how reflexively the text goes vague exactly where precision would be checkable.
+dazzle camouflage: how much impressive display is positioned to prevent the eye from finding the weak point.
+credential substitution for argument: how much who-I-am stands where here-is-why should be.
+urgency manufacture: how much time pressure is created rather than reported.
+scarcity theater: how much limited availability is staged to force decisions.
+FOMO leverage: how much the pitch works by fear of missing out rather than the thing's own merits.
+testimonial dependence: how much the case rests on curated praise rather than verifiable results.
+MLM structural echo: how much the value flows depend on recruitment rather than product.
+ponzi temporal signature: how much early participants are paid with later participants' contributions.
+regulatory-arbitrage scent: how much the model works only in gaps between rules. Score the scent; distinguish innovation the rules haven't met from evasion the rules already address.
+jurisdiction shopping: how much the structure has been placed where oversight is weakest.
+accountability-free upside: how much the author collects if right while bearing nothing if wrong.
+comfort with other people's money: how casually the text spends funds it did not earn and will not repay.
+density: how much substance per unit of text — mass that stays mass under compression.
+porosity: how much space the text leaves for the reader's own thought to enter — gaps that admit, not gaps that lose.
+brittleness: how much the argument shatters rather than bends when one part fails.
+ductility: how far the text's ideas can be drawn into new shapes without breaking.
+viscosity: how much the prose resists flowing — thickness felt in the reading. Score the viscosity; some material wants honey, some wants water; judge the fit.
+temperature: how hot or cold the text runs — passion versus chill as a felt physical property. Score the temperature itself; judge separately whether it suits the material.
+luminosity: how much light the text throws on things outside itself — surroundings visible by its glow.
+opacity: how much the text resists being seen through — meaning withheld from even careful reading. Score the opacity; distinguish depth's darkness from mud.
+buoyancy: how much the text rises — lightness that keeps the reader afloat through difficult water.
+torque: how much twisting force the text applies to the reader's existing views — rotation, not just push.
+friction coefficient: how much the text resists the reader's motion through it — roughness felt sentence to sentence. Score the friction; some traction is chosen, some is failure to sand.
+elasticity: how much the text springs back when stretched by objections — resilience of shape under argument.
+tensile strength: how much pull the central thread bears before snapping — the through-line under load.
+fatigue resistance: how well the text survives repeated stress — rereading, quotation, being argued with — without cracking.
+corrosion resistance: how well the text withstands its environment over time — hostile commentary, shifting context, slow rust.
+crystallinity: how much the text has a regular internal lattice — ordered structure repeating at every scale.
+amorphousness: how much the text lacks fixed internal structure — glass, not crystal.
+granularity: how fine the grain of detail runs — the resolution at which the text engages its subject.
+laminarity: how smoothly the flow of thought runs in parallel layers without churning.
+turbulence: how much productive churn the text generates — vortices of ideas colliding.
+resonance: how much the text rings at frequencies the reader already carries — sympathetic vibration with lived experience.
+damping: how well the text absorbs its own oscillations — hype self-corrected, alarm self-checked, swings settled.
+impedance match with its audience: how well the text's output impedance meets the reader's input — maximum transfer, minimal reflection.
+center-of-gravity height: how high the text's weight sits — top-heavy abstraction or low, stable groundedness. Score the height; low centers survive collisions, high centers reach further; judge the tradeoff.
+moment of inertia: how much the text resists changes to its own rotation — mass distributed far from its axis.
+surface tension: how much the text's surface holds together against penetration — polish that resists entry. Score the tension; note when it lets readers skate and when it keeps them out.
+capillary pull: how much the text draws the reader onward through narrow spaces by its own adhesion.
+phase-transition proximity: how close the text stands to changing state — an argument about to crystallize, a field about to melt.
+entropy: how much disorder the text carries — information degraded, structure dissipating.
+negentropy hoard: how much concentrated order the text has gathered against the surrounding noise — structure banked and defended.
+stakes clarity: how clearly the reader knows what is at risk and for whom.
+protagonist believability: how much the central actor — person, team, idea — behaves like something real.
+antagonist fairness: how honestly the opposition — rival, obstacle, counterargument — is rendered at strength.
+conflict authenticity: how real the central tension is — a genuine collision, not a staged misunderstanding.
+earned-ness of its resolution: how much the ending is paid for by what preceded it.
+chekhov-gun discipline: how much every introduced element eventually fires.
+subplot discipline: how well secondary threads serve the main one.
+pacing control: how deliberately the speed of events and revelations is managed.
+in-medias-res courage: how boldly the text starts inside the action and trusts the reader to catch up.
+exposition-smuggling skill: how invisibly necessary background is delivered inside forward motion.
+show-don't-tell ratio: how much the text demonstrates rather than asserts its qualities and claims.
+unreliable-narrator awareness: how much the text knows its own account is partial and shows the reader where.
+dramatic-irony deployment: how skillfully the text lets the reader know more than its subjects.
+foreshadowing subtlety: how quietly the text plants what it will later need.
+twist fairness: how honestly a reversal was prepared — surprising yet inevitable in retrospect.
+denouement patience: how well the text lets consequences settle after the climax.
+character-arc completeness: how fully the people in the account change, and whether the change is shown happening.
+world-building economy: how much world the text builds relative to how much it uses.
+lore restraint: how well the text resists explaining its own background beyond need.
+canon consistency: how well the text stays consistent with its own established facts.
+mythos ambition: how much the text reaches toward becoming a story people tell about the world.
+origin-story polish: how visibly the founding narrative has been smoothed by retelling. Score the polish; note what the smoothing removed, and whether the working parts survive.
+hero's-journey template dependence: how much the account leans on the standard transformation arc.
+anticlimax risk: how much the buildup exceeds what the payoff can honor.
+narrative-fallacy self-awareness: how much the text knows that its tidy story was imposed on messier events.
+second-order-effect anticipation: how far the text traces what its proposal causes after the first effect — reactions, adaptations, side markets.
+third-order humility: how honestly the text admits that effects beyond the second ring exceed anyone's foresight.
+game-theoretic literacy: how well the text reasons about others as strategic players who anticipate and respond.
+commitment-device usage: how skillfully the text binds its own future self to keep promises credible.
+credible-threat architecture: how much the text's deterrents would actually be executed if tested.
+schelling-point instinct: how well the text finds the solutions people converge on without communication.
+focal-point design: how deliberately the text creates new points for others to coordinate on — standards, defaults, salient numbers.
+coordination-problem diagnosis: how correctly the text identifies when failure is coordination, not will or knowledge.
+mechanism-design taste: how elegantly the text builds rules under which self-interested behavior produces the desired outcome.
+incentive-compatibility checking: how rigorously the text verifies that telling the truth and cooperating are each player's best move.
+defection robustness: how well the plan survives some parties cheating.
+exploitability audit: how honestly the text asks who could game this and how.
+minimax prudence: how much the text weighs the worst case in choosing its path.
+maximin generosity: how much the text designs to raise the floor for the worst-off outcome or party.
+negotiation-position awareness: how clearly the text knows what it holds, what it can concede, and what the other side values.
+BATNA candor: how honestly the text states its alternative if this deal or plan fails.
+information-asymmetry ethics: how fairly the text uses what it knows that others do not.
+signaling-versus-substance ratio: how much of the strategic behavior is signal management rather than capability building.
+cheap-talk discount: how properly the text discounts costless statements — including its own.
+costly-signal investment: how much the text proves commitment through what it visibly spent.
+reputation-stake sizing: how well reputational bets are sized to the situation.
+iterated-game patience: how much strategy accounts for playing many rounds — cooperation built, punishment measured, forgiveness scheduled.
+endgame awareness: how clearly the text sees how this phase ends and positions for what follows.
+board-state reading: how accurately the text reads the current position — who stands where, what is actually threatened.
+tempo-sacrifice wisdom: how wisely the text gives up speed for position, or position for speed.
+scenius acknowledgment: how much credit flows to the scene — the community of mutual influence that made the work possible.
+lineage gratitude: how specifically the text honors those whose work it builds on.
+mentorship pay-forward: how much the text invests in people coming up behind the author.
+collaboration-credit precision: how exactly contributions are attributed — who did what, stated plainly.
+rivalry sublimation: how well competitive heat is converted into better work rather than worse conduct.
+community-building instinct: how naturally the text creates commons — shared vocabulary, gathering points, on-ramps.
+onboarding generosity: how much the text smooths the path for someone joining late.
+lurker respect: how much the text values the silent majority who read and never post.
+newcomer welcome: how genuinely first-timers are received — questions honored, jargon translated.
+elder respect: how much the text honors those who did the early work, including where they are now wrong.
+succession planning: how seriously the text prepares for its own leaders' replacement.
+knowledge-transfer diligence: how much effort goes into moving know-how out of heads and into forms others can use.
+documentation as care: how much the documentation reads as written for the person who will need it, by someone who cared.
+bus-factor reduction effort: how actively the text works to make itself unnecessary.
+translation across camps: how well the text carries ideas between communities that don't read each other.
+bridge-building patience: how much slow trust-building across divides the text demonstrates or invests in.
+feud avoidance: how well the text declines invitations to escalate personal conflict.
+dogpile resistance: how much the text refuses to join a pile-on even when the target is unpopular.
+parasocial boundary health: how honestly the text manages one-way intimacy with its audience.
+gift-economy fluency: how naturally the text gives value without immediate accounting — and how that gift circulates.
+orders-of-magnitude fluency: how comfortably the text moves between scales — knowing when thousands versus millions versus billions changes the nature of the thing.
+dimensional-analysis instinct: how naturally the text checks that its quantities have the right units and the equations balance.
+fermi-estimate courage: how willingly the text estimates the unestimated — decomposing, bounding, committing to a number.
+back-of-envelope honesty: how honestly rough calculations are labeled rough — and still done.
+scaling-law awareness: how much the text knows what actually changes with size in its domain — what compounds, what saturates.
+bottleneck-migration anticipation: how well the text foresees that relieving this constraint moves the constraint elsewhere.
+throughput-versus-latency clarity: how cleanly the text distinguishes doing much from responding fast.
+amortization instinct: how naturally the text spreads one-time costs across the uses that justify them.
+batch-size wisdom: how well the text chooses how much to bundle — work, decisions, releases — against feedback speed.
+granularity-choice fitness: how well the text picks the size of its units of analysis for the question asked.
+aggregation-level care: how carefully the text chooses and states the level at which it aggregates.
+ecological-fallacy avoidance: how well the text resists inferring individual truths from group statistics.
+simpson's-paradox vigilance: how alert the text is to aggregate trends that reverse within every subgroup.
+per-capita discipline: how consistently totals are normalized when comparison demands it.
+stock-versus-flow clarity: how cleanly the text separates amounts held from rates of change.
+log-scale comfort: how naturally the text thinks in multiples and doublings where the phenomenon is multiplicative.
+heavy-tail respect: how seriously the text treats domains where rare events carry most of the mass.
+black-swan humility: how honestly the text admits which of its plans die on an unforeseen extreme.
+variance-versus-mean attention: how much the text cares about spread and not just center.
+respect for the law of small numbers: how properly the text distrusts patterns in tiny samples.
+curation ruthlessness: how mercilessly the text selects — keeping only what earns its place.
+omission wisdom: how much what is left out improves what remains.
+restraint as signal: how much the text's holding-back communicates confidence and standards.
+negative-space usage: how deliberately the text uses what it does not say — implication, silence, the unstated obvious.
+less-is-more conviction: how deeply the text believes subtraction improves — and practices it.
+maximalism executed well: how successfully abundance — of detail, reference, ornament — is made to work as a system.
+kitsch awareness: how much the text knows where sentimental mass-taste clichés lie, and either avoids or knowingly deploys them.
+camp intentionality: how deliberate any over-the-top aesthetic is — exaggeration with a knowing wink.
+irony-budget discipline: how much irony is spent and whether the text can still say anything sincerely afterward.
+sincerity-budget courage: how much unprotected sincerity the text spends where irony was available.
+reference-quality curation: how good the taste in citations, allusions, and influences is — each reference a room the reader might enter.
+influence-selection taste: how well-chosen the masters are — who the author decided to learn from. Score the chosen teachers; note what the selection reveals.
+quality-floor enforcement: how consistently nothing below a standard ships anywhere in the text.
+quality-ceiling ambition: how high the best moments reach.
+connoisseurship depth: how finely the text discriminates within its domain — differences invisible to outsiders, load-bearing to insiders.
+philistine honesty: how honestly the text admits what it does not appreciate rather than faking taste.
+acquired-taste patience: how much the text invests in tastes that repay slow acquisition — and helps the reader acquire them.
+guilty-pleasure candor: how honestly the text owns enjoying what its milieu disdains.
+taste-versus-preference distinction: how clearly the text separates trained judgment from mere liking.
+aesthetic-consistency discipline: how coherently every choice belongs to one governing sensibility.
+larval promise: how much undeveloped capability the text shows — the shape of what this author will become.
+adolescent overreach: how much the text attempts beyond its current strength — ambition outrunning craft. Score the overreach; honor the reach while marking the gap.
+early-career hunger: how much the text carries the drive of someone with everything to prove and energy to prove it. Score the hunger; note what it powers and what it rushes.
+mid-career consolidation: how much the text works to secure and systematize earlier gains.
+late-style freedom: how much the text shows the liberty of someone past needing approval — rules broken knowingly, economy earned.
+juvenilia charm: how much early-work awkwardness carries genuine charm and signal. Score the charm honestly; do not grade juvenilia as mature work in either direction.
+apprentice diligence: how faithfully the text does the exercises — forms practiced, masters copied, fundamentals honored.
+journeyman reliability: how dependably competent the work is — professional, repeatable, unspectacular.
+master's economy: how much the text achieves with visibly little — the single line where others need ten.
+post-mastery play: how much the text plays with what it has already mastered — rules bent by someone who could follow them perfectly.
+growth-edge visibility: how clearly the text shows where this author is currently learning — the live frontier of their ability.
+plateau honesty: how honestly the text admits where the author has stopped improving.
+second-act reinvention: how genuinely the text represents a real reinvention rather than the first act repeated in new clothes.
+comeback energy: how much the text carries return-from-setback drive — humility and hunger recombined.
+swan-song poignancy: how much the text carries valedictory weight — last words consciously chosen.
+premature-optimization scent: how much effort polishes parts whose requirements are not yet known.
+premature-scaling scent: how much the text scales a process not yet proven at small size.
+seasoning evidence: how much the judgment shows time under real conditions — heuristics with scars, confidence with calluses.
+weathering: how much exposure has shaped the text — positions eroded to their durable cores.
+patina authenticity: how genuine the surface of age and use is — wear earned, not applied.
+wit density: how much sharp, compressed intelligence-as-humor the text carries per page.
+humor risk tolerance: how much the text is willing to risk a joke not landing.
+self-deprecation calibration: how precisely jokes at the author's expense are sized — disarming without groveling.
+irony load: how much of the text means something other than what it says.
+deadpan control: how steadily the text delivers absurdity with a straight face.
+absurdism discipline: how purposefully the absurd is deployed — nonsense in service of sense.
+pun forgiveness required: how much goodwill the wordplay demands of the reader.
+comic-timing precision: how exactly the funny lands where and when it should — setup, beat, release.
+levity-placement wisdom: how wisely lightness is positioned against heavy material.
+joke-tax fairness: how fairly the humor's cost — length, digression, tone risk — is balanced by what it pays.
+humor as argument: how much the comedy itself does argumentative work — the absurdity that exposes, the parody that clarifies.
+humor as evasion: how much the jokes deflect exactly where seriousness was owed.
+satire fairness: how honestly the satire hits what its target actually is.
+parody accuracy: how precisely the imitation captures what it mocks.
+whimsy authenticity: how genuine the playful strangeness is — native to the author, not applied.
+mischief energy: how much gleeful rule-testing animates the text.
+earned-ness of its gallows humor: how much the dark joke is earned by proximity to the darkness.
+in-joke generosity: how much the inside humor still gives outsiders something.
+laugh-line frequency: how often the text is actually funny.
+comedy-tragedy balance: how well the text holds both masks where the material contains both.
+touch-grass evidence: how much the text shows recent contact with the physical, social, unmediated world.
+field-experience residue: how much time in the field has left traces in the text — details no desk produces.
+calluses visible: how much hard repeated practice shows in the hands of the prose — shortcuts earned, pains known.
+desk-research ceiling: how clearly the text has hit the limit of what reading alone can know.
+armchair altitude: how far above the ground the reasoning floats — comfort with abstraction untested by contact. Score the altitude; note where the view helps and where the ground disagrees.
+boots-on-ground credibility: how much the author has stood where they report from.
+practitioner fluency: how much the text speaks the working language of people who do this daily.
+user-contact frequency: how often the text's claims have met actual users, customers, or subjects.
+customer-voice presence: how much the people served speak in their own words in the text.
+real-name accountability: how much the author stands behind the text under their own name where it costs something.
+place attachment: how much the text is rooted in a particular place it knows and answers to.
+local-knowledge depth: how deep the text's knowledge of its particular context runs — the exceptions, histories, and micro-politics maps miss.
+terroir: how much the work tastes of where it was grown — conditions, community, and constraint expressed in the thing itself.
+embodied-knowledge scent: how much the knowing lives in the body of the practice — balance, timing, feel — and shows through the description.
+craft-apprenticeship residue: how much learning-under-a-master shows in the work's habits.
+tool-wear authenticity: how much the tools described show real use — workflows with worn grips, not showroom setups.
+workshop-floor vocabulary: how naturally the text uses the words workers actually use, precisely.
+lived-experience weight: how much weight the text gives to having been there, calibrated against its evidential limits.
+secondhand-knowledge honesty: how clearly the text marks what it knows only through others.
+map-territory discipline: how consistently the text remembers its models are not the thing itself.
+self-awareness without self-absorption: how much the text knows itself while staying pointed at its subject.
+fourth-wall discipline: how deliberately the text manages acknowledgment of its own artifice.
+meta-commentary budget: how much text-about-the-text the piece spends.
+self-citation restraint: how much the author resists routing the reader back to their own prior work beyond need.
+cartography of its own limitations: how precisely the text maps where it fails, thins, or does not apply.
+scope-disclaimer honesty: how honestly the stated scope matches what the text actually attempts.
+genre self-knowledge: how well the text knows what kind of thing it is — and either obeys or knowingly breaks its form.
+audience self-knowledge: how accurately the text knows who is actually reading it.
+purpose clarity to itself: how much the text knows what it is for.
+mission drift within the document: how far the text ends from where it promised to go.
+thesis fidelity: how faithfully the body serves the stated thesis.
+promise-keeping within the text: how completely the text delivers everything its own sentences promised.
+title-content contract fulfillment: how honestly the content delivers what the title sold.
+abstract-body consistency: how accurately the summary matches what the full text establishes.
+conclusion-introduction handshake: how well the ending answers the opening — questions posed, then actually answered or honestly returned.
+internal-contradiction rate: how often the text disagrees with itself without noticing.
+self-undermining risk: how much the text's own method or tone defeats its message.
+reflexivity depth: how deeply the text applies its own standards to itself.
+navel-gaze risk: how much self-examination has replaced outward work.
+exegesis invitation: how much the text rewards and invites close interpretive reading.
+voice distinctiveness: how unmistakably this prose could be no one else's.
+voice consistency: how stable the voice holds across the text's length and registers.
+persona-author gap: how far the presented self stands from the evident actual author.
+ventriloquism skill: how convincingly the text speaks in voices not its own — quotation, pastiche, imagined interlocutors.
+register agility: how smoothly the text moves between formal and informal, technical and plain, as the moment demands.
+code-switching smoothness: how naturally the text moves between community dialects it genuinely holds.
+idiolect strength: how much the author's personal language — coinages, constructions, private emphases — shapes the text.
+house-style submission: how much the text has surrendered to an institutional style. Score the submission; note what the house gained and what the writer lost.
+style-guide independence: how much the text departs from convention deliberately and well.
+imitability resistance: how hard this text would be to fake convincingly.
+parody vulnerability: how easily the style could be parodied — tics prominent enough to exaggerate. Score the vulnerability; a style all signature is a style ready-made for mockery.
+whether you would know the author blind: how identifiable the authorship is with the name removed. Score the blind identifiability; treat it as the cleanest measure of voice.
+signature-move reliance: how much the text leans on the author's known moves.
+tic frequency: how often involuntary verbal habits recur — pet words, reflex constructions.
+verbal-fingerprint stability: how consistent the author's statistical signature is — rhythm, word choice, construction habits. Score the stability; note it as identity evidence, not quality.
+borrowed-voice scent: how much the prose smells of another writer worn secondhand.
+translation survivability: how much of the text's value would survive into another language. Score the survivability; note what is load-bearing meaning versus untranslatable surface.
+read-aloud quality: how well the prose performs when spoken — breath, rhythm, emphasis landing where meant.
+inner-voice intimacy: how much the text sounds like thought itself — the reader hearing their own mind think it.
+broadcast-voice projection: how well the voice carries to a large audience without losing its grain.
+pulpit tendency: how much the voice climbs into the pulpit — elevation, cadence, moral altitude. Score the climb; note where the height serves and where it merely elevates the speaker.
+fireside register: how much the voice sits down with the reader — warmth, patience, story-pace.
+control-room terseness: how much the voice speaks in operational shorthand — compressed, load-bearing, no wasted syllables.
+bedside manner: how the voice handles the reader at their most vulnerable — bad news delivered, fears addressed.
+courtroom precision: how much the voice speaks as if under oath and cross-examination — every word chosen to be defensible.
+attention respect: how much the text treats reader attention as borrowed capital to be repaid.
+clickbait residue: how much headline-trickery survives in the text — curiosity exploited, promises inflated.
+headline-body integrity: how honestly the title's claim survives contact with the body's content.
+hook honesty: how truthfully the attention-grabbing opening represents what follows.
+curiosity-gap ethics: how fairly the text opens gaps it intends to close.
+dwell time deserved: how much of the time readers spend the text actually earns.
+scroll-stopping without tricks: how much the text arrests attention by substance rather than manipulation.
+notification worthiness: how much this text deserves to interrupt someone.
+interruption justification: how well the text justifies the attention it demands right now versus later or never.
+memorability per minute: how much of the text a reader still carries a week later, per minute spent.
+quotability without context collapse: how well the text's best lines survive extraction without becoming false.
+screenshot survivability: how well a fragment of this text behaves when it travels alone.
+virality-design scent: how much the text was shaped for sharing rather than reading.
+algorithm-shaped compromise: how much the text has bent itself to platform incentives — length, keywords, outrage cadence.
+engagement-bait absence: how free the text is of provocations that exist to generate response.
+outrage-fuel fraction: how much of the text's energy comes from stoking indignation.
+doomscroll contribution: how much the text adds to compulsive despair consumption without agency.
+attention-restoration quality: how much reading this leaves attention better rather than more fragmented.
+calm-technology spirit: how much the text informs without seizing — present when needed, quiet otherwise.
+deep-attention reward: how much the text gives back to fully-committed attention that skimming can never extract.
+feedback-loop identification: how well the text finds the loops — what feeds back into what, reinforcing or balancing.
+delay appreciation: how seriously the text treats the time between cause and visible effect.
+stock-and-flow modeling: how cleanly the text thinks in reservoirs and rates when the system has both.
+leverage-point targeting: how well the text aims at the places where small changes shift the whole system — rules, goals, paradigms — rather than parameters.
+unintended-consequence appetite: how hungrily the text hunts its own proposal's side effects before critics do.
+equilibrium-shift realism: how honestly the text estimates what it takes to move a system to a new stable state rather than a temporary displacement.
+path-dependence awareness: how much the text understands that where the system can go depends on where it has been.
+lock-in caution: how carefully the text treats choices that will be expensive to reverse once ecosystems form around them.
+hysteresis awareness: how much the text knows that undoing a change does not retrace the path — systems remember.
+emergence respect: how seriously the text treats properties that exist only at the system level.
+reductionism discipline: how skillfully the text decomposes without losing what mattered about the whole.
+holism discipline: how rigorously the text handles wholes — system claims with mechanisms, not vibes.
+boundary-drawing judgment: how wisely the text draws its system boundary — wide enough to include what matters, tight enough to say anything.
+exogeneity honesty: how honestly the text labels what it treats as outside the model — given, fixed, someone else's problem.
+endogeneity vigilance: how alert the text is to its causes being caused by its effects.
+root-cause depth: how far down the why-chain the text actually digs before acting.
+symptom-treatment candor: how honestly the text admits when it is managing symptoms rather than curing causes.
+intervention-point wisdom: how well the text chooses where in the system to act among the options it mapped.
+homeostasis respect: how much the text expects the system to fight back and restore its setpoint.
+cascade-risk mapping: how well the text traces how one failure propagates — dependencies, contagion paths, common-mode risks.
+single-point-of-failure hunting: how actively the text hunts the one thing whose loss stops everything.
+redundancy budgeting: how deliberately the text buys backup capacity — what is doubled, what is accepted bare, and why.
+graceful-degradation design: how well the described system fails — partial service, safe states, legible failure.
+discipline of its antifragility claims: how rigorously any gains-from-disorder claim is backed by mechanism.
+slack appreciation: how much the text values unallocated capacity — the empty space that absorbs shocks and enables response.
+maintenance glamour: how much the text makes upkeep visible and honorable rather than invisible until failure.
+janitorial respect: how much the text credits the unglamorous work that keeps everything running.
+upkeep budgeting: how honestly ongoing costs are counted at decision time, not discovered later.
+deferred-maintenance honesty: how openly the text admits what has been postponed and what the postponement is costing.
+technical-debt candor: how honestly shortcuts are recorded as debts with interest rather than forgotten.
+gardening patience: how much the text tends its systems like a garden — seasons respected, growth supported, forcing avoided.
+pruning courage: how willingly the text cuts living but wrong growth — features, programs, prose — for the health of the whole.
+weeding diligence: how regularly small invasions are removed before they establish — errors, scope, bad patterns.
+composting of failures: how well failures are broken down into nutrients for the next attempt — lessons extracted, residue discarded.
+stewardship ethic: how much the text treats what it manages as held in trust for others and the future.
+custodial pride: how much care for a thing's condition shows as pride rather than obligation.
+repair-over-replace instinct: how naturally the text reaches for fixing before discarding.
+patch-quality conscience: how well even the quick fix is made — the patch that respects the fabric.
+backward-compatibility care: how much the text protects those depending on what came before.
+migration-path kindness: how gently users of the old way are led to the new one — bridges, timelines, translations.
+deprecation courtesy: how respectfully the text retires what people still use — warning, alternatives, dignity.
+sunsetting dignity: how well things are ended — completed, archived, credited, closed.
+legacy-system respect: how much the text honors the old system's embedded wisdom while replacing it.
+refactoring appetite: how willingly the text restructures what works for what will keep working.
+entropy-fighting stamina: how much sustained will the text shows for the fight that never ends — order maintained against constant decay.
+bad-news delivery speed: how fast the text surfaces what its audience least wants to hear.
+hard-truth appetite: how much the text seeks out and states the truths that cost it something.
+euphemism avoidance: how plainly the text names hard things — deaths, failures, firings — without softening fog.
+elephant-naming promptness: how quickly the text names what everyone sees and no one says.
+whistle-blowing spine: how much the text risks its own standing to report what its community would rather not know.
+self-incrimination honesty: how willingly the text includes facts that damage its own case or author.
+awkwardness tolerance: how well the text sits in discomfort without smoothing it prematurely.
+taboo-topic composure: how steadily the text handles subjects its audience finds untouchable — neither flinching nor performing courage.
+third-rail touching judgment: how wisely the text chooses which untouchable subjects actually need touching, and how.
+sacred-cow inspection: how willingly the text examines its own community's protected beliefs.
+emperor's-clothes candor: how readily the text says the celebrated thing is not working.
+room-reading versus truth-telling balance: how wisely the text balances what this audience can hear against what must be said.
+diplomatic honesty: how much the text achieves honesty and tact simultaneously rather than trading one for the other.
+brutal-honesty restraint: how much the text resists using honesty as a license for cruelty.
+candor with care: how well the text pairs full disclosure with visible concern for the person receiving it.
+dissent-expression skill: how effectively disagreement is voiced so it can actually be heard — specific, timely, addressed to the decision.
+minority-report courage: how willingly the text files its disagreement formally when the group goes the other way.
+career-risk truth-telling: how much professional cost the author accepts to say this.
+retraction grace: how well the text takes things back — fully, promptly, without minimizing choreography.
+apology quality: how completely any apology names the harm, owns the cause, and changes the behavior.
+pedagogical patience: how much the text tolerates the learner's pace — repetition without resentment, questions without contempt.
+curse-of-knowledge resistance: how well the text remembers what it was like not to know.
+beginner's-mind access: how freshly the text can still see its subject as strange and questionable.
+misconception anticipation: how well the text predicts the specific wrong ideas learners bring and addresses them directly.
+error-driven teaching: how deliberately the text uses mistakes — the reader's or its own — as the engine of learning.
+productive-struggle design: how well the text calibrates difficulty so the reader struggles enough to learn and not enough to quit.
+scaffolding-removal timing: how wisely support is withdrawn as competence grows.
+transfer-distance ambition: how far from the teaching context the text aims its lessons to work.
+first-principles rebuilding: how much the text teaches by reconstructing knowledge from the ground rather than delivering conclusions.
+memorization honesty: how honestly the text admits what must simply be memorized versus what can be derived.
+intuition-first sequencing: how well the text builds felt understanding before formal machinery.
+formalism-first courage: how deliberately the text starts with the rigorous version when intuition would mislead.
+motivation before mechanism: how well the text makes the reader want the answer before providing it.
+mechanism before motivation: how deliberately the text teaches the machinery first where premature why would distort.
+socratic restraint: how much the text asks and waits where telling would be faster and shallower.
+telling when telling helps: how readily the text simply states what direct statement serves best.
+feedback specificity: how precisely the text's corrections point to the exact gap — this step, this word, this assumption.
+praise precision: how exactly the praise names what was good and why it worked.
+critique digestibility: how well criticism is portioned and sequenced so it can be metabolized rather than defended against.
+learning-in-public generosity: how much the text shares its own learning process — confusions, wrong turns, corrections — for others' benefit.
+triage clarity: how decisively the text sorts what must be done now, later, and never.
+prioritization ruthlessness: how willingly the text lets genuinely good things die so the best thing lives.
+constraint acknowledgment: how honestly the text names the limits it operates under — time, money, attention, politics.
+scarcity honesty: how truthfully the text represents what there is not enough of.
+trade-off explicitness: how openly the text states what it gave up to get what it chose.
+pareto-frontier awareness: how well the text knows when it is choosing between optima versus leaving free improvements unclaimed.
+satisficing wisdom: how wisely the text chooses good-enough where optimal is not worth its cost.
+optimization-target sanity: how sound the objective itself is before effort optimizes it.
+good-enough courage: how bravely the text ships at sufficient rather than polishing past the point of return.
+perfectionism containment: how well the drive for perfection is confined to where perfection pays.
+corner-cutting disclosure: how honestly the text says which corners were cut and why those.
+quality-triangle honesty: how honestly the text admits it cannot have fast, cheap, and good at once.
+deadline realism: how honestly the stated deadlines reflect what the work actually takes.
+scope-cut wisdom: how wisely the text chooses what to drop when something must go.
+requirement-pushback spine: how firmly the text challenges demands that should not survive.
+gold-plating avoidance: how well the text resists adding unrequested refinement to the already-sufficient.
+bikeshedding resistance: how well attention stays on the reactor and off the bikeshed — weight of discussion matching weight of decision.
+yak-shaving awareness: how conscious the text is of prerequisite chains that wander from the goal.
+rabbit-hole discipline: how well the text explores tangents with a rope tied to the entrance.
+essentialism: how completely the text has found the vital few things and released the trivial many.
+jargon load: how much specialized vocabulary the text carries relative to need.
+acronym hospitality: how kindly the text treats readers meeting its acronyms — expanded on first use, kept few.
+term-of-art precision: how correctly the text uses its field's technical terms in their load-bearing senses.
+plain-language courage: how bravely the text says it simply when simplicity is available.
+latinate-anglo balance: how well the text balances Latinate abstraction against Anglo-Saxon directness.
+sentence-opening variety: how varied the sentence openings run — not every sentence the same subject-verb march.
+adverb restraint: how sparingly adverbs prop up verbs that should stand alone.
+intensifier inflation: how much very, extremely, and incredibly have devalued the text's currency.
+filler-phrase fraction: how much of the text is throat-clearing constructions — it is worth noting, in order to, the fact that.
+nominal-style stiffness: how much action hides in noun constructions instead of verbs.
+verbal-style vigor: how much the prose runs on strong verbs in active clauses.
+concrete-noun density: how much of the text names things you could point to.
+dead-metaphor reliance: how much the text leans on metaphors so worn they no longer picture anything.
+mixed-metaphor risk: how often the text's images collide — bootstrapping the low-hanging fruit uphill.
+idiom freshness: how much the text's idiomatic language still has juice.
+punctuation confidence: how surely the text wields its commas, colons, and dashes — rhythm controlled, meaning disambiguated.
+em-dash dependence: how much the text leans on the dash for effects other punctuation should share.
+parenthetical discipline: how well asides know their place — brief, genuinely parenthetical, not smuggled main points.
+footnote temperance: how moderately the text drinks from the footnote — apparatus serving, not sprawling.
+epigraph aptness: how precisely any opening quotation actually frames what follows.
+bureaucratic wildness: how much untamed creative energy survives inside procedural form — the wild thing filed in triplicate.
+disciplined chaos: how much apparent disorder rests on rigorous underlying control — improvisation over mastered changes.
+cold passion: how much intense commitment burns without heat in the voice — fervor conducted through precision.
+humble swagger: how much earned confidence walks beside genuine modesty — sure of the work, unsure of nothing else it should be sure of.
+rigorous whimsy: how much genuine play is built on exact foundations — the joke that is also a proof.
+patient urgency: how much the text holds real hurry and real patience at once — moving now, without panic, for as long as it takes.
+ambitious modesty: how much vast aim coexists with modest claims — the huge attempt described in exact, unpuffed terms.
+playful gravity: how much serious weight is carried with a light step — grave matter, unponderous manner.
+austere generosity: how much is given through restraint — the spare text that spends everything on the reader.
+reckless precision: how much daring lives inside exactitude — bold bets stated to the decimal.
+intimate formality: how much closeness is achieved through formal means — the bow that is warmer than the hug.
+chaotic diligence: how much relentless thorough work proceeds without visible system — everything covered, nothing filed.
+serene intensity: how much total engagement runs without agitation — the calm surface over full power.
+minimalist abundance: how much plenty is delivered through few elements — the small set that generates the large world.
+conservative radicalism: how much deep change is pursued through careful, tradition-respecting means — the revolution that conserves.
+skeptical faith: how much sustained commitment coexists with sustained doubt — belief that keeps testing itself and working anyway.
+detached devotion: how much full dedication runs without clinging — the work served completely, outcomes held loosely.
+effortful ease: how much visible grace rests on invisible labor — the simple line that took a hundred drafts.
+complicated simplicity: how much a simple surface truthfully compresses genuine complexity — plain words over deep machinery, nothing false.
+quiet loudness: how much force arrives without volume — the whisper that carries further than the shout.
+spine of the argument visible through the prose: how clearly the skeletal logic shows through the writing's surface — every paragraph locatable on the spine.
+gravitational pull on the reader's attention: how much the text bends attention toward itself without demanding it — the mass that curves the reading.
+willingness to bore the reader for the right reasons: how bravely the text includes the necessary dull part — the table, the derivation, the caveat — where excitement would falsify.
+smell of a real deadline survived: how much the text carries the compression marks of true time pressure met — decisions forced, scope cut, the thing shipped. Score the survival marks; distinguish the sprint's honest scars from chronic rush.
+confidence that comes from having checked: how much the certainty rests on verification actually performed — the calm of the person who ran the numbers twice.
+generosity toward its own predecessors: how kindly the text treats those who tried this before and got less far — their partial success honored, their errors explained without contempt.
+appetite for being fact-checked: how much the text welcomes verification — claims stated checkably, sources reachable, corrections invited.
+capacity to change a smart skeptic's mind: how much the text could actually move someone intelligent who arrived disagreeing.
+residue of real conversations behind it: how much the text shows it was tested on real people before publication — objections absorbed, confusions fixed, examples that landed kept.
+sense that the author would do this unpaid: how much the work radiates being its own
+distance between its stated and revealed priorities: how far what the text says it values sits from what its choices show it values — space given, care spent, corners cut.
+degree to which it would survive its author's absence: how well the work would continue to function, be maintained, and be understood with the author gone — documentation, succession, self-explaining structure.

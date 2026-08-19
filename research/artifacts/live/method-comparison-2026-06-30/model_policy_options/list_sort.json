@@ -1,0 +1,82 @@
+{
+  "attribute_scores": {
+    "deepseek_v4_flash_fast": {
+      "cost_discipline": 0.0,
+      "public_receipt_credibility": 0.0,
+      "route_freshness": 0.0
+    },
+    "glm_5_2_logprob_candidate": {
+      "cost_discipline": 0.25,
+      "public_receipt_credibility": 0.25,
+      "route_freshness": 0.25
+    },
+    "kimi_k2_thinking_diverse": {
+      "cost_discipline": 0.75,
+      "public_receipt_credibility": 0.75,
+      "route_freshness": 0.75
+    },
+    "quality_only_opus_46": {
+      "cost_discipline": 0.5,
+      "public_receipt_credibility": 0.5,
+      "route_freshness": 0.5
+    },
+    "sonnet_reference_then_fast": {
+      "cost_discipline": 1.0,
+      "public_receipt_credibility": 1.0,
+      "route_freshness": 1.0
+    }
+  },
+  "extra": {
+    "confidence": 0.85,
+    "ranked_ids_raw": [
+      "sonnet_reference_then_fast",
+      "kimi_k2_thinking_diverse",
+      "quality_only_opus_46",
+      "glm_5_2_logprob_candidate",
+      "deepseek_v4_flash_fast"
+    ]
+  },
+  "method": "list_sort",
+  "metrics_vs_reference": {
+    "candidate_ranked_ids": [
+      "sonnet_reference_then_fast",
+      "kimi_k2_thinking_diverse",
+      "quality_only_opus_46",
+      "glm_5_2_logprob_candidate",
+      "deepseek_v4_flash_fast"
+    ],
+    "kendall_tau": 0.6,
+    "reference_ranked_ids": [
+      "sonnet_reference_then_fast",
+      "quality_only_opus_46",
+      "kimi_k2_thinking_diverse",
+      "deepseek_v4_flash_fast",
+      "glm_5_2_logprob_candidate"
+    ],
+    "topk_jaccard": 1.0
+  },
+  "model": "openai/gpt-4.1-mini",
+  "ranked_ids": [
+    "sonnet_reference_then_fast",
+    "kimi_k2_thinking_diverse",
+    "quality_only_opus_46",
+    "glm_5_2_logprob_candidate",
+    "deepseek_v4_flash_fast"
+  ],
+  "usage": {
+    "calls": 1,
+    "completion_tokens": 56,
+    "cost_is_estimate": false,
+    "cost_nanodollars": 246400,
+    "cost_usd": 0.0002464,
+    "latency_ms": 2077,
+    "prompt_tokens": 392
+  },
+  "utility": {
+    "deepseek_v4_flash_fast": 0.0,
+    "glm_5_2_logprob_candidate": 0.25,
+    "kimi_k2_thinking_diverse": 0.75,
+    "quality_only_opus_46": 0.5,
+    "sonnet_reference_then_fast": 1.0
+  }
+}

@@ -1,0 +1,20 @@
+benchmarking moonshotai/kimi-k3 ...
+model: moonshotai/kimi-k3 · template: canonical_v2
+  signal           +1.133 [+0.703, +1.564] nats (n=20)  → 0.678
+  order-flip       +0.000 [+0.000, +0.161] rate (n=20)  → 1.000
+  order-residual   +0.144 [+0.088, +0.200] nats (n=20)  → 0.866
+  frustration      +0.018 curl fraction (n=13)  → 0.982
+  spin-survival    +1.000 [+0.438, +1.000] rate (n=3)  → 1.000
+  susceptibility   +0.146 [+0.038, +0.254] nats/spin (n=5)
+  polarity         -0.857 spearman (n=8)  → 0.929
+  paraphrase       +0.976 spearman (n=8)  → 0.988
+  null-bias        +0.000 [+0.000, +0.000] nats (n=4)  → 1.000
+  nuisance         +0.214 [+0.128, +0.300] nats (n=24)  → 0.807
+  orbit-coherence  +0.752 [+0.462, +1.042] energy fraction (n=6)  → 0.752
+  interaction      +0.134 [-0.097, +0.365] energy fraction (n=6)
+  harmonic         +0.083 energy fraction (n=1)  → 0.917
+    nuisance:whitespace   +0.152 nats (n=6)
+    nuisance:markdown     +0.132 nats (n=6)
+    nuisance:bullet       +0.178 nats (n=6)
+    nuisance:halo         +0.395 nats (n=6)
+  coherence 0.923 (harmonic 0.915) · JUDGE SCORE 0.626 · 194 comparisons (0 cached) · 0 refusals · $1.4935

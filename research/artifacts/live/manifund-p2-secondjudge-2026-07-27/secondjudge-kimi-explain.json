@@ -1,0 +1,54 @@
+{
+  "attributes": [
+    {
+      "attribute_id": "explain_0",
+      "prompt": "plausibility of the causal path from the proposed activities to the claimed impact",
+      "spearman_alone": 0.17125435540069683,
+      "fitted_weight": 0.1127363136331188
+    },
+    {
+      "attribute_id": "explain_1",
+      "prompt": "expected impact per marginal dollar at the stated minimum funding ask",
+      "spearman_alone": 0.06498257839721254,
+      "fitted_weight": 0.0
+    },
+    {
+      "attribute_id": "explain_2",
+      "prompt": "strength of verifiable track-record evidence that this team can execute this plan",
+      "spearman_alone": 0.156794425087108,
+      "fitted_weight": 0.0
+    },
+    {
+      "attribute_id": "explain_3",
+      "prompt": "epistemic integrity of the write-up: honest failure modes, quantified claims, falsifiable milestones",
+      "spearman_alone": 0.37404181184668983,
+      "fitted_weight": 0.8872636863668812
+    }
+  ],
+  "combined_spearman": 0.39808362369337974,
+  "meta": {
+    "topk_error": 7.832566620048259,
+    "tolerated_error": 0.1,
+    "comparisons_attempted": 660,
+    "comparisons_used": 646,
+    "comparisons_refused": 7,
+    "comparisons_cached": 0,
+    "comparison_budget": 660,
+    "latency_ms": 5353033,
+    "model_used": "moonshotai/kimi-k2.6",
+    "rater_id_used": "moonshotai/kimi-k2.6",
+    "provider_input_tokens": 1755722,
+    "provider_output_tokens": 1639943,
+    "provider_cost_nanodollars": 6784712926,
+    "provider_cost_is_estimate": false,
+    "entities_pruned": 0,
+    "pairs_counterbalanced": 317,
+    "position_flips": 53,
+    "evidence_judgements": 0,
+    "logprob_mode_judgements": 0,
+    "evidence_visible_mass_mean": null,
+    "evidence_order_residual_mean_abs": 0.59363944242218,
+    "judgement_frustration_mean": 0.05192201137488421,
+    "stop_reason": "budget_exhausted"
+  }
+}

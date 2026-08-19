@@ -1,0 +1,102 @@
+{
+  "attribute_scores": {
+    "bandit_policy_cardinal": {
+      "auditability": 0.58,
+      "information_per_call": 0.6,
+      "noise_resistance": 0.84
+    },
+    "cardinal_pairwise_ratio": {
+      "auditability": 0.62,
+      "information_per_call": 0.52,
+      "noise_resistance": 0.68
+    },
+    "ordinal_pairwise": {
+      "auditability": 0.78,
+      "information_per_call": 0.45,
+      "noise_resistance": 0.8
+    },
+    "single_scalar_rating": {
+      "auditability": 0.92,
+      "information_per_call": 0.9,
+      "noise_resistance": 0.55
+    },
+    "whole_list_sort": {
+      "auditability": 0.7,
+      "information_per_call": 0.65,
+      "noise_resistance": 0.35
+    }
+  },
+  "extra": {
+    "confidence": {
+      "bandit_policy_cardinal": {
+        "auditability": 0.79,
+        "information_per_call": 0.83,
+        "noise_resistance": 0.89
+      },
+      "cardinal_pairwise_ratio": {
+        "auditability": 0.8,
+        "information_per_call": 0.82,
+        "noise_resistance": 0.84
+      },
+      "ordinal_pairwise": {
+        "auditability": 0.85,
+        "information_per_call": 0.88,
+        "noise_resistance": 0.9
+      },
+      "single_scalar_rating": {
+        "auditability": 0.87,
+        "information_per_call": 0.9,
+        "noise_resistance": 0.88
+      },
+      "whole_list_sort": {
+        "auditability": 0.82,
+        "information_per_call": 0.84,
+        "noise_resistance": 0.86
+      }
+    }
+  },
+  "method": "scalar_matrix",
+  "metrics_vs_reference": {
+    "candidate_ranked_ids": [
+      "single_scalar_rating",
+      "bandit_policy_cardinal",
+      "ordinal_pairwise",
+      "cardinal_pairwise_ratio",
+      "whole_list_sort"
+    ],
+    "kendall_tau": 0.4,
+    "reference_ranked_ids": [
+      "bandit_policy_cardinal",
+      "ordinal_pairwise",
+      "cardinal_pairwise_ratio",
+      "single_scalar_rating",
+      "whole_list_sort"
+    ],
+    "topk_jaccard": 0.5
+  },
+  "model": "openai/gpt-5.4-mini",
+  "ranked_ids": [
+    "single_scalar_rating",
+    "bandit_policy_cardinal",
+    "ordinal_pairwise",
+    "cardinal_pairwise_ratio",
+    "whole_list_sort"
+  ],
+  "usage": {
+    "calls": 1,
+    "completion_tokens": 272,
+    "cost_is_estimate": false,
+    "cost_nanodollars": 1500000,
+    "cost_usd": 0.0015,
+    "latency_ms": 2294,
+    "prompt_tokens": 368,
+    "total_tokens": 640
+  },
+  "utility": {
+    "bandit_policy_cardinal": 0.6910000000000001,
+    "cardinal_pairwise_ratio": 0.609,
+    "ordinal_pairwise": 0.6725000000000001,
+    "single_scalar_rating": 0.765,
+    "whole_list_sort": 0.5425
+  }
+}

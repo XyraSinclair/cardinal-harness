@@ -1,0 +1,221 @@
+{
+ "judge": "openai/gpt-5.4-nano",
+ "cost": 0.0029077999999999994,
+ "m1": {
+  "India": {
+   "estimate": 1430000000.0,
+   "raw": "India\u2019s recent census/population estimates place it at roughly the mid\u20131.4 billion range; a reasonable current estimate is about **1,430,000,000**."
+  },
+  "United States": {
+   "estimate": 334000000.0,
+   "raw": "The United States current population is approximately 334 million people; as of 2026 it\u2019s around 334,000,000. **334000000**"
+  },
+  "Pakistan": {
+   "estimate": 245000000.0,
+   "raw": "Pakistan\u2019s current national population is roughly in the mid\u2013240 million range (using recent census-based estimates and ongoing growth rates).  \n245000000"
+  },
+  "Japan": {
+   "estimate": 123000000.0,
+   "raw": "Japan\u2019s population has been declining gradually and is currently in the low-to-mid 120 millions range; a reasonable estimate for today is about **123,000,000**."
+  },
+  "Germany": {
+   "estimate": 83100000.0,
+   "raw": "As of recent estimates, Germany\u2019s population is about **83 million** (roughly 83.1\u201383.3 million in the last year or so).  \n83100000"
+  },
+  "South Korea": {
+   "estimate": 51500000.0,
+   "raw": "South Korea\u2019s population has been around the low-to-mid 50 millions recently; a reasonable current estimate is **51,500,000**."
+  },
+  "Australia": {
+   "estimate": 26500000.0,
+   "raw": "Australia\u2019s population is currently in the high-20-millions range; a reasonable estimate for the present is about **26,500,000**."
+  },
+  "Netherlands": {
+   "estimate": 17800000.0,
+   "raw": "The Netherlands population is currently in the mid\u201317 million range; recent estimates place it around 17.8 million.  \n17800000"
+  },
+  "Sweden": {
+   "estimate": 10500000.0,
+   "raw": "Sweden\u2019s population is about 10.5 million in recent years (around mid\u20112020s).  \n10500000"
+  },
+  "Bulgaria": {
+   "estimate": 6400000.0,
+   "raw": "Bulgaria\u2019s population is currently around the low 6-millions range; recent estimates are about 6.4 million.  \n6400000"
+  },
+  "Uruguay": {
+   "estimate": 3500000.0,
+   "raw": "Uruguay\u2019s population is currently on the order of about 3.5 million. A reasonable estimate for the present time is **3,500,000**."
+  },
+  "Botswana": {
+   "estimate": 2900000.0,
+   "raw": "Botswana\u2019s population is roughly around the mid-to-high 2.0 million range currently. A reasonable estimate for the current national population is: **2900000**"
+  },
+  "Estonia": {
+   "estimate": 1330000.0,
+   "raw": "Estonia\u2019s population is commonly cited around 1.3 million in recent years (roughly 1.33 million).  \n**1330000**"
+  },
+  "Fiji": {
+   "estimate": 900000.0,
+   "raw": "Fiji\u2019s population is roughly in the mid\u2013900,000s today; a reasonable current estimate is about **900,000**.  \n\n900000"
+  },
+  "Malta": {
+   "estimate": 550000.0,
+   "raw": "Malta\u2019s population has been fairly stable just under 0.55\u20130.56 million in recent years; the current estimate is about **0.55 million**.  \n\n550000"
+  },
+  "Iceland": {
+   "estimate": 380000.0,
+   "raw": "As of recent mid\u20112020s estimates, Iceland\u2019s population is about 380,000.  \n380000"
+  },
+  "Barbados": {
+   "estimate": 287000.0,
+   "raw": "Barbados\u2019 population has been roughly stable around the mid\u2011280,000s to low\u2011290,000s in recent years; a reasonable estimate for the current national population is: **287000**"
+  },
+  "Tonga": {
+   "estimate": 105000.0,
+   "raw": "Tonga\u2019s population has been around ~100k in recent years; a reasonable current estimate is about **105,000**."
+  },
+  "Dominica": {
+   "estimate": 73000.0,
+   "raw": "Dominica\u2019s population has been relatively stable in recent years around the low-to-mid 70,000s; a reasonable current estimate is about **73,000**.  \n\n73000"
+  },
+  "Saint Kitts and Nevis": {
+   "estimate": 53000.0,
+   "raw": "Saint Kitts and Nevis\u2019 population is currently approximately in the mid\u201350,000s; recent estimates put it around **53,000**.  \n53000"
+  },
+  "San Marino": {
+   "estimate": 34000.0,
+   "raw": "San Marino\u2019s population is relatively stable in recent years, around the mid-30,000s. A reasonable current estimate is **34,000**."
+  },
+  "Palau": {
+   "estimate": 22000.0,
+   "raw": "Palau is a small island nation; current population estimates are commonly around the mid-20,000s. The most recent figures place it at roughly **22,000** people.  \n\n22000"
+  },
+  "Tuvalu": {
+   "estimate": 12000.0,
+   "raw": "Tuvalu\u2019s population has been around ~11\u201312 thousand in recent years; a reasonable current estimate is **12,000**."
+  }
+ },
+ "m2": {
+  "India": {
+   "score": 97.0,
+   "raw": "India is one of the most populous countries on Earth\u2014second only to China historically, and very high compared to nearly all other countries. On a 0\u2013100 scale, I\u2019d score it **97**.  \n97"
+  },
+  "United States": {
+   "score": 95.0,
+   "raw": "95"
+  },
+  "Pakistan": {
+   "score": 85.0,
+   "raw": "bout 240\u2013250 million, making it one of the most populous countries globally but not near the absolute highest (e.g., China/India). On a 0\u2013100 scale, it\u2019s roughly in the high range, around **85**.  \n85"
+  },
+  "Japan": {
+   "score": 78.0,
+   "raw": "n is a highly populated country, but not among the very most populous globally (far behind countries like India, China, the U.S., Indonesia, etc.). A reasonable relative score on a 0\u2013100 scale is:\n\n78"
+  },
+  "Germany": {
+   "score": 50.0,
+   "raw": "y has a population of about 84 million, which is high globally but far below the most populous countries (e.g., China, India, US, Indonesia, etc.). On a 0\u2013100 scale, a reasonable score is **50**.  \n50"
+  },
+  "South Korea": {
+   "score": 66.0,
+   "raw": "million, which is quite high globally but far below the world\u2019s most populous countries (e.g., India, China, the U.S. highest tens/hundreds millions). On a 0\u2013100 scale, it lands in the mid range.  \n66"
+  },
+  "Australia": {
+   "score": 35.0,
+   "raw": "Australia is relatively low in population compared with the most populous countries, but it\u2019s not among the least-populous. A reasonable estimate on the 0\u2013100 \u201crelative population\u201d scale is: **35**"
+  },
+  "Netherlands": {
+   "score": 48.0,
+   "raw": "population (about 17\u201318 million), making it neither among the least nor the most populous countries globally. Relative to worldwide extremes, it lands in the low-to-mid range of the 0\u2013100 scale.  \n\n48"
+  },
+  "Sweden": {
+   "score": 26.0,
+   "raw": "Sweden has a moderate population\u2014far from the most populous countries globally\u2014so it would score relatively low on that 0\u2013100 scale. 26"
+  },
+  "Bulgaria": {
+   "score": 12.0,
+   "raw": "Bulgaria has a population of about 6\u20137 million people, which is relatively low compared with most countries worldwide, so on a 0\u2013100 scale it would be on the lower end but not near zero.  \n\n12"
+  },
+  "Uruguay": {
+   "score": 8.0,
+   "raw": "uay has a population of about 3.3 million\u2014far smaller than most countries and much lower than the world\u2019s most populous nations\u2014so it ranks very low in global terms. A reasonable 0\u2013100 score is: **8**"
+  },
+  "Botswana": {
+   "score": 8.0,
+   "raw": "Botswana has a relatively small population compared with most countries worldwide, though it\u2019s not the very least populous. **8**"
+  },
+  "Estonia": {
+   "score": 3.0,
+   "raw": " about 1.3 million people, making it quite sparsely populated compared with most countries worldwide, though it\u2019s not the very least populous globally. On a 0\u2013100 scale, I\u2019d score it around **3**.  \n3"
+  },
+  "Fiji": {
+   "score": 20.0,
+   "raw": "Fiji has a small-to-moderate population compared with most countries, so on a 0\u2013100 scale it would be on the lower end, though not the very smallest. **20**"
+  },
+  "Malta": {
+   "score": 65.0,
+   "raw": "0\u2013100 scale, it ranks around the mid-to-upper range among countries due to its density and population size relative to many nations, but it\u2019s not close to the largest countries globally. **Score: 65**"
+  },
+  "Iceland": {
+   "score": 10.0,
+   "raw": "Iceland has a relatively small population (around 400,000), especially compared with most countries worldwide, so its populousness score is very low on a 0\u2013100 scale.  \n\n10"
+  },
+  "Barbados": {
+   "score": 5.0,
+   "raw": "Barbados has a relatively small population (around a few hundred thousand), far less than most countries worldwide. On a 0\u2013100 scale, it would be in the low range.  \n\n5"
+  },
+  "Tonga": {
+   "score": 18.0,
+   "raw": "Tonga is relatively sparsely populated compared with most countries worldwide, with a population well under 1 million. On a 0\u2013100 scale, that places it very low.  \n18"
+  },
+  "Dominica": {
+   "score": 12.0,
+   "raw": "Dominica has a small population (around 70,000), making it far less populous than most countries, though not the absolute smallest. On a 0\u2013100 scale, its relative \u201cpopulousness\u201d is low.\n\n12"
+  },
+  "Saint Kitts and Nevis": {
+   "score": 5.0,
+   "raw": "Saint Kitts and Nevis is very small by population (around 50,000 people), so it would rank near the least-populous countries globally; on a 0\u2013100 scale, that places it very close to the bottom. **5**"
+  },
+  "San Marino": {
+   "score": 15.0,
+   "raw": "San Marino is very small in population, far below most countries, but not the very least populous in the world. **15**"
+  },
+  "Palau": {
+   "score": 1.0,
+   "raw": "Palau has a very small population (around 18\u201319k people), making it one of the least populous sovereign states worldwide. On a 0\u2013100 scale, I\u2019d score it **1**.  \n1"
+  },
+  "Tuvalu": {
+   "score": 7.0,
+   "raw": "Tuvalu is extremely small in population compared to most countries worldwide\u2014around 11\u201312 thousand people\u2014so it would be near the very low end of global population.  \n7"
+  }
+ },
+ "m3": {
+  "order": [
+   "India",
+   "Pakistan",
+   "United States",
+   "Japan",
+   "Germany",
+   "South Korea",
+   "Australia",
+   "Netherlands",
+   "Sweden",
+   "Bulgaria",
+   "Uruguay",
+   "Botswana",
+   "Estonia",
+   "Fiji",
+   "Malta",
+   "Iceland",
+   "Barbados",
+   "Tonga",
+   "Dominica",
+   "Saint Kitts and Nevis",
+   "San Marino",
+   "Palau",
+   "Tuvalu"
+  ],
+  "attempt": 1
+ },
+ "failures": []
+}

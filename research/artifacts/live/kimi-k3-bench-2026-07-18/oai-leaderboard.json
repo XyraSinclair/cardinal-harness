@@ -1,0 +1,38 @@
+[
+  {
+    "coherence": 0.756185237415498,
+    "coherence_harmonic": 0.43705357231730024,
+    "cost_nanodollars": 76510500,
+    "frustration": 0.07568096898210272,
+    "judge_score": 0.3632950613724231,
+    "model": "openai/gpt-5.4-mini",
+    "nuisance_drift_nats": 0.548370539131609,
+    "null_bias_nats": 0.0,
+    "order_flip_rate": 0.2,
+    "order_residual_nats": 0.2915281769632241,
+    "paraphrase_spearman": 0.9285714285714286,
+    "polarity_spearman": -0.6190476190476191,
+    "refusals": 0,
+    "signal_nats": 0.6547562466589805,
+    "spin_survival": 0.6666666666666666,
+    "susceptibility_nats": 0.5520800379374816
+  },
+  {
+    "coherence": 0.6045702809802735,
+    "coherence_harmonic": 0.0,
+    "cost_nanodollars": 20453400,
+    "frustration": 0.21655363244865541,
+    "judge_score": 0.24581233980282566,
+    "model": "openai/gpt-5.4-nano",
+    "nuisance_drift_nats": 0.826692997627152,
+    "null_bias_nats": 0.0,
+    "order_flip_rate": 0.4,
+    "order_residual_nats": 0.23840814370100244,
+    "paraphrase_spearman": 0.9285714285714286,
+    "polarity_spearman": -0.023809523809523808,
+    "refusals": 0,
+    "signal_nats": 0.5218700237763857,
+    "spin_survival": 0.0,
+    "susceptibility_nats": 0.9601043982981714
+  }
+]

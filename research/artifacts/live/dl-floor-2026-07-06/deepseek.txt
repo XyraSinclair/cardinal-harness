@@ -1,0 +1,4 @@
+sigma_w = 0.195 nats (contextual, per draw) · sigma_b = 0.030 nats (structural floor) · Q = 3.70 on 3 df
+floored scores: [0.63, 0.89, 0.74, 0.52, 0.0]
+naive   scores: [0.63, 0.89, 0.74, 0.52, 0.0]
+42 draws total · cached 4608/15826 input tokens · $0.0043

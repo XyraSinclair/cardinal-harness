@@ -1,0 +1,778 @@
+You are consulted as a first-rank theorist-engineer (the register sought: Feynman's distillation instinct, von Neumann's architectural inevitability). cardinal-harness is a Rust engine for structured LLM judgment: pairwise ratio elicitation -> robust IRLS solve -> cardinal scores with uncertainty; an invariance-probe suite (order, paraphrase, framing spin) that tests whether a judgment is a BELIEF (fixed point of transformations that should not matter) or an echo; a self-validating judge-coherence benchmark; content-addressed judgment packets that fuse byte-identically (a real G-Set CRDT as of yesterday); variance-component pooling; judge-portfolio theory over correlated errors. Everything below is real, receipted, and was adversarially red-teamed yesterday (synthesis included).
+
+--- docs/PRINCIPLES.md ---
+# Principles: staying ahead of slop
+
+How this repo keeps shipping profound work in its canonical flavor —
+structured, provenanced, invariance-tested LLM judgment. Each principle
+earned its place by catching something real; the receipt is cited. Read
+before any substantial work session.
+
+## 1. Refutability is the product
+
+Ship every claim as something that can lose: two-sided pins with dated
+history, planted pathologies that must be caught, controlled experiments
+aimed at our own hypotheses. **Session health metric: self-refutation
+count.** A session that never proved itself wrong wasn't testing anything.
+(Receipts: ladder-curl experiment killed our own quantization hypothesis;
+nano's polarity headline died on retest; the Cesàro convergence criterion
+was unreachable and the unit pins caught it; the byte-sum hash judge
+failed to avalanche and the attack had to be made competent.)
+
+## 2. Validate the instrument on scripted pathologies before live claims
+
+A probe that has never caught a planted fake measures nothing. Every
+benchmark axis and probe ships with the adversary it kills, in the test
+suite: oracle, constant, position-biased, sycophant (linear AND
+threshold), cyclic, avalanche-hash, inversion-blind, sign-broken-channel.
+New axis ⇒ new scripted judge that dies by exactly it.
+
+## 3. No claim without its denominator and noise class
+
+n = 1 receipts are instrument demonstrations, labeled as such — never
+model properties. Relation axes (polarity, paraphrase) carry ~4× the
+run-to-run noise of direction axes (flip, spin, curl) at current corpus
+size: know an axis's noise floor before narrating its value. Test–retest
+is a standing cost of every leaderboard version, not a one-off. (Receipt:
+mean |ΔJUDGE| 0.022 but polarity swung ±0.4 on the same model.)
+
+## 4. Mathematics is the register; stories are contamination
+
+Report the measured functional property — slope, R², odd/even
+decomposition, curl fraction, probability-mass flow — never the
+personality ("stiffens", "follows the asker"). Physics vocabulary is
+admitted only where the math is literal (Hodge curl, gauge freedom,
+linear response), never as decoration. If a finding cannot be stated as a
+number with units and a denominator, it is not ready.
+
+## 5. Probes graduate into estimators
+
+The maturity ladder for every invariance: measured violation → nuisance
+parameter fitted jointly (template gains) → equivariant-by-construction
+elicitation (counterbalancing; orbit sampling next). Quote uncertainty
+experimentalist-style — statistical and systematic side by side in native
+units, never silently pooled. A belief whose systematics dominate is not
+improved by more sampling; it names the transformation to fix.
+
+## 6. Receipts or it didn't happen; errata on top, never rewrites
+
+Every published number recomputable from committed raw judgements (JSONL
++ replayable cache in dated `artifacts/live/` packs). When a claim dies,
+append the erratum to the original pack and correct downstream surfaces
+the same day — the receipt stands, the correction stands on it.
+
+## 7. Adversary before audience
+
+Red-team every design before it ships: enumerate the exploits per axis,
+pair each with a countermeasure or list it as OPEN in the doc. (Receipts:
+reciprocity double-counting and refusal-laundering were fixed pre-launch
+because an adversary pass demanded it; the open-attack list IS the v2
+spec.) Also red-team the fix: a countermeasure that never faced its
+bypass is untested.
+
+## 8. Eat the dogfood at every level
+
+Choose judges by our own coherence benchmark; prioritize our roadmap with
+our own ANP; audit our own sessions with our own probes' discipline.
+Self-application is simultaneously the demo, the test, and the fastest
+source of real bug reports.
+
+## 9. Composition over surface; pay the bloat tax on every add
+
+New capability must be composition of the seven primitives (entity,
+attribute, presentation, judgement, evidence, weight, posterior). If it
+needs a parallel implementation, fix the primitives instead. When you add
+surface, consolidate surface: dedupe shared math to one canonical fn
+(the reflection rule was pasted three times before it was one), prune a
+flag, or mark something experimental. Distribution > capability once the
+capability exists.
+
+## 10. The transformation group is the roadmap
+
+Before "what feature next," ask "which transformation should not matter,
+and is it instrumented?" New work = a new row of the invariance table, a
+deeper treatment of an existing row (probe → estimator), or scale for a
+row whose noise floor blocks claims. The ✗ rows are ranked future work by
+construction.
+
+## 11. Prompt bytes are physics
+
+The judge sees rendered bytes, not intentions. Templates HTML-escape `"`
+and `'` (both shipped garbled framings before tests caught them); rtk
+rewrites shell output; caches key on exact strings. Verify what the model
+actually receives (`--show-prompt`, od) before interpreting what it
+answers. Wording hygiene is measurement hygiene — and fixed wordings are
+memorizable, so probe wordings rotate procedurally at scale.
+
+## 12. Everything is denominated
+
+Nanodollars, calls, tokens, and noise floors on every result; worst-case
+pricing before every run; cost of the credibility number itself
+(test–retest ≈ $0.50/board) budgeted per version. A measurement whose
+cost is unknown cannot be scaled; a benchmark whose reproducibility is
+unpaid-for cannot be trusted.
+
+--- notes/ideation-2026-07-05/differentiation.md ---
+# Differentiation scouting: cardinal-harness / seriate
+
+Read: cardinal README, docs/FIRST_PRINCIPLES.md, docs/WHAT_WHY_HOW.md,
+docs/COMPARISON.md, seriate README, src/bin/cardinal.rs (full subcommand
+surface: sort, weigh, distinguish, calibrate, judge [+spin], elaborate,
+explain, cache-export/prune, policy, eval/eval-likert/eval-compare, report,
+experiment-expand, validate, rerank).
+
+## The one sentence that matters
+
+Everything genuinely novel in this stack is already built and receipted —
+frustration (Hodge curl on the judgement graph), susceptibility (spin-probe
+χ), hysteresis (order-residual), the canonical-attribute loop, AHP weighing,
+differentiation profiles, a cross-model logprob reality map. The gap is not
+capability. The gap is that all of it lives inside stderr printlns, JSONL
+files, and a dense theory doc — nothing turns the math into something a
+stranger *feels* in ten seconds. This is a distribution and artifact problem
+riding on top of a genuinely deep engine, not a capability problem.
+
+## 1. What could this do that NOTHING else on the internet does
+
+The unifying primitive underneath every idea below is already named in
+FIRST_PRINCIPLES: a **taste vector** — N judges (human or model) × M
+attributes × pairwise-ratio judgements → per-judge latent scores with
+uncertainty. `weigh` extracts one taste vector from one goal today. Nothing
+in the ecosystem treats "a judge's taste" as a first-class, measurable,
+comparable, storable object. Everything interesting downstream is really the
+same move pointed at a different judge population or a different consumer.
+
+### 1a. Cross-model belief cartography — a map of machine values
+Run the same frozen attribute + entity set across N frontier models (the
+machinery already exists: `--model` swap + shared cache), correlate the
+resulting latent vectors, and publish it as a browsable atlas: where do
+GPT-5.5, Opus, Gemini, DeepSeek agree on "which of these ideas is more
+insightful," and where do they diverge sharply? `calibrate` already proves
+per-model *bias*; nobody is doing per-model *taste correlation* on shared
+canonical attributes as a standing public artifact. This is the single most
+"nothing else exists" idea on the list — taste benchmarks (LMArena,
+MMLU-style) measure capability or preference-as-vote; nothing measures
+*magnitude-scale agreement structure* between models' priors.
+
+### 1b. Personal taste model, fitted and self-audited
+Point the exact same probe battery already built for LLM judges — two-sided
+consistency, paraphrase consistency, spin/susceptibility, frustration/curl —
+at a human. Let someone answer a stream of pairwise ratio judgements about
+their own domain (research ideas, dating profiles, career options, whatever),
+fit their personal latent taste vector, and then tell them the truth about
+their own incoherence: "you show 0.31 frustration curl — you have a rock-
+paper-scissors preference cycle among these three" or "your stated criterion
+does not survive being asked in the opposite polarity — you don't actually
+have a stable preference here, you have a vibe." Nothing self-quantifies
+human preference incoherence with this much rigor; palantir-of-the-self,
+receipted. This is the most personally viral idea here because the payoff is
+about the reader, not about a model.
+
+### 1c. Attribute markets / a canonical-attribute commons
+Attributes are already content-addressed entities (`Attribute::new`,
+reworded = different, per FIRST_PRINCIPLES §1). The canonical-attribute loop
+(§8: propose → measure → correlate → complement) is designed and partially
+shipped. The missing move: let good attributes — the ones that pass
+two-sided and paraphrase consistency, with receipts — become citable,
+versioned, shared objects that other people's sorts reference instead of
+re-deriving from scratch ("use the well-audited `insightfulness-for-a-
+software-engineer@a3f9c2` attribute, not your own guess at the wording").
+This is a package registry, but for judgement criteria instead of code —
+genuinely novel, and it composes with 1a/1b/1e for free because attributes
+are the shared currency across all of them.
+
+### 1d. Judgement provenance chains as a communication medium
+Right now a ranking is a list of numbers. The thesis of this whole stack
+("provenance judgment as the future of communication") implies you should be
+able to hand someone a ranking *and its entire evidence graph* as one object
+they can explore — click any item, see the pairwise judgements that placed
+it there, see which pairs flipped under order-swap, see the raw provider
+bytes via seriate's provenance walk. The data for this already exists in
+every `--trace` JSONL and every rerank response; nothing renders it as
+something a recipient can actually inspect rather than just receive. This is
+the most feasible idea on the list because it requires zero new judgement
+math — it's a renderer over data structures that already exist.
+
+### 1e. Disagreement as content
+The frustration/curl metric and the counterbalance flip-rate already
+*identify* the maximally-contested pairs in any run. Nobody surfaces "the
+judge disagreed with itself hardest right here" as a first-class, inherently
+interesting artifact. A "spiciest disagreements" view of any sort — the
+pairs where order-flip happened, or where spin susceptibility was highest —
+is compelling content almost for free, because contested judgements are
+naturally the ones humans want to read first. This folds into 1d rather than
+standing alone.
+
+### 1f. Longitudinal drift tracking — a taste seismograph
+FIRST_PRINCIPLES explicitly marks "time (same judge, days apart)" ✗. Given
+how fast frontier models rev, a standing frozen benchmark re-run against
+every new model release, tracking latent-score drift on the same attribute
+set over time, would answer a question nobody tracks: does a model's *taste*
+drift across versions the way its capability does? Genuinely novel — but it
+needs a time series to be a story, which this month cannot produce (one data
+point isn't drift). Real, but not a this-month ship.
+
+### 1g. Taste-portfolio feeds with receipts
+`weigh` already turns a goal into a normalized weight vector over
+attributes; multi-attribute rerank already composes weighted attributes into
+one score. The full idea: a person owns a persistent weighted-attribute
+portfolio (their fitted taste vector from 1b, or a `weigh` output), and any
+list they hand it — papers, backlog items, a feed — gets ranked by receipted
+dot-product against that portfolio, with a per-item breakdown of which
+attribute did the work. This is the most "categorically different" pitch of
+all seven: recommender feeds today are opaque and engagement-optimized; this
+is a transparent, user-owned, portfolio-explainable ranking. Feasibility
+this month is real but partial — the scoring primitive exists, but a live
+feed needs ingestion and a presentation surface that don't exist yet.
+
+## 2. What feels off
+
+**The CLI-first framing is actively hiding the most profound findings.**
+χ = +0.64 on a contested pair (a model's belief moving with whoever is
+asking, landing at *exactly* zero absent a nudge — a "paramagnetic
+judgement"), and the discovery that the ratio ladder itself injects
+quantization curl into the frustration metric — these are arXiv-abstract-
+grade findings. They currently live as dated bullet points inside
+FIRST_PRINCIPLES.md, a file structured as a permutation-table audit for
+maintainers, not a place a stranger would ever land. The stack has the
+content to make someone say "wait, what?" and it's buried three docs deep.
+
+**It's a toolbox where it should occasionally be an artifact.** The flagship
+demo in the README is a tab-separated table on stdout with a stderr summary
+line. That is the right shape for a library's smoke test. It is the wrong
+shape for the single thing a stranger sees first. Nothing in the repo
+produces something you'd screenshot, or open in a browser, or send a
+non-technical friend a link to. Given the "communication medium" thesis,
+the absence of anything shareable is the sharpest gap in the whole repo.
+
+**Every genuinely novel capability is buried behind flags on `sort`.**
+`--two-sided`, `--also-by`, `--spin`, `--prune-below`, `template=
+ratio_letter_v1` — the flag surface on `sort` alone is ~20 options. A
+first-time reader has to already know these probes exist to ever invoke
+them. The "ultimate loop" (§8, propose/measure/correlate/complement to find
+the canonical attributes that actually span a decision) is arguably the
+single most profound capability here — "map your values, not just sort your
+list" — and it is a subsection of a theory document, not a headline, not a
+command with its own name.
+
+**cardinal and seriate have soft-overlapping vocabulary.** Both define
+`Entity`/`Attribute` concepts; cardinal's README says seriate "will consume"
+into cardinal and seriate's says sort/active-selection "belongs to"
+cardinal — the boundary is stated in both places but only in prose, not
+enforced by any dependency-direction test. Not urgent, but worth a
+regression check before either repo's surface grows further, since 1a-1d
+above all live at exactly that seam.
+
+**No cross-model, cross-time receipt exists yet despite the machinery
+wanting one.** `calibrate` invites "run this per model" but there is no
+standing comparison artifact once you've run it twice. The repo is one
+small orchestration layer away from turning its own probes into the map
+described in 1a, and currently leaves that composition to the user.
+
+## 3. What would make a stranger immediately get it
+
+Not a sorted list — a **contested judgement**, rendered as something you can
+poke at. The single most compelling demo: take one real pair from the
+existing spin-probe receipts (`artifacts/live/spin-probe-2026-07-05/`) —
+gpt-5.4-mini on a contested pair, zero-field belief exactly 0.000, moving to
+χ = +0.64 nats under a one-sentence framing nudge — and render it as an
+interactive page: the two items, the neutral judgement, then a slider or
+toggle for "pro-A framing" / "pro-B framing" that visibly moves the belief
+and shows the nats delta live. That is the ten-second "whoa": you are
+*watching* an LLM's stated preference get pushed around by who's asking, on
+data that's already sitting in the repo. It requires no new judgement math,
+no new probes — only a renderer over an existing receipt. It is also the
+best possible proof of the whole thesis ("a judgement deserves the name
+*belief* only if it survives framings that shouldn't matter") in a form a
+non-technical person feels immediately, instead of reading a nats value in
+a markdown table.
+
+## 4. What to deliberately NOT build (bloat risks)
+
+- **No hosted multi-tenant SaaS for the attribute registry or taste
+  portfolios.** Keep it git/file-based and statically hostable (content-
+  addressed JSON + receipts, pullable by URL or path). The moment this
+  needs auth, billing, or a database, it has become a different company,
+  not a differentiator.
+- **No general feed-ingestion pipeline** (RSS parsing, dedup, spam
+  filtering) as part of this repo. If 1g gets built, ship the "portfolio
+  scores a list you already have" library function only; ingestion belongs
+  to whatever consumer app wants a feed, not to the judgement engine.
+- **No real-time multiplayer judging UI** (live cursors, websockets). Cool,
+  not this repo's edge — the edge is provenance and math, not collaboration
+  infra.
+- **No fine-tuning / reward-model training on collected judgements.** The
+  README already correctly fences this off to `openpriors-research`. Worth
+  restating because it's exactly the kind of scope creep a "what should we
+  build next" brainstorm tends to reach for, and the existing boundary is
+  the right one.
+- **No new instrument variants before the artifact layer ships.** Interval
+  scale and full k-wise order are already correctly deprioritized in
+  FIRST_PRINCIPLES ("low priority," "likely not worth it"). Best-worst /
+  MaxDiff is flagged there as the single highest-value *missing instrument*
+  — legitimate, but it is efficiency/completeness work, not differentiation;
+  it should not jump the queue ahead of making the existing findings visible.
+- **No abandoning the receipts culture for polish.** Whatever ships in this
+  vein must keep rendering real numbers from real runs — the credibility of
+  this whole stack is that every claim is pinned to a receipt. An artifact
+  layer that starts faking or smoothing numbers for a better demo would
+  torch the thing that makes this different from every other LLM-ranking
+  tool.
+
+## Ranked by wow × feasibility-this-month ÷ bloat
+
+1. **Interactive judgement/receipt viewer** (renders existing trace + spin +
+   frustration data as an explorable page; the susceptibility-slider demo
+   from §3 is its hero view). Wow: high. Feasibility: very high — zero new
+   judgement math, pure rendering over data already produced by
+   `--trace`, `judge --spin`, and rerank responses. Bloat: very low.
+2. **Personal taste model + self-audit.** Wow: high, deeply personal. Feas:
+   medium — needs an interactive human-judging loop and a persisted profile,
+   but every probe (two-sided, spin, frustration) is already built and
+   judge-agnostic. Bloat: low.
+3. **Cross-model belief cartography.** Wow: high. Feas: medium — mostly
+   orchestration (run N models on one frozen set) plus the viewer from #1
+   for the visualization. Bloat: low-medium.
+4. **Attribute registry / canonical-attribute commons.** Wow: medium-high,
+   genuinely novel framing. Feas: medium if scoped file/git-based. Bloat:
+   medium (real risk of platform creep if scoped wrong).
+5. **Taste-portfolio feeds.** Wow: highest of all seven ("categorically
+   different"). Feas: lower this month (needs ingestion + a presentation
+   loop beyond the scoring primitive). Bloat risk: medium-high if ingestion
+   creeps in — ship only the scoring primitive now.
+6. **Longitudinal drift tracking.** Wow: high, unique. Feas: low this month
+   (one data point isn't a drift story). Bloat: low if it stays a scheduled
+   append-only log.
+7. **Best-worst/MaxDiff instrument.** Legitimately high scientific value
+   (self-flagged as the highest-value missing cell) but it's instrument
+   completeness, not differentiation — belongs on the roadmap, not this
+   sprint.
+
+## The one thing I'd ship next, and why
+
+The interactive judgement/receipt viewer (#1), built around the
+susceptibility-slider demo from §3, using data that already exists in
+`artifacts/live/spin-probe-2026-07-05/`.
+
+Why this one: it requires no new judgement science — every number it needs
+has already been measured and checked in. It directly fixes the sharpest
+thing that feels off (toolbox, not artifact; profound findings buried in a
+theory doc) with the least possible risk (pure rendering, receipts
+untouched). And it is a prerequisite, not a detour, for almost everything
+else on this list: the cross-model atlas (#3) wants the same viewer to
+display correlations; the attribute registry (#4) wants the same viewer to
+show an attribute's consistency receipts before someone trusts it; the
+taste-portfolio pitch (#7) wants the same per-item breakdown rendering. Ship
+the viewer once, reuse it four times, and the stack goes from "a Rust crate
+with excellent tests" to "a thing you can hand someone and watch their face
+change."
+
+--- notes/red-team-2026-07-09/SYNTHESIS.md ---
+# Red-team synthesis — adjudication of 30 findings (2026-07-09)
+
+Five adversarial lenses over the repo's IDEAS (not code quality): parsimony,
+mathematical register, from-The-Book, strategy, doctrine. Full findings in
+this directory. **Tier receipt**: all five agents served `claude-fable-5`
+on every turn (30–58 turns each), verified from transcript `message.model`
+fields; pre-flight probe also fable-5. Main-loop spot-verification was
+performed on every finding acted on (the sweep even-component arithmetic
+was recomputed by hand; fuse() non-idempotency and AGENTS.md staleness
+were verified in source before any edit).
+
+Scoreboard: 30 findings → **7 executed same-day** (commits 7c3aa13, +1
+follow-up), **6 filed as issue/comments** (#51 new; comments on #45, #46,
+#49, #50), **10 proposed to operator** (doctrine text, strategy reorder,
+publishing — not the panel's or this session's to decide), **5 deferred
+with named gates**, **2 amended** (accepted in part, with the weak half
+identified). Zero findings rejected outright — and 8 explicit SURVIVALS
+were recorded where the panel attacked and the existing work held
+(Hodge, orbit/Parseval, transitivity 2se discipline, packet composition,
+scope fences, §2/§7/§11, fused-beats-both which *gained* a Steiger receipt
+z≈2.2–2.5 it never had).
+
+## Convergence map (independent lenses, same verdict — the strongest evidence class here)
+
+| Verdict | Lenses |
+|---|---|
+| fuse() non-idempotent, CRDT claim false as shipped | math #4 ∧ parsimony #3 |
+| #46 sheaf layer is vocabulary without new receipts; wire format is the real content | book #4 ∧ math #6 ∧ strategy #5 |
+| No validation loop exits the operator (dogfooding closed / zero demand-side data) | doctrine #1 ∧ strategy #1 |
+| "Distribution > capability" lost silently to the roadmap | doctrine #2 ∧ strategy #5-context |
+| Monoid sentence: the theorem is the multiset, not compressed statistics | book #4-bonus ∧ math #6 |
+| Narration outruns instrument exactly in the proudest packs | math meta ∧ doctrine #4 |
+
+## Executed same-day (receipts: commit 7c3aa13 and follow-up)
+
+1. **Spin-sweep even-component narrative reversed** (math #1, hand-verified:
+   gpt even mean +0.239 not "near-zero", sonnet +0.035 not "+0.31") →
+   erratum ON TOP of the pack; FIRST_PRINCIPLES sweep paragraph corrected
+   (including the ordinal-ladder and excerpt-asymmetry caveats from math #2,
+   downgrading "CLOSED" to "PARTIALLY closed"); receipt-viewer copy corrected
+   same day. This conviction includes work shipped by this session yesterday.
+2. **fuse() made genuinely idempotent** (math #4 ∧ parsimony #3) —
+   packet-id dedup, redelivery pin byte-identical, validated against the
+   planted pre-fix behavior (first plant was secretly a compile error;
+   caught, redone honestly). CRDT sentence now stated as a theorem with its
+   precondition (evidence-disjointness of distinct packets = provenance
+   layer's contract).
+3. **"Sufficient statistics" phrase sharpened** to the free-commutative-
+   monoid statement (no mergeable compression under Huber) in packet.rs.
+4. **AGENTS.md stale Key Areas deleted** (parsimony #4): pipeline/commander
+   entries gone (deleted by 91af6a8, never removed from the doc).
+5. **Two prior errata hoisted to top** of judge-bench and v1.1 packs
+   (doctrine #5's checkable half).
+
+## Filed (issue/comments)
+
+6. **#51 (new): interval-censored (ordered-probit) likelihood** — book #1,
+   the deepest single finding of the panel: the ratio ladder is a quantizer
+   treated as a ruler; the censored likelihood dissolves ≥5 mechanisms
+   (ORDINAL_OBSERVATION_RATIO hack, quantization-curl floor, ladder-geometry
+   debate, template trichotomy, possibly the ordinal-beats-ratio negative).
+   Zero-spend confirmations specified (ladder_curl refit; heavy-noise regime).
+7. **#45 comment**: orbit absorption becomes a done-criterion (parsimony #1
+   ∧ book #6) — spin stays outside the group (linear response), the rest
+   restrict to subgroups or #45 ships probe N+1.
+8. **#46 comment**: descope to wire format + cross-context transport; sheaf
+   demoted unless a cellular sheaf with real restriction maps (template
+   gains) is instantiated; add cross-target determinism (libm powf/ln
+   unpinned — byte-identity currently per-binary, marketed per-party).
+9. **#49 comment**: JCB v2 scored as energy fractions of the orbit
+   decomposition (book #6); JCB = diagonal block of the portfolio Gram
+   matrix — cross-judge blocks at fixed character name WHICH bias channels
+   labs share, the refinement behind effective-error-sources 2.89 (book #3).
+10. **#50 comment**: the Φ formula prices an unspecified estimand (math #3)
+    — persistent b_p belongs in the conditional mean, the trigger is the
+    certified crossing not the raw crossing, Gaussian tails vs Huber; the
+    on-disk backtest must gate any pricing language.
+
+## Proposed to operator (not executed — doctrine text, strategy, publishing are yours)
+
+- **PRINCIPLES.md word-ledger edits** (doctrine #1–#4, #6; net +14 words,
+  every rhetorical target a deletion): §8 external-reference clause; delete
+  "Distribution > capability" slogan OR enforce it (note: it lives in
+  differentiation.md, and the panel showed it lost 9:1 in 3 days); delete
+  the "self-refutation count" metric sentence (keep the absence-framing
+  line) — accepting this would also retire this session's own reporting
+  habit; §4 retitle + "binds hardest on our own instruments"; §10 retirement
+  criterion (stopping rule). All are edits to an operator-authored file.
+- **Stake reorder** (strategy #1–#4): external-contact event as stake #0;
+  habit loop above the map; 14K scale-up shrunk pending the 20-entity
+  "did this change anything I'll do" probe; JCB published as the one asset
+  with a living external consumer. Six probes, <$10 total, each can lose.
+  The GitHub-Pages move specifically: the panel's claim that the Artifacts
+  ban "doesn't cover" it is an interpretation of an operator ban — that
+  scope call, and any publishing, is yours alone.
+- **Cost sig-figs** (doctrine #5's other half): round sub-$0.10 costs to
+  1 sig fig across receipts to end ritual-digit skimming.
+
+## Deferred with gates
+
+- **Seven primitives → six** (parsimony #2): the weight-as-functional half
+  is verified (PacketObservation fuses them); the entity|attribute-as-roles
+  merge cites §7's duality theorem — verify that theorem's statement before
+  restructuring the doc.
+- **canonical_bucket_v1 retirement** (parsimony #6): gate = confirm
+  ratio_letter_v1 receipt covers bucket's grid cell; freeze-for-replay is
+  the right mechanism if so.
+- **transmissibility → judge_geometry statistic** (parsimony #5): gate =
+  one refactor PR when canonize is next touched; same input object confirmed.
+- **8-block Pythagoras master identity** (book #2): $0 synthetic-array pin;
+  enters when pulled as a dependency (parsimony rule). Honest boundary
+  recorded: stochastic transitivity does NOT reduce — it is the GoF test of
+  the whole generative model.
+- **Confidence-map knobs (eps, γ)** (book #5): $0 ML fit on committed
+  receipts; if flat, delete the knob. Runs with the next receipts session.
+
+## Amendments (accepted in part)
+
+- math #2 (χ not a susceptibility): the reparameterization critique is
+  accepted and now in FIRST_PRINCIPLES; the probe itself keeps its value as
+  a *shape detector* — the kill is of the "linear-response coefficient with
+  units" language, not the instrument.
+- strategy #6 (#50 gate): accepted with the gate re-pointed at "first
+  external counterparty", but the backtest stays scheduled regardless — it
+  tests the math, not the market.
+
+## What this cost and what it caught
+
+Five fable-5 agents, ~2.1M transcript tokens. It caught: one live
+receipts-vs-narrative contradiction in a shipped pack (with same-day
+downstream contamination in a page shipped yesterday), one
+theorem-level false claim in the protocol core (now a passing test), one
+sign-flipped doctrine violation (errata placement), stale authority docs,
+and one genuinely new research direction (#51) that no document in the
+repo had conceived. The panel also *strengthened* one claim the repo was
+right about but had never tested (fused-beats-both, Steiger z≈2.2–2.5).
+The session health claim is left as the receipts above rather than a
+count — one of the panel's own findings is that counting them is the
+wrong frame, and that finding is pending operator adjudication.
+
+--- docs/FIRST_PRINCIPLES.md (opening: the seven nouns + instrument grid) ---
+# First principles: the type system of structured LLM judgement
+
+Permute the smallest words and see what the space actually is; then check,
+cell by cell, whether the repo occupies it. ✓ = implemented with receipts,
+◐ = partial, ✗ = absent (and honestly so).
+
+## 1. The primitives
+
+Seven nouns, everything else is composition:
+
+| Primitive | What it is | Where |
+|---|---|---|
+| **Entity** | a thing that can be judged (text shown to the judge) | seriate `Entity`, cardinal `MultiRerankEntity` |
+| **Attribute** | one way an entity set wants to be ordered | `Attribute` (content-addressed: reworded = different) |
+| **Presentation** | which entity in which slot, this call | `Presentation`, reflection algebra |
+| **Judgement** | one elicited answer, typed by instrument | `PairwiseJudgement`, seriate `JudgementRecord` |
+| **Evidence** | the judgement as a distribution, mass accounted | `AnswerEvidence` + `PmfCompleteness` |
+| **Weight** | how much one judgement moves the fit | `g(c)` or measured PMF precision |
+| **Posterior** | latents ± uncertainty over the set, per attribute | `CompiledPosterior`, rating engine solve |
+
+## 2. The instrument grid
+
+An instrument is a point in **arity × scale × output-form**:
+
+- arity: 1 (pointwise) · 2 (pairwise) · k (setwise) · n (listwise)
+- scale (Stevens): nominal (pick) · ordinal (order) · interval (differences
+  meaningful) · ratio (ratios meaningful)
+- output form: point (one answer) · sample-set (repeat draws) · **PMF**
+  (answer-token logprobs — the model's whole prior in one call)
+
+| Cell | Status | Notes |
+|---|---|---|
+| pairwise · ratio · point | ✓ `canonical_v2` | the founding instrument |
+| pairwise · ratio · PMF | ✓ `ratio_letter_v1` | 52-letter alphabet; live receipt: ~3× separation/dollar vs point |
+| pairwise · ordinal · point | ✓ `ordinal_v1` | direction + confidence JSON |
+| pairwise · ordinal · PMF | ✓ `ordinal_letter_v1` | 3-token alphabet; cheapest instrument |
+| pairwise · interval · any | ✗ | "how much more, additively" — meaningful only for bounded attributes; low priority, ratio subsumes on log scale |
+| pointwise · ordinal/ratio (rubric) | ◐ scalar control | seriate `scalar` digit-PMF; a baseline, not a path — anchor drift is the documented disease |
+| pointwise · ratio **to fixed anchors** | ✗ | classic magnitude estimation with pinned anchor entities; fixes anchor drift; cheap O(n); worth building |
+| k-wise · nominal ("which is most") | ◐ | seriate `kwise` + lowering; not exposed in cardinal |
+| k-wise · **best–worst** (MaxDiff) | ✗ | pick best AND worst of k → 2k−3 implied pairs per call; the classic efficiency instrument; highest-value missing cell |
+| k-wise · full order of k | ✗ | k! answer space; PMF impossible past tiny k; likely not worth it |
+| listwise · any | ✗ by design | context limits, position bias, silent drops — documented rejection |
+
+**The permutation that matters most and is missing: best–worst scaling.**
+One call yields the top and bottom of a k-subset — O(k) pairwise
+implications for one call's price. It composes with everything here
+(lowering to weighted pairwise evidence, exactly like k-wise).
+
+## 3. What each scale admits (so we don't compute nonsense)
+
+- ordinal: medians, ranks, concordance (tau). Means of ranks are already a
+  liberty. ✓ we report tau/rank metrics for ordinal paths.
+- interval: differences, means, Pearson. Ratios meaningless.
+- ratio (ours, in log space): products/ratios meaningful; geometric means;
+  the log map makes ratio evidence additive — the entire reason the solver
+  is least-squares on log-ratios. ✓
+- Aggregation discipline: PMF moments (mean, var of signed log-ratio) are
+  the sufficient statistics we consume; escape mass never averaged in. ✓
+
+## 4. Efficiency: bits, calls, dollars
+
+Theory: a noiseless binary comparison yields ≤1 bit; full order of n needs
+Θ(n log n) bits ⇒ Θ(n log n) point-comparisons; top-k identification needs
+Θ(n) for fixed k. A PMF answer yields the model's whole conditional prior —
+up to log₂(52) ≈ 5.7 bits per call at the same price as a point.
+
+| Property | Status |
+|---|---|
+| per-call cost receipts (nanodollars, tokens) | ✓ everywhere |
+| pre-run worst-case pricing | ✓ `--estimate` (per-template honest: $0.011 vs $1.19) |
+| budget defaults O(n), not O(n²) | ✓ 4·n |
+| planner vs baseline measured | ✓ regret benchmark; wins scarce-budget, pinned two-sided |
+| **bits-per-dollar as a formal receipt** | ✗ — we showed 3× separation/dollar informally; entropy-of-posterior-reduction per nanodollar is computable from what we already store |
+| best–worst call efficiency | ✗ (see grid) |
+
+## 5. Stability: the invariance group of a belief
+
+Her question, formalized: a judgement deserves the name *belief* only if it
+is a fixed point of the transformations that shouldn't matter. The group:
+
+| Axis | Instrumented? |
+|---|---|
+| presentation order | ✓ counterbalance default + flip receipts + order-residual (nats) |
+| polarity (attribute ↔ its opposite) | ✓ `--two-sided`, consistency receipt |
+| paraphrase (same attribute, other words) | ✓ `--also-by`, consistency receipt |
+| null content (pure prior) | ✓ `cardinal calibrate` (4 models measured clean) |
+| **framing spin** (persuasive preamble pushing a side) | ✓ `cardinal judge --spin`: the same pair under neutral, pro-first, and pro-second requester framings × both orders; reports susceptibility χ in nats and whether the belief survives — "if you spin it, do they still agree" made a receipt |
+| **temperature** | ✗ never swept — one JSD data point (t=0 logprobs vs t=1 samples, 0.128 on gpt-5.4-mini) is a hint, not a map |
+| **reasoning effort / thinking params** | ✗ never swept; we only know reasoning models refuse logprobs |
+| **wording of the ratio question** (times-more ↔ fraction ↔ times-less: the group inverses on (ℝ₊,×)) | ✓ `judge --wordings` + live receipt: frontier models keep the SIGN (inversion works) but the fraction wording elicits +0.35…+0.92 nats larger magnitudes — human ratio-bias reproduced in machines; magnitudes are wording-calibrated, not absolute |
+| **nuisance edits** (whitespace, markdown, bullets, prestige halo) | ✓ bench axis 9 + live receipts (6 pairs × 4 edits, single run per model): Anthropic measured near-blind (0.08–0.09 nats), prestige suffix moved gpt-5.4-mini 0.878 nats — headline-sized effects, headline-unworthy denominators until replicated |
+| judge model | ◐ seriate probe compares models; no standing cross-model receipt in cardinal runs |
+| time (same judge, days apart) | ✗ |
+
+The stability axes we cover, we cover with receipts; the remaining ✗ rows
+(parameter sweeps, time drift) are the cheapest untouched science in the repo.
+
+The invariance group is now also an INSTRUMENT: `cardinal bench` (the Judge
+Coherence Benchmark, docs/BENCHMARK.md) runs order swap, reciprocal
+antisymmetry, frustration, spin, polarity, paraphrase, null calibration,
+and nuisance perturbation as a standardized 138-call battery per model,
+× a signal axis, → one leaderboard number labs can hill-climb without
+ground-truth labels. The benchmark validates itself against six scripted
+pathological judges in `tests/judge_bench.rs`.
+
+## 5½. The physics of a judge (receipts, not metaphors)
+
+Prior elicitation behaves like a physical system, and each analogy lands on
+a computable receipt:
+
+| Physics | Judgement meaning | Receipt |
+|---|---|---|
+| **Frustration** (spin glass) | cyclic preference structure no scores can satisfy (A>B>C>A) | ✓ `judgement_frustration_mean` (total) AND the full Hodge split (`SolveSummary.hodge`): triangle-auditable local curl vs harmonic cycles invisible to every triad audit; Pythagoras invariant local+harmonic ≈ hcr pinned end-to-end; harmonic_dim reported like a denominator (the JCB graph's is 0 by construction — pinned) |
+| **Hysteresis** | path dependence: judging A→B vs B→A | ✓ order-residual in nats + flip counts |
+| **Susceptibility** | response to a small applied field: framing spin | ✓ `judge --spin` (secant) and `judge --sweep` (response function over f ∈ −3…+3: odd slope, linear R², even component) |
+| **Temperature/entropy** | PMF spread per judgement; annealing across sampling temperature | ◐ entropy computable from stored PMFs; sweep unmeasured |
+| **Ground state** | the solved scores: minimum-energy potential for the field | ✓ the solver itself |
+| **Relaxation** | drift of the same judgement re-asked over time | ✗ |
+
+**Finding from shipping susceptibility** (2026-07-05, live,
+`artifacts/live/spin-probe-2026-07-05/`): χ is state-dependent, not a model
+constant. gpt-5.4-mini on a clear pair: χ = −0.18 nats (mild reactance,
+belief survives). The same model on a contested pair: zero-field belief
+EXACTLY 0.000 and χ = +0.64 — a **paramagnetic judgement**, moving with
+whoever asks. gemini-2.5-flash holds a direction on that same pair and
+yields only +0.12. The sycophancy question decomposes into: does this
+judgement have a spontaneous direction, and how much field moves it?
+
+The secant critique (adversarial self-review) is PARTIALLY closed as
+instrumentation: `judge --sweep` measures the response function m(f) over
+field f ∈ −3…+3 and reports its decomposition — odd slope χ (linear
+susceptibility), linear R², and the even component mean
+(m(f)+m(−f))/2 − m(0), which captures dependence on field MAGNITUDE that
+no odd/linear model can represent. Caveats that stand (red team
+
+--- README.md (pitch + quickstart) ---
+# cardinal-harness
+
+[![CI](https://github.com/XyraSinclair/cardinal-harness/actions/workflows/ci.yml/badge.svg)](https://github.com/XyraSinclair/cardinal-harness/actions/workflows/ci.yml)
+[![crates.io](https://img.shields.io/crates/v/cardinal-harness.svg)](https://crates.io/crates/cardinal-harness)
+[![docs.rs](https://img.shields.io/docsrs/cardinal-harness)](https://docs.rs/cardinal-harness)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+Sort lists with LLMs — and get numbers you can defend.
+
+```console
+$ cardinal sort ideas.txt --by "expected impact on retention"
+```
+
+`cardinal-harness` turns noisy LLM pairwise **ratio** judgements ("how many
+times more of X does A have than B?") into globally consistent **cardinal
+scores with uncertainty**, spends each next comparison where it buys the most
+information about the order, and stops when the top-k is certain enough — or
+the budget runs out. Every run returns receipts: comparisons, tokens, dollar
+cost, stop reason, and an optional per-judgement trace.
+
+## Why not just ask the model to sort?
+
+Every obvious way to sort a list with an LLM breaks somewhere:
+
+| Approach | What breaks |
+|---|---|
+| "Rate each item 1–10" | Miscalibrated, anchor-dependent; scores cluster at 7–8; no error bars |
+| "Sort this list" in one prompt | Position bias, context limits, silently dropped or hallucinated items |
+| "Which is better, A or B?" over pairs | Ordinal only — throws away *how much* better; naive schedules cost O(n²) |
+| Elo / Bradley–Terry over wins | Better aggregation, but still magnitude-blind and usually passive about which pair to ask next |
+
+`cardinal-harness` treats each ratio answer as a noisy log-space measurement,
+fits latent scores over the whole comparison graph with a robust solver (IRLS,
+Huber loss), reads uncertainty off the posterior, and plans the next
+comparison by effective resistance on the graph. Default budget is 4·n
+comparisons — O(n), not O(n²). The planner's efficiency is MEASURED, not
+assumed: our regret benchmark (`tests/planner_regret.rs`) initially caught
+it losing to uniform random pair selection; the fix (anchor-diverse
+exploration, replacing a hub-and-spoke geometry) now has it winning at
+scarce budgets (where saving comparisons matters), tying at medium ones,
+and slightly trailing random at large budgets on global order — all pinned
+two-sided, history preserved in the test file and issue #43. The receipts
+culture applies to our own planner first.
+
+What you get that the alternatives don't, in one package:
+
+- **Cardinal magnitudes**, not just an order — "A is ~3× better" survives into the output.
+- **Uncertainty per item** and a top-k error estimate, honestly reported.
+- **Active pair selection** and principled stopping under an explicit budget.
+- **Counterbalancing by default**: every planned pair is asked in both presentation orders, and the disagreement rate is reported — position bias measured, not assumed away.
+- **Attribute health probes**: judge the opposite side of your criterion (`--two-sided`) and alternate phrasings (`--also-by`), get rank-consistency receipts that tell you whether the attribute even coheres for this judge.
+- **Receipts**: JSONL trace per judgement, token/cost accounting, SQLite cache, seeded reproducibility.
+
+## Quickstart
+
+```bash
+cargo install cardinal-harness
+export OPENROUTER_API_KEY=your_key_here   # any model on OpenRouter
+
+cardinal sort examples/sort-demo.txt --by "usefulness as advice for a software engineer" --scores
+```
+
+Real output (preserved, with full receipts, under
+[`artifacts/live/sort-demo-2026-07-02/`](artifacts/live/sort-demo-2026-07-02/)):
+
+```text
+1.082±0.741	premature optimization is the root of all evil
+0.609±0.785	measure twice, cut once
+0.514±0.772	a chain is only as strong as its weakest link
+0.451±0.768	don't put all your eggs in one basket
+0.327±0.758	practice makes perfect
+0.258±0.785	if it ain't broke, don't fix it
+0.180±0.783	too many cooks spoil the broth
+0.000±0.737	a bird in the hand is worth two in the bush
+
+sorted 8 items by "usefulness as advice for a software engineer" · 32 comparisons (1 cached, 0 refused) · $0.0500 · stop: budget_exhausted
+```
+
+Note what the receipt admits: at the default 4·n budget those posterior stds
+overlap. You get a well-motivated point estimate of the order, not a certified
+one — raise `--budget` or focus `--top-k` when you need certainty. The same
+run replays offline, keyless, for $0 via `--cache-only`.
+
+`sort` reads newline-delimited items or a JSON array (of strings or
+`{"id","text"}` objects) from a file or stdin, and writes plain lines (pipeable),
+`--format json|jsonl|csv`, `--scores`, `--reverse`, `--trace trace.jsonl`.
+A sort where every comparison fails refuses to print, loudly.
+
+## The evidence path: logprobs as judgements
+
+With `--template ratio_letter_v1`, each comparison asks for ONE letter from
+a 52-token alphabet (case = which item, letter = magnitude on the ladder,
+`A` = parity, `!` = refuse) — so a single completion position's top-k
+logprobs are the model's **full judgement PMF**. The solver then weights
+each observation by its **measured variance** instead of a stated
+confidence. Rendering, parsing, and mass accounting are delegated to
+[seriate](https://github.com/XyraSinclair/seriate); where a provider hides
+or rejects logprobs, the path degrades loudly to sampled mode and the run
+summary says so (`evidence: 63/63 logprob-mode, visible 0.99`).
+
+Live head-to-head at equal budget and cost on gpt-5.4-mini
+([receipts](artifacts/live/evidence-path-2026-07-04/)): top-to-bottom
+separation **≈4.0σ vs ≈1.4σ** for the canonical JSON path — roughly 3× the
+resolving power per dollar, because each call consumes the model's prior
+instead of one sample from it. Caveats in the receipt pack, including that
+the two instruments induce correlated but not identical orderings
+(Spearman 0.74) — different elicitations tap different priors.
+
+## Healthy elicitation, by default
+
+Most LLM-annotation pathologies are invisible unless you deliberately measure
+them. `sort` measures them as part of the run:
+
+- **Both orders, every pair.** LLM judges favor whichever item is presented
+  first. Randomizing order (still available via `--no-counterbalance`) only
+  averages that bias; the default asks each planned pair in both orders,
+  cancels the bias per-pair, and reports the disagreement rate.
+- **The opposite side of the attribute.** `--two-sided` also judges
+  `lack of <criterion>` (weight −1) and reports whether the two sides mirror
+  each other. If they don't, your attribute doesn't mean anything stable to
+
+QUESTION:
+Distill this stack to its very essence. Specifically:
+1. THE ONE OBJECT: If this whole stack is secretly one mathematical/conceptual object, what is it? State it in one sentence a physicist would accept and a stranger would feel.
+2. THE ONE TOOL: What is the single tool shape — one verb, one input, one output, usable by a stranger in 60 seconds — that delivers that essence so directly that people would be extraordinarily excited to use it? (Constraints from the owners: no SaaS/platform, no auth/DB, git/file-native, receipts culture non-negotiable — every number recomputable; the engine already exists, this is about the FORM.)
+3. WHAT TO DELETE: What in the current surface (commands, concepts, docs, vocabulary) actively obscures the essence and should be removed or folded? Be specific and ruthless — deletion is the preferred move.
+4. THE INEVITABLE INTERFACE: Sketch the exact 60-second stranger experience (command lines or page interactions, concretely) for your ONE TOOL. What does the stranger see at second 10, 30, 60 that makes them feel the deep thing?
+5. THE VON NEUMANN TEST: What is the cheapest decisive demonstration that this essence is real and matters — one that could FAIL visibly?
+
+Answer all five, tersely. Do not flatter. If the essence is already exposed and the current form is right, say so and defend it. IMPORTANT: All necessary context is provided above. Do not read additional files.

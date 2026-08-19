@@ -1,0 +1,2706 @@
+{
+  "generated_at": "2026-08-15T15:23:53.645612+00:00",
+  "offline": false,
+  "models": [
+    "openai/gpt-4.1-mini",
+    "openai/gpt-5.4-nano"
+  ],
+  "seed": 17,
+  "spend_cap_usd": 5.0,
+  "band_rule": "PROGRAM.md §2 provisional thresholds: grokked = order agreement >= 0.90 AND curl (hcr) <= 0.10 AND polarity <= -0.80 AND paraphrase >= 0.80. The WST criterion (zero violations beyond 2 SE) is UNMEASURED here: this protocol has no repeat draws. Operationalization of the unnamed lower bands: 4 criteria pass = grokked, 2-3 = partial, <= 1 = not.",
+  "pools": [
+    {
+      "slug": "countries",
+      "attribute": "population",
+      "paraphrase": "number of people living there",
+      "negation": "smallness of population",
+      "truth_source": "UN World Population Prospects 2024 (persons, 2024 estimates)",
+      "entities": [
+        {
+          "name": "China",
+          "true_value": 1419321278.0,
+          "ln_true": 21.073444621054524
+        },
+        {
+          "name": "India",
+          "true_value": 1450935791.0,
+          "ln_true": 21.095474558318678
+        },
+        {
+          "name": "United States",
+          "true_value": 345426571.0,
+          "ln_true": 19.66029064891722
+        },
+        {
+          "name": "Indonesia",
+          "true_value": 283487931.0,
+          "ln_true": 19.462680108797322
+        },
+        {
+          "name": "Brazil",
+          "true_value": 211998573.0,
+          "ln_true": 19.172090101481558
+        },
+        {
+          "name": "Nigeria",
+          "true_value": 232679478.0,
+          "ln_true": 19.265172433579874
+        },
+        {
+          "name": "Japan",
+          "true_value": 123753041.0,
+          "ln_true": 18.63379853284852
+        },
+        {
+          "name": "Mexico",
+          "true_value": 130861007.0,
+          "ln_true": 18.689646302623085
+        },
+        {
+          "name": "Germany",
+          "true_value": 84552242.0,
+          "ln_true": 18.25288014981123
+        },
+        {
+          "name": "France",
+          "true_value": 66548530.0,
+          "ln_true": 18.01344201390629
+        },
+        {
+          "name": "United Kingdom",
+          "true_value": 69138192.0,
+          "ln_true": 18.051617842274936
+        },
+        {
+          "name": "Italy",
+          "true_value": 59342867.0,
+          "ln_true": 17.89884248645592
+        },
+        {
+          "name": "Kenya",
+          "true_value": 56432944.0,
+          "ln_true": 17.84856365941559
+        },
+        {
+          "name": "Australia",
+          "true_value": 26713205.0,
+          "ln_true": 17.100668570399787
+        },
+        {
+          "name": "Netherlands",
+          "true_value": 18228742.0,
+          "ln_true": 16.71851013714264
+        },
+        {
+          "name": "New Zealand",
+          "true_value": 5213944.0,
+          "ln_true": 15.466847133103368
+        }
+      ]
+    },
+    {
+      "slug": "rivers",
+      "attribute": "length in kilometres",
+      "paraphrase": "how long the river runs",
+      "negation": "shortness of the river",
+      "truth_source": "commonly cited lengths, Wikipedia list of rivers by length (km, 2024)",
+      "entities": [
+        {
+          "name": "Nile",
+          "true_value": 6650.0,
+          "ln_true": 8.8023721336499
+        },
+        {
+          "name": "Amazon",
+          "true_value": 6400.0,
+          "ln_true": 8.764053269347762
+        },
+        {
+          "name": "Yangtze",
+          "true_value": 6300.0,
+          "ln_true": 8.748304912379623
+        },
+        {
+          "name": "Mississippi",
+          "true_value": 6275.0,
+          "ln_true": 8.744328763999984
+        },
+        {
+          "name": "Yenisei",
+          "true_value": 5539.0,
+          "ln_true": 8.619569258033104
+        },
+        {
+          "name": "Yellow",
+          "true_value": 5464.0,
+          "ln_true": 8.605936401250625
+        },
+        {
+          "name": "Ob",
+          "true_value": 5410.0,
+          "ln_true": 8.596004371840527
+        },
+        {
+          "name": "Paraná",
+          "true_value": 4880.0,
+          "ln_true": 8.492900498847193
+        },
+        {
+          "name": "Congo",
+          "true_value": 4700.0,
+          "ln_true": 8.45531778769815
+        },
+        {
+          "name": "Amur",
+          "true_value": 4444.0,
+          "ln_true": 8.39931015075952
+        },
+        {
+          "name": "Lena",
+          "true_value": 4400.0,
+          "ln_true": 8.389359819906353
+        },
+        {
+          "name": "Mekong",
+          "true_value": 4350.0,
+          "ln_true": 8.37793112408273
+        },
+        {
+          "name": "Mackenzie",
+          "true_value": 4241.0,
+          "ln_true": 8.352554369474591
+        },
+        {
+          "name": "Niger",
+          "true_value": 4200.0,
+          "ln_true": 8.34283980427146
+        },
+        {
+          "name": "Danube",
+          "true_value": 2850.0,
+          "ln_true": 7.955074273262696
+        },
+        {
+          "name": "Rhine",
+          "true_value": 1230.0,
+          "ln_true": 7.114769448366463
+        }
+      ]
+    },
+    {
+      "slug": "cities",
+      "attribute": "metro-area population",
+      "paraphrase": "how many people the metropolitan area holds",
+      "negation": "smallness of metro-area population",
+      "truth_source": "UN World Urbanization Prospects urban agglomeration 2024 (persons)",
+      "entities": [
+        {
+          "name": "Tokyo, Japan",
+          "true_value": 37000000.0,
+          "ln_true": 17.4264284706085
+        },
+        {
+          "name": "Delhi, India",
+          "true_value": 33800000.0,
+          "ln_true": 17.335971360453247
+        },
+        {
+          "name": "Shanghai, China",
+          "true_value": 29900000.0,
+          "ln_true": 17.213369038360916
+        },
+        {
+          "name": "São Paulo, Brazil",
+          "true_value": 22800000.0,
+          "ln_true": 16.94227109392467
+        },
+        {
+          "name": "Mexico City, Mexico",
+          "true_value": 22500000.0,
+          "ln_true": 16.929025867174648
+        },
+        {
+          "name": "Cairo, Egypt",
+          "true_value": 22600000.0,
+          "ln_true": 16.933460464242515
+        },
+        {
+          "name": "Mumbai, India",
+          "true_value": 21700000.0,
+          "ln_true": 16.892822818510687
+        },
+        {
+          "name": "Beijing, China",
+          "true_value": 22200000.0,
+          "ln_true": 16.915602846842507
+        },
+        {
+          "name": "Osaka, Japan",
+          "true_value": 19000000.0,
+          "ln_true": 16.759949537130716
+        },
+        {
+          "name": "New York, United States",
+          "true_value": 18900000.0,
+          "ln_true": 16.75467248002987
+        },
+        {
+          "name": "Karachi, Pakistan",
+          "true_value": 17600000.0,
+          "ln_true": 16.68340946000838
+        },
+        {
+          "name": "Istanbul, Turkey",
+          "true_value": 16000000.0,
+          "ln_true": 16.588099280204055
+        },
+        {
+          "name": "London, United Kingdom",
+          "true_value": 9700000.0,
+          "ln_true": 16.08763644347361
+        },
+        {
+          "name": "Paris, France",
+          "true_value": 11300000.0,
+          "ln_true": 16.240313283682568
+        },
+        {
+          "name": "Chicago, United States",
+          "true_value": 9000000.0,
+          "ln_true": 16.012735135300492
+        },
+        {
+          "name": "Vienna, Austria",
+          "true_value": 2000000.0,
+          "ln_true": 14.508657738524219
+        }
+      ]
+    }
+  ],
+  "engine_spec": {
+    "n": 16,
+    "attribute": {
+      "temperature": 1.0
+    },
+    "raters": [
+      [
+        "openai/gpt-4.1-mini",
+        {
+          "beta": 1.0,
+          "cost_per_edge": 1.0
+        }
+      ]
+    ],
+    "config": {
+      "huber_k": 1.5,
+      "irls_max_iters": 12,
+      "irls_tol": 1e-8,
+      "ridge_lambda": 1e-9,
+      "tiny": 1e-18,
+      "max_log_ratio": 10.0,
+      "hutch_probes": 12,
+      "rank_weight_exponent": 1.0,
+      "rank_band_window": 5,
+      "small_gap_threshold": 0.5,
+      "max_rank_pairs": 200000,
+      "top_k": null,
+      "tail_weight": 0.0,
+      "lambda_risk": 1.0,
+      "rng_seed": 1337
+    }
+  },
+  "runs": [
+    {
+      "pool": "countries",
+      "model": "openai/gpt-4.1-mini",
+      "wording": "attribute",
+      "criterion": "population",
+      "rng_seed": 1711354941884501985,
+      "comparison_budget": 64,
+      "comparisons_attempted": 64,
+      "comparisons_used": 64,
+      "comparisons_refused": 0,
+      "pairs_counterbalanced": 32,
+      "position_flips": 8,
+      "stop_reason": "budget_exhausted",
+      "provider_input_tokens": 21604,
+      "provider_output_tokens": 1600,
+      "cost_nanodollars": 11201600,
+      "latency_ms": 20831,
+      "latents": [
+        {
+          "id": "China",
+          "mean": 3.58962783219495,
+          "std": 1.047280467660479
+        },
+        {
+          "id": "India",
+          "mean": 3.825849065432176,
+          "std": 0.6648733299502618
+        },
+        {
+          "id": "United States",
+          "mean": 3.415443135359542,
+          "std": 0.8333280712922086
+        },
+        {
+          "id": "Indonesia",
+          "mean": 3.106943981409728,
+          "std": 0.8737336443404783
+        },
+        {
+          "id": "Brazil",
+          "mean": 3.495898790303923,
+          "std": 1.0382029485569966
+        },
+        {
+          "id": "Nigeria",
+          "mean": 3.4052805188893673,
+          "std": 1.047280467660479
+        },
+        {
+          "id": "Japan",
+          "mean": 2.8125114427842037,
+          "std": 0.9056508863477613
+        },
+        {
+          "id": "Mexico",
+          "mean": 2.7156856855459925,
+          "std": 0.9034121204304901
+        },
+        {
+          "id": "Germany",
+          "mean": 2.4146338048135343,
+          "std": 0.9153641075288936
+        },
+        {
+          "id": "France",
+          "mean": 2.1282154452268696,
+          "std": 0.9237564607391398
+        },
+        {
+          "id": "United Kingdom",
+          "mean": 2.023938445319301,
+          "std": 0.8961555791985781
+        },
+        {
+          "id": "Italy",
+          "mean": 1.9839706460889692,
+          "std": 0.9139683524825156
+        },
+        {
+          "id": "Kenya",
+          "mean": 1.9436823566192776,
+          "std": 0.9098050486150565
+        },
+        {
+          "id": "Australia",
+          "mean": 1.9925018195230397,
+          "std": 0.8701364359939331
+        },
+        {
+          "id": "Netherlands",
+          "mean": 1.1926310431267892,
+          "std": 0.8333280159868148
+        },
+        {
+          "id": "New Zealand",
+          "mean": 0.0,
+          "std": 0.6648732440362297
+        }
+      ],
+      "order": {
+        "pairs_with_both_orientations": 32,
+        "agreements": 24,
+        "agreement_frac": 0.75,
+        "mean_abs_delta_ln_r": 0.5066488619260303
+      },
+      "solver": {
+        "observations": 64,
+        "hcr": 0.03913665742933787,
+        "local_curl_frac": 0.01225407122298721,
+        "harmonic_frac": 0.02688258620635065,
+        "filled_triangles": 16,
+        "harmonic_dim": 3,
+        "cycle_dim": 17,
+        "resolve_vs_sort_spearman": 1.0
+      }
+    },
+    {
+      "pool": "countries",
+      "model": "openai/gpt-4.1-mini",
+      "wording": "paraphrase",
+      "criterion": "number of people living there",
+      "rng_seed": 510929838433025714,
+      "comparison_budget": 32,
+      "comparisons_attempted": 32,
+      "comparisons_used": 32,
+      "comparisons_refused": 0,
+      "pairs_counterbalanced": 16,
+      "position_flips": 9,
+      "stop_reason": "budget_exhausted",
+      "provider_input_tokens": 10932,
+      "provider_output_tokens": 800,
+      "cost_nanodollars": 5652800,
+      "latency_ms": 17377,
+      "latents": [
+        {
+          "id": "China",
+          "mean": 3.2922142916102026,
+          "std": 2.597269104406871
+        },
+        {
+          "id": "India",
+          "mean": 3.2167104681501595,
+          "std": 1.477906653265754
+        },
+        {
+          "id": "United States",
+          "mean": 2.4506970594634274,
+          "std": 1.9843466233021019
+        },
+        {
+          "id": "Indonesia",
+          "mean": 2.1841592332315987,
+          "std": 2.2848283249304995
+        },
+        {
+          "id": "Brazil",
+          "mean": 2.24107331010397,
+          "std": 2.4645790930714195
+        },
+        {
+          "id": "Nigeria",
+          "mean": 2.294693036579733,
+          "std": 2.5619886774379483
+        },
+        {
+          "id": "Japan",
+          "mean": 1.843072028598917,
+          "std": 2.597269104406871
+        },
+        {
+          "id": "Mexico",
+          "mean": 1.889066647190394,
+          "std": 2.5837546894889085
+        },
+        {
+          "id": "Germany",
+          "mean": 2.1704879810878177,
+          "std": 2.533516981053877
+        },
+        {
+          "id": "France",
+          "mean": 2.1251767602734075,
+          "std": 2.4537174495449388
+        },
+        {
+          "id": "United Kingdom",
+          "mean": 1.8974825972605016,
+          "std": 2.3506417628413825
+        },
+        {
+          "id": "Italy",
+          "mean": 1.9316004878198985,
+          "std": 2.2166624618803468
+        },
+        {
+          "id": "Kenya",
+          "mean": 1.965718360123602,
+          "std": 2.0440327180557256
+        },
+        {
+          "id": "Australia",
+          "mean": 1.2578988699000133,
+          "std": 1.8217982076149244
+        },
+        {
+          "id": "Netherlands",
+          "mean": 1.0972843137300572,
+          "std": 1.528473020172907
+        },
+        {
+          "id": "New Zealand",
+          "mean": 0.0,
+          "std": 1.1090145510993958
+        }
+      ],
+      "order": {
+        "pairs_with_both_orientations": 16,
+        "agreements": 7,
+        "agreement_frac": 0.4375,
+        "mean_abs_delta_ln_r": 0.5461060722266116
+      },
+      "solver": {
+        "observations": 32,
+        "hcr": 0.0018407675119910547,
+        "local_curl_frac": 0.0,
+        "harmonic_frac": 0.0018407675119910547,
+        "filled_triangles": 0,
+        "harmonic_dim": 1,
+        "cycle_dim": 1,
+        "resolve_vs_sort_spearman": 1.0
+      }
+    },
+    {
+      "pool": "countries",
+      "model": "openai/gpt-4.1-mini",
+      "wording": "negation",
+      "criterion": "smallness of population",
+      "rng_seed": 17465967854419371402,
+      "comparison_budget": 32,
+      "comparisons_attempted": 32,
+      "comparisons_used": 32,
+      "comparisons_refused": 0,
+      "pairs_counterbalanced": 16,
+      "position_flips": 4,
+      "stop_reason": "budget_exhausted",
+      "provider_input_tokens": 10900,
+      "provider_output_tokens": 800,
+      "cost_nanodollars": 5640000,
+      "latency_ms": 11153,
+      "latents": [
+        {
+          "id": "China",
+          "mean": 0.0,
+          "std": 2.83651526721174
+        },
+        {
+          "id": "India",
+          "mean": 0.2559538636607447,
+          "std": 1.653820388467967
+        },
+        {
+          "id": "United States",
+          "mean": 1.271553549511199,
+          "std": 2.210165478823331
+        },
+        {
+          "id": "Indonesia",
+          "mean": 2.472544277669498,
+          "std": 2.5316578491999144
+        },
+        {
+          "id": "Brazil",
+          "mean": 1.6032060893614524,
+          "std": 2.7108003831306475
+        },
+        {
+          "id": "Nigeria",
+          "mean": 1.8285359376837182,
+          "std": 2.804537242813372
+        },
+        {
+          "id": "Japan",
+          "mean": 0.6637328669774579,
+          "std": 2.83651526721174
+        },
+        {
+          "id": "Mexico",
+          "mean": 1.4606962686038767,
+          "std": 2.821942358966489
+        },
+        {
+          "id": "Germany",
+          "mean": 1.323848950631612,
+          "std": 2.7693924022704413
+        },
+        {
+          "id": "France",
+          "mean": 1.559490527908377,
+          "std": 2.6869290737961484
+        },
+        {
+          "id": "United Kingdom",
+          "mean": 1.5345285189597309,
+          "std": 2.5773073348067816
+        },
+        {
+          "id": "Italy",
+          "mean": 1.5095665347386094,
+          "std": 2.431872893677619
+        },
+        {
+          "id": "Kenya",
+          "mean": 2.4212743029529884,
+          "std": 2.2436724926878493
+        },
+        {
+          "id": "Australia",
+          "mean": 1.2649102705825659,
+          "std": 2.000673769290247
+        },
+        {
+          "id": "Netherlands",
+          "mean": 2.3713504815771533,
+          "std": 1.6792538186506776
+        },
+        {
+          "id": "New Zealand",
+          "mean": 3.2830583474028567,
+          "std": 1.2188769669396844
+        }
+      ],
+      "order": {
+        "pairs_with_both_orientations": 16,
+        "agreements": 12,
+        "agreement_frac": 0.75,
+        "mean_abs_delta_ln_r": 0.5846678077482059
+      },
+      "solver": {
+        "observations": 32,
+        "hcr": 0.0006958969327061354,
+        "local_curl_frac": 0.0,
+        "harmonic_frac": 0.0006958969327061354,
+        "filled_triangles": 0,
+        "harmonic_dim": 1,
+        "cycle_dim": 1,
+        "resolve_vs_sort_spearman": 1.0
+      }
+    },
+    {
+      "pool": "rivers",
+      "model": "openai/gpt-4.1-mini",
+      "wording": "attribute",
+      "criterion": "length in kilometres",
+      "rng_seed": 2805148458980628157,
+      "comparison_budget": 64,
+      "comparisons_attempted": 64,
+      "comparisons_used": 64,
+      "comparisons_refused": 0,
+      "pairs_counterbalanced": 32,
+      "position_flips": 12,
+      "stop_reason": "budget_exhausted",
+      "provider_input_tokens": 21824,
+      "provider_output_tokens": 1600,
+      "cost_nanodollars": 11289600,
+      "latency_ms": 22109,
+      "latents": [
+        {
+          "id": "Nile",
+          "mean": 1.3011207127338125,
+          "std": 0.8552023595314213
+        },
+        {
+          "id": "Amazon",
+          "mean": 1.214766817695708,
+          "std": 0.6438919054833616
+        },
+        {
+          "id": "Yangtze",
+          "mean": 1.4005870805167437,
+          "std": 0.8114105892624097
+        },
+        {
+          "id": "Mississippi",
+          "mean": 0.9356307770551127,
+          "std": 0.8552023595314213
+        },
+        {
+          "id": "Yenisei",
+          "mean": 0.9328039241724027,
+          "std": 0.7959576497752759
+        },
+        {
+          "id": "Yellow",
+          "mean": 0.013686339231378852,
+          "std": 0.6040858032055852
+        },
+        {
+          "id": "Ob",
+          "mean": 0.04943267925154027,
+          "std": 0.6256902179893928
+        },
+        {
+          "id": "Paraná",
+          "mean": 0.8495097388756232,
+          "std": 0.6313669331548547
+        },
+        {
+          "id": "Congo",
+          "mean": 1.0899197155648652,
+          "std": 0.5285212929768973
+        },
+        {
+          "id": "Amur",
+          "mean": 0.45377423817320695,
+          "std": 0.6751759315397713
+        },
+        {
+          "id": "Lena",
+          "mean": 0.20899140992474674,
+          "std": 0.7039289018522709
+        },
+        {
+          "id": "Mekong",
+          "mean": 0.7426583370693594,
+          "std": 0.666517513706868
+        },
+        {
+          "id": "Mackenzie",
+          "mean": 0.0,
+          "std": 0.7345562383953058
+        },
+        {
+          "id": "Niger",
+          "mean": 0.8043489333357126,
+          "std": 0.5982387395391874
+        },
+        {
+          "id": "Danube",
+          "mean": 1.4358037663832262,
+          "std": 0.6648143312849529
+        },
+        {
+          "id": "Rhine",
+          "mean": 0.8306762054940051,
+          "std": 0.5249026512477306
+        }
+      ],
+      "order": {
+        "pairs_with_both_orientations": 32,
+        "agreements": 20,
+        "agreement_frac": 0.625,
+        "mean_abs_delta_ln_r": 0.6009883908903452
+      },
+      "solver": {
+        "observations": 64,
+        "hcr": 0.12880697455099996,
+        "local_curl_frac": 0.12628252373372992,
+        "harmonic_frac": 0.0025244508172700955,
+        "filled_triangles": 15,
+        "harmonic_dim": 2,
+        "cycle_dim": 17,
+        "resolve_vs_sort_spearman": 1.0
+      }
+    },
+    {
+      "pool": "rivers",
+      "model": "openai/gpt-4.1-mini",
+      "wording": "paraphrase",
+      "criterion": "how long the river runs",
+      "rng_seed": 2212506670036632670,
+      "comparison_budget": 32,
+      "comparisons_attempted": 32,
+      "comparisons_used": 32,
+      "comparisons_refused": 0,
+      "pairs_counterbalanced": 16,
+      "position_flips": 5,
+      "stop_reason": "budget_exhausted",
+      "provider_input_tokens": 10984,
+      "provider_output_tokens": 800,
+      "cost_nanodollars": 5673600,
+      "latency_ms": 12467,
+      "latents": [
+        {
+          "id": "Nile",
+          "mean": 1.583050578057238,
+          "std": 3.1902846095303663
+        },
+        {
+          "id": "Amazon",
+          "mean": 1.44368853089969,
+          "std": 1.371504194089939
+        },
+        {
+          "id": "Yangtze",
+          "mean": 1.3996366607216835,
+          "std": 1.8895111015225454
+        },
+        {
+          "id": "Mississippi",
+          "mean": 0.9846161144612998,
+          "std": 2.251152005265274
+        },
+        {
+          "id": "Yenisei",
+          "mean": 0.940564228435702,
+          "std": 2.5245441915335958
+        },
+        {
+          "id": "Yellow",
+          "mean": 0.19962914140799737,
+          "std": 2.7362686566431744
+        },
+        {
+          "id": "Ob",
+          "mean": 0.0,
+          "std": 2.899864448428264
+        },
+        {
+          "id": "Paraná",
+          "mean": 0.8893694478187751,
+          "std": 3.0307954257782512
+        },
+        {
+          "id": "Congo",
+          "mean": 1.5353297239206165,
+          "std": 3.1264233489081046
+        },
+        {
+          "id": "Amur",
+          "mean": 0.7465531715807101,
+          "std": 3.179093008215942
+        },
+        {
+          "id": "Lena",
+          "mean": 0.4514196170741811,
+          "std": 3.1902846095303663
+        },
+        {
+          "id": "Mekong",
+          "mean": 0.7167570922952654,
+          "std": 3.146594916433276
+        },
+        {
+          "id": "Mackenzie",
+          "mean": 0.21583448767031643,
+          "std": 3.0302822855806104
+        },
+        {
+          "id": "Niger",
+          "mean": 0.8836305087475393,
+          "std": 2.8045511799998257
+        },
+        {
+          "id": "Danube",
+          "mean": 1.5024679550571907,
+          "std": 2.4273619902570167
+        },
+        {
+          "id": "Rhine",
+          "mean": 1.1616992772620816,
+          "std": 1.817532496181217
+        }
+      ],
+      "order": {
+        "pairs_with_both_orientations": 16,
+        "agreements": 11,
+        "agreement_frac": 0.6875,
+        "mean_abs_delta_ln_r": 0.5447354083445898
+      },
+      "solver": {
+        "observations": 32,
+        "hcr": 0.011798835674587602,
+        "local_curl_frac": 0.0,
+        "harmonic_frac": 0.011798835674587602,
+        "filled_triangles": 0,
+        "harmonic_dim": 1,
+        "cycle_dim": 1,
+        "resolve_vs_sort_spearman": 1.0
+      }
+    },
+    {
+      "pool": "rivers",
+      "model": "openai/gpt-4.1-mini",
+      "wording": "negation",
+      "criterion": "shortness of the river",
+      "rng_seed": 14653161279997899947,
+      "comparison_budget": 32,
+      "comparisons_attempted": 32,
+      "comparisons_used": 32,
+      "comparisons_refused": 0,
+      "pairs_counterbalanced": 16,
+      "position_flips": 4,
+      "stop_reason": "budget_exhausted",
+      "provider_input_tokens": 10984,
+      "provider_output_tokens": 800,
+      "cost_nanodollars": 5673600,
+      "latency_ms": 8625,
+      "latents": [
+        {
+          "id": "Nile",
+          "mean": 0.20984006154437737,
+          "std": 2.170033660564615
+        },
+        {
+          "id": "Amazon",
+          "mean": 1.6400969425398628,
+          "std": 0.903850657550941
+        },
+        {
+          "id": "Yangtze",
+          "mean": 0.5541946431983398,
+          "std": 1.2474812171105034
+        },
+        {
+          "id": "Mississippi",
+          "mean": 1.7502183653046217,
+          "std": 1.4892246580361101
+        },
+        {
+          "id": "Yenisei",
+          "mean": 2.071021441414808,
+          "std": 1.673824401133435
+        },
+        {
+          "id": "Yellow",
+          "mean": 3.1798685007596306,
+          "std": 1.8187642811163265
+        },
+        {
+          "id": "Ob",
+          "mean": 3.61967487315032,
+          "std": 1.9360567400973527
+        },
+        {
+          "id": "Paraná",
+          "mean": 1.6358455865937986,
+          "std": 2.0407097289066427
+        },
+        {
+          "id": "Congo",
+          "mean": 1.1178107720965178,
+          "std": 2.1163018736466475
+        },
+        {
+          "id": "Amur",
+          "mean": 2.37331374030059,
+          "std": 2.159995898587759
+        },
+        {
+          "id": "Lena",
+          "mean": 2.717123060705912,
+          "std": 2.170033660564615
+        },
+        {
+          "id": "Mekong",
+          "mean": 1.085670937100304,
+          "std": 2.13637927000756
+        },
+        {
+          "id": "Mackenzie",
+          "mean": 2.394897963088027,
+          "std": 2.050509361780087
+        },
+        {
+          "id": "Niger",
+          "mean": 1.678245203643257,
+          "std": 1.8918444578618974
+        },
+        {
+          "id": "Danube",
+          "mean": 0.0,
+          "std": 1.6305559254894848
+        },
+        {
+          "id": "Rhine",
+          "mean": 0.821267052315933,
+          "std": 1.2157233045074778
+        }
+      ],
+      "order": {
+        "pairs_with_both_orientations": 16,
+        "agreements": 12,
+        "agreement_frac": 0.75,
+        "mean_abs_delta_ln_r": 1.2239927157956934
+      },
+      "solver": {
+        "observations": 32,
+        "hcr": 0.039483675869533524,
+        "local_curl_frac": 0.0,
+        "harmonic_frac": 0.039483675869533524,
+        "filled_triangles": 0,
+        "harmonic_dim": 1,
+        "cycle_dim": 1,
+        "resolve_vs_sort_spearman": 1.0
+      }
+    },
+    {
+      "pool": "cities",
+      "model": "openai/gpt-4.1-mini",
+      "wording": "attribute",
+      "criterion": "metro-area population",
+      "rng_seed": 4010369691648278814,
+      "comparison_budget": 64,
+      "comparisons_attempted": 64,
+      "comparisons_used": 64,
+      "comparisons_refused": 0,
+      "pairs_counterbalanced": 32,
+      "position_flips": 10,
+      "stop_reason": "budget_exhausted",
+      "provider_input_tokens": 22060,
+      "provider_output_tokens": 1600,
+      "cost_nanodollars": 11384000,
+      "latency_ms": 30665,
+      "latents": [
+        {
+          "id": "Tokyo, Japan",
+          "mean": 1.6760097100804956,
+          "std": 0.6785113271255473
+        },
+        {
+          "id": "Delhi, India",
+          "mean": 2.1069677791074413,
+          "std": 0.604230423877655
+        },
+        {
+          "id": "Shanghai, China",
+          "mean": 2.3667223622793516,
+          "std": 0.6785113271255473
+        },
+        {
+          "id": "São Paulo, Brazil",
+          "mean": 1.6487371457608868,
+          "std": 0.5346490885482448
+        },
+        {
+          "id": "Mexico City, Mexico",
+          "mean": 1.5748366199152148,
+          "std": 0.5367475441189794
+        },
+        {
+          "id": "Cairo, Egypt",
+          "mean": 1.0850281372316193,
+          "std": 0.49487974372063254
+        },
+        {
+          "id": "Mumbai, India",
+          "mean": 1.4534268142815234,
+          "std": 0.5021727311804455
+        },
+        {
+          "id": "Beijing, China",
+          "mean": 1.576664871084616,
+          "std": 0.5644141894089704
+        },
+        {
+          "id": "Osaka, Japan",
+          "mean": 0.687444987296123,
+          "std": 0.5096577726323691
+        },
+        {
+          "id": "New York, United States",
+          "mean": 1.4368917679625506,
+          "std": 0.44577528836544406
+        },
+        {
+          "id": "Karachi, Pakistan",
+          "mean": 1.2810968021086344,
+          "std": 0.44352042418348225
+        },
+        {
+          "id": "Istanbul, Turkey",
+          "mean": 1.0070147762329595,
+          "std": 0.546269972780568
+        },
+        {
+          "id": "London, United Kingdom",
+          "mean": 1.1231149396949298,
+          "std": 0.5734585966028168
+        },
+        {
+          "id": "Paris, France",
+          "mean": 0.8612800951042563,
+          "std": 0.6517991778959528
+        },
+        {
+          "id": "Chicago, United States",
+          "mean": 0.9359628149647861,
+          "std": 0.6748824173053362
+        },
+        {
+          "id": "Vienna, Austria",
+          "mean": 0.0,
+          "std": 0.6032135353069759
+        }
+      ],
+      "order": {
+        "pairs_with_both_orientations": 32,
+        "agreements": 22,
+        "agreement_frac": 0.6875,
+        "mean_abs_delta_ln_r": 0.41543365115202474
+      },
+      "solver": {
+        "observations": 64,
+        "hcr": 0.059801586296185594,
+        "local_curl_frac": 0.05176752915798607,
+        "harmonic_frac": 0.008034057138199541,
+        "filled_triangles": 14,
+        "harmonic_dim": 5,
+        "cycle_dim": 17,
+        "resolve_vs_sort_spearman": 1.0
+      }
+    },
+    {
+      "pool": "cities",
+      "model": "openai/gpt-4.1-mini",
+      "wording": "paraphrase",
+      "criterion": "how many people the metropolitan area holds",
+      "rng_seed": 6478955233078608807,
+      "comparison_budget": 32,
+      "comparisons_attempted": 32,
+      "comparisons_used": 32,
+      "comparisons_refused": 0,
+      "pairs_counterbalanced": 16,
+      "position_flips": 4,
+      "stop_reason": "budget_exhausted",
+      "provider_input_tokens": 11152,
+      "provider_output_tokens": 800,
+      "cost_nanodollars": 5740800,
+      "latency_ms": 9083,
+      "latents": [
+        {
+          "id": "Tokyo, Japan",
+          "mean": 1.7803755213997887,
+          "std": 4.92887271503991
+        },
+        {
+          "id": "Delhi, India",
+          "mean": 2.03204459631943,
+          "std": 2.0066320788973977
+        },
+        {
+          "id": "Shanghai, China",
+          "mean": 2.0213494090159037,
+          "std": 2.772825547682834
+        },
+        {
+          "id": "São Paulo, Brazil",
+          "mean": 1.508503419262889,
+          "std": 3.3145086892299025
+        },
+        {
+          "id": "Mexico City, Mexico",
+          "mean": 1.4978082316838197,
+          "std": 3.730789741056279
+        },
+        {
+          "id": "Cairo, Egypt",
+          "mean": 1.2247487771173924,
+          "std": 4.060422905380928
+        },
+        {
+          "id": "Mumbai, India",
+          "mean": 1.4764178465310018,
+          "std": 4.32327355563753
+        },
+        {
+          "id": "Beijing, China",
+          "mean": 1.7280869132339889,
+          "std": 4.530979130047063
+        },
+        {
+          "id": "Osaka, Japan",
+          "mean": 1.128064216832364,
+          "std": 4.690870583600641
+        },
+        {
+          "id": "New York, United States",
+          "mean": 1.7055538829661963,
+          "std": 4.81780049360795
+        },
+        {
+          "id": "Karachi, Pakistan",
+          "mean": 1.4537131007316277,
+          "std": 4.897063721217329
+        },
+        {
+          "id": "Istanbul, Turkey",
+          "mean": 1.1778837129599764,
+          "std": 4.92887271503991
+        },
+        {
+          "id": "London, United Kingdom",
+          "mean": 0.8993349562219703,
+          "std": 4.889246885613893
+        },
+        {
+          "id": "Paris, France",
+          "mean": 0.8791073639207743,
+          "std": 4.716432890533564
+        },
+        {
+          "id": "Chicago, United States",
+          "mean": 1.1170875744459308,
+          "std": 4.302333031458224
+        },
+        {
+          "id": "Vienna, Austria",
+          "mean": 0.0,
+          "std": 3.4698662813247383
+        }
+      ],
+      "order": {
+        "pairs_with_both_orientations": 16,
+        "agreements": 12,
+        "agreement_frac": 0.75,
+        "mean_abs_delta_ln_r": 0.5105566232473991
+      },
+      "solver": {
+        "observations": 32,
+        "hcr": 0.0009369943329906485,
+        "local_curl_frac": 0.0,
+        "harmonic_frac": 0.0009369943329906485,
+        "filled_triangles": 0,
+        "harmonic_dim": 1,
+        "cycle_dim": 1,
+        "resolve_vs_sort_spearman": 1.0
+      }
+    },
+    {
+      "pool": "cities",
+      "model": "openai/gpt-4.1-mini",
+      "wording": "negation",
+      "criterion": "smallness of metro-area population",
+      "rng_seed": 7709899455497077654,
+      "comparison_budget": 32,
+      "comparisons_attempted": 32,
+      "comparisons_used": 32,
+      "comparisons_refused": 0,
+      "pairs_counterbalanced": 16,
+      "position_flips": 4,
+      "stop_reason": "budget_exhausted",
+      "provider_input_tokens": 11120,
+      "provider_output_tokens": 800,
+      "cost_nanodollars": 5728000,
+      "latency_ms": 15964,
+      "latents": [
+        {
+          "id": "Tokyo, Japan",
+          "mean": 0.5357840808795741,
+          "std": 2.4789580510310087
+        },
+        {
+          "id": "Delhi, India",
+          "mean": 0.7688582092569837,
+          "std": 1.6824721236328937
+        },
+        {
+          "id": "Shanghai, China",
+          "mean": 0.41920015975294206,
+          "std": 2.164460448129994
+        },
+        {
+          "id": "São Paulo, Brazil",
+          "mean": 0.917759262670164,
+          "std": 2.412084536825123
+        },
+        {
+          "id": "Mexico City, Mexico",
+          "mean": 1.1000730216961596,
+          "std": 2.4789580510310087
+        },
+        {
+          "id": "Cairo, Egypt",
+          "mean": 1.5380450702531006,
+          "std": 2.4397371375257735
+        },
+        {
+          "id": "Mumbai, India",
+          "mean": 1.0000669954468488,
+          "std": 2.38085026509309
+        },
+        {
+          "id": "Beijing, China",
+          "mean": 0.32639702921160196,
+          "std": 2.3282947367210225
+        },
+        {
+          "id": "Osaka, Japan",
+          "mean": 1.0390854290762996,
+          "std": 2.242714174377172
+        },
+        {
+          "id": "New York, United States",
+          "mean": 0.0,
+          "std": 2.1892048008330303
+        },
+        {
+          "id": "Karachi, Pakistan",
+          "mean": 0.6659170939799327,
+          "std": 2.0592160654643714
+        },
+        {
+          "id": "Istanbul, Turkey",
+          "mean": 0.48962431758759156,
+          "std": 1.9149920781860144
+        },
+        {
+          "id": "London, United Kingdom",
+          "mean": 0.4601918467399546,
+          "std": 1.7247633059352285
+        },
+        {
+          "id": "Paris, France",
+          "mean": 0.6904935474467369,
+          "std": 1.4572581179073945
+        },
+        {
+          "id": "Chicago, United States",
+          "mean": 0.6623644893276514,
+          "std": 1.1373519391585996
+        },
+        {
+          "id": "Vienna, Austria",
+          "mean": 1.574012318461759,
+          "std": 0.6998783482111346
+        }
+      ],
+      "order": {
+        "pairs_with_both_orientations": 16,
+        "agreements": 12,
+        "agreement_frac": 0.75,
+        "mean_abs_delta_ln_r": 0.40838822902238375
+      },
+      "solver": {
+        "observations": 32,
+        "hcr": 0.00282517627395227,
+        "local_curl_frac": 0.0,
+        "harmonic_frac": 0.00282517627395227,
+        "filled_triangles": 0,
+        "harmonic_dim": 1,
+        "cycle_dim": 1,
+        "resolve_vs_sort_spearman": 1.0
+      }
+    },
+    {
+      "pool": "countries",
+      "model": "openai/gpt-5.4-nano",
+      "wording": "attribute",
+      "criterion": "population",
+      "rng_seed": 13995183593216070391,
+      "comparison_budget": 64,
+      "comparisons_attempted": 64,
+      "comparisons_used": 63,
+      "comparisons_refused": 1,
+      "pairs_counterbalanced": 29,
+      "position_flips": 12,
+      "stop_reason": "budget_exhausted",
+      "provider_input_tokens": 21544,
+      "provider_output_tokens": 1660,
+      "cost_nanodollars": 6383800,
+      "latency_ms": 15041,
+      "latents": [
+        {
+          "id": "China",
+          "mean": 2.98930039189488,
+          "std": 0.9291517126691571
+        },
+        {
+          "id": "India",
+          "mean": 2.916385329501946,
+          "std": 0.6146125244336378
+        },
+        {
+          "id": "United States",
+          "mean": 3.2338088535952085,
+          "std": 0.7148385980543113
+        },
+        {
+          "id": "Indonesia",
+          "mean": 3.444379449178393,
+          "std": 0.8119391372456171
+        },
+        {
+          "id": "Brazil",
+          "mean": 3.252282822551895,
+          "std": 0.7839725474992395
+        },
+        {
+          "id": "Nigeria",
+          "mean": 3.3870998774268117,
+          "std": 0.8985946781552657
+        },
+        {
+          "id": "Japan",
+          "mean": 2.5335760286395943,
+          "std": 0.7849405337968908
+        },
+        {
+          "id": "Mexico",
+          "mean": 2.670167328731717,
+          "std": 0.7829057880583324
+        },
+        {
+          "id": "Germany",
+          "mean": 2.697863527705533,
+          "std": 0.8120830703584301
+        },
+        {
+          "id": "France",
+          "mean": 2.6358427885526887,
+          "std": 0.7230069754512198
+        },
+        {
+          "id": "United Kingdom",
+          "mean": 2.366476257223428,
+          "std": 0.7488488366037388
+        },
+        {
+          "id": "Italy",
+          "mean": 2.5637139158496374,
+          "std": 0.7584361524119209
+        },
+        {
+          "id": "Kenya",
+          "mean": 2.7524747074344114,
+          "std": 0.8367582371830772
+        },
+        {
+          "id": "Australia",
+          "mean": 1.9488662433404702,
+          "std": 0.9291517126691571
+        },
+        {
+          "id": "Netherlands",
+          "mean": 0.0418607561202351,
+          "std": 0.8949944235925418
+        },
+        {
+          "id": "New Zealand",
+          "mean": 0.0,
+          "std": 0.7164081988655332
+        }
+      ],
+      "order": {
+        "pairs_with_both_orientations": 31,
+        "agreements": 17,
+        "agreement_frac": 0.5483870967741935,
+        "mean_abs_delta_ln_r": 0.822333209590828
+      },
+      "solver": {
+        "observations": 63,
+        "hcr": 0.17040817456366683,
+        "local_curl_frac": 0.07424686851701008,
+        "harmonic_frac": 0.09616130604665679,
+        "filled_triangles": 17,
+        "harmonic_dim": 4,
+        "cycle_dim": 17,
+        "resolve_vs_sort_spearman": 1.0
+      }
+    },
+    {
+      "pool": "countries",
+      "model": "openai/gpt-5.4-nano",
+      "wording": "paraphrase",
+      "criterion": "number of people living there",
+      "rng_seed": 2176368442085735305,
+      "comparison_budget": 32,
+      "comparisons_attempted": 32,
+      "comparisons_used": 32,
+      "comparisons_refused": 0,
+      "pairs_counterbalanced": 16,
+      "position_flips": 9,
+      "stop_reason": "budget_exhausted",
+      "provider_input_tokens": 10900,
+      "provider_output_tokens": 832,
+      "cost_nanodollars": 3220000,
+      "latency_ms": 7007,
+      "latents": [
+        {
+          "id": "China",
+          "mean": 3.025995130036598,
+          "std": 3.111888945295515
+        },
+        {
+          "id": "India",
+          "mean": 2.9505479101985004,
+          "std": 0.7025356349070233
+        },
+        {
+          "id": "United States",
+          "mean": 2.438114149217509,
+          "std": 0.9870285071840479
+        },
+        {
+          "id": "Indonesia",
+          "mean": 2.212374190403903,
+          "std": 1.2008359038605585
+        },
+        {
+          "id": "Brazil",
+          "mean": 2.2524828303090243,
+          "std": 1.3772803277727022
+        },
+        {
+          "id": "Nigeria",
+          "mean": 1.9257721988700485,
+          "std": 1.5293488727922713
+        },
+        {
+          "id": "Japan",
+          "mean": 1.5118848733085724,
+          "std": 1.6637390087416182
+        },
+        {
+          "id": "Mexico",
+          "mean": 1.4649821345301408,
+          "std": 1.7844493956457772
+        },
+        {
+          "id": "Germany",
+          "mean": 1.199220818998527,
+          "std": 1.8940972638118572
+        },
+        {
+          "id": "France",
+          "mean": 1.219083774838463,
+          "std": 1.9945079311680327
+        },
+        {
+          "id": "United Kingdom",
+          "mean": 1.1924267141400506,
+          "std": 2.087015087281202
+        },
+        {
+          "id": "Italy",
+          "mean": 1.0067081035483452,
+          "std": 2.1726285247773567
+        },
+        {
+          "id": "Kenya",
+          "mean": 0.7529234047847053,
+          "std": 2.252134561839538
+        },
+        {
+          "id": "Australia",
+          "mean": 0.6672639993156113,
+          "std": 2.4297405428336347
+        },
+        {
+          "id": "Netherlands",
+          "mean": 0.6442181803762423,
+          "std": 2.7801150129257204
+        },
+        {
+          "id": "New Zealand",
+          "mean": 0.0,
+          "std": 3.111888945295515
+        }
+      ],
+      "order": {
+        "pairs_with_both_orientations": 16,
+        "agreements": 7,
+        "agreement_frac": 0.4375,
+        "mean_abs_delta_ln_r": 0.39723942181249866
+      },
+      "solver": {
+        "observations": 32,
+        "hcr": 0.0008705820554994828,
+        "local_curl_frac": 0.0,
+        "harmonic_frac": 0.0008705820554994828,
+        "filled_triangles": 0,
+        "harmonic_dim": 1,
+        "cycle_dim": 1,
+        "resolve_vs_sort_spearman": 1.0
+      }
+    },
+    {
+      "pool": "countries",
+      "model": "openai/gpt-5.4-nano",
+      "wording": "negation",
+      "criterion": "smallness of population",
+      "rng_seed": 7636319162718472775,
+      "comparison_budget": 32,
+      "comparisons_attempted": 32,
+      "comparisons_used": 32,
+      "comparisons_refused": 0,
+      "pairs_counterbalanced": 16,
+      "position_flips": 14,
+      "stop_reason": "budget_exhausted",
+      "provider_input_tokens": 10868,
+      "provider_output_tokens": 830,
+      "cost_nanodollars": 3211100,
+      "latency_ms": 7510,
+      "latents": [
+        {
+          "id": "China",
+          "mean": 0.45472628307696245,
+          "std": 2.0704327942506806
+        },
+        {
+          "id": "India",
+          "mean": 0.0,
+          "std": 1.276499892315628
+        },
+        {
+          "id": "United States",
+          "mean": 2.0272954893601924,
+          "std": 1.6999168162806924
+        },
+        {
+          "id": "Indonesia",
+          "mean": 3.5735462068841386,
+          "std": 1.9262078704065644
+        },
+        {
+          "id": "Brazil",
+          "mean": 3.5460664487373412,
+          "std": 2.034114905353829
+        },
+        {
+          "id": "Nigeria",
+          "mean": 3.379604815588027,
+          "std": 2.0704327942506806
+        },
+        {
+          "id": "Japan",
+          "mean": 1.977545053858838,
+          "std": 2.062632347208561
+        },
+        {
+          "id": "Mexico",
+          "mean": 1.6014470089695128,
+          "std": 2.024747535305422
+        },
+        {
+          "id": "Germany",
+          "mean": 1.5405507686457032,
+          "std": 1.9623883416110692
+        },
+        {
+          "id": "France",
+          "mean": 1.3050406230307239,
+          "std": 1.8795042585090735
+        },
+        {
+          "id": "United Kingdom",
+          "mean": 1.0477576803350956,
+          "std": 1.777195498490223
+        },
+        {
+          "id": "Italy",
+          "mean": 1.0210232821247447,
+          "std": 1.6535874495863052
+        },
+        {
+          "id": "Kenya",
+          "mean": 0.9215859797975674,
+          "std": 1.5066156935027426
+        },
+        {
+          "id": "Australia",
+          "mean": 0.7570056427695343,
+          "std": 1.3302683767056869
+        },
+        {
+          "id": "Netherlands",
+          "mean": 0.508990381230174,
+          "std": 1.109817756126665
+        },
+        {
+          "id": "New Zealand",
+          "mean": 0.3458890817313167,
+          "std": 0.8032896175940399
+        }
+      ],
+      "order": {
+        "pairs_with_both_orientations": 16,
+        "agreements": 2,
+        "agreement_frac": 0.125,
+        "mean_abs_delta_ln_r": 1.6026130007564523
+      },
+      "solver": {
+        "observations": 32,
+        "hcr": 0.28387294579780625,
+        "local_curl_frac": 0.0,
+        "harmonic_frac": 0.28387294579780625,
+        "filled_triangles": 0,
+        "harmonic_dim": 1,
+        "cycle_dim": 1,
+        "resolve_vs_sort_spearman": 1.0
+      }
+    },
+    {
+      "pool": "rivers",
+      "model": "openai/gpt-5.4-nano",
+      "wording": "attribute",
+      "criterion": "length in kilometres",
+      "rng_seed": 8945152937878733785,
+      "comparison_budget": 64,
+      "comparisons_attempted": 64,
+      "comparisons_used": 64,
+      "comparisons_refused": 0,
+      "pairs_counterbalanced": 32,
+      "position_flips": 19,
+      "stop_reason": "budget_exhausted",
+      "provider_input_tokens": 21776,
+      "provider_output_tokens": 1654,
+      "cost_nanodollars": 6422700,
+      "latency_ms": 13540,
+      "latents": [
+        {
+          "id": "Nile",
+          "mean": 2.401250749430619,
+          "std": 0.9563572426503283
+        },
+        {
+          "id": "Amazon",
+          "mean": 1.2123789967413934,
+          "std": 0.6237133321642501
+        },
+        {
+          "id": "Yangtze",
+          "mean": 2.3597881315117664,
+          "std": 0.7457032140240281
+        },
+        {
+          "id": "Mississippi",
+          "mean": 0.9398361523150185,
+          "std": 0.7079300024671292
+        },
+        {
+          "id": "Yenisei",
+          "mean": 0.8155764151885851,
+          "std": 0.7951271256587678
+        },
+        {
+          "id": "Yellow",
+          "mean": 0.4344791047447978,
+          "std": 0.8011306431715551
+        },
+        {
+          "id": "Ob",
+          "mean": 0.2346798349462138,
+          "std": 0.8046642687304756
+        },
+        {
+          "id": "Paraná",
+          "mean": 1.6346403643924694,
+          "std": 0.9563572426503283
+        },
+        {
+          "id": "Congo",
+          "mean": 2.8562634214860534,
+          "std": 0.9547116628335434
+        },
+        {
+          "id": "Amur",
+          "mean": 1.7040700657970649,
+          "std": 0.7987804054351944
+        },
+        {
+          "id": "Lena",
+          "mean": 1.054252125744884,
+          "std": 0.7543321876623417
+        },
+        {
+          "id": "Mekong",
+          "mean": 1.5027687121253201,
+          "std": 0.7614206883770428
+        },
+        {
+          "id": "Mackenzie",
+          "mean": 0.0,
+          "std": 0.8687663007193583
+        },
+        {
+          "id": "Niger",
+          "mean": 0.9281944898950565,
+          "std": 0.7738350313548582
+        },
+        {
+          "id": "Danube",
+          "mean": 1.7049890362098974,
+          "std": 0.753349520949923
+        },
+        {
+          "id": "Rhine",
+          "mean": 1.4589234370996293,
+          "std": 0.6237133312303148
+        }
+      ],
+      "order": {
+        "pairs_with_both_orientations": 32,
+        "agreements": 13,
+        "agreement_frac": 0.40625,
+        "mean_abs_delta_ln_r": 2.109266259004894
+      },
+      "solver": {
+        "observations": 64,
+        "hcr": 0.22828698603146072,
+        "local_curl_frac": 0.1944337891812837,
+        "harmonic_frac": 0.03385319685017699,
+        "filled_triangles": 12,
+        "harmonic_dim": 6,
+        "cycle_dim": 17,
+        "resolve_vs_sort_spearman": 1.0
+      }
+    },
+    {
+      "pool": "rivers",
+      "model": "openai/gpt-5.4-nano",
+      "wording": "paraphrase",
+      "criterion": "how long the river runs",
+      "rng_seed": 11145557178997436574,
+      "comparison_budget": 32,
+      "comparisons_attempted": 32,
+      "comparisons_used": 32,
+      "comparisons_refused": 0,
+      "pairs_counterbalanced": 16,
+      "position_flips": 7,
+      "stop_reason": "budget_exhausted",
+      "provider_input_tokens": 10952,
+      "provider_output_tokens": 830,
+      "cost_nanodollars": 3227900,
+      "latency_ms": 7181,
+      "latents": [
+        {
+          "id": "Nile",
+          "mean": 2.0813455514773724,
+          "std": 2.4355511665550296
+        },
+        {
+          "id": "Amazon",
+          "mean": 3.1088904539904547,
+          "std": 1.0289557954936726
+        },
+        {
+          "id": "Yangtze",
+          "mean": 3.463098584455422,
+          "std": 1.4191655112186867
+        },
+        {
+          "id": "Mississippi",
+          "mean": 2.9584809824182856,
+          "std": 1.6928798401981027
+        },
+        {
+          "id": "Yenisei",
+          "mean": 3.6539461012266483,
+          "std": 1.9011007508657556
+        },
+        {
+          "id": "Yellow",
+          "mean": 1.9005754659137182,
+          "std": 2.119138488006114
+        },
+        {
+          "id": "Ob",
+          "mean": 2.984233976573596,
+          "std": 2.266244280108615
+        },
+        {
+          "id": "Paraná",
+          "mean": 2.4646215448935638,
+          "std": 2.378944965707251
+        },
+        {
+          "id": "Congo",
+          "mean": 3.4070753757951158,
+          "std": 2.4355511665550296
+        },
+        {
+          "id": "Amur",
+          "mean": 2.1378082096488558,
+          "std": 2.422405899620602
+        },
+        {
+          "id": "Lena",
+          "mean": 0.5912330409731612,
+          "std": 2.3158618650568554
+        },
+        {
+          "id": "Mekong",
+          "mean": 2.01410887538556,
+          "std": 2.155021755055036
+        },
+        {
+          "id": "Mackenzie",
+          "mean": 0.0,
+          "std": 1.9111816423054528
+        },
+        {
+          "id": "Niger",
+          "mean": 1.0342046542362686,
+          "std": 1.6928799731867572
+        },
+        {
+          "id": "Danube",
+          "mean": 1.4058564331549996,
+          "std": 1.4191656708881497
+        },
+        {
+          "id": "Rhine",
+          "mean": 1.2682234137374802,
+          "std": 1.0289559303451616
+        }
+      ],
+      "order": {
+        "pairs_with_both_orientations": 16,
+        "agreements": 9,
+        "agreement_frac": 0.5625,
+        "mean_abs_delta_ln_r": 1.6940827426543439
+      },
+      "solver": {
+        "observations": 32,
+        "hcr": 0.003245044821351441,
+        "local_curl_frac": 0.0,
+        "harmonic_frac": 0.003245044821351441,
+        "filled_triangles": 0,
+        "harmonic_dim": 1,
+        "cycle_dim": 1,
+        "resolve_vs_sort_spearman": 1.0
+      }
+    },
+    {
+      "pool": "rivers",
+      "model": "openai/gpt-5.4-nano",
+      "wording": "negation",
+      "criterion": "shortness of the river",
+      "rng_seed": 8211176024781906236,
+      "comparison_budget": 32,
+      "comparisons_attempted": 32,
+      "comparisons_used": 32,
+      "comparisons_refused": 0,
+      "pairs_counterbalanced": 15,
+      "position_flips": 12,
+      "stop_reason": "budget_exhausted",
+      "provider_input_tokens": 10952,
+      "provider_output_tokens": 832,
+      "cost_nanodollars": 3230400,
+      "latency_ms": 7002,
+      "latents": [
+        {
+          "id": "Nile",
+          "mean": 1.4436571918944507,
+          "std": 1.4142135547716959
+        },
+        {
+          "id": "Amazon",
+          "mean": 1.7177741241122948,
+          "std": 0.6846531959971139
+        },
+        {
+          "id": "Yangtze",
+          "mean": 1.0552213283569585,
+          "std": 0.9354143444718762
+        },
+        {
+          "id": "Mississippi",
+          "mean": 1.002375026814311,
+          "std": 1.103970104657079
+        },
+        {
+          "id": "Yenisei",
+          "mean": 1.4548294307237208,
+          "std": 1.224744866441578
+        },
+        {
+          "id": "Yellow",
+          "mean": 0.0,
+          "std": 1.3110110541492628
+        },
+        {
+          "id": "Ob",
+          "mean": 0.18295615282682376,
+          "std": 1.369306386859328
+        },
+        {
+          "id": "Paraná",
+          "mean": 0.7429662451981134,
+          "std": 1.4031215126153758
+        },
+        {
+          "id": "Congo",
+          "mean": 1.295056204964449,
+          "std": 1.4142135547716959
+        },
+        {
+          "id": "Amur",
+          "mean": 2.0036920586450586,
+          "std": 1.4031215126153753
+        },
+        {
+          "id": "Lena",
+          "mean": 1.9980010951261693,
+          "std": 1.3693063868593274
+        },
+        {
+          "id": "Mekong",
+          "mean": 1.3926332026496318,
+          "std": 1.3110110541492621
+        },
+        {
+          "id": "Mackenzie",
+          "mean": 1.666750133350114,
+          "std": 1.2247448664415777
+        },
+        {
+          "id": "Niger",
+          "mean": 2.0484227539706157,
+          "std": 1.1039701046570787
+        },
+        {
+          "id": "Danube",
+          "mean": 1.5845864251802384,
+          "std": 0.9354143444718761
+        },
+        {
+          "id": "Rhine",
+          "mean": 1.6032905444821193,
+          "std": 0.6846531959971138
+        }
+      ],
+      "order": {
+        "pairs_with_both_orientations": 16,
+        "agreements": 3,
+        "agreement_frac": 0.1875,
+        "mean_abs_delta_ln_r": 1.4505556143077407
+      },
+      "solver": {
+        "observations": 32,
+        "hcr": 0.19961702780277168,
+        "local_curl_frac": 0.0,
+        "harmonic_frac": 0.19961702780277168,
+        "filled_triangles": 0,
+        "harmonic_dim": 1,
+        "cycle_dim": 1,
+        "resolve_vs_sort_spearman": 1.0
+      }
+    },
+    {
+      "pool": "cities",
+      "model": "openai/gpt-5.4-nano",
+      "wording": "attribute",
+      "criterion": "metro-area population",
+      "rng_seed": 1602617265782149740,
+      "comparison_budget": 64,
+      "comparisons_attempted": 64,
+      "comparisons_used": 64,
+      "comparisons_refused": 0,
+      "pairs_counterbalanced": 32,
+      "position_flips": 12,
+      "stop_reason": "budget_exhausted",
+      "provider_input_tokens": 21986,
+      "provider_output_tokens": 1664,
+      "cost_nanodollars": 6477200,
+      "latency_ms": 14747,
+      "latents": [
+        {
+          "id": "Tokyo, Japan",
+          "mean": 0.5151566360692739,
+          "std": 0.6514377014610456
+        },
+        {
+          "id": "Delhi, India",
+          "mean": 0.4734765404123406,
+          "std": 0.4382100215295188
+        },
+        {
+          "id": "Shanghai, China",
+          "mean": 1.0001898172801214,
+          "std": 0.6514377014610456
+        },
+        {
+          "id": "São Paulo, Brazil",
+          "mean": 0.7939750024123806,
+          "std": 0.5908003205247452
+        },
+        {
+          "id": "Mexico City, Mexico",
+          "mean": 0.6155124047219058,
+          "std": 0.6048150829012281
+        },
+        {
+          "id": "Cairo, Egypt",
+          "mean": 0.20185719116994238,
+          "std": 0.43978641690484666
+        },
+        {
+          "id": "Mumbai, India",
+          "mean": 0.40782841273438625,
+          "std": 0.4684389760291257
+        },
+        {
+          "id": "Beijing, China",
+          "mean": 0.4565140199975096,
+          "std": 0.41973250749544855
+        },
+        {
+          "id": "Osaka, Japan",
+          "mean": 0.16723022627722534,
+          "std": 0.3986191553618053
+        },
+        {
+          "id": "New York, United States",
+          "mean": 0.7262014315377558,
+          "std": 0.42582121275563106
+        },
+        {
+          "id": "Karachi, Pakistan",
+          "mean": 0.0,
+          "std": 0.41652183260650416
+        },
+        {
+          "id": "Istanbul, Turkey",
+          "mean": 0.22574891416750292,
+          "std": 0.4088799687969444
+        },
+        {
+          "id": "London, United Kingdom",
+          "mean": 0.12107551000175049,
+          "std": 0.6425248773902072
+        },
+        {
+          "id": "Paris, France",
+          "mean": 0.23278073083704348,
+          "std": 0.559687422009175
+        },
+        {
+          "id": "Chicago, United States",
+          "mean": 0.6212117382023512,
+          "std": 0.4802250598437
+        },
+        {
+          "id": "Vienna, Austria",
+          "mean": 0.21016553932479892,
+          "std": 0.5070094511470105
+        }
+      ],
+      "order": {
+        "pairs_with_both_orientations": 32,
+        "agreements": 20,
+        "agreement_frac": 0.625,
+        "mean_abs_delta_ln_r": 0.4485690038909844
+      },
+      "solver": {
+        "observations": 64,
+        "hcr": 0.1926101576248947,
+        "local_curl_frac": 0.0972896106318152,
+        "harmonic_frac": 0.09532054699307949,
+        "filled_triangles": 10,
+        "harmonic_dim": 7,
+        "cycle_dim": 17,
+        "resolve_vs_sort_spearman": 1.0
+      }
+    },
+    {
+      "pool": "cities",
+      "model": "openai/gpt-5.4-nano",
+      "wording": "paraphrase",
+      "criterion": "how many people the metropolitan area holds",
+      "rng_seed": 2987540707594284944,
+      "comparison_budget": 32,
+      "comparisons_attempted": 32,
+      "comparisons_used": 32,
+      "comparisons_refused": 0,
+      "pairs_counterbalanced": 16,
+      "position_flips": 10,
+      "stop_reason": "budget_exhausted",
+      "provider_input_tokens": 11120,
+      "provider_output_tokens": 832,
+      "cost_nanodollars": 3264000,
+      "latency_ms": 5397,
+      "latents": [
+        {
+          "id": "Tokyo, Japan",
+          "mean": 1.3105261808770392,
+          "std": 1.4142135547716959
+        },
+        {
+          "id": "Delhi, India",
+          "mean": 0.815032012628963,
+          "std": 0.6846531959971139
+        },
+        {
+          "id": "Shanghai, China",
+          "mean": 1.0574911040379285,
+          "std": 0.9354143444718762
+        },
+        {
+          "id": "São Paulo, Brazil",
+          "mean": 1.1078187450915957,
+          "std": 1.103970104657079
+        },
+        {
+          "id": "Mexico City, Mexico",
+          "mean": 1.1616307207019556,
+          "std": 1.224744866441578
+        },
+        {
+          "id": "Cairo, Egypt",
+          "mean": 1.1783887101610073,
+          "std": 1.3110110541492628
+        },
+        {
+          "id": "Mumbai, India",
+          "mean": 1.4993496756064173,
+          "std": 1.369306386859328
+        },
+        {
+          "id": "Beijing, China",
+          "mean": 1.4045358894367068,
+          "std": 1.4031215126153758
+        },
+        {
+          "id": "Osaka, Japan",
+          "mean": 0.5616994907744964,
+          "std": 1.4142135547716959
+        },
+        {
+          "id": "New York, United States",
+          "mean": 0.6555328198481113,
+          "std": 1.4031215126153753
+        },
+        {
+          "id": "Karachi, Pakistan",
+          "mean": 0.20006000426017478,
+          "std": 1.3693063868593274
+        },
+        {
+          "id": "Istanbul, Turkey",
+          "mean": 0.0,
+          "std": 1.3110110541492621
+        },
+        {
+          "id": "London, United Kingdom",
+          "mean": 0.006656633963232572,
+          "std": 1.2247448664415777
+        },
+        {
+          "id": "Paris, France",
+          "mean": 0.10048996084691941,
+          "std": 1.1039701046570787
+        },
+        {
+          "id": "Chicago, United States",
+          "mean": 0.9322765470303769,
+          "std": 0.9354143444718761
+        },
+        {
+          "id": "Vienna, Austria",
+          "mean": 0.698646889250047,
+          "std": 0.6846531959971138
+        }
+      ],
+      "order": {
+        "pairs_with_both_orientations": 16,
+        "agreements": 6,
+        "agreement_frac": 0.375,
+        "mean_abs_delta_ln_r": 0.661564252327882
+      },
+      "solver": {
+        "observations": 32,
+        "hcr": 0.05297559077775077,
+        "local_curl_frac": 0.0,
+        "harmonic_frac": 0.05297559077775077,
+        "filled_triangles": 0,
+        "harmonic_dim": 1,
+        "cycle_dim": 1,
+        "resolve_vs_sort_spearman": 1.0
+      }
+    },
+    {
+      "pool": "cities",
+      "model": "openai/gpt-5.4-nano",
+      "wording": "negation",
+      "criterion": "smallness of metro-area population",
+      "rng_seed": 9882021949784909964,
+      "comparison_budget": 32,
+      "comparisons_attempted": 32,
+      "comparisons_used": 32,
+      "comparisons_refused": 0,
+      "pairs_counterbalanced": 16,
+      "position_flips": 9,
+      "stop_reason": "budget_exhausted",
+      "provider_input_tokens": 11088,
+      "provider_output_tokens": 830,
+      "cost_nanodollars": 3255100,
+      "latency_ms": 4024,
+      "latents": [
+        {
+          "id": "Tokyo, Japan",
+          "mean": 2.000153351070745,
+          "std": 2.5944160286958486
+        },
+        {
+          "id": "Delhi, India",
+          "mean": 2.855640488669171,
+          "std": 1.3108032506462282
+        },
+        {
+          "id": "Shanghai, China",
+          "mean": 2.4611026357293047,
+          "std": 1.819557498506144
+        },
+        {
+          "id": "São Paulo, Brazil",
+          "mean": 1.994788513291532,
+          "std": 2.1574287656837896
+        },
+        {
+          "id": "Mexico City, Mexico",
+          "mean": 2.0062303662272893,
+          "std": 2.3805342160705765
+        },
+        {
+          "id": "Cairo, Egypt",
+          "mean": 1.8393498584154837,
+          "std": 2.5196764654583927
+        },
+        {
+          "id": "Mumbai, India",
+          "mean": 1.082205754559607,
+          "std": 2.587605686009675
+        },
+        {
+          "id": "Beijing, China",
+          "mean": 0.7215230150245269,
+          "std": 2.5944160286958486
+        },
+        {
+          "id": "Osaka, Japan",
+          "mean": 0.47499520164309383,
+          "std": 2.558506257815543
+        },
+        {
+          "id": "New York, United States",
+          "mean": 0.0,
+          "std": 2.496388379409913
+        },
+        {
+          "id": "Karachi, Pakistan",
+          "mean": 1.5454327304138502,
+          "std": 2.4028911086147784
+        },
+        {
+          "id": "Istanbul, Turkey",
+          "mean": 1.624528390538672,
+          "std": 2.2741474097347254
+        },
+        {
+          "id": "London, United Kingdom",
+          "mean": 2.1916894155431295,
+          "std": 2.103696093693444
+        },
+        {
+          "id": "Paris, France",
+          "mean": 2.050608891508171,
+          "std": 1.8802281828740777
+        },
+        {
+          "id": "Chicago, United States",
+          "mean": 1.9810787894594997,
+          "std": 1.5814261758937769
+        },
+        {
+          "id": "Vienna, Austria",
+          "mean": 2.3595926996264094,
+          "std": 1.1499954154650796
+        }
+      ],
+      "order": {
+        "pairs_with_both_orientations": 16,
+        "agreements": 7,
+        "agreement_frac": 0.4375,
+        "mean_abs_delta_ln_r": 0.88307064426113
+      },
+      "solver": {
+        "observations": 32,
+        "hcr": 0.00023995026610115002,
+        "local_curl_frac": 0.0,
+        "harmonic_frac": 0.00023995026610115002,
+        "filled_triangles": 0,
+        "harmonic_dim": 1,
+        "cycle_dim": 1,
+        "resolve_vs_sort_spearman": 1.0
+      }
+    }
+  ],
+  "gauges": [
+    {
+      "pool": "countries",
+      "model": "openai/gpt-4.1-mini",
+      "n_entities": 16,
+      "order_agreement": 0.75,
+      "order_pairs": 32,
+      "mean_abs_delta_ln_r": 0.5066488619260303,
+      "curl_hcr": 0.03913665742933787,
+      "curl_observations": 64,
+      "filled_triangles": 16,
+      "harmonic_dim": 3,
+      "polarity_spearman": -0.5294117647058824,
+      "paraphrase_spearman": 0.8441176470588235,
+      "relation_n": 16,
+      "signal_latent_sd": 0.9769744432494937,
+      "signal_mean_posterior_std": 0.8900718238012697,
+      "signal_ratio": 1.0976355133646238,
+      "truth_spearman": 0.9647058823529412,
+      "truth_slope": 0.6509702384279333,
+      "truth_r2": 0.8970864902438338,
+      "truth_pairs": 120,
+      "truth_spearman_paraphrase": 0.8647058823529412,
+      "truth_spearman_negation": -0.47352941176470587,
+      "truth_slope_negation": -0.4168241580036609,
+      "band": "partial",
+      "band_passes": 2,
+      "band_criteria": [
+        {
+          "name": "order_agreement >= 0.90",
+          "value": 0.75,
+          "pass": false
+        },
+        {
+          "name": "curl_hcr <= 0.10",
+          "value": 0.03913665742933787,
+          "pass": true
+        },
+        {
+          "name": "polarity <= -0.80",
+          "value": -0.5294117647058824,
+          "pass": false
+        },
+        {
+          "name": "paraphrase >= 0.80",
+          "value": 0.8441176470588235,
+          "pass": true
+        }
+      ]
+    },
+    {
+      "pool": "rivers",
+      "model": "openai/gpt-4.1-mini",
+      "n_entities": 16,
+      "order_agreement": 0.625,
+      "order_pairs": 32,
+      "mean_abs_delta_ln_r": 0.6009883908903452,
+      "curl_hcr": 0.12880697455099996,
+      "curl_observations": 64,
+      "filled_triangles": 15,
+      "harmonic_dim": 2,
+      "polarity_spearman": -0.8117647058823529,
+      "paraphrase_spearman": 0.9294117647058824,
+      "relation_n": 16,
+      "signal_latent_sd": 0.4735318445614012,
+      "signal_mean_posterior_std": 0.6824664636547942,
+      "signal_ratio": 0.6938536467059625,
+      "truth_spearman": 0.35,
+      "truth_slope": 0.0335148647218003,
+      "truth_r2": 0.0007898445179143882,
+      "truth_pairs": 120,
+      "truth_spearman_paraphrase": 0.25882352941176473,
+      "truth_spearman_negation": 0.041176470588235294,
+      "truth_slope_negation": 0.628393805941203,
+      "band": "partial",
+      "band_passes": 2,
+      "band_criteria": [
+        {
+          "name": "order_agreement >= 0.90",
+          "value": 0.625,
+          "pass": false
+        },
+        {
+          "name": "curl_hcr <= 0.10",
+          "value": 0.12880697455099996,
+          "pass": false
+        },
+        {
+          "name": "polarity <= -0.80",
+          "value": -0.8117647058823529,
+          "pass": true
+        },
+        {
+          "name": "paraphrase >= 0.80",
+          "value": 0.9294117647058824,
+          "pass": true
+        }
+      ]
+    },
+    {
+      "pool": "cities",
+      "model": "openai/gpt-4.1-mini",
+      "n_entities": 16,
+      "order_agreement": 0.6875,
+      "order_pairs": 32,
+      "mean_abs_delta_ln_r": 0.41543365115202474,
+      "curl_hcr": 0.059801586296185594,
+      "curl_observations": 64,
+      "filled_triangles": 14,
+      "harmonic_dim": 5,
+      "polarity_spearman": -0.35294117647058826,
+      "paraphrase_spearman": 0.9323529411764706,
+      "relation_n": 16,
+      "signal_latent_sd": 0.5477422372700139,
+      "signal_mean_posterior_std": 0.5651683475111854,
+      "signal_ratio": 0.9691665141582853,
+      "truth_spearman": 0.8323529411764706,
+      "truth_slope": 0.6791703192860877,
+      "truth_r2": 0.6981559908002857,
+      "truth_pairs": 120,
+      "truth_spearman_paraphrase": 0.8647058823529412,
+      "truth_spearman_negation": -0.0029411764705882353,
+      "truth_slope_negation": -0.21665111629585193,
+      "band": "partial",
+      "band_passes": 2,
+      "band_criteria": [
+        {
+          "name": "order_agreement >= 0.90",
+          "value": 0.6875,
+          "pass": false
+        },
+        {
+          "name": "curl_hcr <= 0.10",
+          "value": 0.059801586296185594,
+          "pass": true
+        },
+        {
+          "name": "polarity <= -0.80",
+          "value": -0.35294117647058826,
+          "pass": false
+        },
+        {
+          "name": "paraphrase >= 0.80",
+          "value": 0.9323529411764706,
+          "pass": true
+        }
+      ]
+    },
+    {
+      "pool": "countries",
+      "model": "openai/gpt-5.4-nano",
+      "n_entities": 16,
+      "order_agreement": 0.5483870967741935,
+      "order_pairs": 31,
+      "mean_abs_delta_ln_r": 0.822333209590828,
+      "curl_hcr": 0.17040817456366683,
+      "curl_observations": 63,
+      "filled_triangles": 17,
+      "harmonic_dim": 4,
+      "polarity_spearman": 0.5764705882352941,
+      "paraphrase_spearman": 0.7970588235294118,
+      "relation_n": 16,
+      "signal_latent_sd": 0.9982952948999669,
+      "signal_mean_posterior_std": 0.7962901954405043,
+      "signal_ratio": 1.2536827661776173,
+      "truth_spearman": 0.8088235294117647,
+      "truth_slope": 0.5509299135413299,
+      "truth_r2": 0.6153937969625016,
+      "truth_pairs": 120,
+      "truth_spearman_paraphrase": 0.9764705882352941,
+      "truth_spearman_negation": 0.35294117647058826,
+      "truth_slope_negation": 0.19113293307773746,
+      "band": "not",
+      "band_passes": 0,
+      "band_criteria": [
+        {
+          "name": "order_agreement >= 0.90",
+          "value": 0.5483870967741935,
+          "pass": false
+        },
+        {
+          "name": "curl_hcr <= 0.10",
+          "value": 0.17040817456366683,
+          "pass": false
+        },
+        {
+          "name": "polarity <= -0.80",
+          "value": 0.5764705882352941,
+          "pass": false
+        },
+        {
+          "name": "paraphrase >= 0.80",
+          "value": 0.7970588235294118,
+          "pass": false
+        }
+      ]
+    },
+    {
+      "pool": "rivers",
+      "model": "openai/gpt-5.4-nano",
+      "n_entities": 16,
+      "order_agreement": 0.40625,
+      "order_pairs": 32,
+      "mean_abs_delta_ln_r": 2.109266259004894,
+      "curl_hcr": 0.22828698603146072,
+      "curl_observations": 64,
+      "filled_triangles": 12,
+      "harmonic_dim": 6,
+      "polarity_spearman": 0.008823529411764706,
+      "paraphrase_spearman": 0.2735294117647059,
+      "relation_n": 16,
+      "signal_latent_sd": 0.7663230328227959,
+      "signal_mean_posterior_std": 0.792493262504965,
+      "signal_ratio": 0.9669773474168746,
+      "truth_spearman": 0.10588235294117647,
+      "truth_slope": -0.013287957609818712,
+      "truth_r2": 0.000047408668381915485,
+      "truth_pairs": 120,
+      "truth_spearman_paraphrase": 0.6970588235294117,
+      "truth_spearman_negation": -0.4294117647058823,
+      "truth_slope_negation": -0.42727208169756486,
+      "band": "not",
+      "band_passes": 0,
+      "band_criteria": [
+        {
+          "name": "order_agreement >= 0.90",
+          "value": 0.40625,
+          "pass": false
+        },
+        {
+          "name": "curl_hcr <= 0.10",
+          "value": 0.22828698603146072,
+          "pass": false
+        },
+        {
+          "name": "polarity <= -0.80",
+          "value": 0.008823529411764706,
+          "pass": false
+        },
+        {
+          "name": "paraphrase >= 0.80",
+          "value": 0.2735294117647059,
+          "pass": false
+        }
+      ]
+    },
+    {
+      "pool": "cities",
+      "model": "openai/gpt-5.4-nano",
+      "n_entities": 16,
+      "order_agreement": 0.625,
+      "order_pairs": 32,
+      "mean_abs_delta_ln_r": 0.4485690038909844,
+      "curl_hcr": 0.1926101576248947,
+      "curl_observations": 64,
+      "filled_triangles": 10,
+      "harmonic_dim": 7,
+      "polarity_spearman": 0.15588235294117647,
+      "paraphrase_spearman": 0.43529411764705883,
+      "relation_n": 16,
+      "signal_latent_sd": 0.2688219892319747,
+      "signal_mean_posterior_std": 0.5064967317636239,
+      "signal_ratio": 0.5307477272280422,
+      "truth_spearman": 0.45294117647058824,
+      "truth_slope": 0.1534485271900077,
+      "truth_r2": 0.14795968663757467,
+      "truth_pairs": 120,
+      "truth_spearman_paraphrase": 0.6088235294117647,
+      "truth_spearman_negation": 0.12352941176470589,
+      "truth_slope_negation": -0.14715503874979619,
+      "band": "not",
+      "band_passes": 0,
+      "band_criteria": [
+        {
+          "name": "order_agreement >= 0.90",
+          "value": 0.625,
+          "pass": false
+        },
+        {
+          "name": "curl_hcr <= 0.10",
+          "value": 0.1926101576248947,
+          "pass": false
+        },
+        {
+          "name": "polarity <= -0.80",
+          "value": 0.15588235294117647,
+          "pass": false
+        },
+        {
+          "name": "paraphrase >= 0.80",
+          "value": 0.43529411764705883,
+          "pass": false
+        }
+      ]
+    }
+  ],
+  "total_cost_nanodollars": 106676200,
+  "caveats": [
+    "WST/MST/SST transitivity is part of the PROGRAM.md band definition but is unmeasured here: the 4n/2n/2n budget has no repeat draws over triads. Bands are computed from the four measured criteria only.",
+    "The spend cap is enforced at run granularity (the sort path owns the call loop), so a breach can overshoot by at most one run's budget.",
+    "Cities truth values use UN urban-agglomeration figures; 'metro area' definitions diverge for London/Paris/Chicago/Vienna — a stated confound of that pool's truth axis.",
+    "Amazon river length is contested (6,400 km used; up to 6,992 km claimed); rank-adjacent anchor pairs in the rivers pool differ by ~1-2%, within any judge's plausible noise.",
+    "Order agreement compares per-orientation MEAN canonical log-ratios per unordered pair; with the default planner most pairs are asked once per orientation."
+  ]
+}

@@ -1,0 +1,137 @@
+{
+  "items": [
+    {
+      "id": "item-0005",
+      "text": "Chapter 12 provides a complete treatment of the transformer architecture: we define attention, multi-head attention, and layer normalization, then discuss why pre-norm placement dominates post-norm in practice given standard initialization and typical optimizer schedules at scale.",
+      "rank": 1,
+      "latent_mean": 3.601534238147074,
+      "latent_std": 1.4844053816490879,
+      "z_score": 1.6383966014705178,
+      "percentile": 0.9583333333333334
+    },
+    {
+      "id": "item-0000",
+      "text": "Take any two whole numbers. Repeatedly replace the larger by the larger minus the smaller until both are equal; that final number divides both originals and nothing larger does. Nothing here needs paper you cannot make or symbols you cannot draw in dirt.",
+      "rank": 2,
+      "latent_mean": 2.984726400336526,
+      "latent_std": 1.4844053816490879,
+      "z_score": 1.0517005981965786,
+      "percentile": 0.875
+    },
+    {
+      "id": "item-0003",
+      "text": "Bread rises because yeast, a living thing present on grain and in air, eats sugar and gives off gas that the stretched protein web in wheat flour traps. Warm dough works faster, salt slows it, and a sour starter is the same process with acid-making bacteria kept alongside the yeast.",
+      "rank": 3,
+      "latent_mean": 2.8851233345882568,
+      "latent_std": 1.4171511605296356,
+      "z_score": 0.9569600371885166,
+      "percentile": 0.7916666666666666
+    },
+    {
+      "id": "item-0006",
+      "text": "A lever is a stiff bar resting on a support. Weight on the long side lifts more weight on the short side, in exact proportion to the two lengths from the support, and this same proportion governs every wheel, oar, and pair of shears you will ever hold.",
+      "rank": 4,
+      "latent_mean": 2.4168196300562244,
+      "latent_std": 1.4397385882976428,
+      "z_score": 0.5115183697437639,
+      "percentile": 0.7083333333333334
+    },
+    {
+      "id": "item-0002",
+      "text": "To find how far away a distant tree is, stand at one end of a line you have paced out, sight the tree, walk to the other end, sight it again, and note how much the direction changed. The longer your paced line, the smaller the change you can trust, and the ratio of line to change gives distance directly.",
+      "rank": 5,
+      "latent_mean": 1.9695399729120282,
+      "latent_std": 1.2816081628633174,
+      "z_score": 0.08607438037468106,
+      "percentile": 0.625
+    },
+    {
+      "id": "item-0011",
+      "text": "The village kept records of first frost for two hundred years in a ledger the schoolmaster inherited, and the dates crept eleven days earlier over the last century.",
+      "rank": 6,
+      "latent_mean": 1.9592783532715707,
+      "latent_std": 0.6868533178835928,
+      "z_score": 0.07631372095838011,
+      "percentile": 0.5416666666666666
+    },
+    {
+      "id": "item-0009",
+      "text": "Sterile technique rests on one claim you can verify yourself: illness often spreads by living things too small to see. Boil water, boil cloth, and wash hands between patients, and deaths after childbirth fall sharply, which is the whole of the evidence and the whole of the method.",
+      "rank": 7,
+      "latent_mean": 1.798817395784401,
+      "latent_std": 1.1162021884499727,
+      "z_score": -0.07631372095838032,
+      "percentile": 0.4583333333333333
+    },
+    {
+      "id": "item-0008",
+      "text": "Count in twos alone and you can write any number as a row of marks meaning present or absent, each place worth twice the one before it. Addition is then two rules and a carry, which is why a machine made of switches, each merely open or shut, can do arithmetic at all.",
+      "rank": 8,
+      "latent_mean": 1.4241459130197374,
+      "latent_std": 1.2442988756620723,
+      "z_score": -0.4326941817823326,
+      "percentile": 0.375
+    },
+    {
+      "id": "item-0004",
+      "text": "Our Q3 retention improved four points after the onboarding revamp, mostly in the self-serve tier.",
+      "rank": 9,
+      "latent_mean": 1.208011566272032,
+      "latent_std": 1.4801284249722109,
+      "z_score": -0.6382771034540421,
+      "percentile": 0.2916666666666667
+    },
+    {
+      "id": "item-0010",
+      "text": "This guide assumes familiarity with the standard toolchain. Install the dependencies, configure the manifest as described in the reference, then run the migration; if the checksum mismatch appears, apply the documented workaround before proceeding to the deployment stage.",
+      "rank": 10,
+      "latent_mean": 1.1318669641413222,
+      "latent_std": 0.9418438946260332,
+      "z_score": -0.7107044154991483,
+      "percentile": 0.20833333333333334
+    },
+    {
+      "id": "item-0001",
+      "text": "Definition 4.2 (Regular Sheaf). A sheaf F on X is regular if its higher direct images under the canonical morphism vanish in positive degree. Note that regularity is stable under flat base change, and that the coherence hypothesis of Definition 3.7 is essential; the reader will recall the standard descent argument.",
+      "rank": 11,
+      "latent_mean": 0.48098007567314127,
+      "latent_std": 1.0168486495643871,
+      "z_score": -1.329815770184923,
+      "percentile": 0.125
+    },
+    {
+      "id": "item-0007",
+      "text": "She writes movingly of the harvest, the dust of the road, the way her mother folded cloth, and the year the river came up over the low field and took the fences.",
+      "rank": 12,
+      "latent_mean": 0.0,
+      "latent_std": 1.3448491056083862,
+      "z_score": -1.7873149632131786,
+      "percentile": 0.041666666666666664
+    }
+  ],
+  "meta": {
+    "topk_error": 7.671753607303955,
+    "tolerated_error": 0.1,
+    "comparisons_attempted": 24,
+    "comparisons_used": 24,
+    "comparisons_refused": 0,
+    "comparisons_cached": 0,
+    "comparison_budget": 24,
+    "latency_ms": 5131,
+    "model_used": "openai/gpt-5.4-mini",
+    "rater_id_used": "openai/gpt-5.4-mini",
+    "provider_input_tokens": 11364,
+    "provider_output_tokens": 666,
+    "provider_cost_nanodollars": 11520000,
+    "provider_cost_is_estimate": false,
+    "entities_pruned": 0,
+    "pairs_counterbalanced": 12,
+    "position_flips": 5,
+    "evidence_judgements": 0,
+    "logprob_mode_judgements": 0,
+    "evidence_visible_mass_mean": null,
+    "evidence_order_residual_mean_abs": 1.573364552602851,
+    "judgement_frustration_mean": 0.007518044863117389,
+    "stop_reason": "budget_exhausted"
+  }
+}

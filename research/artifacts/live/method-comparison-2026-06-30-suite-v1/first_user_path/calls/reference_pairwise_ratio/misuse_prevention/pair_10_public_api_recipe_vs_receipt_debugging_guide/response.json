@@ -1,0 +1,46 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "I need to evaluate which item better prevents users from applying cardinal ranking where it is the wrong tool.\n\n**Item A (public_api_recipe):** A minimal library example constructing a MultiRerankRequest, installing a model policy, running one attribute, and emitting a report. This is a code example showing *how* to use the tool. It demonstrates the mechanics but doesn't inherently warn against misuse or guide users on when cardinal ranking is inappropriate. A user following this recipe might apply it without understanding when it's the wrong tool.\n\n**Item B (receipt_debugging_guide):** A troubleshooting guide covering cache misses, model refusals, cost estimates, non-convergence, and **inconsistent pairwise judgments**. The mention of \"non-convergence\" and \"inconsistent pairwise judgments\" is particularly relevant \u2014 these are symptoms that arise when cardinal ranking is being misapplied or when the underlying assumptions don't hold. A debugging guide that addresses these failure modes implicitly teaches users to recognize when the tool is breaking down, which helps prevent misuse. When users encounter non-convergence or inconsistent pairwise judgments, the guide would direct them to understand *why* \u2014 which could include the tool being the wrong choice.\n\nItem B more directly addresses failure modes that signal misuse, while Item A just shows how to use the tool mechanically. However, neither item is explicitly designed to prevent cardinal ranking misuse \u2014 B does it indirectly through troubleshooting failure symptoms.\n\nB has a moderate edge over A, but it's not a dramatic difference since neither is primarily focused on this attribute.\n\n{\"higher_id\":\"receipt_debugging_guide\",\"ratio\":2.0,\"confidence\":0.4}",
+        "reasoning": null,
+        "refusal": null,
+        "role": "assistant"
+      },
+      "native_finish_reason": "end_turn"
+    }
+  ],
+  "created": 1782861878,
+  "id": "gen-1782861878-q9xyCwWJoNK7CXvBVP6O",
+  "model": "anthropic/claude-4.6-sonnet-20260217",
+  "object": "chat.completion",
+  "provider": "Anthropic",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 377,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.006315,
+    "cost_details": {
+      "upstream_inference_completions_cost": 0.005655,
+      "upstream_inference_cost": 0.006315,
+      "upstream_inference_prompt_cost": 0.00066
+    },
+    "is_byok": false,
+    "prompt_tokens": 220,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 597
+  }
+}

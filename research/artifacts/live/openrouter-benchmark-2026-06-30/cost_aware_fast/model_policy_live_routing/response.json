@@ -1,0 +1,209 @@
+{
+  "entities": [
+    {
+      "id": "frontier_ladder_2026_06",
+      "rank": 1,
+      "feasible": true,
+      "u_mean": 3.028804817687789,
+      "u_std": 1.7545405040016273,
+      "p_flip": 0.433103356146072,
+      "attribute_scores": {
+        "freshness_and_capability": {
+          "latent_mean": 0.7755563511291914,
+          "latent_std": 0.8232843334852337,
+          "z_score": 1.033514202882056,
+          "min_normalized": 1.7755563511291914,
+          "percentile": 0.9166666666666666
+        },
+        "public_benchmark_reliability": {
+          "latent_mean": 1.0821003844458197,
+          "latent_std": 0.7788479907708854,
+          "z_score": 0.5655313022472906,
+          "min_normalized": 2.0821003844458197,
+          "percentile": 0.75
+        },
+        "cost_discipline": {
+          "latent_mean": 0.5103361608858403,
+          "latent_std": 0.7034071577134287,
+          "z_score": 0.5348366225873393,
+          "min_normalized": 1.5103361608858403,
+          "percentile": 0.75
+        }
+      }
+    },
+    {
+      "id": "quality_only_opus_46",
+      "rank": 2,
+      "feasible": true,
+      "u_mean": 2.4269146300816242,
+      "u_std": 1.8181880237896086,
+      "p_flip": 0.5,
+      "attribute_scores": {
+        "public_benchmark_reliability": {
+          "latent_mean": 1.3630434971994743,
+          "latent_std": 0.7868664579037252,
+          "z_score": 1.0608333052594372,
+          "min_normalized": 2.3630434971994743,
+          "percentile": 0.9166666666666666
+        },
+        "cost_discipline": {
+          "latent_mean": 0.2380484229798492,
+          "latent_std": 0.7489079200530812,
+          "z_score": -0.41564227577471935,
+          "min_normalized": 1.2380484229798492,
+          "percentile": 0.4166666666666667
+        },
+        "freshness_and_capability": {
+          "latent_mean": 0.36544353674797725,
+          "latent_std": 0.8430042350866719,
+          "z_score": -0.34133220354530747,
+          "min_normalized": 1.3654435367479771,
+          "percentile": 0.4166666666666667
+        }
+      }
+    },
+    {
+      "id": "glm_5_2",
+      "rank": 3,
+      "feasible": true,
+      "u_mean": 1.8192322980583062,
+      "u_std": 1.8026403967152986,
+      "p_flip": 0.5666421642698587,
+      "attribute_scores": {
+        "cost_discipline": {
+          "latent_mean": 0.47619004873046283,
+          "latent_std": 0.7489079200530812,
+          "z_score": 0.41564227577471924,
+          "min_normalized": 1.476190048730463,
+          "percentile": 0.5833333333333334
+        },
+        "public_benchmark_reliability": {
+          "latent_mean": 0.3169367778440342,
+          "latent_std": 0.7675584612693431,
+          "z_score": -0.7834502167058999,
+          "min_normalized": 1.3169367778440342,
+          "percentile": 0.25
+        },
+        "freshness_and_capability": {
+          "latent_mean": 0.569080408445766,
+          "latent_std": 0.8373099043505586,
+          "z_score": 0.34133220354530747,
+          "min_normalized": 1.5690804084457661,
+          "percentile": 0.5833333333333334
+        }
+      }
+    },
+    {
+      "id": "qwen_3_7_max",
+      "rank": 4,
+      "feasible": true,
+      "u_mean": 1.8066508485645931,
+      "u_std": 1.7782430751261058,
+      "p_flip": 0.5684661664058683,
+      "attribute_scores": {
+        "cost_discipline": {
+          "latent_mean": 0.0,
+          "latent_std": 0.7244400594176968,
+          "z_score": -1.2466014830116974,
+          "min_normalized": 1.0,
+          "percentile": 0.08333333333333333
+        },
+        "freshness_and_capability": {
+          "latent_mean": 0.7154008335699327,
+          "latent_std": 0.8209102169174068,
+          "z_score": 0.8318511622674601,
+          "min_normalized": 1.7154008335699327,
+          "percentile": 0.75
+        },
+        "public_benchmark_reliability": {
+          "latent_mean": 0.7802352457759667,
+          "latent_std": 0.7868664579037252,
+          "z_score": 0.03334382002978034,
+          "min_normalized": 1.7802352457759667,
+          "percentile": 0.5833333333333334
+        }
+      }
+    },
+    {
+      "id": "kimi_k2_thinking",
+      "rank": 5,
+      "feasible": true,
+      "u_mean": 1.291394661566809,
+      "u_std": 1.732480983808194,
+      "p_flip": 0.6254608483822386,
+      "attribute_scores": {
+        "cost_discipline": {
+          "latent_mean": 0.018830221239029915,
+          "latent_std": 0.6927657330278162,
+          "z_score": -1.1808705467718648,
+          "min_normalized": 1.0188302212390299,
+          "percentile": 0.25
+        },
+        "freshness_and_capability": {
+          "latent_mean": 0.31300344234151345,
+          "latent_std": 0.8430042350866719,
+          "z_score": -0.5171303566857302,
+          "min_normalized": 1.3130034423415133,
+          "percentile": 0.25
+        },
+        "public_benchmark_reliability": {
+          "latent_mean": 0.7424089638982639,
+          "latent_std": 0.7349976133234978,
+          "z_score": -0.03334382002978015,
+          "min_normalized": 1.742408963898264,
+          "percentile": 0.4166666666666667
+        }
+      }
+    },
+    {
+      "id": "cost_aware_deepseek_v4_flash",
+      "rank": 6,
+      "feasible": true,
+      "u_mean": 0.9165787746195461,
+      "u_std": 1.6418671545310346,
+      "p_flip": 0.6687680875132371,
+      "attribute_scores": {
+        "cost_discipline": {
+          "latent_mean": 0.5903507915910958,
+          "latent_std": 0.6859241310050109,
+          "z_score": 0.814144896365851,
+          "min_normalized": 1.5903507915910957,
+          "percentile": 0.9166666666666666
+        },
+        "freshness_and_capability": {
+          "latent_mean": 0.0,
+          "latent_std": 0.7538030851401343,
+          "z_score": -1.5664310437464763,
+          "min_normalized": 1.0,
+          "percentile": 0.08333333333333333
+        },
+        "public_benchmark_reliability": {
+          "latent_mean": 0.0,
+          "latent_std": 0.703281003664164,
+          "z_score": -1.34220896097885,
+          "min_normalized": 1.0,
+          "percentile": 0.08333333333333333
+        }
+      }
+    }
+  ],
+  "meta": {
+    "global_topk_error": 2.8783549449423718,
+    "tolerated_error": 0.08,
+    "k": 2,
+    "band_size": 5,
+    "comparisons_attempted": 45,
+    "comparisons_used": 45,
+    "comparisons_refused": 0,
+    "comparisons_cached": 0,
+    "comparison_budget": 72,
+    "latency_ms": 84518,
+    "model_used": "deepseek/deepseek-v4-flash",
+    "rater_id_used": "live-openrouter-model_policy_live_routing",
+    "provider_input_tokens": 24085,
+    "provider_output_tokens": 14294,
+    "provider_cost_nanodollars": 6775553,
+    "provider_cost_is_estimate": false,
+    "stop_reason": "no_new_pairs"
+  }
+}

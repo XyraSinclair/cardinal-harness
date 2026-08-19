@@ -1,0 +1,46 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "I need to evaluate which item better reduces time-to-first-success for a new user.\n\n**Item A (when_not_to_use_cardinal):** This is a section explaining when NOT to use the system. For a new user, this could help them quickly determine if they're in the right place, potentially saving time if they're misapplying the tool. However, it doesn't directly help them get a successful run - it might even discourage them or add confusion before they've tried anything.\n\n**Item B (receipt_debugging_guide):** This is a troubleshooting guide for common failure modes: cache misses, model refusals, cost estimates, non-convergence, inconsistent pairwise judgments. For a new user attempting their first run, they're very likely to encounter at least one of these issues. Having a clear guide to resolve these problems directly reduces the time before they get a meaningful successful run.\n\n**Comparison:**\n- Item B directly addresses the obstacles that prevent first success - when a new user hits an error, they can quickly diagnose and fix it\n- Item A is more of a scoping/qualification document - useful but doesn't help someone who has decided to use the system actually succeed\n- A new user who hits a cache miss or non-convergence issue without a debugging guide could spend hours confused; with Item B they might resolve it in minutes\n- Item A might slightly help by filtering out wrong use cases, but most new users exploring a tool will try it regardless\n\nItem B has substantially more of this attribute. A new user is almost certain to hit at least one of those failure modes, and the debugging guide directly accelerates their path to success. The ratio is meaningful but not extreme.\n\n{\"higher_id\":\"receipt_debugging_guide\",\"ratio\":4.0,\"confidence\":0.78}",
+        "reasoning": null,
+        "refusal": null,
+        "role": "assistant"
+      },
+      "native_finish_reason": "end_turn"
+    }
+  ],
+  "created": 1782861811,
+  "id": "gen-1782861811-CxShl0OGel0jm8tk8rr2",
+  "model": "anthropic/claude-4.6-sonnet-20260217",
+  "object": "chat.completion",
+  "provider": "Anthropic",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 395,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.006588,
+    "cost_details": {
+      "upstream_inference_completions_cost": 0.005925,
+      "upstream_inference_cost": 0.006588,
+      "upstream_inference_prompt_cost": 0.000663
+    },
+    "is_byok": false,
+    "prompt_tokens": 221,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 616
+  }
+}

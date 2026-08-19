@@ -1,0 +1,18 @@
+{
+  "max_tokens": 2200,
+  "messages": [
+    {
+      "content": "You are a rigorous structured-judgment engine. Judge only the stated attribute. Use the item text, not outside popularity. Return strict JSON only. Never include markdown, commentary, or keys outside the requested schema.",
+      "role": "system"
+    },
+    {
+      "content": "Case: benchmark_design_rigor\nDescription: Prioritize benchmark-design requirements for making a live method-comparison result publishable.\n\nAttributes:\n- claim_validity (weight 0.5): how much this increases the validity of any public benchmark claim\n- reproducibility (weight 0.3): how much this lets another researcher reproduce or falsify the result\n- cost_feasibility (weight 0.2): how feasible this is to execute without excessive provider spend or manual effort\n\nItems:\n- equal_dollar_budget: Run every method under a fixed provider-dollar cap and report how much agreement each method buys before the cap is exhausted.\n- repeated_model_swaps: Repeat the same suite across multiple candidate and reference models so method effects are separated from one model's quirks.\n- human_adjudicated_slice: Collect a small human-adjudicated slice that can calibrate whether the live LLM reference itself is plausible.\n- failure_mode_taxonomy: Tag each disagreement by likely source: prompt ambiguity, reference brittleness, ratio-scale misuse, cost constraint, or genuine method weakness.\n- pre_registered_cases: Freeze the case list, attributes, weights, models, budget policy, and scoring script before running a public benchmark.\n\nTask: Score every item independently on every attribute. Output JSON exactly like this schema: {\"scores\": [{\"id\": \"item id\", \"attributes\": {\"attribute_id\": {\"score\": \"number from 0 to 100\", \"confidence\": \"number from 0 to 1\"}}}]}",
+      "role": "user"
+    }
+  ],
+  "model": "openai/gpt-5.4-mini",
+  "response_format": {
+    "type": "json_object"
+  },
+  "temperature": 0.1
+}

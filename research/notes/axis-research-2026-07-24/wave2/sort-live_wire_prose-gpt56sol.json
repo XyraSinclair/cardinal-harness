@@ -1,0 +1,137 @@
+{
+  "items": [
+    {
+      "id": "item-0000",
+      "text": "Week nine on the parser: the Deutsche Bahn feed broke it again — their delay field flips sign after midnight — so the third rewrite treats timestamps as opaque strings until pairing. Two customers run the new path; Hartmann's export still fails and I don't know why yet.",
+      "rank": 1,
+      "latent_mean": 2.91343195677052,
+      "latent_std": 3.7454128820477504,
+      "z_score": 1.9595752877424422,
+      "percentile": 0.9583333333333334
+    },
+    {
+      "id": "item-0006",
+      "text": "The enclosure still resonates at 210 Hz; the damping foam bought us 4 dB, not the 10 the vendor's datasheet implied. Fifth PCB rev goes out tomorrow — moving the buck converter finally kills the ADC noise Wenjie flagged in March.",
+      "rank": 2,
+      "latent_mean": 2.692094635042383,
+      "latent_std": 3.6702877674548624,
+      "z_score": 1.7137261068700091,
+      "percentile": 0.875
+    },
+    {
+      "id": "item-0003",
+      "text": "Draft four of the grant: cut the whole second aim after Priya showed the pilot data can't support it, rebuilt the power analysis around the smaller effect from the Tübingen replication. Submitting Thursday whether or not the biosketch formatting fight resolves itself.",
+      "rank": 3,
+      "latent_mean": 2.4625596757357564,
+      "latent_std": 2.9695985685566355,
+      "z_score": 1.4587714463250778,
+      "percentile": 0.7916666666666666
+    },
+    {
+      "id": "item-0010",
+      "text": "The community garden's irrigation timer failed twice in June, so we're watering by hand while we compare replacement controllers. Harvest totals are roughly on pace with last year.",
+      "rank": 4,
+      "latent_mean": 1.8023378998653972,
+      "latent_std": 3.2253188623849223,
+      "z_score": 0.7254338350963743,
+      "percentile": 0.7083333333333334
+    },
+    {
+      "id": "item-0007",
+      "text": "Rehearsals are going well; the second act still drags and we keep adjusting the blocking. Opening night is in three weeks and the cast is mostly off book.",
+      "rank": 5,
+      "latent_mean": 1.7106100862663227,
+      "latent_std": 3.7454128820477504,
+      "z_score": 0.6235476838568161,
+      "percentile": 0.625
+    },
+    {
+      "id": "item-0009",
+      "text": "Exciting progress this sprint — the onboarding flow is rebuilt and activation is trending up. A few integration bugs remain, but the team is confident about the release.",
+      "rank": 6,
+      "latent_mean": 1.1581851275920716,
+      "latent_std": 3.5881256130747943,
+      "z_score": 0.009944778918948016,
+      "percentile": 0.5416666666666666
+    },
+    {
+      "id": "item-0002",
+      "text": "We launched the beta to about forty users last month. Feedback has been mostly positive, and we're working through a list of bug reports while planning the next feature round.",
+      "rank": 7,
+      "latent_mean": 1.1402786149627653,
+      "latent_std": 2.5202199260148,
+      "z_score": -0.009944778918948263,
+      "percentile": 0.4583333333333333
+    },
+    {
+      "id": "item-0005",
+      "text": "Up at 5 AM, gym, then deep work before the team even logs on. Momentum compounds. We closed two enterprise deals this week because winners execute while everyone else is planning. Stay hungry.",
+      "rank": 8,
+      "latent_mean": 0.9834290910134449,
+      "latent_std": 3.5121257107769184,
+      "z_score": -0.18416450238038692,
+      "percentile": 0.375
+    },
+    {
+      "id": "item-0011",
+      "text": "I've been outlining the second draft of the novel and it's coming along. The middle section needs restructuring, and I hope to have a full pass done by fall.",
+      "rank": 9,
+      "latent_mean": 0.9604257311947897,
+      "latent_std": 2.51072882896031,
+      "z_score": -0.20971535446703393,
+      "percentile": 0.2916666666666667
+    },
+    {
+      "id": "item-0001",
+      "text": "Massive month for the team — we are absolutely crushing it. Pipeline is up 3x, the product is flying, and the energy has never been higher. We shipped nonstop, closed our biggest logo yet, and we're just getting started. LFG.",
+      "rank": 10,
+      "latent_mean": 0.7873287880218283,
+      "latent_std": 1.8471606704912653,
+      "z_score": -0.4019818071300187,
+      "percentile": 0.20833333333333334
+    },
+    {
+      "id": "item-0004",
+      "text": "The library offers extended hours during exam season. Students can reserve study rooms online, and printing services are available on the second floor.",
+      "rank": 11,
+      "latent_mean": 0.024116655463491288,
+      "latent_std": 3.2883158833055894,
+      "z_score": -1.2497153757680157,
+      "percentile": 0.125
+    },
+    {
+      "id": "item-0008",
+      "text": "Our quarterly newsletter includes updates from each department. Please submit items to the communications team by the last Friday of the month.",
+      "rank": 12,
+      "latent_mean": 0.0,
+      "latent_std": 3.7353310495049654,
+      "z_score": -1.2765028147086772,
+      "percentile": 0.041666666666666664
+    }
+  ],
+  "meta": {
+    "topk_error": 10.432144932937797,
+    "tolerated_error": 0.1,
+    "comparisons_attempted": 24,
+    "comparisons_used": 24,
+    "comparisons_refused": 0,
+    "comparisons_cached": 0,
+    "comparison_budget": 24,
+    "latency_ms": 28533,
+    "model_used": "openai/gpt-5.6-sol",
+    "rater_id_used": "openai/gpt-5.6-sol",
+    "provider_input_tokens": 10796,
+    "provider_output_tokens": 2135,
+    "provider_cost_nanodollars": 118030000,
+    "provider_cost_is_estimate": false,
+    "entities_pruned": 0,
+    "pairs_counterbalanced": 12,
+    "position_flips": 0,
+    "evidence_judgements": 0,
+    "logprob_mode_judgements": 0,
+    "evidence_visible_mass_mean": null,
+    "evidence_order_residual_mean_abs": 0.3646419294638433,
+    "judgement_frustration_mean": 0.00229967916187593,
+    "stop_reason": "budget_exhausted"
+  }
+}

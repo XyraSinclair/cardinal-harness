@@ -1,0 +1,18 @@
+{
+  "max_tokens": 800,
+  "messages": [
+    {
+      "content": "You are a rigorous structured-judgment engine. Judge only the stated attribute. Use the item text, not outside popularity. Return strict JSON only. Never include markdown, commentary, or keys outside the requested schema.",
+      "role": "system"
+    },
+    {
+      "content": "Case: public_release_risks\nAttribute likelihood: how likely this risk is to occur during public sharing without additional work\n\nA (overclaiming_evidence): The README or report implies method superiority beyond the checked receipt, making a careful reader distrust the whole project.\n\nB (opaque_failure_cases): Known cases where cardinal performs badly are buried instead of explained as useful constraints on the method.\n\nTask: Which item has more of this attribute, and how many times more? Use ratio=1 only for near ties; cap large gaps at 26. Output JSON exactly: {\"higher_id\":\"item id\",\"ratio\":1.0,\"confidence\":0.0}.",
+      "role": "user"
+    }
+  ],
+  "model": "anthropic/claude-sonnet-4.6",
+  "response_format": {
+    "type": "json_object"
+  },
+  "temperature": 0.1
+}

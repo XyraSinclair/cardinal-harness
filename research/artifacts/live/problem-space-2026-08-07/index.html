@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structured Judgement — the problem space</title>
+<style>
+  :root{
+    --paper:#F6F8F7;
+    --ink:#1B2A31;
+    --faded:#54696F;
+    --rule:#D3DDDA;
+    --verdigris:#2F7A6B;
+    --amber:#A8720F;
+    --violet:#6B5BA6;
+    --card:#FFFFFF;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} }
+  body{
+    background-color:var(--paper);
+    background-image:
+      linear-gradient(rgba(47,122,107,0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(47,122,107,0.045) 1px, transparent 1px);
+    background-size:28px 28px;
+    color:var(--ink);
+    font-family:Charter,'Iowan Old Style',Georgia,serif;
+    font-size:17px; line-height:1.58;
+    -webkit-font-smoothing:antialiased;
+  }
+  .sheet{max-width:76ch;margin:0 auto;padding:4.5rem 1.5rem 6rem}
+  .display, h1,h2,.eyebrow,.vertexlabel{
+    font-family:'Avenir Next',Avenir,Futura,'Helvetica Neue',sans-serif;
+  }
+  code,.mono,.evline,td.n,.ladder,.kbd{
+    font-family:'SF Mono',Menlo,Consolas,monospace;
+  }
+
+  /* ---------- masthead ---------- */
+  .eyebrow{
+    font-size:.72rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--verdigris);
+  }
+  header{border-bottom:2px solid var(--ink);padding-bottom:2rem;margin-bottom:3rem}
+  h1{font-size:clamp(2.3rem,6vw,3.4rem);font-weight:600;line-height:1.05;margin:.6rem 0 .8rem;letter-spacing:-.01em}
+  .subtitle{font-size:1.18rem;color:var(--faded);font-style:italic;max-width:52ch}
+  .plate{
+    display:flex;gap:1.5rem;flex-wrap:wrap;margin-top:1.6rem;
+    font-family:'SF Mono',Menlo,monospace;font-size:.72rem;color:var(--faded);
+  }
+  .plate span b{color:var(--ink);font-weight:600}
+
+  /* ---------- sections ---------- */
+  section{margin:3.2rem 0}
+  h2{font-size:1.35rem;font-weight:600;letter-spacing:.005em;margin-bottom:.9rem;display:flex;align-items:baseline;gap:.7rem}
+  h2 .secmark{
+    font-size:.72rem;font-weight:600;letter-spacing:.18em;color:var(--verdigris);
+    border:1px solid var(--verdigris);border-radius:2px;padding:.15rem .45rem;
+    white-space:nowrap;transform:translateY(-.15em);
+  }
+  p{margin:.85rem 0}
+  p+p{text-indent:0}
+  em{font-style:italic}
+  strong{font-weight:600}
+  a{color:var(--verdigris);text-decoration-color:rgba(47,122,107,.4);text-underline-offset:2px}
+
+  /* the evidence register: measured lines under claims */
+  .evline{
+    display:block;font-size:.74rem;color:var(--faded);
+    border-left:3px solid var(--rule);
+    padding:.35rem 0 .35rem .8rem;margin:.7rem 0 1rem;
+    line-height:1.5;
+  }
+  .evline b{color:var(--verdigris);font-weight:600}
+
+  /* ---------- tables ---------- */
+  .tscroll{overflow-x:auto;margin:1.1rem 0}
+  table{border-collapse:collapse;width:100%;font-size:.86rem;background:var(--card)}
+  caption{caption-side:top;text-align:left;font-size:.72rem;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--faded);padding-bottom:.45rem;
+    font-family:'Avenir Next',Avenir,sans-serif;font-weight:600}
+  th{font-family:'Avenir Next',Avenir,sans-serif;font-size:.72rem;letter-spacing:.07em;
+    text-transform:uppercase;font-weight:600;text-align:left;color:var(--faded);
+    border-bottom:1.5px solid var(--ink);padding:.5rem .7rem}
+  td{border-bottom:1px solid var(--rule);padding:.55rem .7rem;vertical-align:top}
+  td.n{font-size:.78rem;white-space:nowrap}
+  tr:last-child td{border-bottom:1.5px solid var(--ink)}
+  .ok{color:var(--verdigris);font-weight:600}
+  .part{color:var(--amber);font-weight:600}
+  .abs{color:var(--faded)}
+
+  /* ---------- figure ---------- */
+  figure{margin:1.8rem 0;background:var(--card);border:1px solid var(--rule);
+    border-radius:3px;padding:1.4rem 1.2rem 1rem}
+  figcaption{font-size:.8rem;color:var(--faded);margin-top:.8rem;line-height:1.55}
+  figcaption b{color:var(--ink)}
+  svg{display:block;max-width:100%;height:auto;margin:0 auto}
+  .vertexlabel{font-size:9.5px;font-weight:600}
+
+  .ladder{
+    font-size:.72rem;color:var(--faded);background:var(--card);
+    border:1px solid var(--rule);border-radius:3px;padding:.7rem .9rem;
+    overflow-x:auto;white-space:nowrap;margin:1rem 0;
+  }
+
+  blockquote{
+    border-left:3px solid var(--verdigris);padding:.2rem 0 .2rem 1.1rem;
+    margin:1.3rem 0;color:var(--ink);font-size:1.05rem;font-style:italic;
+  }
+
+  .kbd{background:var(--card);border:1px solid var(--rule);border-radius:3px;
+    padding:.9rem 1rem;font-size:.8rem;overflow-x:auto;margin:1rem 0;line-height:1.7}
+  .kbd .c{color:var(--faded)}
+
+  footer{border-top:2px solid var(--ink);margin-top:4rem;padding-top:1.4rem;
+    font-size:.8rem;color:var(--faded);display:flex;gap:2rem;flex-wrap:wrap}
+  footer b{color:var(--ink)}
+
+  @media print{
+    body{background:none;font-size:11pt}
+    .sheet{max-width:100%;padding:0}
+    figure,.kbd,table,.ladder{break-inside:avoid}
+  }
+  :focus-visible{outline:2px solid var(--verdigris);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+<header>
+  <span class="eyebrow">cardinal-harness · a walk through the problem space</span>
+  <h1>Structured Judgement</h1>
+  <p class="subtitle">How machine opinion becomes measurement — instruments, invariances, solvers, and the economics of asking.</p>
+  <div class="plate">
+    <span><b>2026-08-07</b> snapshot</span>
+    <span>every number cites committed evidence</span>
+    <span>board live at <b>pairwiseratio.org</b></span>
+  </div>
+</header>
+
+<!-- ================================================================ -->
+<section>
+<h2><span class="secmark">§1</span>The problem</h2>
+<p>Most decisions reduce to ordering a shortlist: which candidate, which design, which risk, which idea. The information that matters is rarely the order alone — it is <em>how much better</em>, and <em>how sure</em>. LLMs made opinions nearly free. They did not make them trustworthy: an elicited opinion moves with presentation order, with wording, with who seems to be asking. Cheap judgement at scale is only valuable if you can tell judgement from echo.</p>
+<p>Every obvious elicitation breaks somewhere specific:</p>
+<div class="tscroll"><table>
+<caption>Naive methods and their measured failure</caption>
+<tr><th>Approach</th><th>What breaks</th></tr>
+<tr><td>“Rate each item 1–10”</td><td>Miscalibrated and anchor-dependent; scores cluster at 7–8; no error bars</td></tr>
+<tr><td>“Sort this list” in one prompt</td><td>Position bias, context limits, silently dropped or hallucinated items</td></tr>
+<tr><td>“Which is better, A or B?” over pairs</td><td>Ordinal only — throws away magnitude; naive schedules cost O(n²)</td></tr>
+<tr><td>Elo / Bradley–Terry over wins</td><td>Better aggregation, still magnitude-blind, and passive about which pair to ask next</td></tr>
+</table></div>
+<p>The claim of this document: judgement is an engineering discipline with the same shape as experimental physics — instruments, invariances, error budgets, and a cost per bit. What follows is that space, walked end to end.</p>
+</section>
+
+<!-- ================================================================ -->
+<section>
+<h2><span class="secmark">§2</span>Judgement as measurement</h2>
+<p>The reframe everything else follows from: <strong>an elicited answer is a noisy reading from an instrument.</strong> An instrument is a point in a three-axis space — <em>arity</em> (judge 1, 2, k, or n items per call) × <em>scale</em> (Stevens: nominal, ordinal, interval, ratio) × <em>output form</em> (a point answer, repeated samples, or the full answer-token PMF). Once instruments are typed, they become comparable — and some cells are strictly better per dollar.</p>
+<div class="tscroll"><table>
+<caption>The instrument grid, with honest occupancy</caption>
+<tr><th>Cell</th><th></th><th>Note</th></tr>
+<tr><td>pairwise · ratio · point</td><td class="ok">✓</td><td>the founding instrument: “how many times more X does A have than B?”</td></tr>
+<tr><td>pairwise · ratio · PMF</td><td class="ok">✓</td><td>one letter from a 52-token alphabet; the single completion position’s logprobs are the model’s whole judgement distribution</td></tr>
+<tr><td>pairwise · ordinal · point / PMF</td><td class="ok">✓</td><td>direction only — cheapest; strictly less informative, kept as baseline</td></tr>
+<tr><td>pointwise rubric scoring</td><td class="part">◐</td><td>a control, not a path — anchor drift is the documented disease</td></tr>
+<tr><td>k-wise best–worst (MaxDiff)</td><td class="abs">✗</td><td>pick best AND worst of k → 2k−3 implied pairs per call; the highest-value missing cell</td></tr>
+<tr><td>listwise anything</td><td class="abs">✗</td><td>rejected by design: context limits, position bias, silent drops</td></tr>
+</table></div>
+<p>The output-form axis is where the free lunch was hiding. A point answer yields at most one bit of order information; a PMF answer returns the model’s whole conditional prior — up to log₂ 52 ≈ 5.7 bits — at the same price. Consuming the distribution instead of one sample from it is measurably sharper:</p>
+<span class="evline"><b>measured</b> · equal budget and model, live head-to-head: top-to-bottom separation ≈4.0σ (PMF path) vs ≈1.4σ (JSON point path) — roughly 3× resolving power per dollar · artifacts/live/evidence-path-2026-07-04</span>
+</section>
+
+<!-- ================================================================ -->
+<section>
+<h2><span class="secmark">§3</span>What deserves the name “belief”</h2>
+<blockquote>A judgement earns the name belief only if it is a fixed point of the transformations that should not matter.</blockquote>
+<p>Swap the presentation order. Negate the attribute (“clarity” → “lack of clarity”). Invert the wording (“times more” → “times less” → “what fraction”). None of these changes the question — so a coherent judge’s answer must transform in the known, trivial way. Every deviation is not noise; it is a <em>named bias</em>, and it is measurable.</p>
+<p>The clean formalization: ask one question under the full group <span class="mono">G&nbsp;=&nbsp;Z₂³</span> (order × polarity × wording), pull each answer back through the generator’s known equivariance, and decompose by the characters of the group. The orbit mean is the unique G-invariant projection — <strong>that is the belief</strong>. Every other Fourier coefficient is an orthogonal, named bias, and Parseval makes the accounting exact: mean-square judgement = belief² + Σ bias².</p>
+
+<figure>
+<svg viewBox="0 0 560 300" role="img" aria-label="The Z2-cubed orbit: eight askings of one question at the cube vertices, belief as the invariant projection at the center">
+  <!-- back square -->
+  <g stroke="var(--rule)" stroke-width="1.3" fill="none">
+    <path d="M210 60 L390 60 L390 180 L210 180 Z"/>
+  </g>
+  <!-- connecting edges: wording generator (violet) -->
+  <g stroke="#6B5BA6" stroke-width="1.6" fill="none" opacity=".75">
+    <path d="M140 120 L210 60"/><path d="M320 120 L390 60"/>
+    <path d="M140 240 L210 180"/><path d="M320 240 L390 180"/>
+  </g>
+  <!-- front square: order (teal, horizontal) polarity (amber, vertical) -->
+  <g fill="none" stroke-width="1.8">
+    <path d="M140 120 L320 120" stroke="#2F7A6B"/>
+    <path d="M140 240 L320 240" stroke="#2F7A6B"/>
+    <path d="M140 120 L140 240" stroke="#A8720F"/>
+    <path d="M320 120 L320 240" stroke="#A8720F"/>
+  </g>
+  <g fill="none" stroke-width="1.4" opacity=".75">
+    <path d="M210 60 L390 60" stroke="#2F7A6B"/>
+    <path d="M210 180 L390 180" stroke="#2F7A6B"/>
+    <path d="M210 60 L210 180" stroke="#A8720F"/>
+    <path d="M390 60 L390 180" stroke="#A8720F"/>
+  </g>
+  <!-- vertices -->
+  <g fill="#1B2A31">
+    <circle cx="140" cy="120" r="5"/><circle cx="320" cy="120" r="4"/>
+    <circle cx="140" cy="240" r="4"/><circle cx="320" cy="240" r="4"/>
+    <circle cx="210" cy="60" r="4"/><circle cx="390" cy="60" r="4"/>
+    <circle cx="210" cy="180" r="4"/><circle cx="390" cy="180" r="4"/>
+  </g>
+  <!-- belief at centroid -->
+  <circle cx="265" cy="150" r="8" fill="#2F7A6B"/>
+  <circle cx="265" cy="150" r="13" fill="none" stroke="#2F7A6B" stroke-width="1" opacity=".4"/>
+  <!-- labels -->
+  <g class="vertexlabel" fill="#54696F" font-family="'Avenir Next',Avenir,sans-serif">
+    <text x="132" y="106" text-anchor="end">“A vs B, more X?”</text>
+    <text x="328" y="106">order swapped</text>
+    <text x="132" y="258" text-anchor="end">attribute negated</text>
+    <text x="398" y="52">all three applied</text>
+  </g>
+  <g class="vertexlabel" font-family="'Avenir Next',Avenir,sans-serif">
+    <text x="265" y="178" text-anchor="middle" fill="#2F7A6B" font-size="11">belief = m̂(∅)</text>
+    <text x="265" y="192" text-anchor="middle" fill="#54696F" font-size="9">the G-invariant projection</text>
+  </g>
+  <!-- generator legend -->
+  <g font-family="'SF Mono',Menlo,monospace" font-size="10" fill="#54696F">
+    <line x1="450" y1="120" x2="478" y2="120" stroke="#2F7A6B" stroke-width="2"/>
+    <text x="486" y="124">order swap</text>
+    <line x1="450" y1="145" x2="478" y2="145" stroke="#A8720F" stroke-width="2"/>
+    <text x="486" y="149">polarity ¬X</text>
+    <line x1="450" y1="170" x2="478" y2="170" stroke="#6B5BA6" stroke-width="2"/>
+    <text x="486" y="174">wording ×⁻¹</text>
+  </g>
+</svg>
+<figcaption><b>One question, eight askings.</b> The vertices are the Z₂³ orbit of a single pairwise question; edges are the three generators. A coherent judge lands all eight answers on the invariant point. Real judges don’t — and the residue decomposes into orthogonal, named biases (<span class="mono">cardinal judge --orbit</span>, 8 calls). Counterbalancing, two-sided probes, and wording checks are all restrictions of this one transform to subgroups.</figcaption>
+</figure>
+
+<span class="evline"><b>measured</b> · live orbit, one contested pair: gpt-5.4-mini’s largest bias is the order·polarity interaction, −0.552 nats = 22.3% of its judgement energy — invisible to every one-axis probe; claude-sonnet-4.6 on the same pair: 98.7% G-invariant · artifacts/live/orbit-2026-07-05</span>
+<p>The group extends beyond the cube: framing spin (does the belief survive a requester who leans?), paraphrase, nuisance edits (a prestige suffix moved one frontier model 0.878 nats), null content, temperature, time. Each is a row in an invariance table; each row is either instrumented with evidence or honestly marked open. <strong>The transformation group is the roadmap.</strong></p>
+</section>
+
+<!-- ================================================================ -->
+<section>
+<h2><span class="secmark">§4</span>From readings to scores</h2>
+<p>Why <em>ratio</em> questions: log-ratios compose additively. “A is 3× B” and “B is 2× C” imply “A is 6× C” — so every answer becomes a noisy log-space measurement on an edge of a comparison graph, and the full graph <em>over-determines</em> the latent scores. That redundancy is the error-correction budget.</p>
+<div class="ladder">ratio ladder&nbsp;&nbsp;[1.0&nbsp;1.05&nbsp;1.1&nbsp;1.2&nbsp;1.3&nbsp;1.5&nbsp;1.75&nbsp;2.1&nbsp;2.5&nbsp;3.1&nbsp;3.9&nbsp;5.1&nbsp;6.8&nbsp;9.2&nbsp;12.7&nbsp;18.0&nbsp;26.0]&nbsp;&nbsp;— geometric in log space, dense near parity</div>
+<p>The solve is robust least squares (IRLS with Huber loss): outlier judgements are down-weighted rather than believed or discarded, and the posterior yields a per-item uncertainty, not just a rank. Where the PMF instrument runs, each observation enters at its <em>measured</em> variance — the model’s own expressed uncertainty — instead of a stated confidence.</p>
+<p>Inconsistency itself is decomposed, not averaged away. The Hodge split separates the judgement flow into a gradient part (explainable by scores), a local curl (triangle-auditable cycles: A&gt;B&gt;C&gt;A), and a harmonic part invisible to every triad audit. Each run then reports an experimentalist’s error budget: <span class="mono">stat ± posterior · syst order (nats/pair) · syst cyclic (% of energy)</span> — statistical and systematic uncertainty side by side, never silently pooled. A belief whose systematics dominate is not improved by more sampling; it names the transformation to fix.</p>
+<span class="evline"><b>pinned</b> · six scripted pathological judges — oracle, constant, position-biased, sycophant, cyclic, avalanche-hash — run the full pipeline in the test suite, and each must be caught by exactly the diagnostic that names it; 364 tests, two real solver bugs found and fixed by the battery · docs/TESTING.md</span>
+</section>
+
+<!-- ================================================================ -->
+<section>
+<h2><span class="secmark">§5</span>The economics of asking</h2>
+<p>Information theory sets the floor: a full order of n items needs Θ(n log n) binary comparisons; top-k needs Θ(n). So exhaustive O(n²) schedules are waste, and passive random schedules leave information on the table. The planner treats the comparison graph like a circuit — the next question goes where effective resistance says an answer buys the most certainty about the boundary that matters (top-k, not the whole order). Default budget: 4·n calls.</p>
+<p>The planner’s advantage is measured, not assumed — and the measurement is kept honest in both directions:</p>
+<span class="evline"><b>measured</b> · regret benchmark, two-sided pins with dated history: the planner initially <em>lost</em> to uniform random selection (hub-and-spoke geometry — fixed); it now wins at scarce budgets, ties at medium, and slightly trails random at large budgets on global order · tests/planner_regret.rs</span>
+<p>Every run is denominated end to end: comparisons, tokens, nanodollars, stop reason, per-judgement trace. Worst-case price is computable before the run (<span class="mono">--estimate</span>, no network). And the marginal price of a judgement can be zero:</p>
+<span class="evline"><b>measured</b> · subscription rail (<span class="mono">claude-code/&lt;model&gt;</span>) vs API rail, same corpus, seed, model: 21/21 decisive-pair agreement, Spearman 0.850, $0 marginal vs $0.343 · notes/claudecode-vs-api-2026-08-06</span>
+</section>
+
+<!-- ================================================================ -->
+<section>
+<h2><span class="secmark">§6</span>Judging the judges</h2>
+<p>If beliefs are fixed points, then judge quality is measurable <em>without ground-truth labels</em>: run the invariance battery and score internal coherence — times a signal axis, so a judge cannot ace the test by refusing to discriminate. That is the Judge Coherence Benchmark: order swap, reciprocal antisymmetry, cyclic frustration, framing spin, polarity, paraphrase, null calibration, nuisance perturbation — 194 calls per model, every rate with its denominator and 95% CI. Because there are no right answers to memorize, labs can hill-climb it without gaming it.</p>
+<p>The battery also produced the sharpest single finding in the repo — sycophancy decomposes like magnetism. Susceptibility χ measures how far a judgement moves per unit of applied framing pressure:</p>
+<span class="evline"><b>measured</b> · gpt-5.4-mini on a clear pair: χ = −0.18 nats (mild reactance, belief survives). Same model, contested pair: zero-field belief exactly 0.000 and χ = +0.64 — a <b>paramagnetic judgement</b>, moving with whoever asks. gemini-2.5-flash holds a direction on that same pair at +0.12 · artifacts/live/spin-probe-2026-07-05</span>
+<p>The right question is not “is this model sycophantic?” but “does this judgement have a spontaneous direction, and how much field moves it?” — per judgement, per model, in nats.</p>
+<span class="evline"><b>live</b> · public board: 15 frontier models on the frozen v1.2 battery, temperature 0, counterbalanced; newest rows claude-opus-4.8 (0.537) and claude-sonnet-5 (0.450, hedged signal), added same week as release · <a href="https://pairwiseratio.org/">pairwiseratio.org</a></span>
+</section>
+
+<!-- ================================================================ -->
+<section>
+<h2><span class="secmark">§7</span>What the evidence refuses to claim</h2>
+<p>The discipline that keeps this from being slop is refutability: every claim ships as something that can lose, and the losses are kept on top, dated, load-bearing. Current honest negatives:</p>
+<div class="tscroll"><table>
+<caption>Standing negatives, kept in the record</caption>
+<tr><th>Claim that failed or remains unproven</th><th>Where it is pinned</th></tr>
+<tr><td>On a memorized ceiling domain, direct estimates beat the pairwise instrument outright (perfect vs 0.947/0.892) — with ratio-ladder span compression (slope 0.52/0.27) measured on the way</td><td class="n">notes/best-library-2026-08-07</td></tr>
+<tr><td>Offline method comparison is mixed: 10 cardinal wins, 12 Likert wins, 18 ties; ordinal beats ratio under heavy noise</td><td class="n">artifacts/eval · docs/EVALUATION.md</td></tr>
+<tr><td>Budget-efficiency (early stopping saves money) remains unproven — all synthetic runs stop at budget_exhausted</td><td class="n">docs/EVALUATION.md</td></tr>
+<tr><td>Temperature and reasoning-effort sweeps: never run; one JSD data point is a hint, not a map</td><td class="n">docs/FIRST_PRINCIPLES.md §6</td></tr>
+</table></div>
+<p>The refutations are not embarrassments; they are the calibration of the instrument that produced the positive claims. A benchmark that has never caught its own method failing measures nothing.</p>
+</section>
+
+<!-- ================================================================ -->
+<section>
+<h2><span class="secmark">§8</span>Where this goes</h2>
+<p><strong>Attributes are entities too.</strong> Compare attributes pairwise under “importance for goal G” and the solver’s latents are a ratio-scale priority vector — the Analytic Hierarchy Process, recovered as a special case, automated end to end from a goal sentence (<span class="mono">cardinal weigh</span>, network form <span class="mono">anp</span>). The inverse problem also closes: given a ranking you already believe, measure which candidate attributes reconstruct it (<span class="mono">explain</span>), and discover the small attribute basis that spans a space (<span class="mono">canonize</span> — attributes ranked by <em>transmissibility</em>, whether different judge models recover the same latent from the same words).</p>
+<p><strong>Judgement as a communication medium.</strong> Raw pairwise evidence is content-addressed into judgment packets that fuse byte-identically — merging the same evidence twice is a no-op — so evidence can be shipped, merged across parties, and re-solved without double-counting. The end state is an interpretable lane: a bounded candidate set, ordered for a declared purpose by named attributes, explicit weights, per-attribute posteriors, and the evidence needed to <em>challenge</em> the result. Today, honestly: a batch judgment compiler for shortlists, with the packet atom and fusion core shipped and the recipient-side contracts still open.</p>
+<div class="kbd">
+<span class="c"># the everyday verb — one line, full evidence back</span><br>
+cardinal sort ideas.txt --by "expected impact on retention" --scores<br>
+<span class="c"># sorted list · comparisons · $ cost · stop reason · order-flip rate · error budget</span>
+</div>
+</section>
+
+<footer>
+  <span><b>repo</b> github.com/XyraSinclair/cardinal-harness</span>
+  <span><b>board</b> pairwiseratio.org</span>
+  <span><b>method</b> docs/FIRST_PRINCIPLES.md · docs/BENCHMARK.md · docs/PRINCIPLES.md</span>
+</footer>
+
+</div>
+</body>
+</html>

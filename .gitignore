@@ -10,3 +10,14 @@ debug
 .cardinal_pairwise_cache.sqlite-shm
 .cardinal_pairwise_cache.sqlite-wal
 .cardinal_pairwise_cache.sqlite-journal
+
+# Research record (research/): raw run caches named exactly cache.sqlite stay
+# local (older packs commit cache-export.jsonl instead). Newer packs
+# deliberately COMMIT replayable *-cache.sqlite files — do not widen this.
+research/artifacts/live/**/cache.sqlite
+research/artifacts/live/**/cache.lock
+scorecard.png
+.desloppify/
+**/mutants.out*/
+# Manifund campaign raw + derived data (rebuild: research/scripts/manifund_fetch.py + manifund_prep.py)
+research/data/manifund/

@@ -1,0 +1,46 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "I need to evaluate which judgment method has more noise resistance (resistance to model calibration drift, anchoring, presentation order, and local inconsistency).\n\n**Whole List Sort (A):**\n- Considers all items simultaneously, which means anchoring effects from early items can cascade through the entire ranking\n- Presentation order of items in the list significantly affects results\n- Local inconsistencies can propagate (if item 3 is misjudged relative to item 2, it affects everything below)\n- Calibration drift across a long list is a real problem - the model's sense of \"good\" can shift\n- Single-pass holistic judgment is highly susceptible to framing and context effects\n\n**Ordinal Pairwise (B):**\n- Each comparison is isolated - only asks \"which is better,\" not \"how much better\"\n- Ordinal (not cardinal) judgments reduce calibration drift since no numeric scores needed\n- Presentation order within each pair matters, but aggregating many pairwise wins averages out some of these effects\n- Local inconsistencies are somewhat contained - a bad comparison affects fewer downstream results\n- However, pairwise comparisons can still suffer from anchoring within each pair and intransitivity\n- Aggregating wins can smooth out some noise through redundancy\n- The binary nature (which is better) is more robust than holistic ranking to calibration drift\n\n**Comparison:**\nPairwise methods are generally more noise-resistant because:\n1. Each decision is isolated and binary (ordinal, not cardinal)\n2. Aggregation over many comparisons averages out some biases\n3. No single comparison can cascade errors through the whole ranking\n4. Less susceptible to calibration drift since no absolute scale is needed\n\nThe advantage is meaningful but not extreme - pairwise still suffers from order effects within pairs and intransitivity. I'd estimate B is moderately more resistant, perhaps 3-4x.\n\n```json\n{\"higher_id\":\"B\",\"ratio\":3.5,\"confidence\":0.72}\n```",
+        "reasoning": null,
+        "refusal": null,
+        "role": "assistant"
+      },
+      "native_finish_reason": "end_turn"
+    }
+  ],
+  "created": 1782861202,
+  "id": "gen-1782861201-4cMLkfQd8Ljd31zpcE3U",
+  "model": "anthropic/claude-4.6-sonnet-20260217",
+  "object": "chat.completion",
+  "provider": "Anthropic",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 454,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.007413,
+    "cost_details": {
+      "upstream_inference_completions_cost": 0.00681,
+      "upstream_inference_cost": 0.007413,
+      "upstream_inference_prompt_cost": 0.000603
+    },
+    "is_byok": false,
+    "prompt_tokens": 201,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 655
+  }
+}

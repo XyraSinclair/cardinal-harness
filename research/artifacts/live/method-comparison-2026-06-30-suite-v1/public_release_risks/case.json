@@ -1,0 +1,43 @@
+{
+  "attributes": [
+    {
+      "id": "trust_damage",
+      "prompt": "how much this would damage trust from a careful external reader",
+      "weight": 0.45
+    },
+    {
+      "id": "fix_leverage",
+      "prompt": "how much fixing this would improve the overall release with one focused change",
+      "weight": 0.35
+    },
+    {
+      "id": "likelihood",
+      "prompt": "how likely this risk is to occur during public sharing without additional work",
+      "weight": 0.2
+    }
+  ],
+  "description": "Rank the risks that would most undermine sharing cardinal-harness widely as a serious artifact.",
+  "items": [
+    {
+      "id": "overclaiming_evidence",
+      "text": "The README or report implies method superiority beyond the checked receipt, making a careful reader distrust the whole project."
+    },
+    {
+      "id": "unportable_artifacts",
+      "text": "A fresh clone cannot verify receipts because paths, cache files, generated artifacts, or model metadata are missing."
+    },
+    {
+      "id": "security_advisory_noise",
+      "text": "Dependency audit warnings distract from the artifact's quality and make users hesitate before installing the crate."
+    },
+    {
+      "id": "opaque_failure_cases",
+      "text": "Known cases where cardinal performs badly are buried instead of explained as useful constraints on the method."
+    },
+    {
+      "id": "first_run_complexity",
+      "text": "The first real run requires too many concepts, flags, and files before the user sees a result worth caring about."
+    }
+  ],
+  "name": "public_release_risks"
+}

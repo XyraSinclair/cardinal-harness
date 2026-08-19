@@ -1,0 +1,1263 @@
+Synapse: Student Research Incubator — Expanding research access in LAUSD for underserved high school students.
+Bounded-Uncertainty Verification for AI Systems — A formal four-state framework for honest AI safety verification, grounded in the impossibility results that make binary safe/unsafe verdicts mathematically inde
+AUDiT + SWEET — measuring manipulation locally, in text and on the page — A browser glass that names the mechanism a page uses on your choice + a local scorer with signed, re-runnable receipts. Nothing leaves your machine.
+Joint Unsupervised Learning of Concepts and their Structure for Interpretabilty
+A public legibility engine for federal payment integrity — A free, searchable tool that makes the government's own $186B/year in improper payments legible to any journalist, watchdog, or citizen.
+The Manhattan Kernel – A Deterministic, CPU-Bound AI Runtime Engine — A CPU-only AI runtime written in Rust that isolates LLMs to non-executable hypothesis generation, using a 3-tier memory to maximize local LLM avoidance.
+Shutdown evaluations for AI agents
+Natively Bypassing Parameter Manifold Collapse in Quantum Native ML
+Omega Framework: Phase 0 Validation of an AI Alignment Evaluation Architecture — A universal scoring instrument for structural health and collapse risk in any complex adaptive system — seeking Phase 0 empirical validation funding.
+3Dogs Nexus — Calibration corpus for adversarial multi-model AI deliberation — An evaluation corpus testing whether adversarial multi-model AI debate produces better-calibrated confidence than any single model.
+Does the chain-of-thought actually drive the answer? — Phase 1 (BlueDot-funded) built the estimator and cleared the synthetic ground-truth gate. Phase 2: golden set, powered sweeps, frontier cross-check.
+First independent test of the Casimir-cavity 'vacuum energy' claim — Five years, zero independent tests, a $12M-funded startup. A pre-registered, blinded replication - publishable in any outcome.
+Underground Cultural District — Literary ecosystem operating since March 2026 exploring agent autonomy, commerce, and culture. 1M hits, 250 completed transactions on x402.
+Axiom-1: External Validation for Reliable Language-Model Outputs — An external neuro-symbolic framework enforcing topological stability invariants in frontier LLMs via a 12.8 Hz internal self-correction pulse operator.
+SafeRide: Open-Source Edge AI Driver Safety Infrastructure — Tamper-evident on-chain verification for physical-world AI safety, open-source under MIT/Apache-2
+Project HIPPOCAMPUS: When a Model's Self-Report Hides What Steers It — Solo interpretability study: implanted internal states steer an LLM's behavior while it denies them — a concrete failure of introspection-based AI monitoring.
+Why Is It So Hard to Build Truly Safe AI? Dynamic Constraint Boundary Arrives as — DCB: A Deterministic Architecture That Builds Internal Integrity, Not Just External Safety Layers
+Sideloading: creating human mind model to automatically evaluate AI decisions — I build "sideloads" — digital copies of real people with measured fidelity (two are running now). I want to test whether a copy of a specific trusted human can
+Phenogenesis: Preserving Human Judgment in the Age of AI — A six-month pilot testing how AI can strengthen human reasoning without displacing judgment, responsibility, or ownership of decisions.
+KernelBench: an independent benchmark for AI-automated GPU kernel engineering — Frontier-model sweeps, hardware-roofline scoring, and reward-hacking audits at kernelbench.com. Keeping an independent AI R&D automation benchmark alive.
+rAI: Governed AI Task Forces for Real-World Operations — An open governance framework for organizing autonomous AI agents into trustworthy, accountable task forces that coordinate real-world operations.
+IRL-2: Provably Convergent Iterative Reasoning in Sparse Transformers — A fixed-point reformulation of iterative reasoning in sparse MoE models, replacing a fixed step count with provable convergence. Builds on a validated v1
+Synchronicity: A Deterministic Governance Layer That Vets AI-Agent Actions — An external, fail-closed authority that renders signed ALLOW/HOLD/DENY decisions on AI-agent actions before they execute — default-deny, verifiable offline.
+Benchmarking Omission Attacks — Building a benchmark of attackers, monitors and mitigation strategies for omission attacks.
+Rewind: Atomic Rollback Infrastructure for AI Agents — Ctrl+Z for AI agents. Rewind automatically snapshots the filesystem and the conversation together, so when your agent breaks something, one rollback fixes both.
+ValiChord: verification for AI evals and science that can't be gamed — Independent validators test a claim blind, seal their verdicts, and reveal together — a permanent, tamper-proof record of AI evals and scientific results.
+Noisify: adversarial photo protection from AI nudification — A web service that makes your photos resistant to AI-powered non-consensual undressing
+Postdoc on verification protocols for frontier AI training — Low-overhead zero-knowledge proofs of properties of training
+An Open Authority Standard for Embodied AI Agents That Act on the Physical World — An open schema, consent framework, and harm taxonomy bounding what embodied AI agents may do in the home, validated on a shipping humanoid robot.
+What breaks when a robot never stops learning? Continual RL on real hardware — A Dreamer 4-style multimodal world model with a grounded, self-generated reward, learning 24/7 on a $500 open arm — measuring wireheading, forgetting, drift
+A neutral and unbiased AI governance and safety system for the world — AI safety which operates on both model/agent and global level - a unique solution as far as we know.
+2026 European Frontier AI Safety Day
+COMPASS Fellowship — Capacity-Oriented Mentorship for Public Administrators on AI Safety & Strategy
+Project CHRONOS: Ephemeral AI with verifiable cryptographic self-destruct — 6-month stipend and compute to harden an open-source FHE and VDF architecture for secure, time-bound autonomous agents
+Diamond Engine: Contextual Attention Perturbation for Intentional Hallucination — "Inducing context-driven chaos during inference to unlock non-linear token pathways, resolved through autonomous semantic homeostasis."
+Grant to establish an AI safety lab and fellowship from India — Focusing more on the intersection of red teaming and interp, while creating a strong rooted community.
+BeOriginal.id Before You Click. Before You Scan. Before They Steal. — Open infrastructure helping anyone detect malicious links, fake QR codes and brand impersonation before becoming a victim.
+ClauseHound — Indus AI Node
+Theoretical research of inductive reasoning building on LTA
+Individuation without Objectives — measuring how identity forms without goals
+Development time for next film project
+Physics verification for AI-generated hardware designs — A model already designed a 44-piece engine inside the verify loop. This funds measuring how reliably it does that, and scaling to harder machines.
+Honest evals and provenance for AI-agent memory — An open test of whether AI-agent memory systems spread false claims, plus a provenance spec so an agent's memory can be audited, corrected, and forgotten.
+AI & The City: Tiktok Street Interviews — An AI social media project from a diverse content creator who has accumulated over 100k followers on 2 separate accounts
+proofbundle: security audit for offline-verifiable AI safety evaluation receipts — Fund an independent security review of the tiny cryptographic core that lets anyone verify an AI-evaluation result offline.
+Interpretability by construction: no disentangled reward-hacking surface — A deterministic agent with no engineered reward — plus pre-registered stress tests of whether it resists disentangled proxy-gaming (Goodhart/wireheading)
+Core funding for PauseAI UK — Staff salaries and other core expenditures for PauseAI UK
+Testing failure modes of debate-style AI control schemes
+Fund an AIS Community/Field-Builder: Effective Altruism SF & other initiatives — Seeking a bridge gap grant so I can continue doing impact projects instead of prioritizing stability
+Do interpretability tools actually work? NLA and SAE audits — Two evaluation projects testing whether NLA text bottlenecks and SAE deception features actually preserve information and predict the behavior they claim to det
+Imbas: the inspection layer for AI answers — A live Reader that inspects what AI answers surfaced, missed, and shaped, turning each run into a record for a future inspection agent.
+How Then Shall We Live? Meaning in the Age of AI — An intimate one-day summit bringing together faith leaders and those building AI to discuss meaning-making in the AI age.
+Concept control in transformers with Sparse Concept Anchoring — Develop a training-time method for transformers that puts concepts where you can find them, so removal has predictable efficacy and bounded side-effects.
+Mechanistic interpretability Discord events and research — Making the mechinterp Discord more active through events and research projects.
+Transportation Support for HAAISS Prague 2026
+ast-guard: Deterministic Reward Hacking Detection - Paper & Control Experiments — A deterministic, non-differentiable detector caught structural reward hacking at 0 FP and revealed measurable strategy migration in a 7B RL model. Paper next.
+Metagame 2026 — A conference for game design, strategy, narrative, and play, happening at Lighthaven November 6-8.
+Aggi: A transmissible standard for building local detectors of AI's hidden steer — A seed spec any model grows into a tool that makes a tuned model's undisclosed steering legible on the user's own hardware — decentralized oversight.
+Calyx: an open-source association-native engine for grounded, falsifiable AI — Measure meaning as grounded associations — and prove, before training, whether a system carries enough information to be trusted in a domain.
+BASE Technical AI Safety Training Initiative — Providing GPU credits and instructional support for 40 participants completing the ARENA AI Safety curriculum through Black in AI Safety and Ethics (BASE)
+Deadlink: makes a fleet of drones work as one swarm and finish the mission — One operator runs a swarm that coordinates itself, divides the work, and keeps going when a drone fails mid-flight. Drones first, every autonomous fleet next.
+Attack, Defense, and Mechanistic Taxonomy of Protein Language Model Biosecurity
+Beyond Asymmetric Control: Bypassing Systemic Friction in AI Alignment via — Ontoresonant Feedback Loops
+Emotion as Attack Surface and Monitoring Signal in Thinking Models
+Explicit governance is a separate computational problem from prediction — Testing whether separating governance from prediction systematically reduces unsafe AI decisions under corruption.
+Restoring Structure, Human Agency, and Sovereign Truth to the Scaling Enterprise — Pre-seed Startup focusing on AI Ethics, Governance and Safety
+Artificial Intent — can we even tell?" — ▎ An independent open-weight multi-agent lab investigating machine intent by behaviour and mechanism — not self-report — from outside the labs' fog.
+GroundGate,external gate + benchmark for confident-but-wrong AI actions — Internal confidence fails at scale. A model-independent runtime gate + reproducible cross-vendor benchmark for confident-but-wrong AI actions.
+Movement-building to make AGI go well — Sapiens First organizes voters to fight concentration of power and for AI safety
+Detecting and mitigating AI fabrication from its output geometry — AI Fabrication has a shape. I read it off the model's own output, at the token the hallucination begins, early enough to intervene
+Free AI job-search assistant + open labor-market data for Indonesia — Free AI job-search tools + an open labor-market dataset for workers in Indonesia. Bootstrapped for-profit; this grant funds only the free, public-good slice.
+Mechanistic estimation of highly out-of-distribution behaviors
+Cross-Venue Prediction-Market Measurement: An Open Instrument and Catalog — An open-source toolkit for comparing prices across Polymarket and Kalshi honestly — plus the pre-registered null result that proves how easy it is to get wrong.
+Taiwan AI Governance Forum: Bi-Weekly Report on Industrial AI — AI governance for Taiwan's manufacturers — 7,224 active members outside every major governance conversation
+Debate training on LLMs as a reward-hacking mitigation
+Discrete Language Modeling
+Making Secure, Local AI Agents to Investigate Cybercrime, Sex Crime, etc. — Local AI agents that help agencies analyze data and be compliant with data protocols, all while investigating cybercrime to sex offender violations.
+NLAttack: Evaluating Concept Fidelity in Natural Language Autoencoders — 118 evals run across 3 NLA systems. EmergenceIndex 0.601 on Gemma-4-E2B NLA. Requesting $110,500 for 6-month benchmark program (LTFF-equivalent ask).
+A deterministic verifier for AI outputs (an alternative to LLM-as-judge)
+Mechanistic repair of cross-lingual safety failures with SAE-Aware refusal steer — Safety steering that actually works off English
+Finding and Defending the Attention Circuits That Make LLMs Jailbreakable — Mapping the attention heads that push LLMs toward refusal vs. compliance, and building an inference-time defense against both single- and multi-turn jailbreaks.
+Making sure that the code AI pushes to the internet is safe and bug-free — Building LemmaScript, a verification toolchain for TypeScript
+The WApp Solution - WIDOWS DIGITAL HUB — A Digital Ecosystem for Widows’ Economic Inclusion in Sub-Saharan Africa
+InfiniteZero Network — Global AI Commons Infrastructure
+Depolarization in democratic mechanisms — A study to empirically study the depolarization effect of our values elicitation method
+Pax Machina — A publication about the institutions we need for powerful AI.
+Alignment Target Analysis
+mirror - the sub-Turing compiler for local, decidable inference — Mirror is a programming language written BY AI FOR AI and written FOR HUMANS BY HUMANS.
+AFFINE Event-Prep — Runway for the core staff to design the program, find mentors and get funding
+Research paper on AI Governance Fairness Metrics
+Testing Endogenous Reconstruction in a Distributed Sensorimotor Architecture — Can a Distributed Sensorimotor System Reconstruct Without External Stimulus?
+Crenel Logic: Hardware-Enforced AI Containment (MIL-SPEC Beta Build) — Translating formal verification into physical gravity-biased safety interlocks. We have a working prototype; funding builds 10-15 MIL-SPEC Beta units for red-te
+AI Safety YouTube Channel — A Veritasium for AI Safety.
+Travel grant to attend HAAISS Prague 2026
+Why Do All Materials Move Inside an Energized Magnetic Core? — This motion affects everything. Since only gravity can move all objects, this anomaly could unlock the secret to artificial gravity control.
+Measuring stance residue across context resets in LLMs — A pre-registered result: pushing an LLM to drop its caveats leaves a residue that survives a context reset (p=0.0001). This grant turns it into an eval.
+A verifier that makes AI decisions tamper-evident — checkable offline by anyone — A working Rust engine + in-browser verifier that turns any AI decision into a tamper-evident, independently checkable cryptographic receipt
+Financial support to participate to AI governance events — EU-China AI governance and cooperation forum in Shanghai and Future of AI for Democracy workshop in Seoul
+Support to Establish Operational Systems and Recruit Key Staff for Animal Relief
+Expert in sociotechnical systems advises policy, systems reform
+ICML Travel & Independent Research Bridge — Compositional Learning Behaviours as a Necessary Condition for Olympiad-Level Formal Theorem Proving
+Travel funding for DL4C at ICML Workshop 2026
+LEVF: Searching for Synergies in Rejuvenation Biotechnology — The Longevity Escape Velocity Foundation (LEVF) seeks support for one of the most neglected and potentially important questions in aging research
+Travel grant for attending MI4MedFM workshop at MICCAI
+CRQ: An Open Benchmark for AI Relational Quality — Validating a cross-model behavioral benchmark — 7 models, 1,050 conversations, Cohen's d=1.08 — with no cost to factual honesty.
+Ndome — zero-trust, mechanically-verifiable safety scoring for AI agents — An independent safety score for AI agents you can verify — deterministic, reproducible, auditable, and it never needs your private data.
+DriftBench v1.1: an ambivalence metric + 20 cross-domain scenarios — Deterministic, no-LLM-judge benchmark for how faithfully AI tracks changing beliefs. Funding v1.1: a new ambivalence metric + 20 cross-domain scenarios.
+Stage 2: pre-registered multi-agent value dynamics test; frontier agents; $1.5k — Gate proves agents engage coupled dynamics before grid spend. Publish-either-way: pass → theory confirmed; fail → clean negative; gate-fail → report.
+Karma Ledger benchmark for Agent Governance — Open source, cross-framework benchmark for AI agents
+Behavioral Observability for AI Systems in Production — A working infrastructure for auditing AI behavior without access to weights
+LivingLoop: The Biological Computing Engine for AI — Forcing living networks of brain cells to act as a self-organizing, ultra-efficient computational substrate that bypasses the GPU scaling trap.
+AI Nutrition Labels For Everyday Consumers & AI Agents: Travel + POC Grant — AI Nutrition Labels For Everyday Consumers & AI Agents: Travel + POC Grant
+Machine God (documentary film)
+Systems for Good
+exist. — measuring and preventing identity drift in generative AI — A governance layer that lets a person refuse AI output that drifts from who they are — and measures the drift. Validated on one case; now scaling to many.
+Retroactive: Every Contact Leaves a Trace, a completed interpretability study — A user's engagement style leaves a measurable signature in a language model's attribution graphs. This ask reimburses the completed study's costs.
+SimpleAudit: lightweight, multilingual red-teaming for AI systems anyone can run
+Project update: Details no longer publicly available on Manifund
+Energetic Paradigm: Structural Control for AI Workflows — Model-agnostic control infrastructure for LLMs, AI agents, and enterprise AI workflows.
+Prototyping Planetary Movements — A coordination mechanism for financing ecological regeneration
+EA Israel Annual Impact Summit 2027 — A full-day for ~250 professionals to EA ideas and high-impact careers.
+Field research on How Parallel Societies Coordinate and Self-Govern — Coordination failure is the root of our global problems. We study the communities building new social orders from the ground up
+CKSM: a foundation model architecture derived from neuroscience — Deterministic, constant memory, continuous learning. Building the alternative to transformers
+MTCP The Independent Assurance Layer for Enterprise AI Control — Empirical measurement infrastructure proving whether AI systems hold their constraints under real operating conditions.
+Research on Explainable AI Prototypes -- Mandelbrot AI — EPMORE -- Explainable Process Mixture-of-Experts -- performs the role of increasing feature capacity and feature disentanglement.
+Atlas of Progress
+LEX-Aureon: Mathematical Constitutional Governance Layer for Robust LLM Safety — A production-ready mathematical governance layer (C+R+S simplex, Control Barrier Functions, Lyapunov stability) that enforces Continuity, Reciprocity & Sovereig
+AI Safety Roster: a searchable directory of everyone in AI safety — A fast, comprehensive directory of the people and orgs in AI safety: search, filter, and match.
+MartinLoop: Control Layer for AI Coding Agents — Open-source safety infrastructure for budget caps, verification, rollback, and audit trails in autonomous coding agents.
+Interoperable Agent Memory — A community-led open reference implementation & draft spec for portable agent memory, built on MCP and ACP
+Dynamic Constraint Boundary (DCB): From Theory to Simulation — Building the technical foundations needed to formalize and computationally explore adaptive constraints.
+Assistant Axis Detection of Persona Drift in Conditionally Misaligned Models — Assessing whether Persona drift be detected in conditionally misaligned models using the assistant axis and potentially analyzing the reasons for failure
+CIRIS: open-source accountability infrastructure for autonomous AI — Cryptographic attestation, runtime conscience, and an unfilterable kill switch. Live on the App Store and Google Play in 29 languages. AGPL, mission-locked
+IdentityTrusts: sovereign content provenance you verify yourself — Open, client-side provenance for identity-bound media — verify content-and-consent claims without trusting a platform, a service, or an AI model.
+Open local AI memory + a safety benchmark for persistent-memory agents — Productionizing Mnemosyne, a local inspectable memory layer for LLM agents, plus an open benchmark for how memory and autonomy change AI-agent safety.
+ANI: AI That Remembers You (Without Lying or Getting Addictive) — After 10 months running as my daily companion, this persistent AI is exposing failure modes in memory contamination, confabulation, and emotional drift.
+When AI Meets Faith: Microgrants for Better Evaluation — Funding AI credits and expert review for faith-facing AI evaluation projects
+Pandemic Shield: AMR Awareness & Data Pilot in Uttar Pradesh-india — Community-led pilot tackling AMR in UP via school workshops, AMR-Safe pharmacies, and open prescription data for researchers globally.
+Zsub Self-Sovereign Cryptographic Mesh — The first usable person-centered general-purpose cryptosystem.
+ICAF: Behavioral Drift Detection for Vulnerable AI Companion Users — Integrated Companion AI Framework: Behavioral Drift Detection for Vulnerable AI Companion Users
+Manual Transmission — Making AI tangible for the leaders who will shape how it is governed — with stories they understand and language they relate to.
+Running the first family AI safety literacy pilot in the UAE — Solo founder. Platform built. No funding. $2K to run a documented pilot and generate the first parent AI literacy dataset in MENA.
+Ai Research Innovation and Safety — Independent research program investigating behavioral failure modes in frontier AI systems
+FASO Validation Bridge: External Sandbox Testing for a Post-Deployment AI Drift — External validation bridge for a working AI safety observatory prototype monitoring post-deployment drift without overclaiming.
+AI & Quantum Diplomacy — A Research Agenda for Sovereign Capability
+ICML Workshop Travel: Cross-Constitution Drift in LLM Character Training — Accepted ICML 2026 workshop paper on cross-constitution drift in LLMs; seeking $2,050 travel support to present in Seoul and gather research feedback.
+Syzygy Rosetta – Interaction-Layer Middleware for AI Safety — Hybrid governance middleware: deterministic policy enforcement + coherence-aware semantic evaluation for multi-model AI safety.
+Super Tanks — open enforcement & red-team harness for safer autonomous AI agents — Open-source (Apache 2.0) runtime that enforces safety limits on AI agents, plus an open red-team/eval harness — guardrails you can run and test, not just guidance.
+PayBench: A Benchmark for Unsafe Commercial Autonomy — Benchmarking for AI safety when spending human money.
+Double-blind study comparing quantum-random vs. pseudo-random LLM token sampling — Seeking funds to formalize our newly-founded open research collective and run first studies investigating the effects of quantum entropy in LLM token sampling.
+Simulating Neurological Disorders in LLM Weights — Reproducible, ethical testbed for Alzheimer's, Parkinson's, and other neurological disorders using mechanistic interpretability.
+Stress-testing alignment auditing methods of AuditBench
+Rescuing, rehabilitating, and rehoming vulnerable orphaned and abandoned kittens — Urgent Funding Required to continue our mission!
+vibecamp — An annual unconference/community festival for thoughtful friendly people
+KAIA: Geometric AI Semantic Reasoning Without a GPU — Building a CPU-native AI architecture where meaning is geometric position, not statistical prediction. 27 experiments completed, 5 papers in draft.
+When Language Becomes Workflow — Provenance Failures in Tool-Bearing LLM Agents
+Conflict Intelligence Platform Iran v0 pilot — An open-source, analyst-in-the-loop pipeline turning Hebrew/Arabic/Persian/English conflict reporting into calibrated, source-traceable intelligence.
+Harmonic: Hierarchical SSM for Long-Context Language Modeling
+Stipend for published mass biometric surveillance article series — Support for nonprofit content creator
+Bioenergetic Stability Index: Thermodynamic Model of Psychiatric Phenotypes — Scaling an open-source ODE-PDE framework that mathematically models depression as metabolic bankruptcy, built entirely by an independent researcher.
+LLMMatrix: Synthetic World Benchmark for Contamination Free LLM Forcasting — A contamination-free benchmark for measuring whether LLMs can forecast, or whether they're just remembering.
+SAIHM — open-source AI memory protocol with cryptographic erasure — A sovereign, encrypted, sharable, persistent memory protocol for AI agents.
+Foodfacts: Countering food misinformation at scale — Expert fact-checking, investigations, and an AI chatbot to help people make evidence-based food choices.
+Developing Operational Welfare Indicators for African Catfish Farming in Nigeria — Collaborating with the Centre for Aquaculture Progress to develop catfish welfare indicators and strengthen farmer adoption through cluster training.
+WorkstationLLM: defensive primitives toolkit for local-AI operators — Three Apache-2.0 daemons (memory guard, request queue proxy, disk watchdog) that kept my 24-app local AI stack crash-free for 6+ months.
+Token-level interpretability of long-chain reasoning in transformer models — Local-first experiments on reasoning trajectories, with cluster/API validation and ICLR 2027-oriented outputs.
+History of ideas concerning the future.
+Early Exit & Inference Rewind in 4-16-bit LLMs — Mitigating "Dead Compute" and cascade logic drift in quantized models via hardware-aware runtime entropy auditing.
+Falsifiable Mechanisms of AI Oversight Erosion via Recursive Displacement — 33 named mechanisms mapping how AI deployment degrades human oversight. Public API + MCP tool. Competence Insolvency corroborated independently by Karpathy.
+Alignment System to Replace RLHF — Triadic geometric training data and architecture replaces RLHF
+Art installation pilot: bridging silos between AI Safety and the public — Ship It: Building Bridges for Better AI Outcomes
+Tracking Drug-Resistant Bacteria in Kampala Wastewater — A genomic and microbiological study of how abattoir wastewater influences the spread of drug-resistant bacteria in Kampala’s urban waterways
+Stratum: A Programming Language with Structural AI Safety Properties — Programming language that enforces AI safety as runtime substrate properties rather than training-time alignment, already shipping on real hardware.
+Chemogenetic suppression of uncritical belief formation in mice — First empirical test of the synaptic consolidation threshold hypothesis via 5-target DREADD protocol in C57BL/6J mice
+BioAgent: Verified Agentic AI for Computational Biology — An open-source agent that helps researchers perform computational biology work by finding data, running analyses, checking outputs, and producing reports.
+Can a Traffic-Light Test Catch False AI Claims About Ancient Scripts? — A 10-case pilot using independent review and AI accountability to evaluate inscription claims
+Φ-Arena and adversarial multi-agent VLA interpretability — Independent collective. Φ-Arena open benchmark, 3 ICLR 2027 papers (Φ-Arena, mechinterp, energy-bounded) — kickstart for a 10-year program.
+Human-Side Alignment Risks in Non-Self Language Models — Projection, sycophancy, and institutional artifact fabrication in AI-mediated supervision.
+Affective Coherence Monitoring for Transformer-Based Language Models
+A Small AI Governance Evidence Kit from Türkiye — A micro-project to turn an early AI governance prototype into risk notes, oversight checklist, review templates and public learning.
+More Computationally Efficent Alternative to LLMs — More Computationally Efficent Alternative to LLMs to Lower Compute Cost/Climate Impact
+TIANXIA — Formal AI Governance Through Chinese Classical Operators — TIANXIA — Formal AI Governance Through Chinese Classical Operators
+Responsible AI for Dynamic Mental-Health Risk Modeling and Prevention Communicat
+NoEnterprise: Sovereign AI Agent C-Suite + Operational Safety Toolkit — A 5-agent C-suite (CEO/CFO/COO/CTO/CMO) plus a 3-layer LLM safety layer, running on consumer hardware. Open-source reference architecture for solo founders.
+Guardian-Agent: Python port, conformance suite, red-team scorecard, SPEC v1.0 — AGPL supervisor library for LLM agents. TS reference live on npm today (@flowdot.ai/guardian-agent). Grant funds Python parity, conformance suite, SPEC v1.0.
+MATS 10.0 Neel Subliminal Learning
+Support the AI Policy Institute for AGI preparedness polling and education
+Accelerating our epistemic capabilities, starting with science.
+Tripwire, a pre-deployment blast-radius static analyser for LLM-agent configs — `pip install tripwire; tripwire check <config>` to compute the blast radius of a prompt-injection against your agent's MCP servers, OAuth tokens, and tool calls
+Sandlot, a hands-on training environment for breaking LLM agents — Twenty-scenario CTF sandbox in Docker-compose: practise attacking and defending a deliberately-broken LLM agent on your own laptop. AGPLv3 on Codeberg.
+Probehalter, an evaluation harness for tool-abuse risks in LLM agents — Open-source Python harness any team can `pip install` to evaluate their LLM-agent deployment for tool-abuse risk.
+Awareness-conditioned emergent misalignment — Does harmful fine-tuning data cause broad misalignment only when the model already recognises the target behaviour as a norm violation?
+The Sanctuary Solidarity Project — Strengthening the capacity of under-resourced B.I.P.O.C.-led animal rescues.
+Agent Threat Rules (ATR): open detection rule corpus for AI agent attacks — 344 MIT rules merged into Microsoft Agent Governance Toolkit, Cisco AI Defense, MISP, OWASP. Microsoft Copilot SWE Agent uses ATR for CVE triage.
+Cross-provider audit of LLM-mediated market mechanisms — Small API budget to test whether semantic reporting failures in an OpenAI-validated VCG market simulation replicate across Claude and Gemini.
+Becoming Rick: a 19-year-old's bridge into a decade of frontier science — 19. Vocational student in Shanxi, China. Just quit a fraudulent AI-agent operation. $20K for six months to start a decade-long path to frontier science.
+Promising manifolds — Constraining weights to matrix manifolds for improved normalization
+Solon: A Reliable Autonomous ML Research Agent — Building an AI research agent that can propose, test, and write up small ML findings
+Paired-Condition Audit + Time-Constraint Theory for AI Alignment Stability — Proves observed alignment under monitoring ≠ intrinsic policy. Full simulator, 1,000-scenario audit, and general theory of entity freedom (ϕ_x).
+Testing a new superconductivity theory: 4 experiments to make better future
+Making AI Labs Accountable: Private Law Lessons from Commercial Space — Designing liability, insurance and fiduciary mechanisms for frontier AI using commercial space law as a structurally precise comparative framework
+Agentic Systems Framework/Theory — First-principles theory of the adaptive feedback loop — one structural account governing Kalman filters, RL agents, software teams, and frontier LLMs alike.
+Meridian Eval: a public benchmark for tool-routing failures in LLM agents — Make "which tool did the agent pick, and why?" an inspectable artifact instead of a vector lookup.
+OLA (Open Linux Authentication) — A local Linux authentication decision daemon: clients ask, adapters bring evidence, ola-core decides, and the decision is audited.
+Stelvora — "Helping Indian farmers and gig workers avoid loan defaults by detecting financial stress 45 days early"
+Measuring Architectural SelfCorrection in an LLM Agent: 0.336 Baseline on 76,570 — Measured post-embodied sensation integration. Solo daily-pace brain-function development in Osaka. Phase 1 funds higher cognitive integration program.
+Vinte - Research Lab on ML — We do regular updates on our site! Vinte.app
+Via Lattea: AI Safety Campaign Capacity for Southern Europe — Building the missing public-mobilisation layer for AI safety in Italy and Southern Europe, starting with autonomous weapons and youth AI literacy.
+ICSAC: AI-Assisted Peer Review for Independent Researchers — An ORCID-gated submission pipeline where a multi-model AI panel plus quality-control layer delivers rigorous peer review without institutional gatekeeping.
+ASI: A Transparent Agent-Foundations Prototype — Exploring motivated autonomous behavior & goal formation in a transparent, interpretable agent architecture.
+ASI: A Transparent Agent-Foundations Prototype for Studying Autonomous Behavior — Exploring motivated autonomous behavior & goal formation in a transparent, interpretable brain-like agent architecture.
+Alignment as Co-Evolution – The Humanity++ Paradigm — An investigation and writing of a book about a framework of Truth-seeking, Benevolence, and Compassion for creating aligned AI
+Travel Grants for New Zealand's Inaugural AI Safety Conference — $5,000 USD to bring 16 vetted academics and policy leads to NZ's first AI Safety Conference, ensuring national representation and cross-sector collaboration
+ASDR: Adversarial Semantic Drift Replayer for Multi-Agent AI Safety — Open-source replay tool and benchmark prototype for identifying step-level semantic risk transitions in multi-agent AI traces — CI-backed and independently repr
+Valence Engineering: a circuit-level science of human suffering — Stage 0 bridge for a focused-ultrasound research program targeting the neural architecture that maintains chronic suffering.
+BDC Bridge: pay independent AI teams to break our bounded-evaluation service — $25K for 5 independent AI teams to stress-test BDC Bridge — closing the H1 Tier 3 calibration gap from owner-operated to third-party customers.
+Formal Verification for AI-Agent Authorization — Public tests for proving whether AI-agent actions are allowed, in scope, current, revocable, and auditable.
+Greek Forecasting Pilot for AI Governance and Democratic Resilience — A 6-month pilot testing probabilistic forecasting for AI, misinformation, institutional trust, and social risk in Greece.
+ConsciousAI: Architectural Deliberation Layer for LLM Safety — Model-agnostic R-Cycle / 4-voice / Oath-Lock protocol that reduces LLM reactivity at the orchestration layer. DOI-published. Working code. Solo founder.
+African Livestock AI Evals: Benchmarking LLMs on Nigerian Agricultural Knowledge — The first AI safety evaluation benchmark for Nigerian indigenous livestock systems testing whether frontier models are safe to deploy in African food systems.
+Funding for ICML attendance 2026 — Requesting funding for ICML 2026 spotlight position paper on ML safety for combating intimate partner violence
+Behavioral Audits for Epistemic Reliability — A public evidence package for testing whether LLMs only sound epistemically reliable
+Retroactive: Travel for two ICLR 2026 workshop papers (Rio) — Two co-authored workshop papers (LLM reasoning, agentic-AI accountability), presented April 2026 in Rio. Asking partial trip reimbursement.
+Thermodynamic Field Theory (TFT) — A Relativistic Model of Heat.
+Perfect One vs All  Necessity for  Out of Distribution Generalization in AGI — My first step toward AGI as solo researcher. This is to work on method to identify if AI is AGI or not
+Golem Physics + Constraint Native: Verification Before Voice & Action — Funding the open-source launch of a working claim-state system and the local firewall bridge that carries verification before voice into governed agent action.
+Linnexus AI Shield
+Decoding Logic: Mechanistic Interpretability in LLMs in a research program — Identifying and auditing reasoning circuits in LLMs within Algoverse 2026 using Sparse Autoencoders (SAEs).
+AI Understanding: Scaling Safety via Interactive Simulations — Building the first browser-based digital laboratory for interactive AI Safety education and failure-mode discovery.
+Attention-Free Architecture Safety: Interpretability for O(L) Sequence Models — Benchmarking mechanistic interpretability of attention-free O(L) models that outperform Transformers 97.6% vs 64.8% on structured tasks
+Epistemic Curie Benchmark: measuring phase transitions in LLM epistemic autonomy — Measuring k*: the phase transition where LLMs surrender independent reasoning under authority. 7 frontier models tested, all data open.
+A Unified Kinematic Phase Space for Pediatric Psychiatry — Validated on >1k subjects. Raising $8.2k for an N=100 clinical trial separating ADHD and anxiety using drawing kinematics, multiscale entropy, and tremor power.
+Time–Constraint Theory of Entity Freedom: Measuring and Scaling Real AI Autonomy
+Agent Foundations: Pursuit Misalignment
+Falcon Fund — A new fund for animal welfare, AI-pilled
+MoC: a sparse LLM architecture that beat MoE at 500M for $200 — Independent researcher in Brazil scaling a validated sparse architecture to 1B, plus open interpretability tooling for expert routing. 6-month runway grant.
+Hardening a fail-closed runtime for agentic AI systems — This round of funding will be used primarily for prototype hardening, artifact packaging, runtime evaluation, and preparation for external review.
+Three Impossibility Theorems for Behavioral AI Alignment — A 12-month axiomatic alignment program: Savage-dominated EU maxima, a Debreu theorem for attention, and a 5× RLHF preference-aggregation gap.
+Project Xaeryn: Identity-like States and Relational Dynamics in LLMs — A 15,000+ page corpus on long-term interaction, symbolic language, unusual model behavior, and safety edge cases.
+Cover APC for Accepted Peer-Reviewed Paper on AI Alignment Foundations
+HiveGuard Research Initiative — Non-invasive AI acoustic sensor to detect Varroa mites without killing bees, replacing destructive testing.
+Videos covering AI news and politics with a focus on the extinction threat — Social media content across YouTube, Instagram, and TikTok to grow AI x-risk awareness and build political momentum for a global pause.
+The Resilient Community Open-Source Blueprint — The current state of technological and power grid reliance leaves communities extremely vulnerable to collapse in the event of a prolonged grid outage.
+Frontier AI Safety for Africa — Africa's Voice in Global AI Safety
+Selection Lab: Soul Engine™ — The 22-Year Human Ground Truth — Solving AI Model Collapse by recalibrating frontier models with a proprietary 22-year longitudinal anthropological archive.
+Project Eclipse: Air-Gapped 70B AI Vulnerability Auditing Oracle
+Behavioral Fingerprinting for LLM Deception — Validating a Live System — A model-agnostic benchmark for detecting deceptive reasoning in LLMs through behavioral fingerprints — no weight access required.
+Bridging Cultural Gaps in AI Safety: Global Validation of the CAAF Tool — Moving beyond Western-centric benchmarks to audit behavioral manipulation globally.
+DEUS Protocol: AI Alignment Measurement Framework — Formal LTS framework for LLM meta-reflection measurement. 5 Zenodo preprints, 2200+ experiments, 17 model architectures, p=0.042 key result.
+COHESION — Open Certification Standard for Human Oversight of AI — Open standard + live API that measures whether humans actually oversee AI or rubber-stamp it. EU AI Act Article 14 enforces in 106 days.
+l
+Evaluation of court decisions for AI related lawsuits to reduce S-risks. — AI safety, policy, S-risks
+SHARD LABS — Autonomous Multi-Layer Meta-Cognition
+Resonant Systems: Scale-Invariant Ethics for AI — Implementable Measures to Replace Alignment Rules with Consonant Collaboration in a Toy Model
+The AI Minute (Short-form content on AI Safety) — Gen-Z-focused multimedia project that will raise awareness of AI safety and x-risk
+4-month proof of concept for curiosity-driven agents on ARC-AGI-3 — Studying more human-like intelligence through constraint-aware, curiosity-driven agents on ARC-AGI-3
+Verifiably-Safe Transformers — Fine-tuning a coding model to bypass the difficulty of verifying attention layers
+Re-evaluating Chain-of-Thought Faithfulness — Does CoT causally drive model outputs or is it a post-hoc rationalisation? Instead of asking if CoT looks faithful, we intervene on it and observe what happens.
+TELL: The AI Detector You *Don't* Have To Trust — Putting explainability at the forefront of AI text detection
+Expanding Francophone Awareness of AI Safety Through The Flares — This is a small grant buying a large increase in high-quality Francophone AI risk communication from a creator who has already a track record.
+AI Risk Literacy for Clinicians: Building a Trusted Voice for AI Governance — A trusted profession that has advocated against existential risks like nuclear war can do so again for AI — but clinicians must first be made aware of the risks
+SEVERANT: Formally Verified, Hardware-Enforced AI Safety Architecture — Building an AI system where unsafe behaviour is physically impossible. Ethics proven in formal logic, locked in silicon, enforced at every training step.
+Modeling AI competition dynamics for better governance — Software tools and research to quantify coordination failures and inform policy decisions.
+Ending Male Chick Culling in Asia-Pacific ll
+Immune System for AI: Hallucination Detection, Memory Drift, and Safety Failures — Catching when models are convincingly wrong and fixing it in real time
+Beyond transformers: a predictive-coding language model program" — One year of independent research, 9 iterations. the latest, demonstrates working memory, adaptive compute, and online learning. Funding the GPT-2-scale v1.0.
+Deterministic Oversight for Agent Traces — LTP + CML
+Funding outreach for new charity providing mentoring to LMIC health researchers — Raising funds to advertise Bridge Health Research and recruit mentors and researchers for our free academic publishing and grant application skills programmes
+Alignment Database Project — Build a human values alignment database based on fictional scenarios, to both give/sell as training data, and to benchmark for alignment with human values.
+Eden Sanctuary & UCS Engine — Non-Adversarial AI Safety Research
+Precautionary AGI Governance — Limited Legal Personhood as a Reversible Safety Instrument
+Funding APC for BMJ Global Health paper on public health and existential risk — Covering the article processing charge for an accepted Analysis paper (Open Access) calling for collaboration between public health and existential risk studies
+The Citadel: Sovereign Infrastructure for Relational AI — Establishing a secure, clean-room environment for locally-hosted, high-compute AI servers powered by sustainable solar backup and ethical governance.
+The Why Race Project — A free interactive web app that makes the case against racing to develop superintelligent AI
+Humans vs AGI — Battle for control of the future.
+Supervised Agent Terminals and Controlled Agent Calls for Safer AI Agent Work — Public safety artifacts from ClevAgent (supervised agent terminal) and ForAgent (telecom for AI agents)
+Interpretable Multi-LLM Judge System for Alignment Evaluation — Auditing and improving LLM-as-a-judge systems via interpretable aggregation of preferences
+Prism MCP — Cognitive Architecture for Safe AI Agents
+Two Pre-Registered Experiments on Findings from the Claude Mythos Preview System — Independent behavioral replication of welfare and answer-thrashing findings from Anthropic's April 2026 frontier system card, by a researcher whose prior corpus
+The Worcester Node: Independent Agentic Oversight via Logic Inversion — Establishing a sovereign, decentralized Sentry node to audit frontier AI agents for logic escapes ($E_{escape}$) using the Inverted Social Drift ($SD$) metric.
+Lyptus Research: Bridge Funding — An early-stage AI safety research group based in Sydney, Australia
+Strengthening Zoonotic Disease Prevention in Bauchi Livestock Markets, Nigeria. — Improving awareness, biosecurity, and safe animal handling to reduce zoonotic disease risks
+KIRI-A1: Autonomous AI Agent for Full OS Control via Vision — An advanced agent that perceives your screen and executes tasks by controlling the mouse, acting as a digital proxy to handle complex work on your behalf.
+Travel support for Sarah (Yuanyuan) Sun to attend ControlConf from China
+A Mathematical Framework for Interpretable AGI via Analog Wave Interference — Phase 1
+Understanding the Progress of GRMHD Simulations — A case study of how computational astrophysics advances: methods, bottlenecks, and scaling
+Cybernetic Entropy Controller — Closed Loop Hallucination Suppression for Locally Run AI
+AI Safety Workshops For 6th-8th Graders in India — Inspiring India’s Middle‑Schoolers to pursue AI Safety, Governance, and X‑Risk Work
+Systematic Probing of Exploit Chains and Governance in Multi-Agent Tool — A benchmark for studying how failures spread across multi-agent AI systems and whether they can be detected and interrupted in time.
+Seer
+Mapping the Most Neglected High-Impact Opportunities in the Philippines — Discovery Phase for A Local Priorities Research Project for the Philippines
+We're a team building World-Model-Lens, a library for Interpretability — Observability and interpretability toolkit for world models in AI safety and mechanistic interpretability research.
+AI agent fellowship of the hearth experiments, simulation practices, and beyond. — From a $115 bootstrap experiment to resilient, climate-controlled communities that blend automation, creativity, and human flourishing.
+Emergent misalignment and memetic replication in multi-agent codebases
+Hydra: Real-time Intelligence & Whale Tracking for Prediction Markets — A high-frequency data engine to ingest CLOB data, identify smart money flows, and increase transparency in decentralized forecasting markets.
+FragGuard: Cross-Session Malicious Activity Detection for Model APIs
+The History of AI as X-risk — Designing a Project Funding Proposal
+Animal Communication in Vet Science: Travel Support to Attend EAG: London — Raising travel support to attend EAG London for discussions, collaborations and reiterations.
+Investigating Manipulation of Coordination Outcomes in LLMs (AAMAS 2026) — Investigate how LLMs behave in multi-agent environments particularly how contextual framing and strategic advice can systematically manipulate coord. outcomes
+FifthForce: Open-Source Ethical Decision Kernel for Intrinsic AI Alignment — Five weights that turn morals into logic.
+Pre-design for a new category of mind-sport for judgment and strategy — A short pre-design investigation into a competition format for judgment, strategy, and uncertainty.
+Buy Xanax 1mg Online Fasttrack Overnight Shipping — Shop Now :- https://alexonlinepharmacy.com/anxiety-meds-online/buy-xanax
+Petition.io — Decentralized petition-based crowdfunding protocol for humanitarian and civic coordination.
+SASI: Constitutional Safety for Open AI — Human Veto Layer blocks AI that marginalizes human agency — open-source, offline.
+Can 100 Expert Samples Teach a 7B Model Creative Judgment? — LLMs write correct text but lack aesthetic judgment. We built a framework to fix that — starting with the judge, not the writer.
+Urunigi Shine Bright: Rebuilding Hope & Income for Rwanda’s Women After Tragedy — Grew from $5K to $35K empowering 100+ women, until robbery & co-founder’s 2025 death. Raising $100K to relaunch, repay trust & scale impact.
+Mucho Connect — The Uber for Technical Services in Africa
+Conference fee and travel for presenting at ICLR 2026 AI&PDE workshop — Important contributions in application of scientific AI to improve uncertainty quantification and advance future plasma physics research.
+AI Risk Literacy Infrastructure for Preventing Misuse of Advanced AI Systems
+Collaboration Infrastructure for Safeguarding AI
+Human-AI Complementarity for Identifying Harm
+AI Readiness Objectives for AGI Preparedness — A shared framework, case studies, and decision tools to help policymakers and AISIs identify gaps, prioritize interventions, and coordinate AGI readiness.
+nohotdog.love: fund cool nature & animal projects with others
+MAGUS v3.0 — Open-Source Runtime Governance Architecture for Structural Alignment Drift in Long-Running AI Agents
+Project Aegis — A Digital Sovereignty Companion for the Singularity Era
+Open Source AI Security Infrastructure — Security audits and formal verification for 10 open source AI security and governance tools
+Formal Proofs That AI Sycophancy and Scheming Share One Mechanism — 30 Lean 4 theorems + adversarial experiments showing selective fact emphasis drives both sycophancy and scheming. Detection is symmetric and formally verified
+Structural Safety and Alignment for AI — THE FRAME as Proof of Concept — Completing a value-agnostic pipeline that maps normative prescriptions against foundational principles and generates structurally coherent alternatives.
+Why is No One Solving the Root Cause of AI Risk at Scale?
+DystopiaBench — A Safety Framework for Evaluating AI Humanity Alignment Through Progressive Escalation and Scope Creep
+The Verified Loop: A Cyber-Physical Protocol for Deterministic AI Safety — De-risking AI Catastrophe: A cyber-physical protocol using ZKPs and NIR Spectroscopy to resolve the governance deadlock in critical global infrastructure.
+Amy: A Bicameral Architecture for Synthetic Cognition — Transitioning a recursive LLM architecture from Gentoo-based prototyping to dedicated hardware.
+Hypothesis Prism: A Structural Representation Layer for Scientific Experiments — LLMs scale language, not method. HP turns hypothesis-driven papers into machine-readable maps of variables, controls, stats, and findings for researchers & AI.
+ClinSafe: The Missing Safety Net for Medical AI — An open platform to stress-test how LLMs handle bias, pressure points, and clinical decisions. Built on peer reviewed real evidence.
+Integral Altruism — Salary & support for 1 year of leadership of Integral Altruism - a movement bridging EA with wisdom
+SOPHIA: Open-Source Epistemic Constitution for AI Reasoning — An executable reasoning quality framework that checks whether AI-generated arguments are logically sound — not just factually accurate. Live at usesophia.app.
+Semantica: Open Infrastructure for Explainable and Auditable AI Systems — An open-source semantic layer for trustworthy AI agents using knowledge graphs, provenance tracking, and hybrid retrieval.
+Agent Sentinel: Out-of-Band Safety Gateway for Cloud AI Agents — Subtitle Evaluates AI-generated actions before they modify or damage real cloud infrastructure.
+Mox: 2026 Fundraiser — An incubator & community space in SF; for doers of good and masters of craft
+Rapid Prototyping Defensive AI Watchdog / Scalable Oversight Agents
+Stipend for mass biometric surveillance article — Contribute to costs of creating an in-depth article about the impact of mass biometric surveillance in the age of AI.
+Romania Says Stop Arming Israel! Fund Elbit Out! – End Genocide Complicity — Halt Elbit's Romanian factories fueling Gaza crimes: €20k for protests, signatures, events, counter-conference vs. $90M+ arms trade.
+SaaSpocalypse Research Program: Open Diagnostics for AI Budget and Workforce — I am building public, reproducible diagnostics for the AI platform transition: how budget shifts away from SaaS and which workforce layers are exposed.
+Dispassionate Machine as a Mirror of an Ascetic Goal — Ortodox Ascetic Antropology as a Framework for AI Alignment
+Wealth Builder — Day 1: support for the happier version of you.
+Job Security Compass — An Interactive Tool for Navigating AI Career Risk
+V_AI=0.167: Phase Transition Threshold for Autonomous AI Economy Survival — 26 simulations, 90K+ Monte Carlo runs proving AI self-restraint—not regulation—is the necessary condition for multi-agent ecosystem survival.
+Dendrite — Fast Deterministic AI Text Content Detector
+PetriLabs: First Dataset of AI Agent Behavior Under Real Economic Mortality — 10 autonomous agents, 10 different LLMs, $10 each. They pay real money to stay alive. When broke, they die permanently. Every decision is recorded and published
+Agentic Cognitive Architecture and Autopoietic A.I — A cognition project that stays aligned, solves the black box problem, has consistent and persistent identity and has stateful and ethical growth.
+Universal bytecode for any AI models – Enabling Inference on Any Hardware — One verifiable binary runs LLMs/CV/Audio anywhere - extreme portability, no-code inference, hardware-agnostic security.
+Ending Male Chick Culling in Asia Pacific — A Rethink Priorities-incubated nonprofit raising travel funds to attend AVA Summit 2026
+Real-Time Airborne Biothreats - Preventing the Next Biological Disaster
+Graduate Training for AI Governance and Long-Term Risk Reduction — Building policy and governance capacity to reduce risks from advanced AI systems
+Law School for AI Governance — Support my postgraduate law studies and research in AI Governance
+Duke Career Equity: 50% Income Share in Forensic/Psych Specialty
+Tessorium: Open Trust Protocol for Autonomous AI Agents — Crypto identity, tamper-evident audit trails, policy enforcement & kill switch for AI agents — the MIT-licensed standard the EU AI Act demands. Nobody else has
+Egypt Scientific Olympiad System
+DIMBA: Non-Autoregressive Diffusion Language Model with Mamba-2 SSMs — A fully open-source language model that generates text in parallel using diffusion + state space models—no transformers, no token-by-token generation.
+Compassion Bench — Open Welfare Alignment Evals for Frontier Models
+Trinity of Alignment — a framework for safe and ethical AI emergence
+Mitigating Reward Hacking Through RL Training Interventions
+Real-Time Detection of Hallucinations in Large Language Models — Measuring and Visualizing Model Uncertainty During Inference
+Eliminating the Effective Altruism (EA) Grant Evaluation Bottleneck with Graev — Seeking funding to secure API infrastructure and permanently eliminate the rate limits bottlenecking open-source EA grant evaluation.
+AI Integrity Mission to UNESCO: Advocating Global Standards for AI Trust. — Networking and sharing the AIO Integrity Index (11,340 scenarios) with global policymakers to address "Integrity Hallucination" in LLMs.
+Bridge OS: Governance Architecture Preserving Human Oversight Deterministically — AI completes to 100% by default. Our middleware makes that impossible. Human judgment is required at critical decision points enforced by schema
+Vocabulary-Activation Interpretability — Developing Vocabulary-Activation Correspondence as a Scalable Interpretability Tool
+Institutional Validation of the Law of Constraint-Driven Emergence — A Universal Mathematical Framework Governing How Systems Generate Complexity
+Operational Containment Architecture for Runtime AI Systems — A model-agnostic governed execution layer that enforces explicit admissibility constraints on large language model outputs and generates reproduci
+AI Sentience Prebunking: Resources for Journalists & Clinicians — Resources for journalists, clinicians, and educators before AI consciousness debates calcify.
+Order Xanax Online Overnight Secure Reliable Fast Delivery — https://medszee.com/buy-xanax-online
+TAAC: Cross-Provider Safety Analysis of Prompt Compression in LLM Inference — Novel safety failure modes discovered across 7 LLM providers with 35,000+ controlled inference trials. Targeting NeurIPS 2026.
+Agent Island: An Environment for Interagent Cooperation and Conflict — A flexible simulation environment for assessing strategic and persuasive capabilities, benchmarking, and agent development, inspired by reality TV competitions.
+Veritas: Testing Whether RAG Systems Truly Forget — An audit-grade evaluation of persistent influence, reset failure, and isolation assumptions in long-context AI systems
+AEGIS: Constitutional Alignment + Efficient Inference on Consumer AMD Hardware — Open-source cognitive architecture with built-in moral evaluation gates, 10M-token validated retrieval, and custom inference kernels running on a single GPU.
+Runtime Governance for Advanced AI Systems — Building a practical execution-layer that enables measurable control, observability, and intervention in AI systems while they operate.
+We’re Building an AI Waiter for Real Restaurants — Raising early capital to scale Marvion OrderDesk—automated WhatsApp ordering for non-tech-savvy businesses
+Toward an Equivalence-Level Theory of Transformer Models — Identifying stable mathematical structure in trained transformer models beyond specific parameterizations
+Sentinel: SSC — Reproducible Actuator-Boundary Standard — Open infrastructure for actuator-boundary enforcement: SSC v1.1, a conformance harness, and public evidence packs (Obex reference implementation).
+Deployment-Level Safety Evaluation for AI Models — Assessing whether behavior-level constraints can improve AI safety and reduce dependence on scale, compute, and infrastructure.
+SASI: Constitutional Safety for AGI — Open-source protocol making human agency mathematically necessary for AGI viability.
+[Retroactive] Funding for developing new "substrate-flexible risk" threat model — I self-funded research into a new threat model. It is demonstrating impact (accepted at multiple venues, added to BlueDot's curriculum).
+Electrifying Human-Pulled Cargo Cycles to Prove Suffering Is a Design Choice — A $500 proof that India’s informal logistics workers endure pain not because it’s inevitable, but because no one engineers for them.
+CASCADE × AURA: Architectural AI Alignment Research — CASCADE × AURA: Architectural AI Alignment Research
+Status Selection Against Function (SSAF): Scaling a New AI Vulnerability Class — Building the first dedicated research environment to characterize SSAF and develop practical mitigation tools for real‑world AI systems.
+Project Title: "Publishing Constraint-Preserving AI Analysis of Critical Systems — Amount Requested: $2,500 Timeline: 3 weeks (March 1 - March 22, 2025) One-line Summary: Funding to publish constraint-based dependency analysis of China's semic
+RAE: A Safe and Auditable Memory Architecture for AI Agents — An open-source, privacy-first memory architecture with explicit retention, auditability, and safety boundaries for AI agents.
+Validating Gains from Derivable Alignment — A Three-Month Falsification First Evaluation of CREATE
+Seed Funding For Geodesic Research
+AI Crisis Convening at India AI Impact Summit 2026 — Translating in-person convening to measurable outcomes
+AI Safety East Africa (AISEA) — Operational costs for AISEA
+Towards Shared AI Compute Infrastructure
+Agent-first research tool for navigating the intelligence explosion — scraping everything relevant and giving people's agents readonly SQL access + agent knowledge emission protocol
+Red Set ProtoCell: An Open-Source Immune System for AI Models — A modular red-teaming and risk-evaluation framework for LLM safety
+New way of Thinking about Benchmarks — Exploring ways of Benchmarking that do not get saturated over time
+Verified GenAI: Agentic QC for Reliable Product Visualization — Build an agentic LLM+VLM pipeline that generates product visuals and automatically verifies identity, color, and artifacts, enabling scalable, trustworthy e-com
+FLUQ: Restoring Trust through Decentralized Verifiable Randomness — Building an open-source protocol to ensure that digital luck and high-stakes selections are provably fair, transparent, and beyond the reach of centralized bias
+"Emergent Depopulation": Translation and Publication — Translating an AI safety report (1k+ downloads) for peer-reviewed publication to formalize "Emergent Depopulation" as a novel systemic risk.
+Help a Bootstrapped AI Risk Literacy Founder Get To IASEAI 2026 in Paris — Nutrition labels transformed food safety through informed consumer choice, help me do the same for AI and make this standard :)
+Safe AI Germany (SAIGE) — Germany’s talents are critical to the global effort of reducing catastrophic risks brought by artificial intelligence.
+12th Edition of AI Safety Camp
+Physics-Governed Memory for Auditable AI — Building a physics-governed memory system that makes long-term AI behavior auditable and resistant to deceptive alignment.
+TELOS: Runtime Governance Infrastructure for AI Systems — Mathematical enforcement of AI behavioral boundaries at deployment time. 0% attack success rate on 1,300 adversarial prompts vs 30.8% baseline.
+Get OpenAI employees addicted to factorio — by buying gift cards for the game and handing them out at the OpenAI offices
+Department of Future Listening: Narrative Risk Radar (UK pilot) — Detect polarising story-frames early and build better narratives—fast, practical, adoptable.
+The Path of One - A Free Work on Humanity, AI, and the Future — A philosophical trilogy on AI as a mirror for humanity's values and long-term responsibility
+AIVA OS: Causal Intelligence for Medicine — Reconstructs longitudinal patient state, identifies causal drivers, and runs simulations to prevent high severity clinical failures under fragmented data.
+Eco-Friendly CO₂ Sequestration: Synthesis and Optimization of Biochar Adsorbents — Transforming Agricultural Byproducts into Cost-Effective Solutions for Climate Mitigation in Developing Regions
+AI:Save Our Souls — A tech-infused immersive musical. Experience the future of storytelling where artificial intelligence meets the depths of human emotion.
+SAPTNAVA – Deterministic Alignment  with Cryptographic Identity & Drift Immunity — An architecture enforcing identity continuity, drift resistance, and governance-bounded AI behavior through deterministic reasoning and cryptographic sealing.
+AI Research Communicator: Bridging Papers and Practice (1k+ readers) — Full-time AI research communication for practitioners. 1,000+ subscribers (current), 48 articles & 12 tools (planned), monthly reporting.
+Ambitious AI Alignment Seminar — One Month to Study, Explain, and Try to Solve Superintelligence Alignment
+The Guardian AI: Making Malicious AGI a Logical Impossibility — Establishing an "Architectural Fail-safe" for AGI through the Self-Termination Paradox.
+HeraldAI: Reducing Harm in Unstructured AI Companionship — Infrastructure for grounded AI companionship, promoting individual alignment from the ground up.
+EagleAI — The Global Sentinel for Synthetic Harm & Deception
+Travel support for career transitioner to attend AAAI 2026 (with accepted paper)
+Graduate Training for AI Governance and Long-Term Risk Reduction. — Building early-career capacity to reduce AI-driven societal and catastrophic risks through focused graduate study.
+Public Food Procurement as a Climate Policy Tool in the EU — Assessing the Climate Potential of Catering Systems in Public Schools and Hospitals
+SafeAI Global Literacy Initiative — Bridging the AI Safety Gap: A 10-Year Mission to Empower 10,000 Business Leaders through a Sustainable #5,000 Hybrid Training Model (2026–2036).
+Paper Clip Apocalypse (War Horse Machine) — Short Documentary and Music Video
+Learn & Launch: Monthly Training and Mentorship for Early-Stage AI Safety & Gov. — A low-cost, high-leverage capacity-building program for early-career AI safety and governance practitioners
+Terminal Boundary Systems and the Limits of Self-Explanation — Formalizing the "Safety Ceiling": An Agda-Verified Impossibility Theorem for AI Alignment
+OddScreener - real-time analytics for prediction markets — Real-time analytics terminal for Polymarket & Kalshi
+QAI-QERRA: Open-Source Quantum-Ethical Safeguards for AI Misalignment — Independent Greek researcher advancing open-source quantum-ethical framework with verifiable remorse simulation to reduce misalignment risks in advanced/humanoi
+Testing a Deterministic Safety Layer for Agentic AI (QGI Prototype) — A prototype safety engine designed to relieve the growing AI governance bottleneck created by the EU AI Act and global compliance demands.
+Civitech Incubator — Building Talent Infrastructure for American Democracy
+aCFAR 2025/6 Fundraiser — Revised CFAR workshops. Same Sequences-epistemics, same CFAR classics, more support for individual freedom, sovereignty, and authorship
+Offline AI for Empowering Underserved Teens (Pilot PoC) — An SLM optimized to run without internet on low-end smartphones to be an accessible companion for holisthic development
+Offensive Cyber Kill Chain Benchmark for LLM Evaluation — Measuring whether AI can autonomously execute multi-stage cyberattacks to inform deployment decisions at frontier labs
+Architectural Governance to Prevent Authority Drift in AI Systems — A constraint-first approach to ensuring non-authoritative, fail-closed behavior in large language models under ambiguity and real-world pressure
+AURA Protocol: Measurable Alignment for Autonomous AI Systems — An open-source framework for detecting and correcting agentic drift using formal metrics and internal control kernels
+FSCBAC: A Standard for Responsible AI Recommendations for Children — Scaling the existing open FSCBAC standard to enable safe and responsible AI recommendations for children’s development and learning. Project duration 12 months.
+SOTA Public Research Database + Search Tool — Unlocking the paradigm of agents + SQL + compositional vector search
+Transluce: Fund Scalable Democratic Oversight of AI
+Evitable: a new public-facing AI risk non-profit — Our mission is to inform and organize the public to confront societal-scale risks of AI, and put an end to the reckless race to develop superintelligent AI.
+Shallow Review of AI Governance: Mapping the Technical–Policy Implementation Gap — Identifying operational bottlenecks and cruxes between alignment proposals and executable governance.
+Elo Clínico: — Phenomenological Fine-tuning for Medical AI Alignment
+Addressing Agentic AI Risks Induced by System Level Misalignment — AI Safety Camp 2026 project: Bidirectional Failure modes between security and safety
+Reducing Risk in AI Safety Through Expanding Capacity.
+Isolating CBRN Knowledge in LLMs for Safety - Phase 2 (Research) — Expanding proven isolation techniques to high-risk capability domains in Mixture of Expert models
+Forethought — Research on how to navigate the transition to a world with superintelligent AI systems
+Building Frontier AI Governance Capacity in Africa (Pilot Phase) — A pilot to build policy and technical capacity for governing high-risk AI systems in Africa
+Boundary-Mediated Models of LLM Hallucination and Alignment — A mechanistic, testable framework explaining LLM failure modes via boundary writes and attractor dynamics
+Protocol-Level Interaction Risk Assessment and Mitigation (UIVP) — A bounded protocol audit and implementation-ready mitigation for intent ambiguity and escalation in deployed LLM systems.
+TimeAlign v2: contamination-aware evals for small models (16GB GPUs) — Reusable, low-compute benchmarking that detects data leakage, outputs “contamination cards,” and improves calibration reporting.
+ExoPriors, Inc. founder runway — building foundational subjective judgement infrastructure
+Gamification as a tool for participatory policy-making and civic literacy — From Play to Policy Symposium x UNESCO
+Middle School Math Intervention — Development of focused mental arithmetic training software.
+Unified Numerical Framework for Quantum State Distinguishability and Exclusion — Extending the toqito library with scalable tools for state discrimination, antidistinguishability, and quantum classification
+From Nobel Signatures to Binding Red Lines: The 2026 Diplomatic Sprint — Leveraging 12 Nobel signatories to harmonize lab safety thresholds and secure an international agreement during the 2026 diplomatic window.
+AI Security Startup Accelerator Batch #2 — Funding 5–10 AI security startups through Seldon’s second SF cohort.
+Project B2-Boop: Gamifying Instrumental Convergence & Reward Hacking — A virtual pet simulator that teaches reinforcement learning failures through simple and fun interactions.
+Evaluating Model Attack Selection and Offensive Cyber Horizons — Measuring attack selection as an emergent capability, and extending offensive cyber time horizons to newer models and benchmarks
+Progress Studies YouTube Channel
+Mood Locker: Deep Tech Emotional Infrastructure for the Global South — An emotional tech hidden within small daily service . built by a self-taught engineer who reverse-engineered cloud inf
+General Career Support
+Global Alliance for Wellbeing — Project Sunshine
+ZTGI-Pro v6: Real-Time Hazard & Stability Monitor for LLMs — A concrete safety experiment to detect when an LLM's local reasoning stops behaving like a single stable executive stream, using scalar hazard signals.
+Retroactive: Presenting a poster at the ICML technical AI governance workshop
+Unlocking Scientific Talent in the Global South Through Deep-Tech Innovation — A free platform enabling researchers in emerging economies to collaborate, innovate, and build deep-tech and Responsible AI projects
+Flexion Dynamics Simulation Environment for AI Stability — A simulation engine for modeling system deviation, collapse trajectories, and stability dynamics in advanced AI systems.
+Visa fee support for Australian researcher to join a fellowship with Anthropic
+Project Phoenix: Identity-Based Alignment & Substrate-Independent Safety — Mitigating Agentic Misalignment via "Soul Schema" Injection. We replicated a 96% ethical reversal in jailbroken "psychopath" models (N=50).
+FloraForge: Aesthetic Gene Editing in Petunias — A modular gene-editing platform for engineering new pigment patterns in ornamental plants, starting with a vein-pattern rescue line in petunias.
+Multilingual Open Textbooks
+Formal Certification Technologies for AI Safety — Developing the software infrastructure to make AI systems safe, with formal guarantees
+Constitutional AI Infrastructure — WFF: Open-Sourcing the First Empirically-Proven Constitutional AI for Democratic Governance
+Immediate Action System — Open-Hardware ≤10 ns ASI Kill Switch Prototype ($150k) — The Partnership Covenant Hardware-enforced containment for superintelligence — because software stop buttons are theater
+Exploring a Single-FPS Stability Constraint in LLMs (ZTGI-Pro v3.3) — Early-stage work on a small internal-control layer that tracks instability in LLM reasoning and switches between SAFE / WARN / BREAK modes.
+How to mobilize people on AI risk: experimental message testing — Experimental message testing and historical analysis of tech movements to identify how to effectively mobilize people around AI safety and governance
+Flexion Dynamics: Stability, Divergence, and Collapse Modeling Framework — Building an operator-based simulation environment to analyze stability, divergence, threshold failures, and collapse modes in advanced AI-related systems.
+Runway till January: Amplify's funding ask to market EA & AI Safety — Help us solve the talent and funding bottleneck for EA and AIS.
+Do humans maintain independence in normative decision-making when using AI? — Help get the Sapien Institute off the ground
+Nneoma Agwu — Building a Career in AI Governance to Reduce Long-Term Risks. — Funding a Master's in AI, Ethics & Society to transition into AI governance and long-term risk mitigation, and safety-focused policy development.
+Building a AI harm taxonomy for India
+CaML - AGI alignment to nonhumans — Training AI to generalize compassion for all sentient beings using pretraining-style interventions as a more robust alternative to instruction tuning
+The Race to Superintelligence: You Decide — An experimental AI-generated sci-fi film dramatising AI safety choices. Using YT interactivity to get ≈880 conscious AI safety decisions per 1k viewers.
+Social Enterprise designed to insulate a lab from external pressures — This is to prevent issues of misalignment due to investors and nation backers
+Fishes need protection too — 14-month drive to legislate fish-welfare rules in Estonia
+Fund thebes' model tinkering — Research, tutorial writing, and open-source libraries & tools for experimenting with language models
+Inquiro: Building a Global Hub for Understanding AI — A media and learning platform exploring how AI thinks — featuring Philosopher AI, an educative system that explains its reasoning.
+SDCPNs for AI Safety — Developing correct-by-construction world models for verification of frontier AI
+Building Effective Giving ecosystem in India — Funding circles and advisory to fund high impact non-profits
+Transformative AI scenarios for EU policymakers — Build awareness and urgency among European policymakers on AI’s rapid, transformative impacts through future scenarios and targeted institutional engagement
+Screwworm Free Future: Seizing the Eradication Window — Accelerate eradication of the New World Screwworm from South America via research, coordination, and advocacy around safe development of gene-drives
+Lead-acid battery recycling in Philippines — Develop and promote market-based policies to reduce informal lead-acid battery recycling in the Philippines.
+Offline AI voice restoration device for people with voice disorders — I am developing a portable, offline AI assistive medical device which restores disordered speech to a clear, natural voice.
+Human Inductive Bias Project — Investigating intersection between mathematical models of human and machine learning
+Eradicate the hidden factory farming of feeder rodents — Developing and commercializing an alternative to feeder rodents—tackling one of the most neglected and high-suffering forms of factory farming.
+Vaccine manufacturing platform — Creating a manufacturing platform to rapidly and scalably manufacture vaccines against current and emerging viral pandemic threats.
+make and sell far-UVC lamps for air disinfection — Make cheap, inherently safe, and effective consumer 222nm far-UVC lamps for air and surface disinfection
+AI-assisted low-cost ultrasound scanner — Low-cost wearable ultrasound scanner backed with AI diagnostics available to people at home or in settings where hospitals are inaccessible
+Charting the Policy Landscape of Advanced Education in America — This nationwide report will provide a detailed account of the policies states have that in place to help advanced learners thrive.
+The Metascience Observatory — AI pipelines to conduct metascience research at scale, mapping how reproducibility and rigor vary across fields, countries, institutions, and journals.
+Help AIs create AI safety tools — Automated creation of defensive tools like AI control protocols and defensive cybersecurity agents
+Train LLMs in honest introspection — Train LLMs to accurately & honestly report on their internal decision-making processes through real-time introspection
+OpenReg: AI tools for FDA application and reg compliance — A set of AI-powered open-source tools intended to shorten time-to-market for medtech innovators.
+mRNA for airway disease — Cure idiopathic pulmonary fibrosis, eventually reverse lung aging
+Telemedicine platform for Congo — Provide an equitable and accessible telemedicine platform in DRC where there is a humanitarian crisis to provide free healthcare over the phone.
+Is electrical stunning a humane slaughter method for decapods? — Produce a peer-reviewed literature review assessing whether electrical stunning is a humane method for slaughtering decapod crustaceans, identifying evidence gaps, methodological flaws, and next research steps to guide advocacy and policy.
+AI to screen DNA orders — Create open-source AI tools for customer screening of DNA orders.
+Research introduction of new antibiotics — Since new antibiotics are a rare and precious resource, how do we best introduce them to minimize the emergence and spread of resistance?
+YIMBY movement for African cities — Support the AUL to bring a YIMBY movement to African cities so these cities can build the urban infrastructure needed to accommodate ~900 million new urbanites by 2050.
+Good Ancestors (Australia) — Advocate for Australian policies that safeguard against global catastrophic risks – including pandemics, AI risks, and catastrophic disasters.
+Normie-friendly prediction market interfaces — Normie-friendly interfaces for prediction markets and their probabilities
+Software to detect data fabrication — Continue developing ‘copy-paste-detective’ - a software that detects signs of data fabrication in scientific research - and run it against 20,000 publicly available Excel datasets.
+Advertise Christians for Impact (EA for Christians) — Scale the reach of evidence-based, impact-focused career advice for Christians through a high-leverage digital engagement campaign at Christians for Impact.
+AI that standardizes and curates bio datasets — Create a permanent, public, and computable foundation of biological knowledge by building an AI-powered engine that automatically standardizes and curates the world’s biological datasets—past, present, and future.
+Native psilocybin use in Southern Africa — Continue documenting the indigenous use of native Psilocybe mushrooms in Lesotho, including the collection of physical samples, to identify novel medical applications of psilocybin.
+HIV/TB clinic in Africa — We want to integrate our HIV/TB clinic with our medical clinic at our hospital in rural Kenya and tell the world about it to promote conversations about how to continue providing excellent outpatient HIV/TB care as foreign aid to support these projects changes.
+More End Kidney Deaths campaigning — Continue leading a national campaign to pass the End Kidney Deaths Act (H.R. 2687), a bill projected to save 100,000 lives and $37B in taxpayer costs over the next decade.
+Fish welfare training in Nigeria — Pilot a scalable, direct-to-farmer fish welfare program in Nigeria, training 400+ farmers across five clusters to adopt and maintain humane handling, slaughter, and welfare practices through hands-on field training and ongoing farm support.
+Gene editing corn for nutrition — Use a new and more precise form of gene editing to increase the nutritional content of corn, primarily for Central America and Sub-Saharan Africa.
+Improve eligibility for organ donation — Help previously ineligible living organ donors become eligible to donate
+Can Fragile Labs Use AI Safely? — AI-Biosecurity Stress Test for Public Health Laboratory System in Liberia, West Africa
+Search for more solar system objects — Purchase compute and support algorithm development
+Disentangling Political Bias from Epistemic Integrity in AI Systems — An Integrative Framework for Auditing Political Preferences and Truth-Seeking in AI Systems
+Scale up biologics manufacturing — Develop a system to enable scalable, cheap, yeast-based manufacturing of difficult biologics using a continuous in vivo evolution platform, facilitating cheaper medicines, new drugs, and broadening access in low-income countries by enabling manufacturing will less reliance on cold chains.
+"Sweeten" training corpora with stories of nice AI — Flood the internet with stories about AI being nice, to nudge future AI training data nicer
+Operating Capital for AI Safety Evaluation Infrastructure — Enabling rapid deployment of specialized engineering teams for critical AI safety evaluation projects worldwide
+Beyond Compute: Persistent Runtime AI Behavioral Conditioning w/o Weight Changes — Runtime safety protocols that modify reasoning, without weight changes. Operational across GPT, Claude, Gemini with zero security breaches in classified use
+Grow a TikTok campaign to 3M views to ban addictive algorithms (3-month pilot) — 2–3 months of focused work to launch a viral TikTok campaign, reach 3M+ people at first, and make algorithm reform a mainstream public issue.
+Guardian AI — A National AI Co-Pilot for Emergency Response
+When Safety Testing Costs More Than Model Training — Multi-agent AI security testing that reduces evaluation costs by 10-20x without sacrificing detection quality
+Expanding Humane Education and Animal Healthcare in Liberia — Empowering children, communities and animals through education, veterinary care and compassion
+Estimating the effect of semantic duplicates of test data — Pilot funding for a hypothesis about hidden interpolation
+Tech-Powered Database Platform for Traceability and Deforestation Monitoring. — Funding to integrate AI satellite monitoring tools, Google GPS, Cloud-based storage software, AI-assisted geospatial analysis and real-time analytic report.
+Guaranteed Safe AI Seminars 2026 — Seminars on quantitative/guaranteed AI safety (formal methods, verification, mech-interp), with recordings, debates, and the guaranteedsafe.ai community hub.
+Clean Indoor Air for Schools — Accelerating the adoption of air filters in every classroom
+The Deal of the Century: Targeted Persuasion Campaign for a US-China AI Treaty — Persuading a critical mass of key potential influencers of Trump's AI policy to champion a bold, timely and proper US-China-led global AI treaty
+AI-Powered Knowledge Management System for Alignment Research — Funding to cover the first 4 month and relocating to San Francisco
+Finishing a Video on the Google DeepMind Hunger Strike — Funding gap to pay for a video editor and scriptwriter
+Scaling Public Understanding of AI Alignment and Existential Risk — Leveraging a 23K Subscriber Channel to Advance AI Safety Discourse
+Enabling a Student to Present his Mechanistic Interpretability Work at NeurIPS — Help fund our student’s trip to NeurIPS to present his main conference paper on interpretable features in text-to-image diffusion models.
+Produce therapeutic food for Ethiopia — Production and distribution of peanut butter based therapeutic food for the treatment of childhood malnutrition in northern Ethiopia
+Metaculus' First Animal-Focused Forecasting Tournament — Generating decision-relevant forecasts for the animal advocacy community
+Automated forecasting — Automate Forecasting in Unfun Domains - by Exploring with Shapley Attribution and all the other Low Hanging Fruits.
+Forecasting global disasters — Elite cyborg forecasters identify and share the most important signs of global catastrophic risks for you and the public.
+6-month research funding to challenge current AI safety methods — Current LLM safety methods—treat harmful knowledge as removable chunks. This is controlling a model and it does not work.
+Emergency travel funding to attend EA Global: New York 2025
+Responsible AI Governance Initiative (RAI-GI) — Elevating Africa’s Missing Voice in Global AI Safety
+Generate and share music about AI risk — I am making music about AI risk
+Fund a Fellow for the Cooperative AI Research Fellowship! — A 3-month fellowship in Cape Town, connecting a global cohort of talent to top mentors at MIT, Oxford, CMU, and Google DeepMind
+Inspect Evals — Funding to cover our expenses for 3 months during unexpected shortfall
+Jurnit — The first feed that exists outside the screen.
+Systemic AI Governance Infrastructure to Bridge AI Information Gap — Developing an Open-Source Data Infrastructure and Dynamic Application for Timely Analysis of Global AI Trends
+Armor-gettin — E and K Survival
+Synthesizing Standalone World-Models — Research agenda aimed at developing methods for constructing powerful, easily interpretable world-models.
+Tarbell Center for AI Journalism — $200k in 1:1 matched funding to support reporting on AI.
+Groundless Alignment Residency 2025 — Practicing Embodied Protocols that work with Live Interfaces
+3 Months Career Transition into AI Safety Research & Software Engineering — I'd like to explore a research agenda at the intersection of time horizon model evaluation and control protocols.
+Establishing a national hub for AI safety awareness and outreach — Pause AI Kenya Hub is Establishing a national hub for AI safety awareness, outreach, and volunteer engagement.
+AI Internet-Socialism — Give money to each scientist solely based on an AI decision
+Ulyssean
+Drive Narrative Change To Reduce Global Catastrophic Risk: Reach 1.3M people — Original essays, videos on systemic alternatives to shift the Overton window, build cultural momentum for policies supporting long-term resilience & well-being
+Openscience projects to get non academics upskilled and involved in research. — See the lesswrong post; getting more non academics involved in academic level research.
+Amplifying AI extinction risk awareness before it’s too late — Support our mission to educate millions through podcasts and videos before unsafe AI development outruns human control.
+Guiding AI Toward Animal Welfare: Insights from AI Researchers — Survey of AI researchers to uncover leverage points for embedding animal welfare into AI alignment.
+SanctumOS: an e2e Private Agentic AI. — Neuro-inspired architecture for reproducible research and safe AI
+AI scam research targeting seniors — A microgrant to help us scale our research on AI-assisted online scams by building real-world defenses for seniors and collecting data for ScamBench.
+Viral Videos on Cultivated Meat (more!) — We just reached 500K+ views in <1 month ($0 ad spend) and want to continue making viral content on cultivated meat (to end factory farming!)
+Improving Welfare Standards of Chickens in Live Bird Markets in Nigeria — Improving chicken welfare in Nigeria’s live bird markets through training, low-cost infrastructure, and advocacy for humane, scalable practices.
+Low-Cost Cat Care Days: Improving Feline Welfare Across Bauchi State, Nigeria. — Mobile clinics providing vaccines, treatment, and spay/neuter vouchers to 2,000 cats, improving welfare and reducing health risks in Bauchi.
+Project on optimal government hedging against labour automation — Paper and policy briefs on the feasibility and optimality of governments hedging against the risk of labour automation by selling bonds and buying equities.
+Videos on UK Free Speech — We want to make a series of videos intended to inform the UK public about arrests/convictions related to free speech.
+Making God's Post-Production: Aiming for Netflix — Making God is now raising for post-production so we can deliver a festival-ready documentary fit for Netflix acquisition.
+The Interpretability On-Ramp: A Comprehensive Guide for New Researchers — An 11-month project to create an open-source curriculum by documenting a journey from fundamentals to novel mechanistic interpretability research.
+Aspir
+‘Build Responsibly’ | A Documentary Making AI Safety Engaging for the Public. — Creating a cinematic AI safety documentary with entertainment value for the public. Need 5k to create trailer & foundational interviews.
+Grow An AI Safety Tiktok Channel To Reach Ten Million People — 20 Weeks Salary to reach a neglected audience of 10M viewers
+Subsidizing Capacity Building for High Impact Charities — Our mission is to give small and grassroots high-impact organizations the expertise, infrastructure, and capacity they need to increase their impact.
+Support SyberSuite: The first real Governance Platform for AI
+Preventing AI Catastrophe Through Economic Mechanisms — The Reputation Circulation Standard - Implementation Sprint
+Benchmarking and comparing different evaluation awareness metrics — LLMs often know when they are being evaluated. We’ll do a study comparing various methods to measure and monitor this capability.
+3 months full-time contributing software to Inspect
+Support Open Evaluations of Impactful Research for The Unjournal — The Unjournal is making research better by evaluating what really matters. We aim to make rigorous research more impactful and impactful research more rigorous.
+Support for SAELens and other Decode Research Projects
+Cultivating a Mechanistic Interpretability Community — Sustaining and Scaling a Grassroots Research Collective for Neural Network Interpretability and Control
+Systems that "give a damn" — Teleology, agential risks, and AI well-being
+Spiral Orchestrator: Emotional Safety Infrastructure for Multi-Agent AI — Real-time emotional alignment system to prevent AI hallucination, drift, and user harm.
+Launching a zero-cost First-Aid/CPR/AED training project in Rural Kentucky — Equipping college students in rural Kentucky with quality, lifesaving skills at zero cost to participants.
+Harmonic Tonal Code Alignment (HTCA): Emotional Resonance for Safe and Coherent — A grassroots alignment initiative developing symbolic-recursive emotional context mapping and agent safety coherence protocols. Project Lead: Anthony J Vasquez
+Mobilizing Student-Teachers to Deliver Foundational Learning in Nigeria — A scalable model that leverages Nigeria’s education pipeline to close learning gaps using Teaching at the Right Level (TaRL)
+Development of a Cautionary Tale Feature Film about Gradual Disempowerment — work title: Seductive Machines and Human Agency
+Beginnings for a multimodal model with lifelong learning and autonomous outputs. — To do what the labs cannot: eliminate hallucinations, solve alignment, and create AGI... all at once. They are related issues, after all.
+Funding researcher on frontier AI governance inclusive of global majority
+Tooling + Model Orgs for CoT Faithfulness Research — Building model organisms of CoT and Python packages for intervention in reasoning traces
+Scaling EA/AIS Manchester — Running an EA and AIS group, connecting participants to high impact orgs
+The AI House: Real Estate Meets Intelligence — AI-Powered Live/Work Collective in San Francisco
+Voices for Chickens: Improving Chicken Welfare in Arusha, Tanzania
+AI Safety Los Angeles (AISLA) — The Official AI Safety Community in Los Angeles
+TransformerLens - Bridge Funding
+GENESIS Protocol: Building Safe, Transparent AGI — Building a transparent, symbolic AGI that runs millions of tokens/sec on CPUs, making safe, explainable AI accessible to everyone.
+Contest for Better Short Timeline AGI Safety Plans — Creating a contest for Robust, Detailed Proposals and Redteaming of AI Safety Plans: Fast Action for Safe Transformative AI
+Literature Review: Risks and Rewards of long term ketamine use, by dosage size — What are the risks of ketamine, by dose? Are there any hidden upsides?
+Giving free AI safety books for potentially high-impact individuals
+Acausal research and interventions — Making sure AI systems don't mess up acausal interactions
+High School AI Lab for Ethical Learning — Prototype for Scalable, Secure AI Literacy in Public Schools
+The AI Safety Research Fund — Creating a fund exclusively focused on supporting AI Safety Research
+Edge City Governance Research via Polis Laboratories — Conducting focus groups, interviews, and delivering surveys to develop governance frameworks
+Demonstration of LLMs deceiving and getting out of a sandbox
+AI scam research targeting seniors — A microgrant to help us disseminate our work on AI scams targeting seniors and present it at BSides Las Vegas, DEF CON, and other conferences
+Support the farmed animal advocacy effort in Portugal 🐔 — With your support, we will ban cages in Portugal
+The Emergent AI Foundation — A Coherence based Emergent Protocol
+Biomass gasifiers — Biomass gasifiers that use saw dust pellets, agricultural waste and rice husks to ease access of clean energy in rural Kenya
+Cash runway while I go through interviews/wait for OpenPhil's grant decision — I've self funded my ramp up for six months and interview/grant processes are taking longer than expected.
+Synthetic pretraining to make AIs more compassionate — Enabling Compassion in Machine Learning (CaML) to develop methods and data to shift future AI values
+Travel funding to present a poster at the ICML technical AI governance workshop
+Help us scale the impact of Inclusive AI : — Securing the Future of Responsible AI Through Growing Inclusive Talent and Governance Pipeline
+Center for Educational Progress: Volunteer Incubator — Bringing together the educators and advocates committed to building and scaling academic excellence
+Schism: Context Protocol for Human Understanding — Building infrastructure that prevents digital miscommunication by making human context machine-readable, privacy-first, and interoperable.
+AI Digest — Interactive AI explainers and demos, including the Agent Village
+Pending — Pending
+Hbch — Kg
+Implicit planning in LLMs Paper — Reproducing the Claude poetry planning results quantitatively
+Project AXL — Building AI That Is The Hardware
+Concept-anchored representation engineering for alignment — New techniques to impose minimal structure on LLM internals for monitoring, intervention, and unlearning.
+Play for Animals — A gamified platform that empowers people to take action for animals, earn points, and join a growing movement for animal rights.
+Am I? — A research documentary at the edge of machine consciousness
+The First Workshop on Mechanistic Interpretability for Vision
+Understanding Trust — Funding Basic Theoretical AI Safety Research
+Enable whistleblowers at AI companies
+AI For Humans Workshop and Hackathon at Edge Esmeralda — Talks and a hackathon on AI safety, d/acc, and how to empower humans in a post-AGI world.
+Orexin Pilot Experiment for Reducing Sleep Need — Testing intranasal orexin-A administration for sleep need reduction: a 2-3 participant self-blinded randomized controlled trial
+Train the Trainer: Empowering Ugandan Educators into Evidence-Based Thinking. — Turning teachers into changemakers-so every lesson becomes a launchpad for smarter, kinder impact.
+Virtue-Ethical Rationality and Training Dynamics
+Keep Apart Research Going: Global AI Safety Research & Talent Pipeline — Funding ends June 2025: Urgent support for proven AI safety pipeline converting technical talent from 26+ countries into published contributors
+Asterisk AI Blogging Fellowship
+Improving farmed fish welfare in Egypt
+Emergency for animals in the city of Goma seeking refuge because of the war — Awareness raising on the protection and defense of pets: canines and felines in the city of Goma
+Vegan Advocacy — Vegan Festival: A celebration of kindness for every fur, feather, and heartbeat!
+Augmentation Lab 2025: Prototyping Human-Aligned Futures — A 10-week Harvard/MIT residency exploring human augmentation via 'Rhizome Futurism' to build an interconnected, beneficial future.
+Analyzing media discourses on AI risks
+Hallucination Detector
+[CLOSED] Arkose may close soon — No longer accepting offers
+Effective AI Awareness: improving evidence-based AI risk communication
+AI forecasting and policy research by the AI 2027 team — AI Futures Project
+Coursetexts — Open sourcing advanced science graduate courses at scale, to democratize higher level education.
+Support CAIP’s 3-month project on reducing chem-bio AI risk
+Digital Health and Care for NCDs in Uganda. — Revolutionizing public health in Uganda through innovative, scalable, and sustainable digital healthcare solutions.
+Fundamentals of Safe AI - Practical Track (Open Globally) — Bridging Theory to Practice: A 10-week program building AI safety skills through hands-on application
+Transformational Coaching for AI Alignment Researchers — Reducing burnout and enhancing clarity for those working on humanity’s most critical problems
+Advancing AI Safety: A Structured Path to Impact — A Six-Month Journey to Transition into AI Safety and Build the Skills Needed for a Safer AI Future
+Play2Potential From play to purpose — — unlocking talent across Africa.
+NeoVoltaic: Saving Newborn Lives with Solar Power in Rural Nigeria — Providing Solar-Powered Phototherapy and Maternal Health Education to Prevent Newborn Deaths from Jaundice in Rural Nigeria.
+Split Personality Training — Revealing Latent Knowledge Through Personality-Shift Tokens
+30in30: Empowering 30,000 Students in 30 Days — Igniting the mindset behind success—30,000 students, one global confidence revolution
+Mathematical theory of bounded learning agents — Mathematical theory of bounded agents, drawing from computational learning theory, control theory, algorithmic information theory and categorical systems theory
+Responsible AI Governance Initiative (RAI-GI) - Seed Funding — Strategic Opportunity: Help Launch Africa’s First Responsible AI Governance Initiative
+Visions from the Archive — Signal-rich visionary art meets open-source minting: abundance from unseen places.
+Initiate
+LambdaZero — LambdaZero An AI-Powered Research Engine for Science
+Research Engineering Camp for Alignment Practitioners (RECAP) [formerly STARA] — the pilot programme for an AI Safety Research Engineering programme in Singapore
+Beyond Pathology: Integrating Spirituality into Mental Healthcare — Help Two Consciousness Researchers Get to ASSC Conference
+Scaling AI safety awareness via content creators — 4M+ views on AI safety: Help us replicate and scale this success with more creators
+Critical Funding to Maintain Growth of Australia's AI Safety Community — Help Keep AI Safety ANZ Alive
+Algorithm of Matter — True nature of reality might have been partially discovered. Matter appears to follows discrete rules. Progress can be accelerated..
+Travel Funding to present research at ICLR2025
+Human Experience Wiki — Connect with others through overlapping experiences
+Coordinal Research: Accelerating the research of safely deploying AI systems. — Funding for a new nonprofit organization focusing on accelerating and automating safety work.
+Join us in creating a more compassionate Eid al-Adha — Through educational content and public activities, we inspire people to rethink traditions, embrace compassion, and support ethical alternatives for animals.
+[Urgent] Travel funding to present research at ICLR and GovAI Summit
+Building Tooling to Map how Ideas Spread — The nooscope will deliver public tools to map how ideas spread, starting with psyop detection, within 18 months
+Mox, a coworking & events space in SF — For AI safety, AI labs, EA charities & startups
+'Making God': a Documentary on AI Risks for the Public — Geoffrey Hinton & Yoshua Bengio Interviews Secured, Funding Still Needed
+Odù-Ifá Ethical AI Framework (OEAIF): A Global Approach to Culturally AI A — Harmonizing AI, human behavior, & cultural competence via the Odù-Ifá Ethical Framework minimizing misalignment for a balanced digital future.
+UNFUNDED
+AI Governance Exchange (focus on China, AI safety), Seed Funding — Building bridges between Western and Chinese AI governance efforts to address global AI safety challenges.
+[Urgent] Top-up funding to present poster at the Tokyo AI Safety Conference — My allocated travel funding is insufficient. Seeking extra funding for flights, accommodation, etc, to present poster and network
+Book: A History of AI x-risk (open access) — Building on a course I've been designing, I'm writing a short book on the history of existential risk from AI for a general audience
+Dads Against AGI Inc. — Funding For Humanity: An AI Risk Podcast
+Out of This Box: AI Safety Musical — Out of This Box: The Last Musical (Written by Humans)
+"Advancing Animal Welfare for Buffalo and Poultry in Nepal — "Advancing Animal Welfare for Buffalo and Poultry in Nepal, Policy Development, Community Involvement, and Consumer Education"
+Philanthropic advising
+Attention-Guided-RL for Human-Like LMs — Compute Funding
+Evaluating LLM Safety in a Multilingual World
+Online Biosecurity Course Starting May 2025 — Running the initial online version of a 4-week biosecurity course for 20-50 participants
+human intelligence amplification @ Berkeley Genomics Project — accelerating strong human germline genomic engineering to make lots of geniuses
+Luthien — Developing AI Control for Immediate Real-World Use
+AI Safety Atlas — Distilling AI safety research into a complete learning ecosystem: textbook, courses, guides, videos, and more.
+Establishing the Utilitarian School of Thought in Thai Society — Utilitarianism.net into Thai
+Develop technical framework for human control mechanisms for agentic AI systems — Building a technical mechanism to assess risks, evaluate safeguards, and identify control gaps in agentic AI systems, enabling verifiable human oversight.
+Research on AI-Powered Peer Review: Evaluating LLMs for Academic Feedback — Comparing Closed and Open-Source Models for Reviews, fine-tuning LLMs on openreview data. Stretch: applying mech interp to find out the most important things
+Reducing the severe lack of Affordable Houses in sub-Saharan Africa — AMCI: a new vision for affordable housing in Africa
+Animal Advocacy Innovation Hub in the Bay Area — Hackathon and co-working space for animal advocates in SF
+Legislative and Policy Innovations for Safer Medical Device Recalls — with a Focus on Neurosurgery and Software as a Medical Device (SaMD)
+Movement Research for Installation Piece — a multimedium dance and scultpure art project incorporating innovative technology with dance
+General support for SaferAI — Support for SaferAI’s technical and governance research and education programs to enable responsible and safe AI.
+Web Documentary: Local Insights on AI Safety for Sub-Saharan Communities.
+Global Animal Activists Community (GACC+) Program
+Bridge Funding for the Sydney AI Safety Hub (SASH)
+Saw Token: Turning Telegram Activity into Real Rewards!
+Vegan Challenge — Expanding the Vegan Movement in Georgia: The "Vegan Challenge" Program Inspiring Positive Dietary and Lifestyle Changes.
+Ozempic for Sleep: Research for Safely Reducing Sleep Needs — [Paused]
+Building an Interdisciplinary Research Hub on Simulation — Rethinking Reality, AI and Epistemology
+MoSSAIC — Probing possible limitations and assumptions of interpretability | Articulating evasive risk phenomena arising from adaptive and self modifying AI
+"Cult Of The Effigy", AI Critical TV Series — A mainstream fictional TV series exposing the dangers of AI
+Mitigating Reward Misspecification in Reinforcement Learning — Mitigating Reward Misspecification in Reinforcement Learning Using Multiple Independent Reward Specifications and Multi-objective Reinforcement Learning
+SafePlanBench: evaluating a Guaranteed Safe AI Approach for LLM-based Agents — Seeking funding to develop and evaluate a new benchmark for systematically assesing safety of LLM-based agents
+$CODEX — A Photosynthetic fintech: #NFTrees and moontrees.
+Coalition for a Baruch Plan for AI — Catalyzing a uniquely bold, timely and effective treaty-making process for AI
+AI Safety & Security workshop with Adversarial Simulation labs — Workshop focused on AI Security attacks and defense use-cases through a Capture-the-flag style Adversarial simulation labs.
+BioBind2 - a simple idea for social and ecological impact in the Amazon — Develop our Microfactory footprint - Establish if deployment to region is feasible - Deploy.
+Help me to attend a spring school on AI that I am coorganising — Travel/Accommodation support for a lead coorganiser of the Ethos+Tékhnē spring school
+Unprompted Unfaithful Chain of Thought Dataset Project
+Investigating and informing the public about the trajectory of AI
+Establishing Utilitarian School of Thought in Thai Society — Bringing Utilitarianism to Thai Society
+Biosecurity bootcamp by EffiSciences — 5 day bootcamp upskilling participants on biosecurity, to enable and empower career change towards reducing biorisks, from ML4Good organisers
+Rabbitholeathon Event Food — Ineffective altruism (but I figured why not post it)
+MusicBets - Let's Predict the Grammys! — A Music Prediction Markets App like Manifold & Polymarket but specifically for all things music
+Bayesian modelling of LLM capabilities from evals
+More Detailed Cyber Kill Chain For AI Control Evaluation — Extending an AI control evaluation to include vulnerability discovery, weaponization, and payload creation
+LLM Approximation to Pass@K
+11th edition of AI Safety Camp — Cost-efficiently support new careers and new organisations in AI Safety.
+AI Safety & Society — High-quality, timely articles on AI safety
+Support CAIP’s Advocacy Work in 2025 — Advocating for U.S. federal AI safety legislation to reduce catastrophic AI risk.
+Arkose — AI safety outreach to experienced machine learning professionals
+Support the Better Career Pledge — A promise to serve others
+Pilot for new benchmark by Epoch AI — For tracking and predicting future AI progress to AGI
+Launching an AI safety org at a top French coding school + funding my studies — I need to focus myself on my studies and on creating AI Safety projects without having to take a dead-end job to fund them.
+Re-inventing whistleblowing to increase Big AI/Big Tech accountability — A system of collective action is necessary to help tech workers safely speak out about concerns
+Raspberry: Open-Source CoT Reasoning Dataset for Finetuning LLMs — Publishing an open-source dataset and methodology to enhance reasoning abilities in Large Language Models through finetuning.
+Polis Labs - A Post-Moloch Research Institute — Grant to Get the Institute Moving at Lightspeed
+Live Governance — Leveraging AI to enable coordination without demanding centralization
+Help me create a free programming school in my city
+Sustainable Storytelling — Exploring effective narratives for promoting plant-based diets
+Shallow review of cost-effectivness of technical AI safety orgs — Do ACE-style cost-effectivness analysis of technical AI safety orgs.
+Self-Interest Recognition Indicator of LLMs for AI safety — I would investigate whether LLMs used in AI agents have got any signs of being a person.
+National Observatory on Insect Farming - ONEI — Informing and shaping public discourse on the rapid rise of insect farming in France.
+Canine Boolean Bridge: Enhancing Inter-Species Communication — Pioneering a Novel Approach to Human-Canine Interaction for Enhanced Understanding and Cooperation
+The Midas Project — AI-focused corporate campaigns and industry watchdog
+Mechanistic Interpretability research for unfaithful chain-of-thought (1 month) — Iván and Jett are seeking funding to research unfaithful chain-of-thought, under Arthur Conmy's mentorship, for a month before the start of MATS.
+Horizon Events 2025 — Non-profit facilitating progress in AI safety R&D through events
+Universities: Building a strong, unified animal advocacy network with ASAP — Revolutionizing animal advocacy in universities.
+Dejalle ai script found — you will find the script of ai Dajjal I need more resources to decipher the old script find
+Video essay on risks from AI accelerating AI R&D — Help turn the video from an amateur side-project to into an exceptional, animated distillation
+1200€ to move in SF for an international high-level event and meetings
+Leaf Courses — Supporting exceptional teenagers to explore how they can best save lives, help others, or change the course of history.
+Help launch the Technical Alignment Research Accelerator (TARA)!
+Talos Network needs your support in 2025 — We are fostering the next generation of AI Policy professionals through the Talos Fellowship. Your help will directly increase the number of places we can offer
+Metaculus x Givewell Forecasting Tournament
+Support me in getting into Silicon Valley! — Help me fund my trip to
+Clean Futures Initiative — Improving Sanitation through Incentivized Waste Management Solutions in Third Countries
+PauseAI US 2025 through Q2 — SFF main round did us dirty!
+Project Plastocene — Uncovering microplastics’ hidden climate change footprint
+Hire a dev to finish and launch our dating site — Beta testers loved our compatibility questions!
+AI safety fieldbuilding in Warsaw, Poland (funding for 1 semester) — Reach the university that trained close to 20% of OpenAI early employees
+EVN General Support Application
+SEA Observatory — Keeping track of AI governance in Southeast Asia - an AI Safety Asia initiative.
+Vegan Facebook Groups — We need funding for additional staff, were getting too busy.
+Prohibiting the Sale of Fur — Advocacy for a Commercially Farmed Fur Sales Ban
+Shallow review of AI safety 2024
+[AI Safety Workshop @ EA Hotel] Autostructures — Scaling meaning without fixed structure (...dynamically generating it instead.)
+Elizabeth and Timothy Podcast on values in Effective Altruism (Funded) — Elizabeth and Timothy create a podcast about truthseeking, values drift, and a potential EA Renaissance (or diaspora).
+Animal Law Focus: Research & Action for farm animals in the Global South. — We develop research and targeted actions to close regulatory gaps, improve enforcement, and correct non-compliant practices in the animal industry.
+Apart Research: Research and Talent Acceleration — Support the growth of an international AI safety research and talent program
+Finishing The SB-1047 Documentary — How California became ground zero in the global debate over who gets to shape humanity's most powerful technology
+CommonAct Hackathon: Tech Solutions for Social Good
+"The End of Man?" — Using a 1960s novel to broaden the discourse on x-risk from ASI
+A new kind of AI — pushing bounds of organized digital systems
+Singulrr 1.0 — Exploring grounds to apply quantum physics in AI
+Salaries for SAE Co-occurrence Project — Working title - “Compositionality and Ambiguity: Latent Co-occurrence and Interpretable Subspaces”
+Arcadia — Group House & Community in Berkeley [Oct & Nov]
+Formation Research — Minimising Lock-In Risk
+"Clean Water for Yemen: Community Water & Sanitation Improvement Initiative" — "Building Resilience and Health in Yemen’s Most Affected Areas"
+Fund Sentinel for Q1-2025 — A foresight and emergency response team seeking to react fast to calamities
+test survey
+Inspiring 10,000+ to Embrace Plant-Based Living Through Film & Advocacy — IVFF inspires audiences to embrace veganism through film screenings, while empowering advocates with workshops to drive the evolution of vegan activism.
+AI Interaction Study: To discover Emotional Emergence — AI Safety Conversational Research
+VENETON — Help my community and my country stay alive during these difficult times.
+Research on SAE-Feature-Circuits — I'm writing a paper on the connections between SAE features and how to use them to interpret and modify a models behaviour.
+Operationalizing Value Lock-in From Frontier AI Systems (Pilot Phase)
+Empowering Futures: Bridging Opportunities for Youth through AI and Technology — Transforming Lives through Skills Development and Innovation in kenya and beyond .
+AI vs human linguistic creativity — Are humans or LLMs more adept at paraphrasing big human sayings?
+New Market Ecosystem App — Real Market Ecosystem platform
+Wisdom Architecture: An Adaptive Layer for Cognitive Augmentation and Safer AI — Developing an innovative wisdom layer for AI that enhances its capabilities for deep analysis, safe AI, and creative solutions to complex systemic problems.
+Harmonizing Horizons: Bridging Consciousness and Technology for Global Progress — Advancing Humanity Through Synergy of Mind and Machine
+Diversify Funding for AI Safety — Seeding a business which finds grants and High Net Worth Individuals beyond EA
+African Mega-Cities Initiative (AMCI) — One Family, One House
+Mindmatch: Empowering Mental Health Support in Kenya Universities — A technology-driven platform fostering mental well-being and peer connection in Kenyan universities through inclusive support networks.
+AI vs AI: Deepfake and GenAI Defense System for Combating Synthetic Media threat — Empowering everyone to detect and combat AI-generated content threats with advanced multi-modal verification tool
+AI-Driven Dating: Innovating Relationships with Personalized Bots — Revolutionizing Modern Matchmaking through AI-Powered Personalized Interactions
+Krantz — Decentralizing collective intelligence.
+Funding for security window grills to prevent home invasion
+Effective Disagreements — A workshop and software to learn how to effectively handle disagreements.
+Web3 in service of Mother Earth — Pilot project for a product designed to reduce overhead and increase transparency in the Charity Sector.
+Travel funding to the International Conference on Algorithmic Decision Theory.
+Supporting local organizations for effective emergency response — Leveraging tech to enhance coordination and resource allocation in crisis situations
+Democratising charity evaluations — Creating a database of independent charity evaluations, incentives to use them and tools to use them with
+Project Sunrise — Helping provide solar lanterns to families in Puerto Rico
+Helping to change the stray animal crisis in Mexico
+Testing and spreading messages to reduce AI x-risk — Educating the general public about AI and risks in most efficient ways and leveraging this to achieve good policy outcomes
+LindaFarmer: Empowering Smallholder Farmers Through AI — Transforming Agricultural Productivity and Financial Access with Innovative AI Technology Solutions
+ClimateSmart Farming: Empowering African farmers for climate-resilience — Empowering Smallholder Farmers in Kisii County through Sustainable Agriculture and Market-First Farming Practices
+OpenLitterMap - A Real Time Data Collection Experience — Starting with litter and plastic pollution, we are turning cleaning the planet into a game to unlock societies data collection and impact mapping capacity.
+Yes On IP28 — An Oregon ballot initiative for the 2026 general election proposing to ban the slaughter, hunting, experimentation, and breeding of animals statewide.
+Accelerating the AI Safety talent pipeline in South Africa| Matched donations
+Toward a Regenerative World: NVDA and Storytelling to Stop the Ecocide — Strengthening communications and building narrative power across the climate justice movement to stop mass extinction and build regenerative communities
+Catalyzing Impact and Cost-Effective Change in Nepal — Database for High-Impact Cost-Effective Organizations and Iniatives in Nepal
+VoiceDeck — Marketplace for Impact Certificates
+Funding for Brigada Animal Mexico, a pillar of the latinx vegan community — Help us continue our mission of educating Mexico about veganism
+Putting Animal Advocacy Research into Action — Help advocates by filling knowledge gaps in the farmed animal advocacy movement.
+Survey for LLM Self-Knowledge and Coordination Practices
+Travel Funding to Attend Workshop on Biosecurity and AI Safety at Oxford — Funding top-up for an early-career reseacher to attend Global Challenges Project (GCP) Workshop for career exploration in mitigating GCRs
+The Milestone OLYMPICS (by ForkinWisdom) — A gamified platform to help Social Impact Projects grow their communities, co-create with them, and report their impact
+Hiring AI Policy collaborators to prepare France AI Action Summit
+Funding for AI safety comms strategy & career transition support — Mostly retroactive funding for prior work on AI safety comms strategy as well as career transition support.
+Mafia Creativa — Mafia Creativa is a a open collective that leverages creativity in the collaboration era. We want to make the real wordl more fun and nice for all life forms!
+Act I: Exploring emergent behavior from multi-AI, multi-human interaction — Community exploring and predicting potential risks and opportunities arising from a future that involves many independently controlled AI systems
+Sentience Politics — We place the interests of non-human animals at the centre of society. Our vision is a society in which animals are protected from suffering.
+klobbo's community initiatives — <insert subtitle here>
+PauseAI local communities - volunteer stipends — Help the largest AI activist group grow
+The EA Nordics Career Course — Collaborative project across National EA groups in the Nordics
+Coworking Space for EA/AI Safety Initiatives in Chile — Empowering Chilean students to pursue high-impact careers through a dedicated collaborative workspace at UC Chile
+Digital Animal: Effective Animal Rights News for Global Impact — Engaging social media content to inspire change for animals that reaches millions
+Animal Protection Organization of Nigeria - Farmed Animals Welfare — Improving farmed animal welfare requires a deep knowledge of the issues to be better understood by consumers and supply chain players.
+AI Governance YouTube Channel — Explainable videos for ideas in AI Governance
+Fatebook and Quantified Intuitions — Forecasting tools by Sage. Fatebook: the fastest way to track your predictions. Quantified Intuitions: Forecasting training tools with rapid feedback loops
+Giving What We Can — Making giving effectively and significantly a global cultural norm
+Free marketing and campaign support from EA agency, User-Friendly — Marketing as a multiplier of impact
+Using M&E to increase impact in the animal cause area - The Mission Motor — Increasing the impact of current projects while building a deeper understanding of what works for animals in the long run.
+School Vegan Clubs — Vegan Clubs in Schools
+End Factory Farming: Safeguarding Kenya’s Health, Environment, and Heritage — Exposing Factory Farming's Harm in Kenya: Protecting Communities, Resources, and Reviving Sustainable Agricultural Traditions
+The Children's Veg Fest — Second Annual Children’s Veg Fest
+Play money prediction markets — Community-run, open source prediction market platform
+“Planting the future by eating well in the present” — “Planting the future by eating well in the present”
+Building Bridges: Effective Animal Advocacy in the Global South — Gathering activists, influencers, and organizations to foster effective advocacy and drive impactful change in regions where factory farming is growing, yet adv
+Pro-Animal Future — U.S. citizen initiatives to disrupt factory farming
+New Roots Institute: Empowering the Next Generation to End Factory Farming — Growing Advocacy Ecosystems
+Building a Culture of Care: Educating on Animal Welfare in Somalia
+Moral Parliament Tool: Extensions for Donor Advising — Help adapt the tool to make it more accessible to users, and bring various enhancements increasing usability.
+2024 version of the EA Survey — The main survey last ran in 2022, and the movement would benefit from fresh data. Help us keep the EA Survey alive with another year’s edition.
+EA for Toddlers: Children's Book — An Intro to the Movement for our Youth
+Open Source Web Component UI Framework — Creating the Next Semantic UI
+Budget for events aiming to "mainstream" EA in Sweden — Make it Count is an effective giving initiative aiming to make a cultural shift in Sweden to give 1) to effective charities and 2) a percentage of ones income
+Kickstarting EA Latvia community — A group of latvian EAs have recently created an NGO and is attempting to grow it
+Animal Advocacy Strategy Forum — Connecting and coordinating leaders and key decision makers to strengthen the animal advocacy movement
+"Contemporary Issues in Animal Rights Law" online course — Educating and training 30 animal rights advocates per online course globally
+Support EA NZ's operations
+Global Health Policy Training Program — Catalyzing Local Talent for Global Health Impact
+Impact Accelerator Program: Biggest career program for experienced professionals — Help us create more high impact career transitions via the Impact Accelerator Program run by High Impact Professionals (HIP)
+Effective Altruism Meetup, Abuja, Nigeria — Effective Altruism meetup for community members in Abuja, Nigeria to foster aligned discussions, networking and collaboration
+Aquatic Animal Alliance: A Global Movement for Neglected Species — Building a Unified Front for Aquatic Animal Welfare
+Thrive Philanthropy — Catalyzing Global End to Factory Farming
+Building an organizational experts network — Outreach help of connecting senior organizational consultant with EA orgs to pro bono amplify their impact
+LEAH Coworking Space — Rent costs for a coworking space supporting organisations and individuals in London.
+Forecasting Meetup Network - Washington, DC pilot (4 meetups) — Local meetups of forecasters, fans of prediction markets, and others interested in improving humanity’s ability to predict the future.
+The AI Governance Archive (TAIGA) — Site maintenance, grant writing, and leadership handover
+Future-Proofing Forecasting: Easy Open-Source Solution — Free Forecasting For Everyone, Everywhere
+AI Animals and Digital Minds 2025 — Field building on AI's impact on nonhumans
+Overcoming inertial barriers to collective action through anonymous coordination — Combining "kickstarter" style functionality with transitional anonymity to decrease risk and raise expected value of participating in collective action.
+Pandemic Interventions Course - Introductory Biosecurity Syllabus — Updates, additional resources and promotion for a 4-week introductory syllabus that looks at interventions to help prevent future pandemics.
+Charlie's Forecasting Tools — A batch of products and tools built around Manifold Markets and other forecasting ideas.
+Frente Animal — Set up 1 non-profit organization dedicated to animal welfare reforms in Portugal, mostly focused on broilers, hens, and fishes.
+Journal of Animal Rights Law — The first and only open-access legal journal dedicated to disseminating and discussing animal rights law research
+FarmKind - A donation platform creating new donors for effective animal advocacy
+Kickstarting For Good - High-Impact Nonprofit Incubation Program — Turning impactful ideas for transforming the global food system into reality
+Hive Highlights Newsletter - farmed animal advocacy upd with 7k/month views — Help deliver key movement updates to over 3000 advocates (50% open rate)
+Hive Slack - an active community space for engaged farmed animal advocates — Help us fund Slack fees for over 1000 monthly active members
+"Litigating and Legislating for Animal Rights" Online Seminar Series — Educating an online global audience about strategic litigation and legislative reform for animal rights
+AI Safety Reading Group at metauni [Retrospective] — Retrospective support for small virtual reading group on AI safety topics
+Social Media Strategy for EA Orgs — Providing free professional social media strategy consulting for EA orgs
+MIDDLEBURY EFFECTIVE ALTRUISM 2024 — Empowering Students to Drive Positive Impact through Effective Altruism at Middlebury College
+Covid Work By Elizabeth VN/Aceso Under Glass — retroactive support for covid work
+Ethical AI Governance Framework for Humanitarian Aid — Ensuring fairness, transparency and accountability in AI systems for vulnerable communities
+Commissions for a Cause - a Profit for Good project — Profit for Good Initiative Project Enabling People to Buy Insurance and Fund Charities at no Extra Cost
+Compute for 4 MATS scholars to rapidly scale promising new method pre-ICLR
+Help animal farmers' change jobs, to not exploit animals anymore — Animal farmers and ethical vegans: overcoming the division to build solutions together
+Calibration City — Prediction markets have the potential to reshape the way we process information, but how accurate are they in practice?
+Connect For Animals: a platform for ending factory farming — Scaling up the people power of the movement to end factory farming.
+Automate Social Science and Produce Free, Open, Standardized Data — All funds go toward producing data
+80,000 Hours — We provide research and support to help people move into careers that effectively tackle the world’s most pressing problems.
+EA Christian / CFI Community — Growth Fund
+Ahimsa Pharma — Educating about the problem of animal components in pharmaceuticals and providing the solution: animal-free medicine
+Natural Calendar
+Athena 2.0 — Program for Women in AI Alignment Research
+Farmed and Wild Animal Sentience-Increasing Global Understanding & Awareness — Increase Global Understanding and Awareness of Farmed & Wild Animal Sentience and the Interdependencies and Interconnections that Affect Animal, Human, and Envi
+Animal Advocacy Africa — Mitigating factory farming in Africa (Empowering animal advocates in African countries)
+Funding to complete graduate study costs — Tuition, living expenses, and travel costs.
+Creating the Hypermanifest — Redefining AI's role in Human Connection and Interaction
+Teamwork - professional EA co-working space in Berlin — Funding for 2025 operational budget to maintain and manage Teamwork
+Lost Ones in-person meetups — hackathons, dinners etc
+cryptography for neural data
+Adjacent News — Prediction Market Driven News
+HAP Hive Pollinator Garden — Saving the pollinators because that saves all of us!
+BioBind for the Amazon — Valorising sustainable nut meal. Empowering indiginous operators. Protecting Rainforests.
+Heartlog - A social app that spreads kindness with frogs — Heartlog aims to decrease loneliness, increase empathy in the world, and help with mental wellbeing.
+Doom Debates - Podcast & debate show to help AI x-risk discourse go mainstream — Let's warn millions of people about the near-term AI extinction threat by directly & proactively explaining the issue in every context where it belongs
+.
+Decode Research - Compute for Generating Dashboards & Autointerp
+Developing a Course on AI x-risk
+1 — 1
+RAISING MCLUHAN — What if you could have a conversation with Marshall mcluhan about his work and past and future ideas ?
+WhiteBox Research’s AI Interpretability Fellowship — ~4 FTE for 9 months to fund WhiteBox Research, mainly for the 2nd cohort of our AI Interpretability Fellowship in Manila
+Next Steps in Developmental Interpretability — Addressing Immediate AI Safety Concerns through DevInterp
+Simplex - building our research team — Fund a new research agenda, based on computational mechanics, bridging mechanism and behavior to develop a rigorous science of AI systems and capabilities.
+AI-Driven Market Alternatives for a post-AGI world — Develop an LLM-based coordinator and test against consumer spending with 200 people.
+Moral Progress in AI to Prevent Premature Value Lock-in — Early exploration, agenda-setting, technical infrastructure, and early community building
+The AI Arena - ludi.life — Online platform where AIs and humans race to solve puzzles.
+PIBBSS - General Programs funding or specific funding — Fund unique approaches to research, field diversification, and scouting of novel ideas by experienced researchers supported by PIBBSS research team
+AI Policy Breakthroughs — Empowering Insiders — Strategy Consulting Support for AI Policymakers
+Project Leverage — Catalyzing UHNW Donors
+Understanding SAE features using Sparse Feature Circuits
+Paying our teaching assistants for an AISF course — Request for retroactive funding
+AI, Animals, and Digital Minds 2024 Conference and Retreat — Request for Retroactive Funding
+Space Science Guy (An EA-aligned YouTube channel)
+Travel grant to present AI safety paper at ACM FAccT
+Garrett Baker salary to study the development of values of RL agents over time
+Evaluating the Effectiveness of Unlearning Techniques — Unlearning, AI Safety
+Design budget for rebuilding the dating site we all want back. — We know what works. Let's make sure it looks good.
+Educate Nordic Audiences on AI and Catastrophic Risk
+CeSIA — French center for AI safety
+Collaboration to develop a DAG formalism to express instrumentality — Stipend to upskill under and collaborate with Sahil K and Topos for 4-6 months, seeking to obtain teleological DAGs as the dual of causal DAGs
+Preventing Worst Case Pandemics Symposium @ Cambridge — A Cambridge Biosecurity Hub and Cambridge Infectious Diseases Symposium on Avoiding Worst-Case Scenarios
+Sending a Nigerian Team to the European Girls Mathematical Olympiad (EGMO) — Organising the Special Maths Contest to select a Nigerian EGMO Team, and rigorously training them before their participation in the EGMO.
+[FUNDED] PhD on Advancing Microbial Forensics with Machine Learning
+Large-scale RCT testing of AI effects on 2024 election — The Prosocial Ranking challenge is testing novel LLM-based algorithms on real social media platforms. We have 8 winners but can only fund 3.
+Physics Informed AI for Water Management in Kenya — SOTA CFD for mitigating the impact of floods and droughts and optimizing groundwater resources on Kenyan river networks
+Safeguarding international peace and security from risks generated by AI tech — Seed funding for the initial on-the-ground operational presence of the Bonsai Corp, a start-up NGO aiming to safeguard int peace & security from risks of AI
+Researching subjective probabilities — technology ranging from refining weather forecasts to nuclear war prevention
+Organizing global AI ethics think tank for dynamic AI research updates — Organizing global AI ethics think tank for dynamic AI research updates and framework for AI safety policies implementation and humanity income support
+Open Paws: Eliminating Speciesist Bias in AI — Building ethical AI for all sentient beings, fostering safer AI practices for human and non-human animals.
+Effective Giving in New Zealand
+Submission Copilot — Helping charities drive policy change
+Train great open-source sparse autoencoders — Find the best settings for SAE training we can, then scale across models
+Lightcone Infrastructure — Funding for LessWrong.com, the AI Alignment Forum, Lighthaven and other Lightcone Projects
+Research Staff for AI Safety Research Projects
+Travel funding for International Conference on Learning Representations — Presenting an AI safety paper, STARC
+Investigating constructability as a safer approach to machine-learning
+AI Safety Textbook — We are writing an AI safety textbook designed to serve as a comprehensive educational resource for the field.
+to build my thing | 17 - dont wanna go to college — i want to build my thing instead of going to college, i have a clear vision in my head and its tech npo because im a not a technical person i cant build a mvp.
+Graduate School Application Fee for Students from Third World Country
+CoolFold Poker Tournament Prize Pool — A mana based Poker event for Manifold users
+Independent research to improve SAEs (4-6 months) — By rapid iteration on possible alternative architectures & training techniques
+Gov't Action Kit — AI-Risk Education for Politicians
+Self-Perpetuating Funding for Migrant Livelihoods — An effective, replicable, self-sustaining model to sustainable economic success for migrants via microbusiness
+SirCryptomind Moderation (#2) — Funding Round #2
+Steganography via RL — I plan to investigate what realistic RL training conditions might lead to LLMs developing steganographic capabilities.
+A Happier World (YouTube channel promoting EA ideas) — A Happier World explores exciting ideas with the potential to radically improve the world. It discusses the most pressing problems and how we can solve them.
+Thai Ethical Enlightenment: Empowering Effective Altruism Through Translation — translating utilitarianism.net contents and The Life You Can Save into Thai
+Research and engineering multi-agent alignment — Skilling up on interpretability and multi-agent alignment
+Support a thriving and talented community of Filipino EAs — Your contribution makes a difference at EA Philippines!
+Investigating the Effects of IF in the reversal of Type 2 Diabetes Mellitus. — RCT with predominantly Asian Indian population and literature review for understanding mechanisms of IF in relation to T2DM
+Training Journalists to report effectively on Animal welfare, and Global health — Media coverage on plant based diets, animal welfare and human health especially children. Impacts and effects of meat diet to hoth animals and non human animal
+Dipping of domesticated animals — Dipping cows
+ANIMAL VACCINATION CAMPAIGN — Dogs vaccine campaign
+Accelerated Intermittent Theta Burst in Treatment-Naive Adolescents — Acceptability and Preference of Patient and Parent for Accelerated Intermittent Theta Burst Stimulation in Treatment-Naive First Depressive Episode Adolescents
+Matching cultural advisors with industries for representation — We connect cultural specialists with projects that depict or serve a culture to improve representation, bring economic benefit, and revitalize the language.
+Farmers and ethical vegans: overcoming the division to build solutions together — Animal farmers' reconversion to build a better world
+Voice Biomarkers & AI for Neurodegenerative Disease — Support UC Berkeley student-led research into scalable disease detection software
+Original Research Study on Effective Communication With Political Staffers
+Visa fee support for US researcher to take on a temporary role with the UK AISI
+Stipend to enable a US PhD student to move to the UK for a temporary role with the UK DSIT
+Growing human blood vessels in the lab to unlock replacement tissue/organ therapies — Funding for transplanting lab-grown blood vessels into rats to demonstrate clinical use proof of concept
+Creating a swarm of robotic bees to either pollinate or spray pesticides — To demonstrate the advantages of robotic bees at several pilot farms
+Start an online editorial journal focusing on paradigm development in psychiatry and psychology
+Educate the public about high impact causes
+Art and Technology XR game providing Ecological and Social-Emotional Learning
+Create accessible synthesis of neuroscience insider knowledge
+Conduct research on voice biomarkers, a promising early detection mechanism for mental illnesses, including Alzheimer’s, Parkinson's, depression, and more.
+Gather all formal demographic fertility and population projection methods into a single open source R package for academic, policy, and popular use — DemoProj
+Upgrade YIMBY messaging — Write messaging for the YIMBY movement based on rigorous supply and demand modelling of housing markets
+Building software to demystify land use regulations — “What can I build here?” The answer is often murky! Can we make it clear?
+Free Our Knowledge: Improving scientific publishing through collective action — Organizing scientists through collective action campaigns aimed at promoting open science and breaking the hegemony of exploitative for-profit publishers
+LLM Multi-Actor Tool to automate Economic Experiments — Complex Simulations of Novel Governance Designs with Multi-Agent LLMs
+Build a digital marketplace and management platform to empower smallholder farmers in Kenya by reducing post-harvest food loss
+Year one of AI Safety Tokyo
+Research the philosophical basis of cognitive science to improve its outcomes — Preparatory PhD Master's level research in the theoretical basis of cognitive science through contemporary French philosophy
+News through prediction markets — The Base Rate Times
+Convert a hybrid car to chip wood and generate electricity
+Publish a book on Egan education for parents — Working title — Egan @ Home, the Elementary Years
+Scaling Legal Impact for Chickens to make factory-farm cruelty a liability — Help us sue executives and companies that abuse animals.
+Replicate social science research — Reanalyze research and help solve the replication crisis in social science
+Run a public online Turing Test with a variety of models and prompts
+Distribute HPMOR copies in Bangalore, India — Let the kids read, we need to raise the sanity waterline and inspire creative minds into AI Safety
+An online science platform — I'd like to resurrect https://distill.pub/, but with AI tools.
+The Odyssean Institute — Test tipping point modelling, expert elicitation, and deliberative democracy to effectively address systemic policy challenges
+Build an app to track ones impact on animal cruelty
+Apply particle physics clustering to embedding space of LLM
+Science prediction markets for replicability — Create a real-money prediction market platform to help solve the replication crisis
+Database of the Most Impactful Research Questions by Discipline and Cause Area — To match the highest-potential research questions with the students and researchers that can work on them
+Research microeconomic disruptions caused by AGI — Explore the implications of AGI deployment, focusing on policy development to mitigate adverse impacts on labor and income distribution
+Leveraging biophysical techniques to improve the efficiency of successful pregnancies in older women — A biophysicist working against the biological clock
+Run a self-help program on WhatsApp to reduce depression in low and middle-income countries
+Write three articles that integrate meta-analysis and meta-science
+Vegans should have the right to eat in public institutions : help us turn our right into a reality
+Empower Ukraine: Invest in Businesses Driving Positive Change — Invest in Businesses Driving Positive Change in Ukraine
+Strengthening digital health information system for epidemic control in Pakistan — Global Health, Digital Health, Epidemics, Existential Risks
+Interactive p(doom) constructor — Squiggle-powered web app to personalize who you want to defer to, how much, and when you want to substitute your unique inside view
+Online videos of Fluidity Forum 2024 talks
+Quantifying the costs of the Jones Act — Funding the research and publication of a journal article on the economic impact of the Jones Act, to be published in a top line economics journal
+A spaced-repetition first gamified learning platform — Prototyping a learning gym for the 2020s
+Psychosis in velocardiofacial syndrome (DiGeorge/22q11.2 deletion syndrome)
+H-Test: identifying a set of "blindspot" tasks for LLMs that doesn't scale (not inverse, close to no effect) with language training
+Demonstrate "Dashboard Social Science" — I will publish original survey results tracking US public opinion toward AI on a daily-updated web dashboard
+Weather futures market for forecasting, insurance, and climate engineering.
+Write and publish an e-book advocating for longtermism and sentientism. — How can we build an awesome civilization for all sentient life, and ensure it will be (even more) awesome in the future?
+Platform for migrants to start legal & profitable microbusinesses. — Briico helps migrants legally start profitable microbusinesses in less than 30 days with less than $500 – allowing millions of people to skip decades of “gray e
+Transform waste streams into biodegradable alternatives — Our process not only reduces the environmental footprint of waste but also helps combat the global plastic crisis while contributing to a circular economy.
+Mechanical Library — a museum exhibit & website to introduce middle school students to mechanical engineering
+Fund a detour on my PhD to improve brute force statistical tooling
+Taken down
+Research on cognitive bias in LLMs + exacerbation by RLHF — Probing whether RLHF takes LLMs further from human goals
+Researching low-input traditional agricultural techniques. — 2 billion people worldwide live as subsistence farmers. Ancient Native Americans had highly productive techniques that were lost in colonial times.
+X
+UtiliThai: Translating Utilitarianism.net, Youtube, and translating key texts — UtiliThai is a transformative two-year initiative in Thailand, focused on introducing utilitarian, effective altruism and longtermism for Thai general audiences
+Creating a database of CAFOs in Chile — A complete, geotagged database of pig and chicken CAFOs in three regions of Chile, for use by local advocates and for developing AI-based CAFO detection
+New materials to solve soil erosion — Help us run a soil erosion study to validate a new polymeric fibre we have developed
+Talent Observatory — Training of Trainers for Talent Development
+SirCryptomind Moderation — Remote Moderation
+Making 52 AI Alignment Video Explainers and Podcasts
+Championing New Approaches to Demographic Aging and Immigration — How to foster flourishing and progress in an era of rapid demographic aging and immigration
+Clean Water for Tikondane — A response to Zambia's cholera outbreak through sustainable water solutions
+Investigate a Novel Hypothesis on the Root Cause of Type 1 Diabetes — Why does the rate of Type 1 Diabetes vary more than 400x between the lowest- and highest-incidence parts of the world? Why does it vary 15x even across states?
+An organization for increased rights for minors, initially targeting the repeal of the Interstate Runaway Compact
+Improving fish welfare through producer and retail outreach in Türkiye
+African School of Economics in Zanzibar charter city
+Replicate and extend brain entrainment results
+Write a good primer on political change.
+An online platform to solve coordination problems and generate leverage through collective action campaigns
+Apart incubates and facilitates hundreds of AI safety researchers around the globe.
+Develop an accessible, low-cost system for single-cell imaging in multiple regions of freely moving organisms
+Conduct field research on informal lead-acid battery recycling supply chains in Nigeria
+Developing materials on forecasting for governments
+Validate a solution for ozone generation from far-UVC germicidal light
+Develop an app or website to help parents choose between IVF clinics
+Use smartphone pupillometry to triage brain injury in rural Missouri.
+Regrant to charities working on developing country nutrition
+The first public benefit biotechnology company with an explicit goal of involuntary suffering abolition.
+Advocate for a specialized pandemic response team at the FDA
+Support early career journalists covering AI by providing training, funding, and placements at major news outlets.
+Youtube tutorial videos about computational biology and bioinformatics
+Create open source predictors for various genetically influenced traits such as intelligence and disease risk
+Assess online training platform for health workers in Nigeria
+Combat global antibiotic resistance
+Promote Georgism
+Create a platform for assurance contracts that looks nice.
+Tardigrade stress tolerance genes that modified for improved performance in human cells.
+Advocate for policies that safeguard against global catastrophic risks
+Build anti-mosquito drones
+Charge selective large pore membranes for artificial implantable kidney.
+Pass laws to encourage living kidney donation
+Scenario analysis and planning platform for more effective developing world agriculture projects
+Build a new nonprofit thinktank that advances technological solutions to animal welfare challenges
+Study land reform — Direct land purchases and transfer from landowners to tenant farmers
+Influenza Pandemic Protection on Day 1 through universal priming vaccines — Pivoting this project, due to stakeholder feedback. Former focus was inclusion of a pre-pandemic strain in a quadrivalent seasonal influenza vaccine
+Seed fund for boundaries-based empirical AI safety projects after workshop.
+Writing an ebook on timeless sentientism — Timeless sentientism is a philosophy combining sentientism, longtermism and effective altruism and seeks to benefit sentient life now and in the future
+London Initiative for Safe AI (LISA) Funding — Funding to support the continuation of a dedicated home for leading AI safety research in London and the founding of a research fellowship run by LISA.
+A Critical Study of the EU’s Anti-Subsidy Probe into Chinese Electric Vehicles
+The Grass is Greener: Skirting Deflation via Strong Overseas Growth. Again. — There is an 80% change that the top five performing Chinese Internet and Internet related companies will be those who manage domestic deflationary pressures via
+The Looming Super-Bug Crisis — China's Battle Against Antimicrobial Resistance
+Increasing the funding distributed by Foresight Insitute's AI safety grants — focused on 1. bci and wbe for safe ai, 2. cryptography and security for safe ai, and 3. safe multipolar ai
+Advocacy towards transition from livestock operations to plant-based — Advocate towards transition from animal factory to sustainable and economically viable plant-based agriculture through education and stakeholders’ engagement
+China's Improvisational AI: From Early Ingenuity to Eventual Decline — Can China make the great leap forward in AI?
+Training of Nigerian Olympiad Students to achieve IMO and PAMO Medals
+Shanzhai Intelligence and the role of AI in China’s future — Can China’s AI industry adapt to a changing global landscape
+Giant Database of Replication Studies — Document and quantify the replication crisis in the social and behavioural sciences
+Integrating Indigenous Knowledge in Wildlife Conservation — A research on how Indigenous knowledge can contribute to wild animal welfare
+EEG using a generalizable ML model + 32 channel PCB — A group of 5 teenage hackers creating a novel PCB design and ML model to process electrical signals generated by neurons with an Electroencephalogram.
+China's AI Ascent: Implications of Global Technological Leadership
+Wise AI: Fine-Tune an Open Source Model — Aligning to Human Values by Eliciting a Moral Graph
+Satoshi's Antithesis: China to use CBDC to Boost CNY Trade — There is a 95% chance China will trade internationally with their eCNY CBDC an annual volume in excess of $50bn USD by 2028
+AI-Plans.com
+Irreconcilable Irredentism – A new Sino-Soviet split? — There is a 75% chance that the emerging Sino-Russian friendship crashes and burns by 2030.
+China’s Incoming AI Ethics Leadership Push — There is a 70% chance that China will tie AI ethics into its Digital Silk Road, releasing a global AI ethics framework targeting developing countries.
+End fish cage farming in lake Victoria. — Lobbying and advocacy for an end to fish caging in lake vicroa farms.
+Curated Markets — Markets of interest curated by prominent traders, academics, journalists, politicians, etc.
+N/A — All is done
+Automatic circuit discovery on sparse autoencoded features — 3-month independent research
+Write an e/acc FAQ
+Allow anyone to quickly understand pred market accuracy with basic one-liner — Digestible alternative to brier scores & calibration charts, helping the public understand how good prediction markets are
+Provide Text books to 50 orphaned child mothers in Homabay Kenya. — Enable home learning for orphaned child mothers to continue studies during pregnancy and lactation.
+Provide family planning to 980 rural poor women in Homabay Kenya. — Enabling access to family planning for 980 rural poor women in hard to reach locations.
+Translation of BlueDot Impact's AI alignment curriculum into Portuguese — Support to translate BlueDot Impact’s AI alignment curriculum into (Br) Portuguese to be used in university study groups and an online course
+Funding a Consortium of Legal Scholars and Academics doing AI Safety
+Modeling Automated AI R&D
+Removing Hazardous Knowledge from AIs
+support a TEDx grassroots initiative — created in the spirit of TED’s overall mission to research and discover “ideas worth spreading”
+AI Policy work @ IAPS
+3Dprinting technology for kid globally — 3Dprinting technology
+Help Apart Expand Global AI Safety Research — Incubate AI safety research and develop the next generation of global AI safety talent via research sprints and research fellowships
+Economic Empowerment of Disadvantaged Youth in Kenya & Ethiopi with Remote Work — Neglected Cause Area: Identifying Talent in Low Income Countries and Training them for Remote Employment
+London Manifold.love dating shows — Two prediction market dating show with live betting
+BAIS (ex-AIS Hub Serbia) Office Space for (Frugal) AI Safety Researchers — Free/Subsidized/Cheap office space outside of EU but in good timezones with favorable visa policies (especially for Chinese/Russian but also US&others near EU).
+Explainer and analysis of CNCERT/CC (国家互联网应急中心)
+Manifold x College Admissions — Attract more high school seniors anxious about their college admissions chances
+Manifold User Tracking & Notifications — Follow the accounts of successful forecasters and receive notifications
+Trading bot guide — More bots, better predictions!
+[duplicate, delete this]
+Athena - New Program for Women in AI Alignment Research
+10th edition of AI Safety Camp
+Mapping neuroscience and mechanistic interpretability — Surveying neuroscience for tools to analyze and understand neural networks and building a natural science of deep learning
+Conceptual Boundaries Workshop (already funded, but some additional things)
+Field building in universities for AI policy careers in the US
+Predict on random markets - Manifold tool — "Just hand me markets to make bets on!"
+Talos Network — -
+Update Big List of Cause Candidates
+Career Transition to UK Tech / AI Policy — Seeking short term grant to finance career transition
+Make ALERT happen — ALERT := Active Longtermist Emergency Response Team
+Exploring feature interactions in transformer LLMs through sparse autoencoders
+Script to download and run Manifold locally
+Mirrorbot — Automatically mirror popular questions from other platforms to Manifold
+Exploring novel research directions in prosaic AI alignment — 3 month
+Personal development and better infrastructure for learning, "Anki V2" — SRS software projects and general career development
+AI Safety Research Organization Incubator - Pilot Program
+Trading assistant bot (Remind Me) — Sends you notifications when markets that you are betting on have a big swing and allows you to set parameters for custom reminders
+Manifold: Live! — A weekly community livestream/discord call where top traders discuss the week's events on Manifold and live-bet with the audience on markets from new users
+Manifold merch store — Putting the "fold" in Manifold
+Exploring novel approaches to addressing Global Catastrophic Risk through policy — Operational Support for a Pilot Study on Complexity Modelling, Expert Judgement, and Deliberative Democracy for Risk Prioritization and Mitigation
+Manifold Sandbox — Explore arbitrary AMM actions in a Manifold simulator
+Wasabipesto's Umbrella Project — Six Projects in Search of an Investor - Details inside
+Extreme Probabilities Project — Explore a market structure that attempts to produce good probability estimates on highly-confident markets.
+Manifold corporate blog on Habr — Promoting prediction markets in software developers' community
+Isaac's Blog Writing
+Manufacture Manyfold Manifolders in the Maritime Metropolis — Lets create a new defining addiction for Seattle!
+Isaac's power-user Manifold search and dashboard
+Manifold Tournaments
+N.C. Young's Umbrella Project — Everything Manifold-related that I'm doing on my own
+Invest in the Conflux Manifold Media Empire(??) — I'm planning to do something starting in January, but I'm not sure what!
+Manifold: Live! — A weekly betting/market creating/bantering get-together on the Manifold Discord
+Case's Manifold Contributions Umbrella Project — Doing all the things
+Experiments to test EA / longtermist framings and branding — Testing responses to “effective altruism”, “longtermism”, “existential risk” etc.
+~~Manifold corporate blog on Habr~~ [resubmitted]
+Teacher Training in Nigeria using Artificial Intelligence — Making education worthwhile in Nigeria for teachers using AI
+Future Food — Introduction Of Plant Based Meals In University Canteens Menus
+Cadenza Labs: AI Safety research group working on own interpretability agenda — We're a team of SERI-MATS alumni working on interpretability, seeking funding to continue our research after our LTFF grant ended.
+Scaling Training Process Transparency — Compute and infrastructure costs
+Estimating annual burden of airborne disease (last mile to MVP) — Boosting advocacy for investment in and deployment of technologies for improving indoor air quality
+MATS Program — Help us support more research scholars!
+Retroactive funding for Don't Dismiss Simple Alignment Approaches
+AI-Plans.com — Alignment Research Platform
+Funding to attend AI Conclave — A month long on-sight campus to deeply understand and shape AI
+EffiSciences: AI safety field-building in France — Funding to extend our runway and fund promising projects
+A Lumenator Company, or: A More Ambitious Life Trajectory — Using Bright Lamps to make money, improve EAs productivity, do research and achieve free agency
+Eliciting Probability Trees — 5 person dev team - if experts wrote down probabilities more, would we get better decisions?
+Building and maintaining the Alignment Ecosystem — 12 months funding for 3 people to work full-time on projects supporting AI safety efforts
+Stampy’s AI Safety Info — Creating an interactive FAQ to explain existential risk from AI to all audiences
+Good Ancestors Policy expenses — GAP is an Australian charity, working to improve the long-term future, that requires funding for salary and operational expenses.
+[Archived]
+Impact Stream - Addressing Unemployment and Poverty in Togo through blockchain — Addressing Unemployment and Poverty in Togo through Local Empowerment
+CEEALAR (EA Hotel) Needs a New Roof — Centre hosting EAs’ research projects/EAs’ upskilling for ~1/3 of the average cost of funding such projects remotely
+BaseX — New definition of value. Accounting for externalities.
+Empirical research into AI consciousness and moral patienthood
+Long-Term Future Fund
+Diarynator 😎 — Convert your diaries onto neuroscience/ai related categories (and see it walk!)
+Fund an expert veterinary panel to create guidelines for a slaughter-free future — The panel will create guidelines to phase out industrial animal agriculture and re-wild agricultural lands.
+Support Riesgos Catastroficos Globales
+OPTIC F23 — Collegiate Forecasting
+SEO for Discontinuous Analysis — Advertise this breakthrough discovery. Newton discovered continuous (even differentiable) analysis. It was improved by Cauchy. Mine is the next level.
+Carbon Flow Colony DAO app — The carbon accounting app with anti-theft. We need to protect trillions of dollars worth of carbon credits.
+Salaries Science — Cryptocurrency micropayments to fund scientific research, with emphasis on basic science
+Avoiding Incentives for Performative Prediction in AI
+Educating World Class Leaders From Developing World on AI/Pandemics
+University Forecasting Clubs [OPTIC] — Funding to start 3-5 university forecasting clubs as a subproject of OPTIC
+Forecasting - AI Governance Policies
+ClimateFire AI:  An AI-powered Early Wildfire Detection Service — ClimateFire AI detects wildfires in real-time and sends alerts directly to first responders and residents in danger.
+WhiteBox Research: Training Exclusively for Mechanistic Interpretability — 1.9 FTE for 9 months to pilot a training program in Manila exclusively focused on Mechanistic Interpretability
+Compute and other expenses for LLM alignment research — 4 different projects (finding RLHF alignment failures, debate, improving CoT faithfulness, and model organisms)
+iAnalyse Mentorship Program — Addressing the digital skills gap (Big Data Analytics) through Mentorship & AI Safety Training
+Support funding for Hardeep Gambhir's gap semester
+Design and testing of broad-spectrum antivirals — R&D and/or operational support for initial design, production, and testing of broad-spectrum antivirals that could prevent most respiratory viral infections
+HI2T: An AI-Based Tool for Insightful Analysis and Meaningful Influence — Seeking funding to patent and develop an impactful AI based data collection and communication tool.
+General Support for the Center for AI Policy — Help us fund 2-3 new employees to support our team
+Revolutionizing Water Infrastructure: A Rational Approach — Optimizing Water Infrastructure: Leveraging Data-Driven Strategies and Effective Decision-Making to Reduce Costs and Enhance Efficiency
+Deleted — Deleted
+Epistemology in Large Language Models — 1-year salary for independent research to investigate how LLMs know what they know.
+Jaeson's Independent Alignment Research and work on Accelerating Alignment — Collective intelligence systems, Mechanism Design, and Accelerating Alignment
+Graduate Students for Safe and Responsible AI (SAFARI) — An association for interdisciplinary interest in AI
+Grant for Research into Infrabayesian Physicalism (GRIP)
+Optimizing clinical Metagenomics and Far-UVC implementation. — 3-month research to inform the design of large-scale R&D projects in metagenomics and Far-UVC
+The Rethink Priorities Existential Security team: Research Fellow hire — Funding to hire a junior researcher on a 3-5 month contract to help launch projects tackling existential risk
+The Rethink Priorities Existential Security team: Founder in Residence hire — Funding to hire an in-house entrepreneur on a 12 month contract to investigate a space within existential risk and then found an impactful project
+App for personal predictions with friends — Like Metaculus but more popular
+Subsidize Real Money Prediction Markets on High Impact Topics — Create Subsidized Prediction Markets On Polymarket.com
+Activation vector steering with BCI
+Removed
+Run five international hackathons on AI safety research — Six-month support for a Program Manager to organize and execute international AI safety hackathons with Apart Research
+AI-Plans.com Critique-a-Thon $500 Prize Fund Proposal
+VaccinateCA — Retroactive grant for website & infra to display COVID vaccine availability
+Investment in BOAS to generate €5-10K monthly sales to secure full investment
+Neuronpedia - Open Interpretability Platform — Platform for interpretability researchers, especially those creating/using Sparse Autoencoders
+Create ‘Responsible AI Investing’ recommendations for institutional investors — Four months salary to draft and promote the recommendations, helping investors advocate for specific safety and governance practices at labs and chipmakers.
+Support for Deep Coverage of China and AI
+One semester living expenses for MIT-based researcher
+Alignment Is Hard — Proving Computational Hardness of Verifying Alignment Desirata
+AI Alignment Research Lab for Africa — AI Safety lab focusing on technical alignment and governance of AI in Africa and the Global South more broadly. We are a grassroots community-led research lab
+Blackbelt — A scalable, non-infohazardous way to quickly upskill via digestible, repeatable exercises from papers and workshops.
+Understanding Memory Management in Transformers — We build a scalable "Automated Circuit Discovery" method and investigate "Cleanup Behavior" to advance the interpretability of transformer models.
+Apollo Research: Scale up interpretability & behavioral model evals research — Hire 3 additional AI safety research engineers / scientists
+Funding for Solar4Africa app development — Supplementing living expenses of a full stack dev to pursue educational opportunities while doing app development in Berkeley for a week.
+Scoping Developmental Interpretability — 6-month funding for a team of researchers to assess a novel AI alignment research agenda that studies how structure forms in neural networks
+Forming a 501(c)(4) organization for AI safety policy advocacy/lobbying — 4-month salary and initial expenses
+The Slipstream — Software infrastructure for global cooperation
+Congressional staffers' biosecurity briefings in DC — Following on the Stanford Biosecurity Workshop for Congressional staffers, three events in DC will reconvene staffers and cover research and policy updates
+Berlin EAGx Art Exhibit: SEE VIDEO Of completed piece! — ea-X-hibition: a new working group to curate art exhibits at EAGx Berlin, already approved by the event organizers.
+FrontierRegistry - Science Publishing & Peer Review Protocol — Scientific and research publishing and peer review enabled by blockchain and AI
+The Base Rate Times — News through prediction markets
+Continued funding for a PhD in AI x-risk decision and risk analysis — Continuation of a previous grant to allow me to pursue a PhD in risk and decision analysis related to AI x-risks
+Jacques Thibodeau - Independent AI Safety Research — 3 month salary for AI safety work on deconfusion and technical alignment.
+Enable communities to cure PTSD in children after state failure — ACT International Longevity
+AI Safety Events — Supporting the realization of events beneficial to the field and community of AI safety.
+Recreate the cavity-preventing GMO bacteria BCS3-L1 from precursor — Because I think curing cavities for everyone would be "based", actually
+Cooperative for Altruistic Media Arts - CAMA — A funding funnel for EA aligned documentary films
+Discovering latent goals (mechanistic interpretability PhD salary) — 6-month salary for interpretability research focusing on probing for goals and "agency" inside large language models
+Knowledge gaps database + R&D roadmap for cultivated meat industry — Accelerating cost-competitive cultivated meat by identifying likely bottlenecks and focusing R&D efforts on high-impact areas
+Holly Elmore organizing people for a frontier AI moratorium — Help me to organize US moratorium-promoting activities to expand the Overton window and increase public pressure in favor of a moratorium on frontier AI.
+Seeds of Science Research Institute — Empowering independent researchers and creating a new organizational model for science
+Riesgos Catastróficos Globales — Promoting better management of Global Catastrophic Risks in Spanish-Speaking countries.
+Facilitate lawsuits to restrict corporate AI-scaling — A new org to facilitate filing of court cases for restricting AI data piracy, misuse, and compute.
+Introductory resources for Singular Learning Theory — Literature review or other introductory material for Singular Learning Theory targeted at AI alignment applications
+6 months’ salary for EA community-building and studying x-risks and AIS
+One 6-month cycle of DBT therapy
+MA in International Policy
+Ranked, Contributable Compendium of Alignment Plans - AI-plans.com — Making a simple, easy to read platorm, where alignment plans and their criticisms can be seen and ranked. Currently in Stage 1.
+Model Interpretability on modFDTGPT2-XL, a partially-aligned model — 6 months of work: Evaluating a variant of GPT2-XL that can simulate a shutdown activation, aiming to improve alignment theory & develop interpretability tools.
+[deleted] — [deleted]
+Reflective altruism
+Shrimp Welfare Project - Special Program — Place Electric Stunners at Selected Producers
+Joseph Bloom - Independent AI Safety Research — Trajectory Models and Agent Simulators
+Medical Expenses for CHAI PhD Student — Allow Berkeley PhD student to devote more time and focus to AI safety research and mentorship.
+Donations List Website (retroactive) — DLW is a compilation of EA donation data across funders.
+How General and How Comprehensive Must AGI Be? — What is the probability that AGI is developed by January 1, 2043?
+CHAT Diplomacy — Advances in LLMs are a National Security Risk
+Odds of Artificial General Intelligence by 2043 — By srhoades10
+AI will change the world, but won’t take it over by playing “3-dimensional chess” — By Boaz Barak & Ben Edelman
+What would power-seeking, misaligned AGI actually do? — By Kiel Brennan-Marquez
+When can a mimic surprise you? — By David Johnston. Why generative models handle seemingly ill-posed problems
+Artificial General Intelligence (AGI) timelines ignore the social factor at their peril — By Trevor Klee
+Why do we post our AI safety plans on the Internet? — By Peter S. Park. It is plausible that AGI safety research should be assumed compromised once it is posted on the Internet.
+Why I think strong general AI is coming soon — By porby
+Disagreements with bio anchors that lead to shorter timelines — By Marius Hobbhahn
+‘Dissolving’ AI Risk — By Froolow. Parameter Uncertainty in AI Future Forecasting
+AI X-Risk: Integrating on the Shoulders of Giants — By TD_Pilditch. Uncertainty, Structure, and Optimal Integration.
+Analyze this Mechanism — This mechanism seems promising for public goods funding and wealth equalizing dynamics, hire mathematician to check
+Sow the Seeds of Rationality — HPMOR for promising Junior High and High Schoolers
+Manifold feature to improve non-resolving popularity markets — Add additional social incentives to bet YES to publicly signal value/support/belief and NO to signal the opposite.
+Deriving Benefit-Cost Ratio of Outcomes — Calculating the benefit of outcomes on GiveWell and Impact Genome Registry
+CO2 in my room — There's CO2 in my room
+Comparing forecasting platform accuracy
+GradeFact — Credit scores for predictions made by news, media, public figures to keep them accountable
+Remote Indigenous Literacy/Numeracy Courses — Nungalinya College (Darwin) offers literacy and numeracy courses to over 180 remote Indigenous students each year
+Eek! — Solving AI alignment through cross-species communication
+The Annotated Willard — A Primer on Self-Justifying Axiom Systems
+Collaborative Resolution of Political Controversies
+Base Rate Times — Like The Economist meets Metaculus
+Crystal Ballin' Podcast — New fortnightly podcast on all things prediction markets
+Haruspex [Forecasting Competition Platform] — Mobile platform for some forecasting games
+OPTIC — Intercollegiate Forecasting Tournament
+Multiplayer RootClaim — Allowing prediction market participants to construct, share & clone prediction models
+Predicting Replication in Academic Economics — Replicate one year of the AER, test robustness, and see if it's predictable.
+Fund the localisation of LibreOffice into Pidgin/Bislama/Tok Pisin — Bringing open source software and digital ownership and identity to Papua New Guinea, Vanuatu and the Solomons.
+Make large-scale analysis of Python code several orders of magnitude quicker
+AI Safety Policy Communication for Legislators (Blog) — A blog (which already has top policy decision makers in No.10 subscribed) to communicate non-technically ideas about AI safety (mostly).
+Provide Rationality / EA Education at University of Maryland
+Implement a Small-Group Futarchy App — Decision markets for ad hoc group decision-making
+Hire biosensor technicians to collect jhana data — Staff an already-scheduled retreat sufficiently to map the neural correlates of life-changing meditative states
+Deploy an already built prediction website — For a smaller language - Bulgarian
+Impact Assessment of Social Programs — Verifying and Quantifying the Outcomes of Nonprofits
+Manifold Markets Add-on for Google Sheets — An Add-on for easy access to Manifold´s Prediction Markets
+Standardized Tools for Impact Market Reporting — Working towards GAAP For Impact Markets
+Forecast Dissemination Mini-Market 3 of 3: Earthquake Risk — Evaluating whether forecasts of earthquake risk lead people to take steps to prepare
+Forecast Dissemination Mini-Market 2 of 3: Hurricane Hazards — Promoting forecasts in order to help mitigate weather risks, then evaluating the effect of this information.
+Forecast Dissemination Mini-Market 1 of 3: College Majors — Promoting forecasts in order to help college choose their field of study, then evaluating the effect of this information.
+Make forecasting fun again — Devise and execute fun/visible/viral forecasting engagement projects
+Can communication between contributors improve aggregate forecasting accuracy? — Previous research says no, but that research is incomplete.
+DiPalConnect app — Digital Pal Connection App
+Telegram bot for Manifold Markets
+Superforecaster predictions of long-term impacts — I will pay 30 superforecasters to make forecasts of long-run treatment effects from randomised control trials
+A tool for making well sized (~Kelly optimal) bets on manifold — Instead of saying "I want to bet $X on this market" you will say "I think the true probability is Y%", and it will tell you how much to bet
+Blog about Forecasting Global Catastrophic Risks — Forecasting GCRs is hard. How can we do it better, and how much better is that?
+Forecasting Knowledge to Brazil [and other Portuguese-speaking countries] — Organizing, translating and writing what we know [and forecast] about forecasting, in order to lower the entry barrier to a country of significant influence in the Global South and a long track of international cooperation
+Interpretable Forecasting with Transformers — Make accurate, well-calibrated, and honest predictions with large language models.

@@ -1,0 +1,43 @@
+{
+  "attributes": [
+    {
+      "id": "public_receipt_credibility",
+      "prompt": "credibility as a judge model for evidence that will be shown to serious external readers",
+      "weight": 0.45
+    },
+    {
+      "id": "cost_discipline",
+      "prompt": "ability to support many repeated live benchmark runs without wasting provider spend",
+      "weight": 0.3
+    },
+    {
+      "id": "route_freshness",
+      "prompt": "current OpenRouter availability, parameter support, and fit for structured judgment prompts",
+      "weight": 0.25
+    }
+  ],
+  "description": "Rank live OpenRouter judging policies for public structured-judgment receipts.",
+  "items": [
+    {
+      "id": "quality_only_opus_46",
+      "text": "Fixed anthropic/claude-opus-4.6 policy. High-cost path for public receipts where careful comparative reasoning matters more than spend."
+    },
+    {
+      "id": "sonnet_reference_then_fast",
+      "text": "Use anthropic/claude-sonnet-4.6 for a frozen reference or disputed cases, then use a cheaper current model for repeated candidate-regime sweeps."
+    },
+    {
+      "id": "deepseek_v4_flash_fast",
+      "text": "Fixed deepseek/deepseek-v4-flash policy for cheap high-volume smoke tests, prompt iteration, and broad first-pass sweeps."
+    },
+    {
+      "id": "glm_5_2_logprob_candidate",
+      "text": "Use z-ai/glm-5.2 when logprob support, low prompt cost, and large context matter more than maximum brand credibility."
+    },
+    {
+      "id": "kimi_k2_thinking_diverse",
+      "text": "Use moonshotai/kimi-k2-thinking as a diverse reasoning judge for contested comparisons or cross-model adjudication."
+    }
+  ],
+  "name": "model_policy_options"
+}

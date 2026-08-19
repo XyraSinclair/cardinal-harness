@@ -1,0 +1,46 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "I need to evaluate which method is more auditable - meaning another engineer can inspect individual judgments and understand why the final order changed.\n\n**A (ordinal_pairwise):**\n- Simple binary pairwise comparisons (A vs B: which is better?)\n- Aggregation via win counts is straightforward to inspect\n- Each judgment is a clear, interpretable choice\n- The path from individual comparisons to final ranking is transparent (count wins, sort)\n- An engineer can trace exactly which comparisons drove rank changes\n\n**B (bandit_policy_cardinal):**\n- Cardinal scores add a layer of magnitude (how much better, not just which is better)\n- Uncertainty-aware policy means the *selection* of which pairs to compare is driven by an algorithm (top-k uncertainty)\n- This introduces two layers of complexity: (1) why were these pairs chosen? (2) how do cardinal scores aggregate?\n- The bandit policy's decisions about where to spend comparisons are based on internal uncertainty estimates that may not be transparent\n- An engineer would need to understand the uncertainty model, the policy decisions, AND the cardinal aggregation to understand why the final order changed\n- More moving parts = harder to audit\n\n**Assessment:**\nA is clearly more auditable. The simplicity of ordinal (binary) choices + win aggregation makes every step inspectable. B adds cardinal magnitudes, uncertainty modeling, and adaptive comparison selection - each layer obscures the causal chain from individual judgments to final ranking.\n\nThe gap is meaningful but not extreme. B isn't completely opaque - cardinal scores are still inspectable - but the bandit policy's adaptive selection and uncertainty weighting significantly complicate auditability. I'd estimate A is roughly 4-5x more auditable.\n\n```json\n{\"higher_id\":\"A\",\"ratio\":4.5,\"confidence\":0.82}\n```",
+        "reasoning": null,
+        "refusal": null,
+        "role": "assistant"
+      },
+      "native_finish_reason": "end_turn"
+    }
+  ],
+  "created": 1782861472,
+  "id": "gen-1782861472-NlEIziwOwA94eKjirwg1",
+  "model": "anthropic/claude-4.6-sonnet-20260217",
+  "object": "chat.completion",
+  "provider": "Anthropic",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 409,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.006756,
+    "cost_details": {
+      "upstream_inference_completions_cost": 0.006135,
+      "upstream_inference_cost": 0.006756,
+      "upstream_inference_prompt_cost": 0.000621
+    },
+    "is_byok": false,
+    "prompt_tokens": 207,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 616
+  }
+}

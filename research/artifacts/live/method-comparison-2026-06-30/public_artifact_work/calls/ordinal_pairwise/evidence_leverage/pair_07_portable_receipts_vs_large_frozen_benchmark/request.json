@@ -1,0 +1,18 @@
+{
+  "max_tokens": 700,
+  "messages": [
+    {
+      "content": "You are a rigorous structured-judgment engine. Judge only the stated attribute. Use the item text, not outside popularity. Return strict JSON only. Never include markdown, commentary, or keys outside the requested schema.",
+      "role": "system"
+    },
+    {
+      "content": "Case: public_artifact_work\nAttribute evidence_leverage: how much completing this work increases concrete falsifiable evidence for robust LLM list judgment\n\nA (portable_receipts): Make every checked-in receipt portable from a fresh clone: relative paths, model IDs, prompt hashes, cache hit counts, provider cost semantics, and explicit non-convergence flags.\n\nB (large_frozen_benchmark): Create a larger frozen benchmark suite with multiple task families, repeated runs, equalized budgets, raw artifacts, and a clear statistical report.\n\nTask: Which item has more of this attribute? Choose one item ID. Output JSON exactly: {\"higher_id\":\"item id\",\"confidence\":0.0}.",
+      "role": "user"
+    }
+  ],
+  "model": "openai/gpt-4.1-mini",
+  "response_format": {
+    "type": "json_object"
+  },
+  "temperature": 0.1
+}

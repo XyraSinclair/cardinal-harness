@@ -1,0 +1,28 @@
+Downloading numpy (5.1MiB)
+Downloading torch (70.2MiB)
+Downloading onnxruntime (18.3MiB)
+ Downloaded numpy
+ Downloaded onnxruntime
+ Downloaded torch
+Installed 39 packages in 550ms
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 28126.92it/s]
+padded seq len: 60
+torch eager fp32                231.8 sent/s   best  2208.9 ms  (reps [2240, 2299, 2228, 2241, 2209])
+/private/tmp/fitscreen/bench_embedder.py:58: DeprecationWarning: You are using the legacy TorchScript-based ONNX export. Starting in PyTorch 2.9, the new torch.export-based ONNX exporter will be the default. To switch now, set dynamo=True in torch.onnx.export. This new exporter supports features like exporting LLMs with DynamicCache. We encourage you to try it and share feedback to help improve the experience. Learn more about the new export logic: https://pytorch.org/docs/stable/onnx_dynamo.html. For exporting control flow: https://pytorch.org/tutorials/beginner/onnx/export_control_flow_model_to_onnx_tutorial.html.
+  torch.onnx.export(Wrap().eval(), (ex["input_ids"], ex["attention_mask"], ex["token_type_ids"]),
+/Users/xyra/.cache/uv/archive-v0/8b83o-n-e_HAQyB8Xh7Ud/lib/python3.13/site-packages/transformers/masking_utils.py:212: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+  if (padding_length := kv_length + kv_offset - attention_mask.shape[-1]) > 0:
+/Users/xyra/.cache/uv/archive-v0/8b83o-n-e_HAQyB8Xh7Ud/lib/python3.13/site-packages/transformers/integrations/sdpa_attention.py:120: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+  is_causal = q_length > 1 and attention_mask is None and is_causal
+/Users/xyra/.cache/uv/archive-v0/8b83o-n-e_HAQyB8Xh7Ud/lib/python3.13/site-packages/torch/onnx/symbolic_opset9.py:5350: UserWarning: Exporting aten::index operator of advanced indexing in opset 17 is achieved by combination of multiple ONNX operators, including Reshape, Transpose, Concat, and Gather. If indices include negative values, the exported graph will produce incorrect results.
+  warnings.warn(
+onnx exported
+ort fp32                        168.3 sent/s   best  3042.8 ms  (reps [3043, 3109, 3191, 3048, 3929])
+WARNING:root:Please consider to run pre-processing before quantization. Refer to example: https://github.com/microsoft/onnxruntime-inference-examples/blob/main/quantization/image_classification/cpu/ReadMe.md 
+ort int8-dynamic                166.9 sent/s   best  3068.3 ms  (reps [3373, 3107, 3068, 3265, 3228])
+
+parity: ort-fp32 vs eager  cos min/mean = 1.000000 / 1.000000
+parity: ort-int8 vs eager  cos min/mean = 0.966711 / 0.979920
+
+speedups vs torch eager:  ort-fp32 0.73x   ort-int8 0.72x

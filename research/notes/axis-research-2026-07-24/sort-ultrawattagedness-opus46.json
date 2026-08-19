@@ -1,0 +1,137 @@
+{
+  "items": [
+    {
+      "id": "item-0002",
+      "text": "No. The bug is not \"subtle\". You are taking a lock in an interrupt handler that can recurse. Here is the four-line fix, and a test that would have caught it in 1998.",
+      "rank": 1,
+      "latent_mean": 2.8036051364250247,
+      "latent_std": 1.2330564540266102,
+      "z_score": 0.7771861662035826,
+      "percentile": 0.9583333333333334
+    },
+    {
+      "id": "item-0008",
+      "text": "The dead do not stop being spoken to; every archive is a seance that works.",
+      "rank": 2,
+      "latent_mean": 2.6371388280088914,
+      "latent_std": 1.957195211807148,
+      "z_score": 0.6079553565463051,
+      "percentile": 0.875
+    },
+    {
+      "id": "item-0007",
+      "text": "We sold our couch to make payroll in March. In April we rewrote the entire ingest pipeline in a weekend because a customer's data physically could not fit. I have never been more awake.",
+      "rank": 3,
+      "latent_mean": 2.4650995561500384,
+      "latent_std": 1.9559281197122829,
+      "z_score": 0.4330590334011915,
+      "percentile": 0.7916666666666666
+    },
+    {
+      "id": "item-0004",
+      "text": "A Reed-Solomon code does not care whether the noise arrives this year or in ten thousand; the Voyager record's grooves and DNA in permafrost are the same bet, made at different temperatures.",
+      "rank": 4,
+      "latent_mean": 2.3857537825658306,
+      "latent_std": 1.6423804164932378,
+      "z_score": 0.3523955668156783,
+      "percentile": 0.7083333333333334
+    },
+    {
+      "id": "item-0000",
+      "text": "Every star that will ever burn has already been allotted its hydrogen; the universe's entire future output of light is a finite number you could in principle write down. What we do in the next century decides who is around to spend it.",
+      "rank": 5,
+      "latent_mean": 2.291427826211642,
+      "latent_std": 1.957195211807148,
+      "z_score": 0.25650314199171725,
+      "percentile": 0.625
+    },
+    {
+      "id": "item-0010",
+      "text": "If the proton decays, every monument has a deadline; the only inheritance that survives is whatever physics lets you re-encode. Plan accordingly.",
+      "rank": 6,
+      "latent_mean": 2.091788982577456,
+      "latent_std": 1.7293331272997536,
+      "z_score": 0.053548901769125905,
+      "percentile": 0.5416666666666666
+    },
+    {
+      "id": "item-0006",
+      "text": "There are infinitely many primes: if there were finitely many, multiply them all and add one; the result is divisible by none of them. Nothing in mathematics is more final.",
+      "rank": 7,
+      "latent_mean": 1.9864406950487588,
+      "latent_std": 1.8926475080564766,
+      "z_score": -0.053548901769126134,
+      "percentile": 0.4583333333333333
+    },
+    {
+      "id": "item-0011",
+      "text": "She left the porch light on for the neighbor's kid every night for eleven years and never mentioned it to anyone.",
+      "rank": 8,
+      "latent_mean": 1.31019384655723,
+      "latent_std": 1.3652876812355594,
+      "z_score": -0.7410261624068853,
+      "percentile": 0.375
+    },
+    {
+      "id": "item-0005",
+      "text": "To remove the pump, first drain the loop, then unscrew the four M4 bolts in a cross pattern so the gasket seats evenly when you reinstall.",
+      "rank": 9,
+      "latent_mean": 0.6964864876252228,
+      "latent_std": 1.767456737221201,
+      "z_score": -1.3649253419637948,
+      "percentile": 0.2916666666666667
+    },
+    {
+      "id": "item-0003",
+      "text": "I wake at 4:47am. Cold plunge. 900 pushups. While you sleep I am shipping. Intensity is a CHOICE. Most people never choose it.",
+      "rank": 10,
+      "latent_mean": 0.5252075018754747,
+      "latent_std": 1.4623419784468117,
+      "z_score": -1.5390487529500505,
+      "percentile": 0.20833333333333334
+    },
+    {
+      "id": "item-0001",
+      "text": "In the grand tapestry of the cosmos, humanity's journey is but a fleeting whisper among the stars, inviting us to ponder our place in the infinite dance of existence.",
+      "rank": 11,
+      "latent_mean": 0.30801166707592564,
+      "latent_std": 0.8986731981928491,
+      "z_score": -1.7598515527900793,
+      "percentile": 0.125
+    },
+    {
+      "id": "item-0009",
+      "text": "We are excited to leverage cutting-edge AI to unlock synergies and deliver best-in-class value for our stakeholders going forward.",
+      "rank": 12,
+      "latent_mean": 0.0,
+      "latent_std": 1.908604803853666,
+      "z_score": -2.072978360845702,
+      "percentile": 0.041666666666666664
+    }
+  ],
+  "meta": {
+    "topk_error": 8.51860854671018,
+    "tolerated_error": 0.1,
+    "comparisons_attempted": 24,
+    "comparisons_used": 24,
+    "comparisons_refused": 0,
+    "comparisons_cached": 0,
+    "comparison_budget": 24,
+    "latency_ms": 7596,
+    "model_used": "anthropic/claude-opus-4.6",
+    "rater_id_used": "anthropic/claude-opus-4.6",
+    "provider_input_tokens": 11348,
+    "provider_output_tokens": 648,
+    "provider_cost_nanodollars": 72940000,
+    "provider_cost_is_estimate": false,
+    "entities_pruned": 0,
+    "pairs_counterbalanced": 12,
+    "position_flips": 0,
+    "evidence_judgements": 0,
+    "logprob_mode_judgements": 0,
+    "evidence_visible_mass_mean": null,
+    "evidence_order_residual_mean_abs": 0.29490788816550967,
+    "judgement_frustration_mean": 0.0020799607911219245,
+    "stop_reason": "budget_exhausted"
+  }
+}

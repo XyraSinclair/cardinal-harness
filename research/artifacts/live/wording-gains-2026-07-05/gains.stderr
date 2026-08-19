@@ -1,0 +1,2 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running `target/debug/examples/wording_gains google/gemini-2.5-flash anthropic/claude-sonnet-4.6 openai/gpt-5.4-mini`

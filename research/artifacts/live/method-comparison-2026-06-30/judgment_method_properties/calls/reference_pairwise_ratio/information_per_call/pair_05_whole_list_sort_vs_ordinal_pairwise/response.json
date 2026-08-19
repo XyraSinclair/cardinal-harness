@@ -1,0 +1,46 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "I need to compare how much ranking information is extracted per provider call for whole_list_sort (A) vs ordinal_pairwise (B).\n\n**A (whole_list_sort):** A single call returns a complete ranked ordering of all N items. This gives N! worth of ordering information compressed into one ranking \u2014 specifically, it provides O(N log N) bits of ordering information in a single call.\n\n**B (ordinal_pairwise):** Each call answers one binary question (which of two items is better on one attribute). This gives roughly 1 bit of ordering information per call. To rank N items, you need O(N log N) such pairwise calls.\n\n**Comparison:**\n- For N items, A gets the full ranking in 1 call = O(N log N) bits per call\n- B gets ~1 bit per call (one pairwise comparison)\n\nThe ratio depends on N. For a typical ranking task with, say, 10 items, whole_list_sort gives roughly log2(10!) \u2248 21.8 bits in one call, while each pairwise call gives ~1 bit. That's roughly a 20x difference. For larger lists (20 items), it's ~61 bits vs 1 bit per call.\n\nFor a reasonable typical case (10-20 items), A provides roughly 20-60x more information per call than B. Capping at 26, a large but not maximum ratio seems appropriate \u2014 around 20x for moderate list sizes.\n\n```json\n{\"higher_id\":\"A\",\"ratio\":20.0,\"confidence\":0.85}\n```",
+        "reasoning": null,
+        "refusal": null,
+        "role": "assistant"
+      },
+      "native_finish_reason": "end_turn"
+    }
+  ],
+  "created": 1782849674,
+  "id": "gen-1782849674-QdecCj9NZSAAp9ZI6nN7",
+  "model": "anthropic/claude-4.6-sonnet-20260217",
+  "object": "chat.completion",
+  "provider": "Anthropic",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 368,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.00612,
+    "cost_details": {
+      "upstream_inference_completions_cost": 0.00552,
+      "upstream_inference_cost": 0.00612,
+      "upstream_inference_prompt_cost": 0.0006
+    },
+    "is_byok": false,
+    "prompt_tokens": 200,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 568
+  }
+}

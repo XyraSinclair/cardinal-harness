@@ -1,0 +1,2 @@
+sorted 23 items by "current national population" · 92 comparisons (0 cached, 0 refused) · $0.0343 · order flips: 12/43 · frustration 0.101 · stop: budget_exhausted
+error budget: stat ±0.723 (posterior, mean) · syst order 1.319 nats/pair · syst cyclic 10.1% of energy · rank risk 4.097 (top-k flip probability)

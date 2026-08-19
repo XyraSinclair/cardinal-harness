@@ -116,22 +116,22 @@ too incoherent to compare.
 
 The trade is explicit: this costs more than one-shot scoring, saves
 comparisons versus exhaustive pairwise judging, and returns uncertainty
-plus evidence instead of only a sorted list. The research side lives in
-[`experiments/`](experiments/) — a never-published workspace crate with
-the experimental verbs, live batteries, and instruments whose evidence is
-not yet in; an instrument graduates into the crate only after its
-evidence earns it. The measured record itself — method comparisons,
-planner-regret benchmarks (which the planner has lost and then won),
-judge-coherence batteries, and every published number's replayable pack —
-is archived in [llmsort-lab](https://github.com/XyraSinclair/llmsort-lab).
-The evidence culture applies to our own planner first.
+plus evidence instead of only a sorted list. The research side lives
+here too: [`experiments/`](experiments/) is a never-published workspace
+crate with the experimental verbs, live batteries, and instruments whose
+evidence is not yet in — an instrument graduates into the crate only
+after its evidence earns it — and [`research/`](research/) is the
+measured record itself: method comparisons, planner-regret benchmarks
+(which the planner has lost and then won), judge-coherence batteries,
+and every published number's replayable pack. [`PROGRAM.md`](PROGRAM.md)
+indexes every method as a rung with its pack. The evidence culture
+applies to our own planner first.
 
 ## Lineage
 
 `cardinal-harness` → `ratiometer` → `llmsorting` → `llmsort`. The parked
-crates.io names keep resolving. Extracted from
-[llmsort-lab](https://github.com/XyraSinclair/llmsort-lab), which carries
-the full pre-extraction history.
+crates.io names keep resolving. Pre-extraction history lives in the
+archived [llmsort-lab](https://github.com/XyraSinclair/llmsort-lab).
 
 ## License
 

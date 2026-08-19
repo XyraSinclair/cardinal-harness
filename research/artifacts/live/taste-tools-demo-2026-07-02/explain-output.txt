@@ -1,0 +1,8 @@
+attribute                                    | alone ρ | weight
+---------------------------------------------|---------|-------
+usefulness as advice for a software engineer |   +0.98 | 0.85
+relevance to software engineering principles |   +0.79 | 0.01
+encourages proactive careful planning        |   +0.21 | 0.00
+wisdom applicable to technical decision-maki |   +0.81 | 0.15
+
+weighted combination reconstructs your ranking at ρ = +0.98

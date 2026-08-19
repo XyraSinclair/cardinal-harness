@@ -1,0 +1,46 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "message": {
+        "content": "I need to evaluate which method has more noise resistance to model calibration drift, anchoring, presentation order, and local inconsistency.\n\n**Method A (single_scalar_rating):**\n- Calibration drift: Each item gets an independent score, but the model's internal calibration can shift across sessions or even within a session. Scores like \"7/10\" are highly susceptible to anchoring from previous items seen.\n- Anchoring: Very susceptible - the first item scored sets an implicit anchor for subsequent scores.\n- Presentation order: Scores are influenced by what was scored before (contrast effects, fatigue).\n- Local inconsistency: A model might score item X as 7 and item Y as 8, but if asked again might reverse them - the absolute numbers are noisy.\n\n**Method B (ordinal_pairwise):**\n- Calibration drift: Each comparison is local and relative - no need for consistent absolute scale across time. Drift in absolute calibration matters less when you're only asking \"which is better.\"\n- Anchoring: Less susceptible - the question is binary/relative, so anchoring to a numeric scale is avoided.\n- Presentation order: Still has some vulnerability (which item is presented first in the pair can matter), but this is a narrower problem than full ordering effects.\n- Local inconsistency: Can produce intransitive cycles (A>B, B>C, C>A), which is a real weakness. Aggregation methods (like Condorcet) can partially handle this.\n\n**Comparison:**\n- B is substantially more resistant to calibration drift and anchoring since it avoids absolute numeric scales entirely.\n- B has some vulnerability to presentation order within pairs and to intransitivity (local inconsistency).\n- A is vulnerable to all four named issues simultaneously and severely.\n- Overall, B is considerably more noise-resistant, though not perfectly so due to intransitivity risks.\n\nThe gap is meaningful but not extreme - B avoids the biggest sources of noise (calibration, anchoring) while still having some vulnerabilities (pair order, cycles). I'd estimate B is roughly 4-5x more resistant.\n\n```json\n{\"higher_id\":\"B\",\"ratio\":4.5,\"confidence\":0.82}\n```",
+        "reasoning": null,
+        "refusal": null,
+        "role": "assistant"
+      },
+      "native_finish_reason": "end_turn"
+    }
+  ],
+  "created": 1782861175,
+  "id": "gen-1782861175-55i2mTZ1ZFtSMaa9kEVY",
+  "model": "anthropic/claude-4.6-sonnet-20260217",
+  "object": "chat.completion",
+  "provider": "Anthropic",
+  "service_tier": "default",
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 504,
+    "completion_tokens_details": {
+      "audio_tokens": 0,
+      "image_tokens": 0,
+      "reasoning_tokens": 0
+    },
+    "cost": 0.008205,
+    "cost_details": {
+      "upstream_inference_completions_cost": 0.00756,
+      "upstream_inference_cost": 0.008205,
+      "upstream_inference_prompt_cost": 0.000645
+    },
+    "is_byok": false,
+    "prompt_tokens": 215,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "video_tokens": 0
+    },
+    "total_tokens": 719
+  }
+}

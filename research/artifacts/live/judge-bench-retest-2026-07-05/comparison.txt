@@ -1,0 +1,18 @@
+model                          judge  signal     coh    flip    curl    spin     chi     pol    para    nuis
+gemini-2.5-flash              -0.002  +0.023  -0.014  -0.050  +0.014  +0.000  -0.009  +0.095  -0.024  +0.108
+claude-sonnet-4.6             -0.000  -0.006  +0.004  +0.000  +0.000  +0.000  +0.097  -0.048  -0.024  -0.012
+claude-haiku-4.5              +0.000  +0.000  +0.000  +0.000  -0.000  +0.000  +0.000  +0.000  +0.000  +0.000
+deepseek-v4-flash             -0.021  -0.026  -0.019  +0.000  +0.026  +0.000  -0.133  +0.000  +0.000  +0.156
+gpt-5.4-mini                  +0.064  +0.164  +0.004  +0.050  -0.010  +0.000  +0.121  +0.286  +0.214  -0.149
+gpt-5.4-nano                  +0.045  +0.021  +0.096  -0.050  -0.008  +0.000  +0.215  -0.786  +0.143  -0.365
+
+rank order run1: ['gemini-2.5-flash', 'claude-sonnet-4.6', 'claude-haiku-4.5', 'deepseek-v4-flash', 'gpt-5.4-mini', 'gpt-5.4-nano']
+rank order run2: ['gemini-2.5-flash', 'claude-sonnet-4.6', 'claude-haiku-4.5', 'gpt-5.4-mini', 'deepseek-v4-flash', 'gpt-5.4-nano']
+
+mean |dJUDGE| = 0.022 · max = 0.064
+
+findings check:
+  nano polarity sign: run1 +0.38 run2 -0.40
+  anthropic nuisance: haiku 0.080->0.080, sonnet 0.092->0.080
+  mini spin: 0.6666666666666666->0.6666666666666666 · nano spin 0.0->0.0
+  mini halo drift: see per-pack breakdowns
