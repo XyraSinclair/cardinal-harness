@@ -1,6 +1,6 @@
 # llmsort-lab (archived)
 
-Everything is **[llmsort](https://github.com/XyraSinclair/llmsort)** now
+Everything is **[cardinal-harness](https://github.com/XyraSinclair/cardinal-harness)** now
 — the crate (`cargo install llmsort`,
 [crates.io](https://crates.io/crates/llmsort),
 [docs.rs](https://docs.rs/llmsort)), the research code (its

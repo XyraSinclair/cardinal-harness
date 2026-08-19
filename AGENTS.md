@@ -1,7 +1,7 @@
 # AGENTS.md
 
 **ARCHIVED.** Everything moved to
-[llmsort](https://github.com/XyraSinclair/llmsort) on 2026-08-19:
+[cardinal-harness](https://github.com/XyraSinclair/cardinal-harness) on 2026-08-19:
 
 - the crate (root package, crates.io `llmsort`);
 - the living research code (llmsort `experiments/`);
