@@ -125,8 +125,8 @@ If a model is newer than the local pricing table, reports use OpenRouter's provi
 Generate a local prompt-surface experiment request without touching the network:
 
 ```bash
-# Prompt-wording experiment expansion lives in the lab repo
-# (llmsort-lab): the `experiment-expand` research verb.
+# Prompt-wording experiment expansion lives in experiments/:
+# the `experiment-expand` research verb (`cardinal` CLI).
 ```
 
 The current CLI accepts the multi-rerank request shape. The simple request shape is converted through the library API.

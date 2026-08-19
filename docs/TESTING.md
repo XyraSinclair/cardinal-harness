@@ -28,8 +28,7 @@ the point of the battery: it is strong enough to find things.
 The comparative research batteries — method dominance (cardinal vs Likert
 vs ordinal), planner regret vs uniform-random selection, and the
 judge-coherence benchmark — run from `experiments/tests/`; their evidence
-packs are archived in
-[llmsort-lab](https://github.com/XyraSinclair/llmsort-lab).
+packs live in `research/artifacts/live/`.
 
 ## A bug the battery found (fixed)
 

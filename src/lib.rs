@@ -38,8 +38,8 @@
 //! Everything else is exposed for composition but may move.
 //!
 //! Lineage: `cardinal-harness` → `ratiometer` → `llmsorting` → `llmsort`;
-//! the research program that produced this engine lives at
-//! <https://github.com/XyraSinclair/llmsort-lab>. See `docs/ALGORITHM.md`
+//! the research program that produced this engine lives in this repo's
+//! `experiments/` crate and `research/` record. See `docs/ALGORITHM.md`
 //! for the design rationale.
 
 pub mod cache;
