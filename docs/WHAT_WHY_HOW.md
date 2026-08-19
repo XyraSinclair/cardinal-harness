@@ -113,7 +113,7 @@ cardinal explain my-ranking.txt --propose 3
 
 The install command pulls the released crate from crates.io. A source
 install of current `main`
-(`cargo install --git https://github.com/XyraSinclair/cardinal-harnessing --locked`)
+(`cargo install --git https://github.com/XyraSinclair/llmsorting --locked`)
 and tagged binaries from GitHub Releases remain available.
 
 Every run prints its evidence summary: comparisons, cost, order flips,

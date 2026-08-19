@@ -7,11 +7,14 @@ Versioning once it reaches `1.0.0`.
 
 ## [Unreleased]
 
-- The GitHub repo is named **cardinal-harness** again (operator decision
-  2026-08-19): many downstream repos point at that original name, so it
-  must carry the maintained state of the art, never a tombstone.
-  `llmsort`, `llmsorting`, and `ratiometer` GitHub URLs redirect here.
-  The crate remains `llmsort` on crates.io.
+- One repo, all names, all history (operator decisions 2026-08-19):
+  the GitHub repo is `llmsort`; the legacy names `cardinal-harness`,
+  `ratiometer`, and `llmsorting` all redirect here (each was walked
+  through this repo to capture its redirect — downstream pointers land
+  on the maintained state of the art, never a tombstone). The full
+  pre-extraction history and seriate's history are grafted into this
+  repo's ancestry via ours-merges; the llmsort-lab and seriate
+  satellite repos are deleted (colo2 bare mirrors retained).
 
 - The repo is now a workspace: `experiments/` (`llmsort-experiments`,
   never published) carries the research side folded in from llmsort-lab —
@@ -25,9 +28,9 @@ Versioning once it reaches `1.0.0`.
   campaign definitions, and python analysis — with `PROGRAM.md` at the
   root and the program docs (FIRST_PRINCIPLES, MATH_FRONTIER, PRINCIPLES,
   …) merged into `docs/`. None of this ships in the published package
-  (the crates.io include-list is unchanged). The
-  [llmsort-lab](https://github.com/XyraSinclair/llmsort-lab) repo is
-  archived; it keeps only pre-extraction history.
+  (the crates.io include-list is unchanged). The llmsort-lab repo's
+  history is grafted into this repo's ancestry and the satellite repo
+  is deleted.
 
 ## [0.14.0] - 2026-08-18
 

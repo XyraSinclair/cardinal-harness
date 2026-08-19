@@ -2,10 +2,11 @@
 
 `llmsort` is the engine: pairwise LLM ratio judgements fitted into cardinal
 scores with uncertainty, active pair selection, and explicit cost and
-provenance. This is the one repo — GitHub name **cardinal-harness** (the
-program's original name; `llmsort`, `llmsorting`, `ratiometer` redirect
-here) — crate, research code, and the measured record in three parts of
-deliberately different polish:
+provenance. This is the ONE repo of the program — every former name
+(`cardinal-harness`, `ratiometer`, `llmsorting`) redirects here, the
+full pre-extraction and seriate histories are grafted into its
+ancestry, and no satellite repos exist — crate, research code, and the
+measured record in three parts of deliberately different polish:
 
 - **the crate** (root package, published to crates.io) — small, promised,
   under the shape mandate below;
@@ -21,9 +22,9 @@ deliberately different polish:
   the book of tricks — every method as a rung with its pack — and is
   served at <https://llmsorting.com/PROGRAM.md>.
 
-Pre-extraction history (the `llmsorting` era) lives in the archived
-[llmsort-lab](https://github.com/XyraSinclair/llmsort-lab) repo; nothing
-new lands there.
+Pre-extraction history is IN this repo (ours-merge grafts, 2026-08-19);
+the former llmsort-lab and seriate repos are deleted, with colo2 bare
+mirrors retained as belt-and-braces.
 
 ## Shape mandate (the crate — root package only)
 
