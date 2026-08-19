@@ -99,6 +99,18 @@ RESULTS.md with denominators) and one page here.
   directions (pairwise positional flips: 6–38%). Agreement ρ 0.29–0.81
   by attribute. Next: reciprocal-frame prompt or per-call pivot-effect
   term in the solver before k-wise earns a promotion.
+- **E9 — NORTH head-to-head: single-token PMF vs JSON rail.** The 10x-core
+  decree's premise, measured (design: docs/NORTH.md). `llmsort sort` on 6
+  items x 24 comparisons, gpt-4.1-mini, both templates, pack-local
+  replayable caches. **EXECUTED** 2026-08-19 (pack
+  `research/artifacts/live/north-e9-2026-08-19/`): at identical cost
+  ($0.0048 vs $0.0044), ratio_letter_v1 reads stat error +-0.020 vs
+  +-0.464 (23x), order residual 0.034 vs 0.178 nats (5x), rank risk 1.88
+  vs 2.79; rankings agree rho 0.886. Flag: frustration HIGHER on the
+  letter rail (16.9% vs 11.5%) — instrument sensitivity vs judge
+  cyclicity, E10 must separate. Next: E10 family sweep (cached pair
+  prefix x {A, A', not-A} x orders → scaling + reliability reading from
+  the same calls).
 - **E8 — whitespace-jitter repeat probes.** Probe the same structured
   judgement K times, probe k widening 1-3 seed-chosen word gaps in the
   attribute prompt (deterministic, blake3(text,k)) so each probe is a

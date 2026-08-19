@@ -1,0 +1,83 @@
+{
+  "items": [
+    {
+      "id": "item-0000",
+      "text": "The obstacle is the way.",
+      "rank": 1,
+      "latent_mean": 0.061109684524488256,
+      "latent_std": 0.02198365000983791,
+      "z_score": 0.7106854742063541,
+      "percentile": 0.9166666666666666
+    },
+    {
+      "id": "item-0001",
+      "text": "We suffer more often in imagination than in reality.",
+      "rank": 2,
+      "latent_mean": 0.05908733685010537,
+      "latent_std": 0.019762312006783796,
+      "z_score": 0.6382960447468363,
+      "percentile": 0.75
+    },
+    {
+      "id": "item-0003",
+      "text": "What gets measured gets managed.",
+      "rank": 3,
+      "latent_mean": 0.04330028822114655,
+      "latent_std": 0.020815652896573722,
+      "z_score": 0.07320258550832104,
+      "percentile": 0.5833333333333334
+    },
+    {
+      "id": "item-0002",
+      "text": "A journey of a thousand miles begins with a single step.",
+      "rank": 4,
+      "latent_mean": 0.03921015849732117,
+      "latent_std": 0.02198365000983791,
+      "z_score": -0.07320258550832079,
+      "percentile": 0.4166666666666667
+    },
+    {
+      "id": "item-0004",
+      "text": "Live, laugh, love.",
+      "rank": 5,
+      "latent_mean": 0.01676297671351787,
+      "latent_std": 0.018478257762428396,
+      "z_score": -0.8766938461291969,
+      "percentile": 0.25
+    },
+    {
+      "id": "item-0005",
+      "text": "Monday is the first day of the work week.",
+      "rank": 6,
+      "latent_mean": 0.0,
+      "latent_std": 0.019013748647227883,
+      "z_score": -1.4767204071927023,
+      "percentile": 0.08333333333333333
+    }
+  ],
+  "meta": {
+    "topk_error": 1.8788850426649544,
+    "tolerated_error": 0.1,
+    "comparisons_attempted": 24,
+    "comparisons_used": 24,
+    "comparisons_refused": 0,
+    "comparisons_cached": 0,
+    "comparison_budget": 24,
+    "latency_ms": 3525,
+    "model_used": "openai/gpt-4.1-mini",
+    "rater_id_used": "openai/gpt-4.1-mini",
+    "provider_input_tokens": 11908,
+    "provider_output_tokens": 48,
+    "provider_cost_nanodollars": 4840000,
+    "provider_cost_is_estimate": false,
+    "entities_pruned": 0,
+    "pairs_counterbalanced": 12,
+    "position_flips": 2,
+    "evidence_judgements": 24,
+    "logprob_mode_judgements": 24,
+    "evidence_visible_mass_mean": 0.9997025710897671,
+    "evidence_order_residual_mean_abs": 0.03389113085866721,
+    "judgement_frustration_mean": 0.1686340509245712,
+    "stop_reason": "budget_exhausted"
+  }
+}
