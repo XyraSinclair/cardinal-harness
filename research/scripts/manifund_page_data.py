@@ -17,6 +17,7 @@ commit, rsync; no exopriors-core deploy needed.
 import datetime
 import json
 import os
+import shutil
 import subprocess
 import sys
 
@@ -155,6 +156,12 @@ FORMAT JSONEachRow"""
     size = os.path.getsize(out_path)
     print(f"{out_path}: {len(proposals)} proposals, {len(attr_list)} attributes, "
           f"{len(out['models'])} models, {total_judgments} judgments, {size/1e6:.1f} MB")
+    # Publish to the live site when the served dir exists (colo2); a missed copy
+    # leaves openpriors.com/manifund fetching stale or 404 data (2026-08-19).
+    publish = os.path.join("/srv/llmsorting/data", os.path.basename(out_path))
+    if os.path.isdir(os.path.dirname(publish)) and os.access(os.path.dirname(publish), os.W_OK):
+        shutil.copyfile(out_path, publish)
+        print(f"published -> {publish}")
 
 
 if __name__ == "__main__":
