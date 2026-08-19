@@ -356,6 +356,45 @@ enum Commands {
     /// under meaning-preserving transformations (order swap, reciprocal
     /// antisymmetry, cyclic frustration, framing spin, polarity reversal,
     /// paraphrase stability, null calibration) plus a signal axis so a
+    /// Whitespace-jitter probe battery: K quasi-independent draws per pair
+    ///
+    /// Probes the same structured judgement K times, each probe inserting
+    /// subtly different amounts of spaces into the attribute prompt at
+    /// seed-chosen points before the elicitation. Each probe is a distinct
+    /// cache key, so draws accumulate instead of colliding; draws pool via
+    /// DerSimonian-Laird with a heterogeneity floor. Reports per-pair
+    /// dispersion, sign stability, duplicate rate, and sigma_w2/sigma_b2.
+    Probe {
+        /// Entities file, one per line
+        file: PathBuf,
+        /// Attribute to judge by
+        #[arg(long)]
+        by: String,
+        /// Model slug (OpenRouter)
+        #[arg(long)]
+        model: String,
+        /// Probes per pair (probe 0 is the unjittered prompt)
+        #[arg(long, default_value_t = 8)]
+        probes: u32,
+        /// Prompt template slug
+        #[arg(long, default_value = "canonical_v2")]
+        template: String,
+        /// Concurrent comparisons
+        #[arg(long, default_value_t = 6)]
+        concurrency: usize,
+        /// Cap the number of ring pairs (default: n, the full stride-1 ring)
+        #[arg(long)]
+        pairs: Option<usize>,
+        /// Write the full JSON report to this path
+        #[arg(long)]
+        out: Option<PathBuf>,
+        /// Do not read or write the pairwise cache
+        #[arg(long)]
+        no_cache: bool,
+        /// SQLite cache path (default: shared user cache)
+        #[arg(long)]
+        cache: Option<PathBuf>,
+    },
     /// constant judge cannot hide in perfect consistency. Headline score =
     /// signal × coherence. Fixed public corpus, 194 comparisons per model.
     Bench {
@@ -1481,6 +1520,67 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 report.iterations,
                 if report.converged { "converged" } else { "NOT CONVERGED" },
             );
+        }
+        Commands::Probe {
+            file,
+            by,
+            model,
+            probes,
+            template,
+            concurrency,
+            pairs,
+            out,
+            no_cache,
+            cache,
+        } => {
+            require_openrouter_key()?;
+            let raw = std::fs::read_to_string(&file)?;
+            let entities: Vec<String> = raw
+                .lines()
+                .map(str::trim)
+                .filter(|l| !l.is_empty())
+                .map(String::from)
+                .collect();
+            if entities.len() < 2 {
+                return Err("need at least 2 entities to probe pairs".into());
+            }
+            let n = entities.len();
+            let mut ring: Vec<(usize, usize)> = (0..n).map(|i| (i, (i + 1) % n)).collect();
+            if n == 2 {
+                ring.truncate(1);
+            }
+            if let Some(cap) = pairs {
+                ring.truncate(cap.max(1));
+            }
+            let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
+            let cache_store = if no_cache {
+                None
+            } else {
+                let cache_path = cache.unwrap_or_else(SqlitePairwiseCache::default_path);
+                Some(SqlitePairwiseCache::new(cache_path)?)
+            };
+            let cache_ref = cache_store
+                .as_ref()
+                .map(|c| c as &dyn llmsort::cache::PairwiseCache);
+            let report = llmsort_experiments::run_probe_battery(
+                &gateway,
+                cache_ref,
+                &entities,
+                &ring,
+                &by,
+                llmsort_experiments::ProbeBatteryOptions {
+                    model,
+                    template,
+                    probes,
+                    concurrency,
+                },
+            )
+            .await?;
+            print!("{}", llmsort_experiments::render_probe_report(&report));
+            if let Some(path) = out {
+                std::fs::write(&path, serde_json::to_string_pretty(&report)?)?;
+                eprintln!("report written to {}", path.display());
+            }
         }
         Commands::Bench {
             models,

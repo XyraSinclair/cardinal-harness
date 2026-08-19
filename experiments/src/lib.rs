@@ -17,6 +17,7 @@ pub mod evaluation;
 pub mod experiments;
 pub mod judgement_run;
 pub mod landing;
+pub mod probes;
 pub mod slate;
 pub mod transitivity;
 
@@ -33,6 +34,10 @@ pub use ensemble::{judge_geometry, JudgeGeometry, JudgePortfolioEntry};
 pub use experiments::{
     expand_prompt_experiment_request, AttributePolarity, AttributeVariantSpec,
     PromptExperimentConfig, PromptExperimentError,
+};
+pub use probes::{
+    render_probe_report, run_probe_battery, whitespace_jitter, PairProbes, ProbeBatteryOptions,
+    ProbeBatteryReport,
 };
 pub use slate::{propose_slate, SlateEntry, SlateError, SlateReport};
 pub use transitivity::{stochastic_transitivity, TransitivityReport, TriadTest};

@@ -99,6 +99,20 @@ RESULTS.md with denominators) and one page here.
   directions (pairwise positional flips: 6–38%). Agreement ρ 0.29–0.81
   by attribute. Next: reciprocal-frame prompt or per-call pivot-effect
   term in the solver before k-wise earns a promotion.
+- **E8 — whitespace-jitter repeat probes.** Probe the same structured
+  judgement K times, probe k widening 1-3 seed-chosen word gaps in the
+  attribute prompt (deterministic, blake3(text,k)) so each probe is a
+  distinct cache key: draws accumulate and replay instead of colliding
+  into the one cached judgement; pooled by `repeat_pooling` (DL
+  heterogeneity floor). **EXECUTED** 2026-08-19 (`cardinal probe`,
+  experiments/src/probes.rs, pack
+  `research/artifacts/live/whitespace-probes-2026-08-19/`): 6 entities x
+  6 probes x ring, 36 calls, $0.003, deepseek-v4-flash. Jitter moves the
+  answer on most repeat draws (duplicate rate 17-40% across two runs);
+  one pair split on DIRECTION across probes in both runs — single-probe
+  elicitation hides that class entirely. sigma_b2 > 0 even at n=6.
+  Next: K-vs-precision curve; jitter-vs-plain-resample A/B (no-cache
+  rail); opt-in repeat mode in sort.
 - **E2 — grok gauge calibration on anchors.** Anchor entity pools with true
   ratios; several models; the gauge's bands tuned where truth exists.
   **EXECUTED** 2026-08-15 (llmsorting `examples/anchor_gauge.rs`, pack
