@@ -1,0 +1,38 @@
+{
+  "name": "manifund-remote",
+  "description": "Remote-API judge lanes over the Manifund grantmaking corpus, complementing the local-GPU manifund-3mo campaign with independent commercial judges. GLM (z.ai coding-plan) drives canonical_bucket_v1 direction+ratio_bucket judgments; GLM returns no output logprobs (censused in model_supports_logprobs) so no PMF posterior lands, but direction and ratio land into ratiometer.judgments, content-addressed and resumable from the ledger. Each phase authenticates via api_key_env against the coding endpoint. Budgets are per-attribute stopping caps sized to sit inside the Lite weekly credit envelope; raise once real consumption is measured. MiniMax lanes activate once the Token Plan payment clears.",
+  "phases": [
+    {
+      "run_tag": "manifund-glm47-classic44-2026-08-17",
+      "corpus": "data/manifund_full.txt",
+      "attributes": "batteries/manifund_attributes.txt",
+      "model": "glm-4.7",
+      "base_url": "https://api.z.ai/api/coding/paas/v4",
+      "api_key_env": "ZAI_API_KEY",
+      "template": "canonical_bucket_v1",
+      "budget": 200,
+      "seed": 1,
+      "concurrency": 4,
+      "env": {
+        "CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS": 1024,
+        "OPENROUTER_TIMEOUT_SECONDS": 180
+      }
+    },
+    {
+      "run_tag": "manifund-glm53-classic44-smallpool-2026-08-17",
+      "corpus": "data/manifund.txt",
+      "attributes": "batteries/manifund_attributes.txt",
+      "model": "glm-5.3",
+      "base_url": "https://api.z.ai/api/coding/paas/v4",
+      "api_key_env": "ZAI_API_KEY",
+      "template": "canonical_bucket_v1",
+      "budget": 120,
+      "seed": 1,
+      "concurrency": 3,
+      "env": {
+        "CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS": 1024,
+        "OPENROUTER_TIMEOUT_SECONDS": 180
+      }
+    }
+  ]
+}
