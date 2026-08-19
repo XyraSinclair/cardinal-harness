@@ -7,6 +7,14 @@ Versioning once it reaches `1.0.0`.
 
 ## [Unreleased]
 
+- The repo is now a workspace: `experiments/` (`llmsort-experiments`,
+  never published) carries the research side folded in from llmsort-lab —
+  the `cardinal` research CLI, the `cardinald` daemon, live batteries, and
+  the research test suites. The published crate is unchanged apart from a
+  handful of `#[doc(hidden)] pub` seams (`rerank::gates` application frame,
+  judgement-run instrumentation hooks, config builders) that the
+  experiments crate consumes; these are not public API.
+
 ## [0.14.0] - 2026-08-18
 
 ### Changed

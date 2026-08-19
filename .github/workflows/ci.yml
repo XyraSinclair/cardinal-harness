@@ -27,18 +27,18 @@ jobs:
         run: cargo fmt --all -- --check
 
       - name: Clippy
-        run: cargo clippy --all-targets --all-features -- -D warnings
+        run: cargo clippy --workspace --all-targets --all-features -- -D warnings
 
       - name: Tests
-        run: cargo test --all-targets --all-features
+        run: cargo test --workspace --all-targets --all-features
 
       - name: Doc tests
-        run: cargo test --doc
+        run: cargo test --workspace --doc
 
       - name: Docs
         env:
           RUSTDOCFLAGS: -D warnings
-        run: cargo doc --no-deps
+        run: cargo doc --workspace --no-deps
 
       - name: Install cargo-audit
         uses: taiki-e/install-action@v2
@@ -49,7 +49,7 @@ jobs:
         run: cargo audit
 
       - name: Publish dry-run
-        run: cargo publish --dry-run --allow-dirty
+        run: cargo publish -p llmsort --dry-run --allow-dirty
 
   msrv:
     runs-on: ubuntu-latest
@@ -65,4 +65,4 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Check on MSRV
-        run: cargo check --all-targets --all-features
+        run: cargo check -p llmsort --all-targets --all-features

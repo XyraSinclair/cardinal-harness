@@ -112,16 +112,19 @@ prompts, research ideas, candidate plans, reviewer notes, backlog items.
 Do not use it for deterministic rankings, scalar metrics, or attributes
 too incoherent to compare.
 
-## Evidence
+## Evidence and experiments
 
 The trade is explicit: this costs more than one-shot scoring, saves
 comparisons versus exhaustive pairwise judging, and returns uncertainty
-plus evidence instead of only a sorted list. The measured record — method
-comparisons, planner-regret benchmarks (which the planner has lost and
-then won), judge-coherence batteries, and every published number's
-replayable pack — lives in the research program:
-[llmsort-lab](https://github.com/XyraSinclair/llmsort-lab). The evidence
-culture applies to our own planner first.
+plus evidence instead of only a sorted list. The research side lives in
+[`experiments/`](experiments/) — a never-published workspace crate with
+the experimental verbs, live batteries, and instruments whose evidence is
+not yet in; an instrument graduates into the crate only after its
+evidence earns it. The measured record itself — method comparisons,
+planner-regret benchmarks (which the planner has lost and then won),
+judge-coherence batteries, and every published number's replayable pack —
+is archived in [llmsort-lab](https://github.com/XyraSinclair/llmsort-lab).
+The evidence culture applies to our own planner first.
 
 ## Lineage
 

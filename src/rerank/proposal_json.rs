@@ -13,7 +13,7 @@ use serde_json::Value;
 /// Parse a completion into JSON, whole-string first, then the first
 /// balanced `[...]`/`{...}` span that parses. `None` only when no
 /// parseable JSON exists anywhere in the content.
-pub(crate) fn lenient_value(content: &str) -> Option<Value> {
+pub fn lenient_value(content: &str) -> Option<Value> {
     let trimmed = content.trim();
     if trimmed.is_empty() {
         return None;
@@ -78,7 +78,7 @@ pub(crate) fn lenient_string_array(content: &str) -> Option<Vec<String>> {
     (!strings.is_empty()).then_some(strings)
 }
 
-pub(crate) fn value_string_array(value: &Value) -> Option<Vec<String>> {
+pub fn value_string_array(value: &Value) -> Option<Vec<String>> {
     let element = |v: &Value| -> Option<String> {
         v.as_str().map(str::to_string).or_else(|| {
             v.as_object()

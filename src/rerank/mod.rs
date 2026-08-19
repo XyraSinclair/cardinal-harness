@@ -14,14 +14,15 @@ pub mod consortium;
 pub mod decimal_ledger;
 pub mod elaborate;
 pub mod explain;
-mod gates;
+pub mod gates;
 pub mod hooks;
 pub mod model_policy;
 pub mod multi;
 pub mod options;
 pub mod orbit;
 pub mod policy_registry;
-pub(crate) mod proposal_json;
+#[doc(hidden)]
+pub mod proposal_json;
 pub mod report;
 pub mod sampling;
 pub mod simple;

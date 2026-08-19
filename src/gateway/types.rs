@@ -197,7 +197,7 @@ pub struct ChatRequest {
     pub prompt_cache_key: Option<String>,
 }
 
-pub(crate) const DEFAULT_CHAT_TEMPERATURE: f32 = 0.0;
+pub const DEFAULT_CHAT_TEMPERATURE: f32 = 0.0;
 
 impl ChatRequest {
     pub fn new(model: ChatModel, messages: Vec<Message>, attribution: Attribution) -> Self {

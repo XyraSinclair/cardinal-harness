@@ -1,10 +1,15 @@
+//! Gate-spec parsing, validation, and threshold application for
+//! multi-attribute reranks. The engine validates specs before a run;
+//! the application frame (`ParsedGateSpec::select`/`passes`) is public
+//! for downstream evaluation harnesses.
+
 use std::collections::HashSet;
 
 use super::multi::MultiRerankError;
 use super::types::MultiRerankGateSpec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum GateUnit {
+pub enum GateUnit {
     Latent,
     Z,
     Percentile,
@@ -12,7 +17,7 @@ pub(crate) enum GateUnit {
 }
 
 impl GateUnit {
-    pub(crate) fn parse(unit: &str) -> Result<Self, MultiRerankError> {
+    pub fn parse(unit: &str) -> Result<Self, MultiRerankError> {
         match unit.to_ascii_lowercase().as_str() {
             "latent" => Ok(Self::Latent),
             "z" => Ok(Self::Z),
@@ -23,16 +28,34 @@ impl GateUnit {
             ))),
         }
     }
+
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Latent => "latent",
+            Self::Z => "z",
+            Self::Percentile => "percentile",
+            Self::MinNorm => "min_norm",
+        }
+    }
+
+    pub fn select(self, latent: f64, z: f64, min_norm: f64, percentile: f64) -> f64 {
+        match self {
+            Self::Latent => latent,
+            Self::Z => z,
+            Self::Percentile => percentile,
+            Self::MinNorm => min_norm,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum GateOp {
+pub enum GateOp {
     GreaterThanOrEqual,
     LessThanOrEqual,
 }
 
 impl GateOp {
-    pub(crate) fn parse(op: &str) -> Result<Self, MultiRerankError> {
+    pub fn parse(op: &str) -> Result<Self, MultiRerankError> {
         match op {
             ">=" => Ok(Self::GreaterThanOrEqual),
             "<=" => Ok(Self::LessThanOrEqual),
@@ -41,33 +64,62 @@ impl GateOp {
             ))),
         }
     }
+
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::GreaterThanOrEqual => ">=",
+            Self::LessThanOrEqual => "<=",
+        }
+    }
+
+    pub fn passes(self, value: f64, threshold: f64) -> bool {
+        match self {
+            Self::GreaterThanOrEqual => value >= threshold,
+            Self::LessThanOrEqual => value <= threshold,
+        }
+    }
 }
 
-pub(crate) fn validate_gate_specs(
-    gates: &[MultiRerankGateSpec],
+#[derive(Debug, Clone, Copy)]
+pub struct ParsedGateSpec<'a> {
+    pub attribute_id: &'a str,
+    pub unit: GateUnit,
+    pub op: GateOp,
+    pub threshold: f64,
+}
+
+pub fn validate_gate_specs<'a>(
+    gates: &'a [MultiRerankGateSpec],
     attribute_ids: &HashSet<&str>,
-) -> Result<(), MultiRerankError> {
-    gates.iter().try_for_each(|gate| {
-        if !attribute_ids.contains(gate.attribute_id.as_str()) {
-            return Err(MultiRerankError::InvalidRequest(format!(
-                "gate references unknown attribute: {}",
-                gate.attribute_id
-            )));
-        }
+) -> Result<Vec<ParsedGateSpec<'a>>, MultiRerankError> {
+    gates
+        .iter()
+        .map(|gate| {
+            if !attribute_ids.contains(gate.attribute_id.as_str()) {
+                return Err(MultiRerankError::InvalidRequest(format!(
+                    "gate references unknown attribute: {}",
+                    gate.attribute_id
+                )));
+            }
 
-        let unit = GateUnit::parse(&gate.unit)?;
-        let op = GateOp::parse(&gate.op)?;
+            let unit = GateUnit::parse(&gate.unit)?;
+            let op = GateOp::parse(&gate.op)?;
 
-        if matches!(unit, GateUnit::Percentile) && !(0.0..=1.0).contains(&gate.threshold) {
-            return Err(MultiRerankError::InvalidRequest(format!(
-                "percentile gate threshold must be in [0,1]: {}",
-                gate.threshold
-            )));
-        }
+            if matches!(unit, GateUnit::Percentile) && !(0.0..=1.0).contains(&gate.threshold) {
+                return Err(MultiRerankError::InvalidRequest(format!(
+                    "percentile gate threshold must be in [0,1]: {}",
+                    gate.threshold
+                )));
+            }
 
-        let _ = (unit, op);
-        Ok(())
-    })
+            Ok(ParsedGateSpec {
+                attribute_id: gate.attribute_id.as_str(),
+                unit,
+                op,
+                threshold: gate.threshold,
+            })
+        })
+        .collect()
 }
 
 #[cfg(test)]
@@ -84,6 +136,8 @@ mod tests {
             threshold: 0.6,
         }];
 
-        validate_gate_specs(&gates, &attribute_ids).expect("valid gate");
+        let parsed = validate_gate_specs(&gates, &attribute_ids).expect("valid gate");
+        assert_eq!(parsed[0].unit, GateUnit::Percentile);
+        assert_eq!(parsed[0].op, GateOp::GreaterThanOrEqual);
     }
 }

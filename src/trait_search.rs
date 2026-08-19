@@ -129,7 +129,8 @@ fn compute_attribute_scale(scores: &[f64]) -> f64 {
 ///
 /// Derived units are computed over finite scores (non-finite scores get 0.0).
 /// Returns (mad_scale, z_scores, min_normalized, percentiles).
-pub(crate) fn compute_attribute_units(scores: &[f64]) -> AttributeUnits {
+#[doc(hidden)]
+pub fn compute_attribute_units(scores: &[f64]) -> AttributeUnits {
     let n = scores.len();
     let mut finite: Vec<usize> = scores
         .iter()

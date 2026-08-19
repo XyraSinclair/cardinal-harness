@@ -457,7 +457,8 @@ async fn sort_with_probes(
 
 /// Spearman rank correlation with average ranks for ties.
 /// Returns `None` for fewer than 3 points or zero variance.
-pub(crate) fn spearman(xs: &[f64], ys: &[f64]) -> Option<f64> {
+#[doc(hidden)]
+pub fn spearman(xs: &[f64], ys: &[f64]) -> Option<f64> {
     if xs.len() != ys.len() || xs.len() < 3 {
         return None;
     }

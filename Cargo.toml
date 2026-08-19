@@ -1,3 +1,6 @@
+[workspace]
+members = ["experiments"]
+
 [package]
 name = "llmsort"
 version = "0.14.0"

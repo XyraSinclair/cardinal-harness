@@ -388,6 +388,16 @@ pub struct RerankExecution<'a> {
     cancel_flag: Option<&'a AtomicBool>,
 }
 
+/// The execution pieces a portable judgement run borrows from a [`RerankExecution`]:
+/// gateway, optional trace sink, run options, and whether a cache is attached.
+#[doc(hidden)]
+pub type JudgementRunInstrumentation<'a> = (
+    Arc<dyn ChatGateway>,
+    Option<&'a dyn TraceSink>,
+    RerankRunOptions,
+    bool,
+);
+
 impl<'a> RerankExecution<'a> {
     #[must_use]
     pub fn new(gateway: Arc<dyn ChatGateway>, attribution: Attribution) -> Self {
@@ -445,11 +455,50 @@ impl<'a> RerankExecution<'a> {
         self.cancel_flag = Some(cancel_flag);
         self
     }
+
+    #[doc(hidden)]
+    pub fn judgement_run_instrumentation(
+        &self,
+    ) -> Result<JudgementRunInstrumentation<'a>, &'static str> {
+        if self.model_policy.is_some() {
+            return Err("model policies have no portable v1 specification");
+        }
+        if self.warm_start.is_some() {
+            return Err("warm starts have no complete comparison trace");
+        }
+        Ok((
+            Arc::clone(&self.gateway),
+            self.trace,
+            self.run_options.clone(),
+            self.cache.is_some(),
+        ))
+    }
+
+    #[doc(hidden)]
+    pub fn with_judgement_run_instrumentation<'b>(
+        self,
+        gateway: Arc<dyn ChatGateway>,
+        trace: &'b dyn TraceSink,
+    ) -> RerankExecution<'b>
+    where
+        'a: 'b,
+    {
+        RerankExecution {
+            gateway,
+            cache: self.cache,
+            model_policy: self.model_policy,
+            run_options: self.run_options,
+            attribution: self.attribution,
+            warm_start: self.warm_start,
+            observer: self.observer,
+            trace: Some(trace),
+            cancel_flag: self.cancel_flag,
+        }
+    }
 }
 
-pub(crate) fn build_trait_search_config(
-    req: &MultiRerankRequest,
-) -> (TraitSearchConfig, TopKConfig) {
+#[doc(hidden)]
+pub fn build_trait_search_config(req: &MultiRerankRequest) -> (TraitSearchConfig, TopKConfig) {
     let attributes = req
         .attributes
         .iter()
@@ -484,10 +533,8 @@ pub(crate) fn build_trait_search_config(
     )
 }
 
-pub(crate) fn build_engine_config(
-    run_options: &RerankRunOptions,
-    topk: &TopKConfig,
-) -> EngineConfig {
+#[doc(hidden)]
+pub fn build_engine_config(run_options: &RerankRunOptions, topk: &TopKConfig) -> EngineConfig {
     let mut config = EngineConfig::default();
     if let Some(seed) = run_options.rng_seed {
         config.rng_seed = seed;
