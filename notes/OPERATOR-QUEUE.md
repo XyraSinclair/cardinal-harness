@@ -9,17 +9,7 @@ dropped. Sessions: read this at start when work touches strategy, doctrine,
 or publication; update states in the same commit as the work that changes
 them.
 
-## OPEN (4 of 5)
-
-**Q6. Rename ratiometer -> llmsorting? — CLOSED (confirmed + executed
-2026-08-15).** Xyra: "yes, rename" (same day it was raised; overrides the
-2026-08-12 ratiometer lock, 505e4ef). Executed in one sweep: GitHub repo
-renamed (redirects live), crate `llmsorting` 0.13.0, `ratiometer` parked on
-crates.io like cardinal-harness, code/docs/site swept (notes/ untouched —
-dated history), llmsorting.com program repo folded in (PROGRAM.md,
-experiments/, www/), pairwiseratio.org redeployed. Binaries `cardinal`/
-`cardinald`, prompt slugs, and frozen contracts unchanged; colo2 cardinald
-rail unaffected (builds from shipped src, names unchanged).
+## OPEN (3 of 5)
 
 **Q2. Stake reorder + external-contact stake #0.** 07-09 strategy findings:
 external-contact event as stake #0, habit loop above the map, 14K scale-up
@@ -84,6 +74,16 @@ next kill before any public tier claim.
     the window (max single-run spend on record: $7.07, P2).
 
 ## CLOSED
+
+**Q6. Rename ratiometer -> llmsorting? — CLOSED (confirmed + executed
+2026-08-15).** Xyra: "yes, rename" (same day it was raised; overrides the
+2026-08-12 ratiometer lock, 505e4ef). Executed in one sweep: GitHub repo
+renamed (redirects live), crate `llmsorting` 0.13.0, `ratiometer` parked on
+crates.io like cardinal-harness, code/docs/site swept (notes/ untouched —
+dated history), llmsorting.com program repo folded in (PROGRAM.md,
+experiments/, www/), pairwiseratio.org redeployed. Binaries `cardinal`/
+`cardinald`, prompt slugs, and frozen contracts unchanged; colo2 cardinald
+rail unaffected (builds from shipped src, names unchanged).
 
 - **C2 (2026-08-10). Q1 closed — all six 07-09 doctrine edits ACCEPTED
   and landed in docs/PRINCIPLES.md**, adjudicated on the 30-day test
