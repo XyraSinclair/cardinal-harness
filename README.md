@@ -21,7 +21,7 @@ receipts.
 | Research threads | [`notes/`](notes/) | 25 dated investigation threads (logprob reality, decimal PMF ground truth, red teams, guardian panels, rename/reshape decisions) |
 | Documentation | [`docs/`](docs/) | the program-depth docs: FIRST_PRINCIPLES, MATH_FRONTIER, PRINCIPLES (the anti-slop rules and the evidence that earned them), BENCHMARK, EVALUATION, canonicality |
 | The program | [`PROGRAM.md`](PROGRAM.md) | the book of tricks: every method as a point in arity × scale × output-form, each rung PLANNED / IN FLIGHT / EXECUTED with its pack |
-| Research instruments | `src/`, `examples/`, `scripts/` | the in-tree research crate (`publish = false`): research verbs, the `cardinald` daemon, elicitation batteries, campaign runners |
+| Research instruments | `src/` (frozen), `scripts/`, `campaigns/` | the living research code moved to llmsort `experiments/` 2026-08-18; the in-tree crate here is a frozen copy for in-flight campaigns, deleted when they land |
 | Benchmark + hub sites | `site/` (history) | pairwiseratio.org and llmsorting.com sources graduated to the ops repo 2026-08-18; `site/` remains only until in-flight pages land |
 
 [![CI](https://github.com/XyraSinclair/llmsorting/actions/workflows/ci.yml/badge.svg)](https://github.com/XyraSinclair/llmsorting/actions/workflows/ci.yml)

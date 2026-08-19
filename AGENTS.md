@@ -1,10 +1,15 @@
 # AGENTS.md
 
-**Engine extracted 2026-08-18:** the public crate + CLI are now
-[llmsort](https://github.com/XyraSinclair/llmsort) (seeded from this repo at
-`0e30e1c`). This repo (renamed `llmsort-lab`) is the research program; its
-in-tree crate is `publish = false` and keeps the research verbs, daemon, and
-full history. Fixes to promised engine surfaces belong in llmsort, not here.
+**Engine extracted 2026-08-18; research code folded after it (same day):**
+the public crate + CLI are [llmsort](https://github.com/XyraSinclair/llmsort)
+(seeded from this repo at `0e30e1c`), and the living research code — the
+`cardinal` research CLI, `cardinald`, the research modules and batteries —
+now lives there too, in its `experiments/` workspace crate (llmsort
+`c2080b9`). This repo is the cold archive: evidence packs, campaigns,
+python analysis, notes, structured judgements, and full history. The
+in-tree crate here is a FROZEN copy kept only so in-flight campaign
+sessions keep running; do not develop in it — every code fix belongs in
+llmsort. It is deleted when the in-flight campaigns land.
 
 `llmsorting` is the pairwise-ratio elicitation engine behind the rest of
 the OpenPriors stack.
