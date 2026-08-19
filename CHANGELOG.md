@@ -7,6 +7,12 @@ Versioning once it reaches `1.0.0`.
 
 ## [Unreleased]
 
+- The GitHub repo is named **cardinal-harness** again (operator decision
+  2026-08-19): many downstream repos point at that original name, so it
+  must carry the maintained state of the art, never a tombstone.
+  `llmsort`, `llmsorting`, and `ratiometer` GitHub URLs redirect here.
+  The crate remains `llmsort` on crates.io.
+
 - The repo is now a workspace: `experiments/` (`llmsort-experiments`,
   never published) carries the research side folded in from llmsort-lab —
   the `cardinal` research CLI, the `cardinald` daemon, live batteries, and

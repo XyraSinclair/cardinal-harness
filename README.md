@@ -1,6 +1,6 @@
-# llmsort
+# llmsort · the cardinal-harness repo
 
-[![CI](https://github.com/XyraSinclair/llmsort/actions/workflows/ci.yml/badge.svg)](https://github.com/XyraSinclair/llmsort/actions/workflows/ci.yml)
+[![CI](https://github.com/XyraSinclair/cardinal-harness/actions/workflows/ci.yml/badge.svg)](https://github.com/XyraSinclair/cardinal-harness/actions/workflows/ci.yml)
 [![crates.io](https://img.shields.io/crates/v/llmsort.svg)](https://crates.io/crates/llmsort)
 [![docs.rs](https://img.shields.io/docsrs/llmsort)](https://docs.rs/llmsort)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -17,6 +17,19 @@ stop reason, and an optional per-judgement trace.
 ```console
 $ llmsort sort ideas.txt --by "expected impact on retention"
 ```
+
+This repo — **cardinal-harness**, the program's original and permanent
+name — is the one home of the whole effort, in three compartments of
+deliberately different polish:
+
+| Compartment | Polish | Promises |
+|---|---|---|
+| the crate (root, [crates.io `llmsort`](https://crates.io/crates/llmsort)) | engineered | API stability, CI green, shape mandate |
+| [`experiments/`](experiments/) | research code | compiles, tested, never published; instruments graduate into the crate only on evidence |
+| [`research/`](research/) | the raw record | none — replayable evidence packs, dated notes, analysis scripts, kept honest rather than pretty |
+
+If a link brought you here from `ratiometer`, `llmsorting`, or `llmsort`,
+this is the maintained state of the art; those names redirect here.
 
 ## Why not just ask the model to sort?
 
@@ -129,7 +142,8 @@ applies to our own planner first.
 
 ## Lineage
 
-`cardinal-harness` → `ratiometer` → `llmsorting` → `llmsort`. The parked
+`cardinal-harness` → `ratiometer` → `llmsorting` → `llmsort` — and the
+repo now carries its original name again, full circle. The parked
 crates.io names keep resolving. Pre-extraction history lives in the
 archived [llmsort-lab](https://github.com/XyraSinclair/llmsort-lab).
 

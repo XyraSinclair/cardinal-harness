@@ -2,8 +2,10 @@
 
 `llmsort` is the engine: pairwise LLM ratio judgements fitted into cardinal
 scores with uncertainty, active pair selection, and explicit cost and
-provenance. This is the one repo — crate, research code, and the measured
-record all live here, in three parts:
+provenance. This is the one repo — GitHub name **cardinal-harness** (the
+program's original name; `llmsort`, `llmsorting`, `ratiometer` redirect
+here) — crate, research code, and the measured record in three parts of
+deliberately different polish:
 
 - **the crate** (root package, published to crates.io) — small, promised,
   under the shape mandate below;
