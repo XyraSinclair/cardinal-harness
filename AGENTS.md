@@ -87,9 +87,11 @@ Background sync automation, if any, should default to `git fetch`, not blind
   judgement-run daemon (HTTP contract in `docs/CARDINALD.md`), the portable
   `cardinal.judgement-run.v1` atom, and ClickHouse landing
 - `tests/`: gateway, rerank, trace, packet, and cache coverage
-- `site/`: the public pairwiseratio.org static site (single committed
-  `index.html`, board data inlined from dated evidence packs; design and
-  hosting plan in `docs/PUBLIC_BENCH.md` § Website)
+- `site/`: pairwiseratio.org static site — canonical home moved to
+  exopriors-core `sites/` 2026-08-18 (operator: web presence consolidates
+  there; `sites/deploy.sh` deploys). `site/` remains here only until
+  in-flight pages land, then it is deleted; `www/` (llmsorting.com) is
+  already gone. Hosting plan history in `docs/PUBLIC_BENCH.md` § Website
 
 ## Working Norms
 

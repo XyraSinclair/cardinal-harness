@@ -22,7 +22,7 @@ receipts.
 | Documentation | [`docs/`](docs/) | the program-depth docs: FIRST_PRINCIPLES, MATH_FRONTIER, PRINCIPLES (the anti-slop rules and the evidence that earned them), BENCHMARK, EVALUATION, canonicality |
 | The program | [`PROGRAM.md`](PROGRAM.md) | the book of tricks: every method as a point in arity × scale × output-form, each rung PLANNED / IN FLIGHT / EXECUTED with its pack |
 | Research instruments | `src/`, `examples/`, `scripts/` | the in-tree research crate (`publish = false`): research verbs, the `cardinald` daemon, elicitation batteries, campaign runners |
-| Benchmark + hub sites | [`site/`](site/), [`www/`](www/) | pairwiseratio.org (Judge Coherence Benchmark) and llmsorting.com (program hub) |
+| Benchmark + hub sites | `site/` (history) | pairwiseratio.org and llmsorting.com sources graduated to the ops repo 2026-08-18; `site/` remains only until in-flight pages land |
 
 [![CI](https://github.com/XyraSinclair/llmsorting/actions/workflows/ci.yml/badge.svg)](https://github.com/XyraSinclair/llmsorting/actions/workflows/ci.yml)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -327,7 +327,7 @@ The public board is live at **[pairwiseratio.org](https://pairwiseratio.org/)**:
 2026-07-18 board plus same-week rows for newly released models — most
 recently claude-sonnet-5 and claude-opus-4.8, added 2026-08-07). Every row
 recomputes from committed judgement evidence; the site is one static
-committed HTML file under [`site/`](site/), plan and methodology in
+committed HTML file (canonical copy in the ops repo since 2026-08-18), plan and methodology in
 [`docs/PUBLIC_BENCH.md`](docs/PUBLIC_BENCH.md).
 
 To *feel* what the spin axis measures, open the interactive evidence viewer
