@@ -21,10 +21,9 @@ receipts.
 | Research threads | [`notes/`](notes/) | 25 dated investigation threads (logprob reality, decimal PMF ground truth, red teams, guardian panels, rename/reshape decisions) |
 | Documentation | [`docs/`](docs/) | the program-depth docs: FIRST_PRINCIPLES, MATH_FRONTIER, PRINCIPLES (the anti-slop rules and the evidence that earned them), BENCHMARK, EVALUATION, canonicality |
 | The program | [`PROGRAM.md`](PROGRAM.md) | the book of tricks: every method as a point in arity × scale × output-form, each rung PLANNED / IN FLIGHT / EXECUTED with its pack |
-| Research instruments | `src/` (frozen), `scripts/`, `campaigns/` | the living research code moved to llmsort `experiments/` 2026-08-18; the in-tree crate here is a frozen copy for in-flight campaigns, deleted when they land |
-| Benchmark + hub sites | `site/` (history) | pairwiseratio.org and llmsorting.com sources graduated to the ops repo 2026-08-18; `site/` remains only until in-flight pages land |
+| Campaigns + analysis | `campaigns/`, `batteries/`, `scripts/` | campaign definitions and python analysis; the research *code* lives in llmsort `experiments/` (folded 2026-08-18, in-tree crate deleted — every version is in this repo's history) |
+| Benchmark + hub sites | git history | pairwiseratio.org and llmsorting.com sources graduated to the ops repo 2026-08-18 (manifund-frontier deployed live 2026-08-19) |
 
-[![CI](https://github.com/XyraSinclair/llmsorting/actions/workflows/ci.yml/badge.svg)](https://github.com/XyraSinclair/llmsorting/actions/workflows/ci.yml)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 **Does the model actually believe what it just told you — or was it only

@@ -1,139 +1,43 @@
 # AGENTS.md
 
-**Engine extracted 2026-08-18; research code folded after it (same day):**
-the public crate + CLI are [llmsort](https://github.com/XyraSinclair/llmsort)
-(seeded from this repo at `0e30e1c`), and the living research code — the
-`cardinal` research CLI, `cardinald`, the research modules and batteries —
-now lives there too, in its `experiments/` workspace crate (llmsort
-`c2080b9`). This repo is the cold archive: evidence packs, campaigns,
-python analysis, notes, structured judgements, and full history. The
-in-tree crate here is a FROZEN copy kept only so in-flight campaign
-sessions keep running; do not develop in it — every code fix belongs in
-llmsort. It is deleted when the in-flight campaigns land.
+This repo is **llmsort-lab: the cold archive** of the llmsort research
+program. It holds evidence, not code.
 
-`llmsorting` is the pairwise-ratio elicitation engine behind the rest of
-the OpenPriors stack.
+- The engine + CLI: [llmsort](https://github.com/XyraSinclair/llmsort)
+  (crates.io `llmsort`; extracted from this repo at `0e30e1c`).
+- The living research code (the `cardinal` research CLI, `cardinald`,
+  research modules, live batteries): llmsort's `experiments/` workspace
+  crate (folded 2026-08-18, llmsort `c2080b9`).
+- The in-tree crate was deleted 2026-08-19 after the fold; every version
+  of it is in this repo's git history. Do not resurrect code here — code
+  fixes belong in llmsort.
+- The public sites (llmsorting.com, pairwiseratio.org) live in
+  exopriors-core `sites/` (consolidated 2026-08-18).
 
-It is the algorithmic core for:
+## What lives here
 
-- pairwise ratio prompts and prompt templates
-- robust IRLS solving over noisy pairwise judgments
-- uncertainty-aware reranking and top-k stopping
-- OpenRouter-backed gateway calls, pricing, usage tracking, and cacheing
+| What | Where |
+|---|---|
+| Evidence packs (replayable, content-addressed) | `artifacts/live/` — 38+ dated packs |
+| Structured judgements + `*-cache.sqlite` | inside each pack |
+| Research threads | `notes/` — dated investigations, red teams, decisions |
+| Program docs | `docs/` (FIRST_PRINCIPLES, MATH_FRONTIER, PRINCIPLES, …), `PROGRAM.md` |
+| Campaign definitions | `campaigns/`, `batteries/`, `data/` |
+| Python analysis | `scripts/`, `examples/*.py` |
 
-## Collaboration Mode
+New experiment *code* is written in llmsort `experiments/`; new
+experiment *evidence* (packs, campaign records, analysis) is committed
+here. `PROGRAM.md` remains the book of tricks — every method as a rung
+with its pack — and is served at <https://llmsorting.com/PROGRAM.md>
+(fetched from this repo's main at deploy time).
 
-This repo is in the fast direct-to-main collaboration set.
+## Norms that survive the freeze
 
-Default git behavior:
-
-1. Before starting work, if the current checkout is clean:
-
-```bash
-./scripts/sync_main.sh
-```
-
-2. After a minimum good chunk of work:
-
-```bash
-git add <intentional-paths>
-./scripts/push_main.sh "<clear message>"
-```
-
-Interpretation:
-
-- default to `main`; do not create branches unless there is a strong reason
-- commit small, coherent changes frequently
-- push soon after useful progress
-- pull with rebase, not merge
-- stage only the files you intentionally changed
-- do not use `git add -A` unless the entire worktree is intentionally part of
-  the task
-- never force-push `main`
-- prefer the repo-local sync scripts over ad hoc git command sequences
-- if the checkout is already dirty with unrelated work, or another agent is
-  active, prefer a separate worktree or clean checkout rather than disturbing
-  existing state
-- if `push_main.sh` or `sync_main.sh` aborts because of a rebase conflict, do
-  not guess in a half-rebased state; handle it deliberately in a clean worktree
-  or branch
-
-Background sync automation, if any, should default to `git fetch`, not blind
-`pull --rebase` against an active working tree.
-
-## Key Areas
-
-- `src/rating_engine.rs`: IRLS solver, planning, diagnostics
-- `src/rerank/`: orchestration loop, stopping logic, trace/report output
-- `src/rerank/sort.rs`: list-in/list-out sorting convenience (`sort_texts`,
-  `sort_documents`) over the single-attribute path; CLI `sort` verb lives in
-  `src/bin/cardinal.rs`
-- `src/rerank/comparison.rs`: pairwise LLM comparison logic
-- `src/rerank/decimal_ledger.rs`: decimal-ledger evidence instrument
-  (research slug `decimal_ledger_v1`): K temp-1 redraws of a free-form
-  decimal ratio fused into a credal exact-atom ledger; (E[Z], honest var)
-  enter IRLS via the evidence_moments seam (evidence pack:
-  notes/decimal-pmf-2026-08-10/; ground-truth property battery:
-  `cargo run --release --example decimal_ledger_groundtruth`)
-- `src/prompts.rs`: prompt templates and ratio ladder
-- `src/seriate/`: vendored single-token evidence instruments
-  (`ratio_letter`/`ordinal`, PMF evidence, content-addressed judgement
-  records) — folded back from the standalone seriate crate 2026-08-11
-  (`notes/seriate-fold-2026-08-11.md`); the external crate is tombstoned
-- `src/gateway/`: OpenRouter adapter, pricing, usage, logprobs; `claude-code/<model>`
-  slugs route to the subscription-billed Claude Code adapter (rail fitness
-  evidence: notes/claudecode-vs-api-2026-08-06/RESULTS.md — 21/21 decisive-pair
-  agreement with the API rail at $0 marginal); `codex/<model>` slugs route to
-  the subscription-billed Codex exec adapter (pooled shim
-  `~/.codexpool/bin/codex`, scratch-cwd isolation, $0 marginal — smoke-verified
-  2026-08-10, no rail-fitness study yet)
-- `src/packet.rs`: content-addressed judgment packets, idempotent byte-identical fusion
-- `src/bin/cardinald.rs` + `src/judgement_run.rs` + `src/landing.rs`: the
-  judgement-run daemon (HTTP contract in `docs/CARDINALD.md`), the portable
-  `cardinal.judgement-run.v1` atom, and ClickHouse landing
-- `tests/`: gateway, rerank, trace, packet, and cache coverage
-- `site/`: pairwiseratio.org static site — canonical home moved to
-  exopriors-core `sites/` 2026-08-18 (operator: web presence consolidates
-  there; `sites/deploy.sh` deploys). `site/` remains here only until
-  in-flight pages land, then it is deleted; `www/` (llmsorting.com) is
-  already gone. Hosting plan history in `docs/PUBLIC_BENCH.md` § Website
-
-## Working Norms
-
-**Never publish claude.ai Artifacts from this repo** (operator ban,
-2026-07-08). Shareable pages (maps, leaderboards) are committed HTML under
-`artifacts/live/` and shown via a local static server on a free localhost
-port (`python3 -m http.server <port> --bind 127.0.0.1` from
-`artifacts/live/`). Never foreground a browser; print the URL.
-
-Read **`docs/PRINCIPLES.md`** before substantial work: the anti-slop
-discipline (refutability, scripted-pathology validation, denominators,
-mathematical register, errata-on-top) with the evidence that earned each
-rule. It is the standing answer to "are we still doing deep work?".
-
-Read **`notes/OPERATOR-QUEUE.md`** when work touches strategy, doctrine,
-or publication: the capped queue of decisions only the operator can close.
-Do not add a sixth open item; get one closed or dropped first. Update item
-states in the same commit as the work that changes them.
-
-**Canonical vs research-grade surface** (guardian panel 2026-07-26): the
-stability-promised consumable is `sort_texts`/`sort_documents`, CLI `sort`
-+ `judge`, and the packet format. All other verbs are research instruments
-— do not promise their shapes to external consumers, and do not grant new
-experiments permanent public verbs by default.
-
-
-- Preserve the core contract: pairwise ratio judgments aggregate into globally
-  consistent cardinal scores with uncertainty.
-- Prefer extending existing rerank/gateway seams over adding parallel
-  implementations.
-- Keep cost, uncertainty, and trace semantics explicit. These are part of the
-  product, not incidental metadata.
-- Avoid broad prompt churn unless it is deliberate and benchmark-motivated.
-- When changing public request/response shapes or CLI behavior, update examples,
-  tests, and docs in the same change.
-- GitHub issues are public executable contracts: each needs a current
-  source-linked discrepancy, one bounded tranche, behavioral acceptance, and
-  a closure rule. Unscheduled research branches, candidate schemas, and
-  internal review process stay in local notes until a frozen fixture earns
-  promotion.
+- Never publish claude.ai Artifacts from this repo (operator ban,
+  2026-07-08). Shareable pages are committed HTML served locally.
+- `docs/PRINCIPLES.md` is the anti-slop discipline and still governs any
+  analysis committed here: refutability, denominators, errata-on-top.
+- `notes/OPERATOR-QUEUE.md` caps operator decisions at five open items.
+- Git: fast direct-to-main, small commits, stage intended paths only,
+  never force-push. Python analysis scripts that invoked the old in-tree
+  binary now use `cargo run --bin cardinal` from a llmsort checkout.
