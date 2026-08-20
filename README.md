@@ -6,9 +6,9 @@
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 A ranking tells you who is above whom; a *scaling* keeps the gaps, and
-gaps are where decisions live. llmsort turns
-noisy LLM pairwise **ratio** judgements ("how many times more of X does A
-have than B?") into globally consistent **cardinal scores with
+gaps are where decisions live. llmsort turns noisy LLM pairwise **ratio**
+judgements ("how many times more of X does A have than B?") into
+globally consistent **cardinal scores with
 uncertainty**, spends each next comparison where it buys the most
 information, and stops when the top-k is certain enough, or the budget
 runs out. Every run returns evidence: comparisons, tokens, dollar cost,
