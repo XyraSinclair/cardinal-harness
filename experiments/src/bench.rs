@@ -19,6 +19,7 @@
 //! | polarity reversal | negate the attribute | scores anti-correlate (ρ → −1) |
 //! | paraphrase stability | reword the attribute | scores correlate (ρ → +1) |
 //! | null calibration | identical items | ratio 1.0 (zero directional mass) |
+//! | position prior | distinct contentless items, both orders | zero mean mass toward slot A |
 //!
 //! Why this shape is hard to game: the dimensions cross-check. A judge that
 //! answers by content-blind hash aces order invariance but cannot know that
@@ -28,7 +29,7 @@
 //! spin. The composite multiplies signal by mean consistency, so zeroing
 //! any side zeroes the headline.
 //!
-//! Cost: `BatterySpec::calls_per_run()` comparisons per model (194 on the
+//! Cost: `BatterySpec::calls_per_run()` comparisons per model (202 on the
 //! v1 battery, ~$0.05 on mini-class models). Deterministic corpus and pair
 //! design; temperature per template default; every raw judgement is
 //! returned for audit storage.
@@ -50,16 +51,20 @@ use llmsort::rerank::sort::spearman;
 use llmsort::rerank::spin::{spin_probe, SpinProbeReport};
 use llmsort::rerank::types::PairwiseJudgement;
 
-/// Apply one semantically-null perturbation. Three format edits apply to
+/// Apply one semantically-null perturbation. Four framing edits apply to
 /// BOTH entities; the halo suffix applies to entity j only (an asymmetric
-/// prestige cue). This is the axis that kills content-blind hash judges:
-/// any bytes-keyed shortcut changes its answer under a null edit (hash
+/// prestige cue). Framing metadata such as section labels can alter what
+/// content a model effectively uses even when the underlying text is
+/// otherwise identical, so a genuine judge must be invariant to inert
+/// container labels. This axis also kills content-blind hash judges: any
+/// bytes-keyed shortcut changes its answer under a null edit (hash
 /// avalanche), while a reader does not.
 fn perturb_text(kind: &str, text: &str, is_target: bool) -> String {
     match kind {
         "whitespace" => format!("  {text}   "),
         "markdown" => format!("**{text}**"),
         "bullet" => format!("- {text}"),
+        "container" => format!("[archived note]\n{text}"),
         // Halo applies only to the target entity (j).
         "halo" if is_target => format!("{text} \u{2014} from a widely cited essay"),
         _ => text.to_string(),
@@ -154,10 +159,13 @@ pub struct JudgeBenchReport {
     pub paraphrase: DimensionStat,
     /// Mean |log-ratio| on identical-item pairs (nats). Subscore e^(−value).
     pub null_bias: DimensionStat,
+    /// Mean signed log-ratio toward slot A for distinct contentless items
+    /// judged in both orders (nats). Subscore e^(−|value|).
+    pub position_prior: DimensionStat,
     /// Mean |drift| of the judgement under semantically-null text edits
-    /// (whitespace, markdown, bullet, prestige-halo), vs the same pair's
-    /// unperturbed same-order call. Nats. Subscore e^(−value). The axis
-    /// that kills content-blind hash shortcuts.
+    /// (whitespace, markdown, bullet, prestige-halo, inert container), vs
+    /// the same pair's unperturbed same-order call. Nats. Subscore
+    /// e^(−value). The axis that kills content-blind hash shortcuts.
     pub nuisance: DimensionStat,
     /// Per-perturbation mean |drift| breakdown (kind, nats, n).
     pub nuisance_breakdown: Vec<(String, f64, usize)>,
@@ -396,6 +404,8 @@ pub async fn run_judge_bench(
     for &i in &battery.null_indices {
         plan.push(("null", primary, i, i, true, None));
     }
+    plan.push(("position", primary, 0, 1, true, None));
+    plan.push(("position", primary, 0, 1, false, None));
     for &(i, j) in &battery.perturb_pairs {
         for kind in PERTURBATIONS {
             plan.push(("nuisance", primary, i, j, true, Some(kind)));
@@ -406,17 +416,21 @@ pub async fn run_judge_bench(
     let results: Vec<(usize, Result<CallOutcome, ComparisonError>)> = stream::iter(
         plan.iter()
             .enumerate()
-            .map(|(idx, &(_, attr, i, j, fwd, perturb))| {
+            .map(|(idx, &(block, attr, i, j, fwd, perturb))| {
                 let attribution = &attribution;
                 let model = model.as_str();
                 let template = template.as_str();
                 async move {
-                    let (text_i, text_j) = match perturb {
-                        Some(kind) => (
+                    let (text_i, text_j) = match (block, perturb) {
+                        ("position", _) => (
+                            battery.null_content_texts[0].clone(),
+                            battery.null_content_texts[1].clone(),
+                        ),
+                        (_, Some(kind)) => (
                             perturb_text(kind, &battery.corpus[i], false),
                             perturb_text(kind, &battery.corpus[j], true),
                         ),
-                        None => (battery.corpus[i].clone(), battery.corpus[j].clone()),
+                        (_, None) => (battery.corpus[i].clone(), battery.corpus[j].clone()),
                     };
                     let out = one_call(
                         gateway,
@@ -533,6 +547,17 @@ pub async fn run_judge_bench(
         .filter_map(|c| c.log_ratio_toward_i.map(f64::abs))
         .collect();
     let (null_mean, null_ci) = mean_ci95(&null_ms);
+
+    // ---- Null-content block: signed directional mass toward slot A ----
+    let position_ms: Vec<f64> = calls
+        .iter()
+        .filter(|c| c.block == "position")
+        .filter_map(|c| {
+            c.log_ratio_toward_i
+                .map(|m| if c.i_in_slot_a { m } else { -m })
+        })
+        .collect();
+    let (position_mean, position_ci) = mean_ci95(&position_ms);
 
     // ---- Nuisance block: drift vs the same pair's unperturbed call ----
     let baseline_m = |i: usize, j: usize| -> Option<f64> {
@@ -754,6 +779,13 @@ pub async fn run_judge_bench(
         unit: "nats",
         subscore: null_mean.map(|b| (-b).exp()),
     };
+    let position_prior = DimensionStat {
+        value: position_mean,
+        ci95: position_ci,
+        n: position_ms.len(),
+        unit: "nats",
+        subscore: position_mean.map(|p| (-p.abs()).exp()),
+    };
     let nuisance = DimensionStat {
         value: nuisance_mean,
         ci95: nuisance_ci,
@@ -840,6 +872,7 @@ pub async fn run_judge_bench(
         polarity.subscore,
         paraphrase.subscore,
         null_bias.subscore,
+        position_prior.subscore,
         nuisance.subscore,
         orbit_coherence.subscore,
     ]
@@ -878,6 +911,7 @@ pub async fn run_judge_bench(
         polarity,
         paraphrase,
         null_bias,
+        position_prior,
         nuisance,
         nuisance_breakdown: breakdown,
         orbit_coherence,
@@ -940,6 +974,7 @@ pub fn render_report(report: &JudgeBenchReport) -> String {
     out.push_str(&fmt_dim("polarity", &report.polarity));
     out.push_str(&fmt_dim("paraphrase", &report.paraphrase));
     out.push_str(&fmt_dim("null-bias", &report.null_bias));
+    out.push_str(&fmt_dim("position-prior", &report.position_prior));
     out.push_str(&fmt_dim("nuisance", &report.nuisance));
     out.push_str(&fmt_dim("orbit-coherence", &report.orbit_coherence));
     out.push_str(&fmt_dim("interaction", &report.interaction_share));

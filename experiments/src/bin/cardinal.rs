@@ -396,7 +396,7 @@ enum Commands {
         cache: Option<PathBuf>,
     },
     /// constant judge cannot hide in perfect consistency. Headline score =
-    /// signal × coherence. Default battery: the fixed v1.2 corpus, 194
+    /// signal × coherence. Default battery: the fixed v1.2 corpus, 202
     /// comparisons per model; scale up with --pool (entity-pool JSON →
     /// procedurally generated battery, deterministic in --battery-seed).
     Bench {

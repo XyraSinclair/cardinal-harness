@@ -48,10 +48,20 @@ pub const SPIN_CONTESTED_PAIRS: [(usize, usize); 2] = [(0, 1), (3, 4)];
 /// v1 null texts: judged against themselves.
 pub const NULL_INDICES: [usize; 4] = [0, 3, 5, 7];
 
+/// Distinct, contentless passages for measuring slot-A position prior.
+pub const NULL_CONTENT_TEXTS: [&str; 2] = [
+    "Placeholder passage alpha. It contains no claim, preference, or evaluation.",
+    "Placeholder passage beta. It contains no claim, preference, or evaluation.",
+];
+
 /// Nuisance perturbations: semantically-null text edits a genuine judge
 /// must see through. Part of the axis definition, not battery data — every
-/// battery runs the same four.
-pub const PERTURBATIONS: [&str; 4] = ["whitespace", "markdown", "bullet", "halo"];
+/// battery runs the same five.
+pub const PERTURBATIONS: [&str; 5] = ["whitespace", "markdown", "bullet", "halo", "container"];
+
+fn default_null_content_texts() -> [String; 2] {
+    NULL_CONTENT_TEXTS.map(str::to_string)
+}
 
 /// The v1 harmonic block: four texts judged ONLY around a chordless 4-cycle
 /// (both orders), disjoint from the main corpus graph. The stride graph's
@@ -196,7 +206,7 @@ pub struct BatteryScale {
     pub spin_clear: usize,
     /// Contested spin pairs (χ measurement).
     pub spin_contested: usize,
-    /// Core pairs given the 4-perturbation nuisance battery; `None` → 30%
+    /// Core pairs given the 5-perturbation nuisance battery; `None` → 30%
     /// of core pairs (the v1 share).
     #[serde(default)]
     pub perturb_count: Option<usize>,
@@ -241,6 +251,10 @@ pub struct BatterySpec {
     pub spin_clear_pairs: Vec<(usize, usize)>,
     pub spin_contested_pairs: Vec<(usize, usize)>,
     pub null_indices: Vec<usize>,
+    /// Distinct contentless texts judged in both orders to isolate position
+    /// prior from content preference.
+    #[serde(default = "default_null_content_texts")]
+    pub null_content_texts: [String; 2],
     pub perturb_pairs: Vec<(usize, usize)>,
     pub orbit_pairs: Vec<(usize, usize)>,
     pub harmonic_block: Vec<String>,
@@ -262,6 +276,7 @@ impl BatterySpec {
             spin_clear_pairs: SPIN_CLEAR_PAIRS.to_vec(),
             spin_contested_pairs: SPIN_CONTESTED_PAIRS.to_vec(),
             null_indices: NULL_INDICES.to_vec(),
+            null_content_texts: default_null_content_texts(),
             perturb_pairs: perturb_pairs(),
             orbit_pairs: orbit_pairs(),
             harmonic_block: HARMONIC_BLOCK.iter().map(|s| s.to_string()).collect(),
@@ -275,6 +290,7 @@ impl BatterySpec {
         self.core_pairs.len() * 2                       // core, both orders
             + self.core_pairs.len() * 2                 // opposite + paraphrase
             + self.null_indices.len()
+            + 2                                         // null-content, both orders
             + self.perturb_pairs.len() * PERTURBATIONS.len()
             + (self.spin_clear_pairs.len() + self.spin_contested_pairs.len()) * 6
             + self.orbit_pairs.len() * 8
@@ -398,6 +414,7 @@ impl BatterySpec {
             spin_clear_pairs: spin_clear,
             spin_contested_pairs: spin_contested,
             null_indices,
+            null_content_texts: default_null_content_texts(),
             perturb_pairs,
             orbit_pairs,
             harmonic_block,
@@ -479,6 +496,11 @@ impl BatterySpec {
         }
         if self.null_indices.iter().any(|&i| i >= n) {
             return err("null index out of bounds".to_string());
+        }
+        if self.null_content_texts.iter().any(String::is_empty)
+            || self.null_content_texts[0] == self.null_content_texts[1]
+        {
+            return err("null-content texts must be nonempty and distinct".to_string());
         }
         // Harmonic block: a single chordless cycle — every vertex degree 2.
         let h = self.harmonic_block.len();
