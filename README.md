@@ -5,14 +5,19 @@
 [![docs.rs](https://img.shields.io/docsrs/llmsort)](https://docs.rs/llmsort)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-A ranking tells you who is above whom; a *scaling* keeps the gaps, and
-gaps are where decisions live. llmsort turns noisy LLM pairwise **ratio**
-judgements ("how many times more of X does A have than B?") into
-globally consistent **cardinal scores with
-uncertainty**, spends each next comparison where it buys the most
-information, and stops when the top-k is certain enough, or the budget
-runs out. Every run returns evidence: comparisons, tokens, dollar cost,
-stop reason, and an optional per-judgement trace.
+You have a list and a fuzzy criterion: fifty grant proposals by
+expected impact, a backlog by user pain, ideas by upside. An LLM can
+judge these, but asked directly it gives answers you cannot trust:
+"rate each 1–10" clusters at 7 with no error bars, and one-prompt
+sorts drop items. llmsort asks the model many small pairwise questions
+("how many times more of X does A have than B?") and fits the answers
+into one consistent set of scores, so you get the order, the size of
+every gap, and how sure the model is about each.
+
+It spends each comparison where it buys the most information, stops
+when the top-k is certain enough or the budget runs out, and reports
+what the run cost: comparisons, tokens, dollars, stop reason, and an
+optional per-judgement trace.
 
 ```console
 $ llmsort sort ideas.txt --by "expected impact on retention"

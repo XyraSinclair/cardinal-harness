@@ -2,8 +2,8 @@
 
 //! # llmsort
 //!
-//! Pairwise LLM ratio judgements fitted into cardinal scores with
-//! uncertainty, active pair selection, and explicit cost and provenance.
+//! Score a list by any fuzzy attribute with an LLM judge: pairwise ratio
+//! questions fitted into consistent scores with error bars, at a known cost.
 //!
 //! Instead of asking an LLM to "rate this 1–10" (unreliable, miscalibrated),
 //! llmsort asks pairwise ratio questions: "how many times more attribute
