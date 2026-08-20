@@ -116,30 +116,15 @@ behavior*. Residual gaming vectors and their mitigations:
   is the same one used in real deployments, so overfitting it still
   transfers.
 
-## Monetization (honest)
+## Sustainability
 
-Direct benchmark revenue is rare; there are three working models in the
-wild and one aligned default:
-
-1. **Private pre-release evals** (the Scale SEAL / Epoch FrontierMath
-   model): labs pay for held-out-set runs on unreleased checkpoints plus
-   the axis-level diagnostic report (orbit character decomposition, failure
-   exemplars, per-axis noise floors). This is the realistic paid product —
-   the public leaderboard is the free tier that creates the demand.
-2. **Judge certification**: companies deploying LLM-as-judge (eval vendors,
-   RLAIF pipelines, marketplaces that rank with LLMs) pay for a coherence
-   certificate on *their* judge+prompt+model configuration. Recurring,
-   because configurations churn. This is SOC2-shaped, and nobody occupies
-   the niche yet.
-3. **The harness as product**: llmsorting itself (counterbalancing,
-   orbit elicitation, IRLS fusion) sold as the *fix* for whatever the
-   benchmark exposes. Benchmark = top of funnel for OpenPriors.
-4. **Zero-revenue default is still a win**: if labs internalize the metric
-   and climb it for free, frontier models become consistent cardinal
-   judges — which is upstream infrastructure for everything OpenPriors
-   wants to exist. Publish regardless of whether 1–3 land.
-
-Do not paywall the leaderboard or the harness; credibility is the asset.
+The leaderboard and the harness are free and stay free; credibility is
+the asset. Costs are covered the way established third-party benchmarks
+cover theirs: private pre-release evals on the held-out set, and
+coherence reports for deployed judge configurations. And if labs simply
+internalize the metric and climb it for free, that is already the win
+condition: frontier models become consistent cardinal judges — upstream
+infrastructure for everything OpenPriors wants to exist.
 
 ## Website: pairwiseratio.org
 
@@ -225,13 +210,10 @@ brandable names.
   model. Public version with tiers lands ~600–1,000 comparisons: $1–20 per
   frontier model, test-retest included. Same-week coverage of a release is
   a <$50 event.
-- **Held-out custody**: private pool lives off-GitHub (owned infra, per
-  repo law); published hashes of the held-out packets let anyone verify
-  after-the-fact that the pool didn't move. **Since 2026-08-20 the home
-  exists**: the `holonomy` repo (canonical `colo2:/srv/git-mirrors/
-  holonomy.git`, never on third-party hosts) holds held-out pools,
-  synthetic context-algebra generation R&D, lab offers, and client
-  records; this repo stays the public engine + harness + dev pools.
+- **Held-out custody**: the private pool lives off-GitHub on owned
+  infrastructure; published hashes of the held-out packets let anyone
+  verify after-the-fact that the pool didn't move. This repo stays the
+  public engine + harness + dev pools.
 
 ## Open questions
 
