@@ -20,7 +20,7 @@ Sorting is the demo; measurement is the product. The ontology is five nouns:
 5. **Scaling** — the output. A **ranking is ordinal; a scaling is cardinal**.
    A ranking is a scaling with the spacing deleted. Each entity in a scaling
    carries a **reading**: magnitude ± uncertainty on the shared log-ratio
-   scale. Readings, not rankings.
+   scale. A reading keeps the gaps a ranking deletes.
 
 The precedent is star magnitudes: astronomy's rank buckets ("first magnitude
 stars") became a measurement system when Pogson fixed the ratio step (2.512×)
@@ -42,10 +42,10 @@ plans, tweets, abstracts, backlog items. Anywhere "which is better, and by
 how much?" is the real question and the list is dozens-to-hundreds, not
 millions.
 
-It is NOT for: query→document retrieval at scale (use a reranker API),
-deterministic metrics (just compute them), or attributes too incoherent for
-two judges to agree on (the tool will tell you when that's happening —
-see probes — but it can't fix it).
+It is NOT for: query-to-document retrieval at scale (use a reranker API),
+deterministic metrics (just compute them), or attributes too incoherent
+for two judges to agree on (the tool will tell you when that is
+happening; see probes; it cannot fix it).
 
 ## Why it's good
 

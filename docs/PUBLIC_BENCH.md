@@ -208,8 +208,10 @@ collision checks, domain checks, and surface test-fits:
 
 Naming map (locked 2026-08-12, full record in
 `research/notes/north-star-ontology-2026-08-11.md`): the engine crate/repo is
-**llmsorting** (renamed from cardinal-harness at 0.12.0); the product
-sentence is **"Readings, not rankings"**; the working vocabulary stays
+**llmsorting** (renamed from cardinal-harness at 0.12.0); the former
+product sentence "Readings, not rankings" was retired 2026-08-20 as a
+verbless contrast slogan (the copy now leads with the declarative "a
+reading keeps the gaps a ranking deletes"); the working vocabulary stays
 common nouns (scaling, reading, magnitude, doubling) so the ranking-vs-
 scaling distinction can propagate unattributed; "pogson" is parked as a
 possible informal unit name; instruments keep versioned slugs, never

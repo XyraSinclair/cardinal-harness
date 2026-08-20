@@ -5,12 +5,12 @@
 [![docs.rs](https://img.shields.io/docsrs/llmsort)](https://docs.rs/llmsort)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-**Readings, not rankings.** A ranking tells you who is above whom; a
-*scaling* keeps the gaps — and gaps are where decisions live. llmsort turns
+A ranking tells you who is above whom; a *scaling* keeps the gaps, and
+gaps are where decisions live. llmsort turns
 noisy LLM pairwise **ratio** judgements ("how many times more of X does A
 have than B?") into globally consistent **cardinal scores with
 uncertainty**, spends each next comparison where it buys the most
-information, and stops when the top-k is certain enough — or the budget
+information, and stops when the top-k is certain enough, or the budget
 runs out. Every run returns evidence: comparisons, tokens, dollar cost,
 stop reason, and an optional per-judgement trace.
 
@@ -18,10 +18,10 @@ stop reason, and an optional per-judgement trace.
 $ llmsort sort ideas.txt --by "expected impact on retention"
 ```
 
-This repo is the one home of the whole effort — every earlier repo
+This repo is the one home of the whole effort; every earlier repo
 (`cardinal-harness`, `ratiometer`, `llmsorting`, `llmsort-lab`,
-`seriate`) redirects here or is grafted into this history — in three
-compartments of deliberately different polish:
+`seriate`) redirects here or is grafted into this history. It keeps
+three compartments of deliberately different polish:
 
 | Compartment | Polish | Promises |
 |---|---|---|
@@ -30,7 +30,7 @@ compartments of deliberately different polish:
 | [`research/`](research/) | the raw record | none — replayable evidence packs, dated notes, analysis scripts, kept honest rather than pretty |
 
 If a link brought you here from `cardinal-harness`, `ratiometer`, or
-`llmsorting`, this is the maintained state of the art.
+`llmsorting`, this is where development continues.
 
 ## Why not just ask the model to sort?
 
@@ -143,10 +143,11 @@ applies to our own planner first.
 
 ## Lineage
 
-`cardinal-harness` → `ratiometer` → `llmsorting` → `llmsort`. The parked
-crates.io names keep resolving; every former GitHub name redirects here,
-and the full pre-extraction history (plus seriate's) is grafted into
-this repo's ancestry — `git log` reaches all the way back.
+First `cardinal-harness`, then `ratiometer`, then `llmsorting`, now
+`llmsort`. The parked crates.io names keep resolving; every former GitHub
+name redirects here, and the full pre-extraction history (plus seriate's)
+is grafted into this repo's ancestry, so `git log` reaches all the way
+back.
 
 ## License
 

@@ -2,9 +2,8 @@
 
 //! # llmsort
 //!
-//! Readings, not rankings: pairwise LLM ratio judgements fitted into
-//! cardinal scores with uncertainty, active pair selection, and explicit
-//! cost and provenance.
+//! Pairwise LLM ratio judgements fitted into cardinal scores with
+//! uncertainty, active pair selection, and explicit cost and provenance.
 //!
 //! Instead of asking an LLM to "rate this 1–10" (unreliable, miscalibrated),
 //! llmsort asks pairwise ratio questions: "how many times more attribute
