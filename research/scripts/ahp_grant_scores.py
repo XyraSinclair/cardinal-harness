@@ -32,7 +32,6 @@ same lane as manifund.json).
 import json
 import math
 import os
-import shutil
 import subprocess
 import sys
 
@@ -285,12 +284,6 @@ GROUP BY attribute, entity FORMAT JSONEachRow"""
         json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
     print(f"{out_path}: {len(goals_out)}/7 goals complete, polarity ready={pol_ready}, "
           f"{os.path.getsize(out_path)} bytes")
-    # Publish to the live site when the served dir exists (colo2). Without this
-    # the page's fetch 404s and the whole AHP lens silently hides (2026-08-19).
-    publish = os.path.join("/srv/llmsorting/data", os.path.basename(out_path))
-    if os.path.isdir(os.path.dirname(publish)) and os.access(os.path.dirname(publish), os.W_OK):
-        shutil.copyfile(out_path, publish)
-        print(f"published -> {publish}")
 
 
 
