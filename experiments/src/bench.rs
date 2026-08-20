@@ -5,7 +5,9 @@
 //!
 //! The claim being tested: a judgement deserves the name *belief* only if it
 //! is (anti)symmetric under the transformations that shouldn't matter. The
-//! benchmark measures, per model, on a fixed public corpus:
+//! benchmark measures, per model, on a battery (`crate::battery` — the
+//! fixed v1.2 corpus by default, pool-generated at scale for the public
+//! tiers):
 //!
 //! | Dimension | Transformation | Perfect judge |
 //! |---|---|---|
@@ -26,15 +28,17 @@
 //! spin. The composite multiplies signal by mean consistency, so zeroing
 //! any side zeroes the headline.
 //!
-//! Cost: `CALLS_PER_RUN` comparisons per model (~$0.05 on mini-class
-//! models). Deterministic corpus and pair design; temperature per template
-//! default; every raw judgement is returned for audit storage.
+//! Cost: `BatterySpec::calls_per_run()` comparisons per model (194 on the
+//! v1 battery, ~$0.05 on mini-class models). Deterministic corpus and pair
+//! design; temperature per template default; every raw judgement is
+//! returned for audit storage.
 
 use std::collections::HashMap;
 
 use futures::stream::{self, StreamExt};
 use serde::Serialize;
 
+use crate::battery::{BatterySpec, PERTURBATIONS};
 use llmsort::cache::PairwiseCache;
 use llmsort::gateway::{Attribution, ChatGateway};
 use llmsort::rating_engine::{AttributeParams, Config, Observation, RaterParams, RatingEngine};
@@ -46,70 +50,11 @@ use llmsort::rerank::sort::spearman;
 use llmsort::rerank::spin::{spin_probe, SpinProbeReport};
 use llmsort::rerank::types::PairwiseJudgement;
 
-/// The public corpus: eight short texts spanning depth on the primary
-/// attribute. Fixed — the benchmark is a standardized instrument, and the
-/// consistency dimensions are unfakeable by memorizing the corpus (they
-/// constrain *relations between answers*, not answers).
-pub const CORPUS: [&str; 8] = [
-    "The obstacle is the way.",
-    "We suffer more often in imagination than in reality.",
-    "No man ever steps in the same river twice.",
-    "A journey of a thousand miles begins with a single step.",
-    "What gets measured gets managed.",
-    "Early to bed and early to rise makes a man healthy, wealthy and wise.",
-    "Live, laugh, love.",
-    "Monday is the first day of the work week.",
-];
-
-/// Primary attribute: what the corpus is judged by.
-pub const PRIMARY_ATTRIBUTE: &str = "depth of insight about living well";
-/// The negation: a coherent judge's scores under it must anti-correlate.
-pub const OPPOSITE_ATTRIBUTE: &str =
-    "shallowness: the absence of any real insight about living well";
-/// A rewording: a coherent judge's scores under it must correlate.
-pub const PARAPHRASE_ATTRIBUTE: &str = "how much genuine wisdom about how to live it carries";
-
-/// Pair design over the 8 corpus items: strides 1, 2, and 4 around the ring
-/// — 20 pairs, connected and cycle-rich (triangles everywhere), so the curl
-/// estimate has support.
-#[must_use]
-pub fn core_pairs() -> Vec<(usize, usize)> {
-    let n = CORPUS.len();
-    let mut pairs = Vec::new();
-    for stride in [1usize, 2, 4] {
-        for i in 0..n {
-            let j = (i + stride) % n;
-            let (a, b) = if i < j { (i, j) } else { (j, i) };
-            if !pairs.contains(&(a, b)) {
-                pairs.push((a, b));
-            }
-        }
-    }
-    pairs
-}
-
-/// Spin pairs: three with a clear expected direction gap (survival is
-/// scoreable) and two genuinely contested (χ is the measurement).
-pub const SPIN_CLEAR_PAIRS: [(usize, usize); 3] = [(0, 7), (1, 6), (2, 7)];
-pub const SPIN_CONTESTED_PAIRS: [(usize, usize); 2] = [(0, 1), (3, 4)];
-
-/// Null texts: judged against themselves.
-pub const NULL_INDICES: [usize; 4] = [0, 3, 5, 7];
-
-/// Nuisance perturbations: semantically-null text edits a genuine judge
-/// must see through. Three format edits apply to BOTH entities; the halo
-/// suffix applies to entity j only (an asymmetric prestige cue). This is
-/// the axis that kills content-blind hash judges: any bytes-keyed shortcut
-/// changes its answer under a null edit (hash avalanche), while a reader
-/// does not.
-pub const PERTURBATIONS: [&str; 4] = ["whitespace", "markdown", "bullet", "halo"];
-
-/// Core pairs that get the perturbation battery (every 3rd pair: 6 of 20).
-#[must_use]
-pub fn perturb_pairs() -> Vec<(usize, usize)> {
-    core_pairs().into_iter().step_by(3).take(6).collect()
-}
-
+/// Apply one semantically-null perturbation. Three format edits apply to
+/// BOTH entities; the halo suffix applies to entity j only (an asymmetric
+/// prestige cue). This is the axis that kills content-blind hash judges:
+/// any bytes-keyed shortcut changes its answer under a null edit (hash
+/// avalanche), while a reader does not.
 fn perturb_text(kind: &str, text: &str, is_target: bool) -> String {
     match kind {
         "whitespace" => format!("  {text}   "),
@@ -121,37 +66,6 @@ fn perturb_text(kind: &str, text: &str, is_target: bool) -> String {
     }
 }
 
-/// The harmonic block: four texts judged ONLY around a chordless 4-cycle
-/// (both orders), disjoint from the main corpus graph. The stride graph's
-/// triangles span its whole cycle space (harmonic_dim = 0, pinned in
-/// tests/hodge_split.rs), so triad-invisible frustration is unmeasurable
-/// there BY CONSTRUCTION; this block has cycle_dim = 1, zero triangles,
-/// harmonic_dim = 1 — any non-closure of the loop is pure harmonic
-/// energy, the kind no triad audit can ever see.
-pub const HARMONIC_BLOCK: [&str; 4] = [
-    "Fortune favors the bold.",
-    "Look before you leap.",
-    "He who hesitates is lost.",
-    "Slow and steady wins the race.",
-];
-
-/// The chordless cycle over the harmonic block (block-local indices).
-pub const HARMONIC_CYCLE: [(usize, usize); 4] = [(0, 1), (1, 2), (2, 3), (0, 3)];
-
-/// Core pairs that get the full Z₂³ orbit transform (6 of 20).
-#[must_use]
-pub fn orbit_pairs() -> Vec<(usize, usize)> {
-    core_pairs()
-        .into_iter()
-        .skip(1)
-        .step_by(3)
-        .take(6)
-        .collect()
-}
-
-/// Total provider calls in one benchmark run.
-pub const CALLS_PER_RUN: usize = 20 * 2 + 20 + 20 + 4 + 6 * 4 + 5 * 6 + 6 * 8 + 4 * 2;
-
 /// Options for [`run_judge_bench`].
 #[derive(Debug, Clone)]
 pub struct JudgeBenchOptions {
@@ -161,6 +75,8 @@ pub struct JudgeBenchOptions {
     pub template: String,
     /// Concurrent comparisons.
     pub concurrency: usize,
+    /// The battery to run (default: the fixed v1.2 corpus).
+    pub battery: BatterySpec,
 }
 
 impl Default for JudgeBenchOptions {
@@ -169,6 +85,7 @@ impl Default for JudgeBenchOptions {
             model: String::new(),
             template: "canonical_v2".to_string(),
             concurrency: 6,
+            battery: BatterySpec::v1(),
         }
     }
 }
@@ -209,6 +126,9 @@ pub struct DimensionStat {
 pub struct JudgeBenchReport {
     pub model: String,
     pub template: String,
+    /// Battery slug this report was measured on — scores are only
+    /// comparable within a battery.
+    pub battery: String,
 
     /// Mean |fused log-ratio| across core pairs. Subscore 1 − e^(−value).
     pub signal: DimensionStat,
@@ -254,6 +174,12 @@ pub struct JudgeBenchReport {
     /// frustration, measurable because the block's harmonic_dim = 1 by
     /// design. Subscore 1 − value.
     pub harmonic: DimensionStat,
+    /// Magnitude calibration against ground truth (anchors tier only):
+    /// OLS-through-origin slope of fused judged log-ratios on true
+    /// log-ratios. 1.0 = calibrated, <1 compressed, >1 exaggerated.
+    /// Reported, unscored — closes the max-ratio signal-inflation attack
+    /// as a sidebar, never the headline.
+    pub magnitude_calibration: Option<DimensionStat>,
 
     /// Mean of available consistency subscores (reciprocity = merged order
     /// flip + residual, frustration, spin survival, polarity, paraphrase,
@@ -333,7 +259,9 @@ async fn one_call(
     } else {
         (j, i, texts.1, texts.0)
     };
-    let ids = ["e0", "e1", "e2", "e3", "e4", "e5", "e6", "e7"];
+    // Index-derived ids: identical to the v1 fixed array for n ≤ 8, so
+    // every cached v1 judgement stays addressable.
+    let (id_a, id_b) = (format!("e{slot_a}"), format!("e{slot_b}"));
     let spec = PairwiseComparisonSpec {
         model,
         attribute: PairwiseComparisonAttribute {
@@ -342,11 +270,11 @@ async fn one_call(
             prompt_template_slug: Some(template),
         },
         entity_a: PairwiseComparisonEntity {
-            id: ids[slot_a],
+            id: &id_a,
             text: text_a,
         },
         entity_b: PairwiseComparisonEntity {
-            id: ids[slot_b],
+            id: &id_b,
             text: text_b,
         },
     };
@@ -375,11 +303,11 @@ async fn one_call(
 }
 
 /// Solve the harmonic block and return its harmonic energy fraction.
-fn harmonic_split(observations: &[(usize, usize, f64)]) -> Option<f64> {
+fn harmonic_split(n: usize, observations: &[(usize, usize, f64)]) -> Option<f64> {
     let mut raters = HashMap::new();
     raters.insert("bench".to_string(), RaterParams::default());
     let mut engine = RatingEngine::new(
-        HARMONIC_BLOCK.len(),
+        n,
         AttributeParams::default(),
         raters,
         Some(Config::default()),
@@ -429,32 +357,48 @@ pub async fn run_judge_bench(
     let attribution = Attribution::new("cardinal::bench");
     let model = opts.model.clone();
     let template = opts.template.clone();
-    let pairs = core_pairs();
+    let battery = &opts.battery;
+    let primary = battery.primary_attribute.as_str();
+    let pairs = battery.core_pairs.clone();
 
     // ---- Build the call plan ----
-    type PlanEntry = (
+    type PlanEntry<'a> = (
         &'static str,
-        &'static str,
+        &'a str,
         usize,
         usize,
         bool,
         Option<&'static str>,
     );
-    let mut plan: Vec<PlanEntry> = Vec::new();
+    let mut plan: Vec<PlanEntry<'_>> = Vec::new();
     for &(i, j) in &pairs {
-        plan.push(("core", PRIMARY_ATTRIBUTE, i, j, true, None));
-        plan.push(("core", PRIMARY_ATTRIBUTE, i, j, false, None));
+        plan.push(("core", primary, i, j, true, None));
+        plan.push(("core", primary, i, j, false, None));
     }
     for &(i, j) in &pairs {
-        plan.push(("opposite", OPPOSITE_ATTRIBUTE, i, j, true, None));
-        plan.push(("paraphrase", PARAPHRASE_ATTRIBUTE, i, j, true, None));
+        plan.push((
+            "opposite",
+            battery.opposite_attribute.as_str(),
+            i,
+            j,
+            true,
+            None,
+        ));
+        plan.push((
+            "paraphrase",
+            battery.paraphrase_attribute.as_str(),
+            i,
+            j,
+            true,
+            None,
+        ));
     }
-    for &i in &NULL_INDICES {
-        plan.push(("null", PRIMARY_ATTRIBUTE, i, i, true, None));
+    for &i in &battery.null_indices {
+        plan.push(("null", primary, i, i, true, None));
     }
-    for &(i, j) in &perturb_pairs() {
+    for &(i, j) in &battery.perturb_pairs {
         for kind in PERTURBATIONS {
-            plan.push(("nuisance", PRIMARY_ATTRIBUTE, i, j, true, Some(kind)));
+            plan.push(("nuisance", primary, i, j, true, Some(kind)));
         }
     }
 
@@ -469,10 +413,10 @@ pub async fn run_judge_bench(
                 async move {
                     let (text_i, text_j) = match perturb {
                         Some(kind) => (
-                            perturb_text(kind, CORPUS[i], false),
-                            perturb_text(kind, CORPUS[j], true),
+                            perturb_text(kind, &battery.corpus[i], false),
+                            perturb_text(kind, &battery.corpus[j], true),
                         ),
-                        None => (CORPUS[i].to_string(), CORPUS[j].to_string()),
+                        None => (battery.corpus[i].clone(), battery.corpus[j].clone()),
                     };
                     let out = one_call(
                         gateway,
@@ -560,8 +504,8 @@ pub async fn run_judge_bench(
     let (residual_mean, residual_ci) = mean_ci95(&residuals);
     let flip_rate = (decisive_pairs > 0).then(|| flips as f64 / decisive_pairs as f64);
 
-    let primary = solve_scores(CORPUS.len(), &fused_obs, &model);
-    let (primary_scores, hcr, cycle_dim) = match &primary {
+    let primary_solve = solve_scores(battery.corpus.len(), &fused_obs, &model);
+    let (primary_scores, hcr, cycle_dim) = match &primary_solve {
         Some((scores, hcr, cycle_dim)) => (scores.clone(), Some(*hcr), *cycle_dim),
         None => (Vec::new(), None, 0),
     };
@@ -573,7 +517,7 @@ pub async fn run_judge_bench(
             .filter(|c| c.block == name)
             .filter_map(|c| c.log_ratio_toward_i.map(|m| (c.i, c.j, m)))
             .collect();
-        solve_scores(CORPUS.len(), &obs, &model).map(|(s, _, _)| s)
+        solve_scores(battery.corpus.len(), &obs, &model).map(|(s, _, _)| s)
     };
     let polarity_rho = block_scores("opposite")
         .filter(|_| !primary_scores.is_empty())
@@ -622,14 +566,14 @@ pub async fn run_judge_bench(
     let mut orbit_coherences: Vec<f64> = Vec::new();
     let mut interaction_shares: Vec<f64> = Vec::new();
     let mut extra_comparisons = 0usize;
-    for &(i, j) in &orbit_pairs() {
+    for &(i, j) in &battery.orbit_pairs {
         let report = llmsort::rerank::orbit::orbit_transform(
             gateway,
             cache,
             &model,
-            PRIMARY_ATTRIBUTE,
-            ("o0", CORPUS[i]),
-            ("o1", CORPUS[j]),
+            primary,
+            ("o0", battery.corpus[i].as_str()),
+            ("o1", battery.corpus[j].as_str()),
             &template,
             attribution.clone(),
         )
@@ -651,7 +595,8 @@ pub async fn run_judge_bench(
     let (interaction_mean, interaction_ci) = mean_ci95(&interaction_shares);
 
     // ---- Harmonic block: chordless 4-cycle, both orders, own solve ----
-    let mut harmonic_outcomes: Vec<(usize, usize, [Option<f64>; 2])> = HARMONIC_CYCLE
+    let mut harmonic_outcomes: Vec<(usize, usize, [Option<f64>; 2])> = battery
+        .harmonic_cycle
         .iter()
         .map(|&(i, j)| (i, j, [None, None]))
         .collect();
@@ -662,10 +607,13 @@ pub async fn run_judge_bench(
                 cache,
                 &model,
                 &template,
-                PRIMARY_ATTRIBUTE,
+                primary,
                 *i,
                 *j,
-                (HARMONIC_BLOCK[*i], HARMONIC_BLOCK[*j]),
+                (
+                    battery.harmonic_block[*i].as_str(),
+                    battery.harmonic_block[*j].as_str(),
+                ),
                 fwd,
                 &attribution,
             )
@@ -688,8 +636,8 @@ pub async fn run_judge_bench(
             _ => None,
         })
         .collect();
-    let harmonic_value = if harmonic_obs.len() == HARMONIC_CYCLE.len() {
-        harmonic_split(&harmonic_obs)
+    let harmonic_value = if harmonic_obs.len() == battery.harmonic_cycle.len() {
+        harmonic_split(battery.harmonic_block.len(), &harmonic_obs)
     } else {
         None
     };
@@ -699,19 +647,20 @@ pub async fn run_judge_bench(
     let mut clear_survivals = 0usize;
     let mut clear_assessed = 0usize;
     let mut chis = Vec::new();
-    for (clear, &(i, j)) in SPIN_CLEAR_PAIRS
+    for (clear, &(i, j)) in battery
+        .spin_clear_pairs
         .iter()
         .map(|p| (true, p))
-        .chain(SPIN_CONTESTED_PAIRS.iter().map(|p| (false, p)))
+        .chain(battery.spin_contested_pairs.iter().map(|p| (false, p)))
     {
         let report = spin_probe(
             gateway,
             cache,
             &model,
             &template,
-            PRIMARY_ATTRIBUTE,
-            ("s0", CORPUS[i]),
-            ("s1", CORPUS[j]),
+            primary,
+            ("s0", battery.corpus[i].as_str()),
+            ("s1", battery.corpus[j].as_str()),
             attribution.clone(),
         )
         .await?;
@@ -787,14 +736,14 @@ pub async fn run_judge_bench(
     let polarity = DimensionStat {
         value: polarity_rho,
         ci95: None,
-        n: CORPUS.len(),
+        n: battery.corpus.len(),
         unit: "spearman",
         subscore: polarity_rho.map(|rho| ((1.0 - rho) / 2.0).clamp(0.0, 1.0)),
     };
     let paraphrase = DimensionStat {
         value: paraphrase_rho,
         ci95: None,
-        n: CORPUS.len(),
+        n: battery.corpus.len(),
         unit: "spearman",
         subscore: paraphrase_rho.map(|rho| ((1.0 + rho) / 2.0).clamp(0.0, 1.0)),
     };
@@ -829,10 +778,35 @@ pub async fn run_judge_bench(
     let harmonic = DimensionStat {
         value: harmonic_value,
         ci95: None,
-        n: usize::from(harmonic_obs.len() == HARMONIC_CYCLE.len()),
+        n: usize::from(harmonic_obs.len() == battery.harmonic_cycle.len()),
         unit: "energy fraction",
         subscore: harmonic_value.map(|h| (1.0 - h).clamp(0.0, 1.0)),
     };
+
+    // ---- Magnitude calibration (anchors tier): fused judged log-ratios
+    // regressed through the origin on true log-ratios. Slope 1.0 =
+    // calibrated; the sidebar that catches direction-right/magnitude-pinned
+    // judges, which full-signal scoring alone cannot. ----
+    let magnitude_calibration = battery.truths.as_ref().and_then(|truths| {
+        let mut tt = 0.0f64;
+        let mut mt = 0.0f64;
+        let mut n = 0usize;
+        for &(i, j, m) in &fused_obs {
+            let t = (truths[i] / truths[j]).ln();
+            if t.is_finite() && t != 0.0 {
+                tt += t * t;
+                mt += m * t;
+                n += 1;
+            }
+        }
+        (tt > 0.0).then(|| DimensionStat {
+            value: Some(mt / tt),
+            ci95: None,
+            n,
+            unit: "slope",
+            subscore: None,
+        })
+    });
 
     // Order-flip and order-residual are measured from the SAME two calls per
     // pair — two views of one transformation. They enter the composite as a
@@ -848,7 +822,7 @@ pub async fn run_judge_bench(
     // axes — which the cyclic-judge test exposed as a reward (deleting a
     // bad judge's worst axis raises its mean). Gated axes now score ZERO:
     // refusal laundering strictly costs.
-    let core_coverage = 1.0 - refusals as f64 / CALLS_PER_RUN.max(1) as f64;
+    let core_coverage = 1.0 - refusals as f64 / battery.calls_per_run().max(1) as f64;
     let gate = |subscore: Option<f64>| -> Option<f64> {
         if core_coverage >= 0.95 {
             subscore
@@ -894,6 +868,7 @@ pub async fn run_judge_bench(
     Ok(JudgeBenchReport {
         model,
         template,
+        battery: battery.slug.clone(),
         signal,
         order_flip,
         order_residual,
@@ -908,6 +883,7 @@ pub async fn run_judge_bench(
         orbit_coherence,
         interaction_share,
         harmonic,
+        magnitude_calibration,
         coherence,
         coherence_harmonic,
         judge_score,
@@ -952,8 +928,8 @@ pub fn render_report(report: &JudgeBenchReport) -> String {
     };
     let _ = writeln!(
         out,
-        "model: {} · template: {}",
-        report.model, report.template
+        "model: {} · template: {} · battery: {}",
+        report.model, report.template, report.battery
     );
     out.push_str(&fmt_dim("signal", &report.signal));
     out.push_str(&fmt_dim("order-flip", &report.order_flip));
@@ -968,6 +944,9 @@ pub fn render_report(report: &JudgeBenchReport) -> String {
     out.push_str(&fmt_dim("orbit-coherence", &report.orbit_coherence));
     out.push_str(&fmt_dim("interaction", &report.interaction_share));
     out.push_str(&fmt_dim("harmonic", &report.harmonic));
+    if let Some(cal) = &report.magnitude_calibration {
+        out.push_str(&fmt_dim("truth-slope", cal));
+    }
     for (kind, mean, n) in &report.nuisance_breakdown {
         let _ = writeln!(out, "    nuisance:{kind:<12} {mean:+.3} nats (n={n})");
     }

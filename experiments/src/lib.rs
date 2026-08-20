@@ -10,6 +10,7 @@
 //! at the repo root indexes every method as a rung with its pack.
 
 pub mod anp;
+pub mod battery;
 pub mod bench;
 pub mod canonize;
 pub mod ensemble;
@@ -22,10 +23,14 @@ pub mod slate;
 pub mod transitivity;
 
 pub use anp::{anp, AnpAlternative, AnpCriterion, AnpError, AnpOptions, AnpReport};
-pub use bench::{
-    core_pairs, orbit_pairs, render_report as render_bench_report, run_judge_bench, BenchCall,
-    DimensionStat, JudgeBenchOptions, JudgeBenchReport, CALLS_PER_RUN, CORPUS, HARMONIC_BLOCK,
+pub use battery::{
+    core_pairs, doubling_strides, orbit_pairs, perturb_pairs, ring_stride_pairs, BatteryError,
+    BatteryScale, BatterySpec, EntityPool, PoolAttribute, PoolItem, CORPUS, HARMONIC_BLOCK,
     HARMONIC_CYCLE, OPPOSITE_ATTRIBUTE, PARAPHRASE_ATTRIBUTE, PRIMARY_ATTRIBUTE,
+};
+pub use bench::{
+    render_report as render_bench_report, run_judge_bench, BenchCall, DimensionStat,
+    JudgeBenchOptions, JudgeBenchReport,
 };
 pub use canonize::{
     canonize, planned_sorts, CandidateCanonicality, CanonizeError, CanonizeOptions, CanonizeReport,

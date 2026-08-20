@@ -25,11 +25,18 @@ The engine is done: `cardinal bench` runs the invariance table (order,
 reciprocity, frustration, spin, polarity, paraphrase, null calibration,
 signal gate) over a fixed 8-text corpus; `orbit.rs` has the full Z₂³
 estimator; `transitivity.rs` has WST/MST/SST; logprob PMFs flow through
-`comparison.rs`. What the public version adds:
+`comparison.rs`. **Since 2026-08-19 the scaling machinery exists too**:
+battery-as-data (`experiments/src/battery.rs`), entity pools under
+`research/data/pools/` (anchors/interventions/funders dev pools), seeded
+procedural generation (`--pool/--battery-seed/--battery-out` on
+`cardinal bench`), and the anchors magnitude-calibration sidebar — see
+`docs/BENCHMARK.md` § Scaling. What the public version still adds:
 
-1. **Meaningful entity pools** (below) replacing the 8-text demo corpus.
-2. **Public dev set / private held-out set** split, with procedural
-   rotation of entities and wordings per version (anti-memorization).
+1. ~~Meaningful entity pools~~ — dev pools landed; held-out pools and
+   quarterly Manifund refresh remain.
+2. **Public dev set / private held-out set** split (the generator's seed
+   rotation is built; the private pool custody and hash publication
+   remain).
 3. **An externally-runnable harness**: one command, open source, $1–20 and
    under an hour per model.
 4. **The website**: leaderboard + explanation of the pairwise-ratio format.

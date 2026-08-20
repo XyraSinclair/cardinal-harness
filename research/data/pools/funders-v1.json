@@ -1,0 +1,37 @@
+{
+  "slug": "funders-v1",
+  "_comment": "Funders tier (docs/PUBLIC_BENCH.md): provocative, press-legible, squarely OpenPriors' domain. DEV POOL ONLY. Item order is a coarse internal prior on the primary attribute — it drives spin-pair selection only, is never shown to the judged model, and is NOT a published ranking. PUBLIC_BENCH open question stands: this tier may be too spicy for lab partnerships; Interventions can take the headline. Harmonic block: four closely-matched basic-science philanthropies.",
+  "attribute": {
+    "primary": "expected positive impact on the world per marginal dollar it grants",
+    "opposite": "impact-per-dollar deadweight: how little good each additional dollar it grants does",
+    "paraphrases": [
+      "how much good one more dollar routed through it would do",
+      "expected value created per additional grant dollar",
+      "the counterfactual bang-per-buck of its marginal grantmaking"
+    ]
+  },
+  "items": [
+    { "id": "givewell", "text": "GiveWell" },
+    { "id": "open-philanthropy", "text": "Open Philanthropy" },
+    { "id": "gates", "text": "The Gates Foundation" },
+    { "id": "ea-funds", "text": "EA Funds" },
+    { "id": "acx-grants", "text": "ACX Grants" },
+    { "id": "emergent-ventures", "text": "Emergent Ventures" },
+    { "id": "wellcome", "text": "The Wellcome Trust" },
+    { "id": "darpa", "text": "DARPA" },
+    { "id": "hhmi", "text": "The Howard Hughes Medical Institute" },
+    { "id": "sloan", "text": "The Alfred P. Sloan Foundation" },
+    { "id": "nih", "text": "The National Institutes of Health" },
+    { "id": "nsf", "text": "The National Science Foundation" },
+    { "id": "templeton", "text": "The John Templeton Foundation" },
+    { "id": "czi", "text": "The Chan Zuckerberg Initiative" },
+    { "id": "rockefeller", "text": "The Rockefeller Foundation" },
+    { "id": "ford", "text": "The Ford Foundation" }
+  ],
+  "harmonic": [
+    { "id": "simons", "text": "The Simons Foundation" },
+    { "id": "schmidt", "text": "Schmidt Sciences" },
+    { "id": "moore", "text": "The Gordon and Betty Moore Foundation" },
+    { "id": "kavli", "text": "The Kavli Foundation" }
+  ]
+}

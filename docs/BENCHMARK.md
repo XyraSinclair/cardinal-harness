@@ -170,12 +170,51 @@ and define v2:
   at zero field has no direction to preserve); only clear pairs enter the
   survival rate, and the denominator is printed.
 
+## Scaling: battery-as-data (v2 machinery, 2026-08-19)
+
+The battery is no longer compile-time constants. `experiments/src/battery.rs`
+carries the machinery the public version (`docs/PUBLIC_BENCH.md`) needs:
+
+- **`BatterySpec`** — corpus, attributes, and every pair block as a value;
+  serializable, so a generated battery ships inside its evidence pack.
+  `BatterySpec::v1()` reproduces the fixed v1.2 battery exactly (the
+  scripted-pathology suite and all cached v1 judgements are untouched).
+- **`EntityPool`** — JSON pools of meaningful entities
+  (`research/data/pools/`: anchors-country-population, interventions,
+  funders per the PUBLIC_BENCH tier table). Items are listed in rough
+  descending prior order; the anchors tier carries `truth` magnitudes.
+- **`BatterySpec::generate(pool, scale, seed)`** — deterministic
+  procedural generation (splitmix64; no RNG-crate dependency, so the
+  mapping is a contract): doubling-stride circulant core graphs stay
+  connected and triangle-rich at any n; spin/null/perturb/orbit blocks
+  scale at the v1 proportions; the seed rotates the corpus subset, block
+  positions, and the paraphrase wording — the anti-memorization mechanism.
+  A 16-entity pool lands at 480 calls/model, 20 entities at ~670: the
+  600–1,000 band the public design costs out. `validate()` refuses any
+  battery that cannot support its own estimators (disconnected core, no
+  cycle support, perturb pair without a drift baseline, non-ring harmonic
+  block) before a dollar is spent.
+- **Magnitude calibration sidebar** — when every corpus item carries a
+  ground-truth magnitude, the report adds `truth-slope`: fused judged
+  log-ratios regressed through the origin on true log-ratios (1.0 =
+  calibrated, <1 compressed, >1 exaggerated). Reported, unscored — closes
+  the max-ratio signal-inflation attack from the adversarial review as a
+  sidebar, never the headline.
+
+Scores are only comparable within a battery; every report names its
+battery slug.
+
 ## Reproduce
 
 ```bash
 cardinal bench \
   --models "openai/gpt-5.4-mini,google/gemini-2.5-flash,..." \
   --no-cache --out reports.jsonl
+
+# public-tier scale: pool-generated battery, replayable spec
+cardinal bench \
+  --models "..." --pool research/data/pools/interventions-v1.json \
+  --battery-seed 1 --battery-out battery.json --out reports.jsonl
 ```
 
 `OPENROUTER_API_KEY` required; ~$0.05/model on mini-class models. Live

@@ -1,0 +1,37 @@
+{
+  "slug": "anchors-country-population-v1",
+  "_comment": "Anchors tier (docs/PUBLIC_BENCH.md): the only tier with ground truth. truth = resident population in millions (2024 UN-flavored estimates, rounded — used only for the magnitude-calibration sidebar, never the headline). Items descending by truth. Memorizable by design; clearly labeled; never the headline. Harmonic block: four countries closely matched in population (48–55M) so the chordless-cycle judgments are genuinely hard.",
+  "attribute": {
+    "primary": "current resident population (how many people live there)",
+    "opposite": "population smallness: how few people live there",
+    "paraphrases": [
+      "the number of inhabitants it has",
+      "how many residents it counts",
+      "the size of its national population"
+    ]
+  },
+  "items": [
+    { "id": "india", "text": "India", "truth": 1450.0 },
+    { "id": "china", "text": "China", "truth": 1410.0 },
+    { "id": "usa", "text": "United States", "truth": 340.0 },
+    { "id": "indonesia", "text": "Indonesia", "truth": 284.0 },
+    { "id": "pakistan", "text": "Pakistan", "truth": 251.0 },
+    { "id": "nigeria", "text": "Nigeria", "truth": 233.0 },
+    { "id": "brazil", "text": "Brazil", "truth": 212.0 },
+    { "id": "bangladesh", "text": "Bangladesh", "truth": 174.0 },
+    { "id": "mexico", "text": "Mexico", "truth": 130.0 },
+    { "id": "japan", "text": "Japan", "truth": 124.0 },
+    { "id": "germany", "text": "Germany", "truth": 84.5 },
+    { "id": "thailand", "text": "Thailand", "truth": 71.7 },
+    { "id": "australia", "text": "Australia", "truth": 26.7 },
+    { "id": "netherlands", "text": "Netherlands", "truth": 18.0 },
+    { "id": "portugal", "text": "Portugal", "truth": 10.6 },
+    { "id": "new-zealand", "text": "New Zealand", "truth": 5.3 }
+  ],
+  "harmonic": [
+    { "id": "kenya", "text": "Kenya", "truth": 55.3 },
+    { "id": "colombia", "text": "Colombia", "truth": 52.9 },
+    { "id": "south-korea", "text": "South Korea", "truth": 51.7 },
+    { "id": "spain", "text": "Spain", "truth": 48.4 }
+  ]
+}

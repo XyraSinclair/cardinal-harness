@@ -396,7 +396,9 @@ enum Commands {
         cache: Option<PathBuf>,
     },
     /// constant judge cannot hide in perfect consistency. Headline score =
-    /// signal × coherence. Fixed public corpus, 194 comparisons per model.
+    /// signal × coherence. Default battery: the fixed v1.2 corpus, 194
+    /// comparisons per model; scale up with --pool (entity-pool JSON →
+    /// procedurally generated battery, deterministic in --battery-seed).
     Bench {
         /// Model slug(s), comma-separated
         #[arg(long)]
@@ -407,6 +409,23 @@ enum Commands {
         /// Concurrent comparisons per model
         #[arg(long, default_value_t = 6)]
         concurrency: usize,
+        /// Entity-pool JSON (research/data/pools/): generate the battery
+        /// from it instead of the fixed v1.2 corpus
+        #[arg(long)]
+        pool: Option<PathBuf>,
+        /// Corpus size drawn from the pool (default: the whole pool)
+        #[arg(long)]
+        scale_n: Option<usize>,
+        /// Battery generation seed: rotates corpus subset, spin/null
+        /// positions, and the paraphrase wording (anti-memorization)
+        #[arg(long, default_value_t = 0)]
+        battery_seed: u64,
+        /// Run an exact battery-spec JSON (overrides --pool)
+        #[arg(long)]
+        battery: Option<PathBuf>,
+        /// Write the resolved battery spec JSON here (replayability)
+        #[arg(long)]
+        battery_out: Option<PathBuf>,
         /// Write full per-model reports (raw calls included) to this JSONL path
         #[arg(long)]
         out: Option<PathBuf>,
@@ -1586,6 +1605,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             models,
             template,
             concurrency,
+            pool,
+            scale_n,
+            battery_seed,
+            battery,
+            battery_out,
             out,
             json,
             no_cache,
@@ -1600,6 +1624,31 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             if model_list.is_empty() {
                 return Err("no models given: --models a/b,c/d".into());
             }
+            let battery_spec = if let Some(path) = battery {
+                let spec: llmsort_experiments::BatterySpec =
+                    serde_json::from_str(&std::fs::read_to_string(&path)?)?;
+                spec.validate()?;
+                spec
+            } else if let Some(path) = pool {
+                let pool: llmsort_experiments::EntityPool =
+                    serde_json::from_str(&std::fs::read_to_string(&path)?)?;
+                let scale =
+                    llmsort_experiments::BatteryScale::for_n(scale_n.unwrap_or(pool.items.len()));
+                llmsort_experiments::BatterySpec::generate(&pool, &scale, battery_seed)?
+            } else {
+                llmsort_experiments::BatterySpec::v1()
+            };
+            if let Some(path) = battery_out {
+                std::fs::write(&path, serde_json::to_string_pretty(&battery_spec)?)?;
+                eprintln!("battery spec written to {}", path.display());
+            }
+            eprintln!(
+                "battery {} · {} entities · {} core pairs · {} calls/model",
+                battery_spec.slug,
+                battery_spec.corpus.len(),
+                battery_spec.core_pairs.len(),
+                battery_spec.calls_per_run(),
+            );
             let gateway = ProviderGateway::from_env(Arc::new(NoopUsageSink))?;
             let cache_store = if no_cache {
                 None
@@ -1625,6 +1674,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         model: model.clone(),
                         template: template.clone(),
                         concurrency,
+                        battery: battery_spec.clone(),
                     },
                 )
                 .await?;
