@@ -198,6 +198,14 @@ keeps its technical name (JCB) in docs and packs. The site headline is
 "Does the judgment survive?" "Cardinal Bench" is retired as a working
 title.
 
+Public-name candidates for the benchmark itself (2026-08-20, decision
+open): **Holonomy** (recommended — every probe is a loop in presentation
+space; a belief is judgment with zero holonomy) vs **RIGOR** (Ratio
+Invariance under Group Orbits and Reciprocity — model-card pragmatic),
+with "the voir dire for AI judges" as press copy either way. Full spread,
+collision checks, domain checks, and surface test-fits:
+`research/notes/benchmark-naming-2026-08-20.md`.
+
 Naming map (locked 2026-08-12, full record in
 `research/notes/north-star-ontology-2026-08-11.md`): the engine crate/repo is
 **llmsorting** (renamed from cardinal-harness at 0.12.0); the product
