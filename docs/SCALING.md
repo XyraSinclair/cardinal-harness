@@ -52,7 +52,7 @@ The planner candidate cap is visible once the full pair set exceeds `50,000`; at
 ## What this benchmark does not prove
 
 - It is not an end-to-end rerank benchmark: provider latency, tokenization, cache I/O, report rendering, and CLI startup are outside the timed scope.
-- It is not a state-of-the-art performance claim. It measures the current dense implementation so regressions and scaling limits are visible.
+- It does not claim best-known performance. It measures the current dense implementation so regressions and scaling limits are visible.
 - It does not prove production suitability above the planner cap. Past that cap, the benchmark is partly measuring capped candidate selection rather than the full pair frontier.
 
 The next performance proof target is a release-profile suite with repeated samples, warmup, fixed hardware metadata, sparse-solver comparisons once implemented, and separate timings for solve, planner, cache, provider, and report paths.

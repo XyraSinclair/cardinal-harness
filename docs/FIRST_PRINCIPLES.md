@@ -196,7 +196,8 @@ instead of by ad-hoc probe design.
 ## 5¾. Respecting the group: from probes to estimator
 
 The invariance table above is diagnostic — it measures violations. The
-paradigm is respected one level deeper when the violations feed back into
+symmetry discipline is respected one level deeper when the violations feed
+back into
 how beliefs are COMPUTED, the way experimental physics treats symmetry:
 
 1. **Systematics are modeled, not just flagged.** Wordings are instrument
