@@ -225,7 +225,11 @@ brandable names.
   a <$50 event.
 - **Held-out custody**: private pool lives off-GitHub (owned infra, per
   repo law); published hashes of the held-out packets let anyone verify
-  after-the-fact that the pool didn't move.
+  after-the-fact that the pool didn't move. **Since 2026-08-20 the home
+  exists**: the `holonomy` repo (canonical `colo2:/srv/git-mirrors/
+  holonomy.git`, never on third-party hosts) holds held-out pools,
+  synthetic context-algebra generation R&D, lab offers, and client
+  records; this repo stays the public engine + harness + dev pools.
 
 ## Open questions
 
