@@ -26,8 +26,9 @@ A goal is included only when its pass is essentially complete (>= MIN_FRAC of
 budget landed); until then the block is absent and the page shows what exists.
 
 Usage: python3 scripts/ahp_grant_scores.py [out.json]
-Default out: site/data/manifund_ahp.json (served CORS-open from llmsorting.com,
-same lane as manifund.json).
+Default out: site/data/manifund_ahp.json. Consumed as the "ahp" half of the
+vendored snapshot in exopriors-core (web/static/data/manifund.json); see
+manifund_page_data.py's docstring for the refresh path.
 """
 import json
 import math

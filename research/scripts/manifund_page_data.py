@@ -8,11 +8,10 @@ deduped through the ReplacingMergeTree with FINAL. Proposal card metadata
 joins data/manifund.txt corpus lines back to data/manifund/projects.jsonl.
 
 Usage: python3 scripts/manifund_page_data.py [out.json]
-Default out: site/data/manifund.json — served at
-https://llmsorting.com/data/manifund.json (rsync site/ to
-colo2:/srv/llmsorting), which openpriors.com/manifund fetches cross-origin
-(CORS header set in /etc/caddy/llmsorting.caddy). Refresh = regenerate,
-commit, rsync; no exopriors-core deploy needed.
+Default out: site/data/manifund.json. The consumer is openpriors.com/manifund,
+which vendors the snapshot at web/static/data/manifund.json in exopriors-core
+as {"study": <this file>, "ahp": <ahp_grant_scores output>}. Refresh =
+regenerate both, merge into that file, commit, deploy nucleus-web.
 """
 import datetime
 import json
