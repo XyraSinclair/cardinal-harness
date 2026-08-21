@@ -22,9 +22,10 @@ import sys
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CH_LOCAL = "/data/clickhouse-twitter-lab/bin/clickhouse"
 CORPUS = "data/manifund_latest.txt"
+# Every DeepSeek V4 Flash lane over the latest slate (seeded phases share the
+# prefix; the ledger dedups per ordered pair across them).
+RUN_TAG_PREFIX = "manifund-latest-dsv4flash-"
 RUN_TAGS = [
-    "manifund-latest-dsv4flash-classic-2026-08-21",
-    "manifund-latest-dsv4flash-fable1000-2026-08-21",
     "fable1000-gemma31b-2026-08-16",
     "fable1000-40pool-seed2-gemma31b",
     "manifund-relentless-2026-08-15",
@@ -106,7 +107,8 @@ FROM (
                     (entity_b, if(higher_ranked = 'B', 1., -1.))]) AS t,
          t.1 AS entity, t.2 * log2(greatest(ratio, 1.)) AS m
   FROM ratiometer.judgments FINAL
-  WHERE run_tag IN ({tags_sql}) AND higher_ranked IN ('A', 'B') AND error = ''
+  WHERE (run_tag IN ({tags_sql}) OR startsWith(run_tag, '{RUN_TAG_PREFIX}'))
+    AND higher_ranked IN ('A', 'B') AND error = ''
 )
 GROUP BY model, attribute, entity
 FORMAT JSONEachRow"""
@@ -145,7 +147,7 @@ FORMAT JSONEachRow"""
     out = {
         "generated": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "corpus": os.path.basename(CORPUS),
-        "runTags": RUN_TAGS,
+        "runTags": RUN_TAGS + [RUN_TAG_PREFIX + "*"],
         "judgments": total_judgments,
         "models": sorted(models),
         "proposals": proposals,

@@ -157,10 +157,40 @@ struct ChatApiRequest<'a> {
     top_logprobs: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     reasoning: Option<ReasoningConfig>,
+    /// OpenRouter provider-routing preferences, passed through verbatim from
+    /// `OPENROUTER_PROVIDER_JSON`. Measured 2026-08-21 on
+    /// deepseek/deepseek-v4-flash: OpenRouter spread a logprobs request over
+    /// 17 providers, 11 of which return none (and `require_parameters` still
+    /// admitted one that advertises logprobs and omits them), so the PMF path
+    /// burned its 3x retry and the run fell from 9 to 0.5 judgments/s. An
+    /// explicit `{"order":[...],"allow_fallbacks":false}` pins the capable set.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    provider: Option<Value>,
     /// OpenAI-style cache-routing hint: content-derived, independent of
     /// nonce/padding, so repeat draws route to the same cache slot.
     #[serde(skip_serializing_if = "Option::is_none")]
     prompt_cache_key: Option<&'a str>,
+}
+
+/// `OPENROUTER_PROVIDER_JSON` is the request's `provider` object, verbatim
+/// (https://openrouter.ai/docs/features/provider-routing). Malformed JSON is
+/// a configuration error, not a silent default.
+fn provider_routing_from_env() -> Option<Value> {
+    let raw = std::env::var("OPENROUTER_PROVIDER_JSON").ok()?;
+    match serde_json::from_str::<Value>(&raw) {
+        Ok(v) if v.is_object() => Some(v),
+        _ => panic!("OPENROUTER_PROVIDER_JSON must be a JSON object, got: {raw}"),
+    }
+}
+
+/// `OPENROUTER_DISABLE_REASONING=1` pins `reasoning.enabled=false` on every
+/// request (hybrid-reasoning models think by default on some providers,
+/// billing ~1k output tokens per pairwise answer that needs two).
+fn reasoning_disabled_from_env() -> bool {
+    matches!(
+        std::env::var("OPENROUTER_DISABLE_REASONING").ok().as_deref(),
+        Some("1") | Some("true")
+    )
 }
 
 #[derive(Serialize)]
@@ -332,10 +362,11 @@ impl OpenRouterAdapter {
             logprobs: req.logprobs,
             top_logprobs: req.top_logprobs,
             prompt_cache_key: req.prompt_cache_key.as_deref(),
+            provider: provider_routing_from_env(),
             reasoning: req.reasoning.clone().or_else(|| {
                 // Kimi K2.5 may emit billed reasoning with empty visible content unless
                 // reasoning is explicitly disabled.
-                if req.model.model_id() == "moonshotai/kimi-k2.5" {
+                if reasoning_disabled_from_env() || req.model.model_id() == "moonshotai/kimi-k2.5" {
                     Some(ReasoningConfig::disabled())
                 } else {
                     None

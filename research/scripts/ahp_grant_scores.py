@@ -40,9 +40,8 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CH_LOCAL = "/data/clickhouse-twitter-lab/bin/clickhouse"
 IMPORTANCE_TAG = "ahp-grant-goals-gemma31b-2026-08-16"
 POLARITY_TAG = "ahp-polarity-gemma31b-2026-08-16"
+PROPOSAL_TAG_PREFIX = "manifund-latest-dsv4flash-"
 PROPOSAL_TAGS = [
-    "manifund-latest-dsv4flash-classic-2026-08-21",
-    "manifund-latest-dsv4flash-fable1000-2026-08-21",
     "fable1000-gemma31b-2026-08-16",
     "fable1000-40pool-seed2-gemma31b",
     "manifund-relentless-2026-08-15",
@@ -144,7 +143,8 @@ def main():
     orient_by_name = {name_of.get(e, attr_name(e)): o for e, o in orient.items()}
 
     # --- per-proposal attribute scores (attr line -> proposal -> score) ---
-    tags_or = " OR ".join(f"run_tag = '{t}'" for t in PROPOSAL_TAGS)
+    tags_or = " OR ".join([f"run_tag = '{t}'" for t in PROPOSAL_TAGS]
+                         + [f"startsWith(run_tag, '{PROPOSAL_TAG_PREFIX}')"])
     q = f"""
 SELECT attribute, entity, round(avg(m), 4) AS score
 FROM (
