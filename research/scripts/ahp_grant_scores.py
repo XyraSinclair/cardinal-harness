@@ -41,6 +41,8 @@ CH_LOCAL = "/data/clickhouse-twitter-lab/bin/clickhouse"
 IMPORTANCE_TAG = "ahp-grant-goals-gemma31b-2026-08-16"
 POLARITY_TAG = "ahp-polarity-gemma31b-2026-08-16"
 PROPOSAL_TAGS = [
+    "manifund-latest-dsv4flash-classic-2026-08-21",
+    "manifund-latest-dsv4flash-fable1000-2026-08-21",
     "fable1000-gemma31b-2026-08-16",
     "fable1000-40pool-seed2-gemma31b",
     "manifund-relentless-2026-08-15",
@@ -108,9 +110,9 @@ def main():
     corpus = [l.rstrip("\n") for l in open(os.path.join(REPO, "data/ahp_attributes.txt")) if l.strip()]
     name_of = {line: attr_name(line) for line in corpus}
 
-    # Proposals, in the manifund.txt corpus order the page uses.
+    # Proposals, in the manifund_latest.txt corpus order the page uses.
     proposals = [attr_name(l) if False else l.split(" — ")[0].strip()
-                 for l in open(os.path.join(REPO, "data/manifund.txt")) if l.strip()]
+                 for l in open(os.path.join(REPO, "data/manifund_latest.txt")) if l.strip()]
 
     # --- importance per goal (each goal is one "attribute" line) ---
     imp_counts = landed_per_attr(IMPORTANCE_TAG)

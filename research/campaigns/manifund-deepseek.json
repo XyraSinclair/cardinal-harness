@@ -1,0 +1,38 @@
+{
+  "name": "manifund-deepseek",
+  "description": "DeepSeek V4 Flash (OpenRouter) as the primary commercial judge over the latest Manifund slate: data/manifund_latest.txt = every non-dummy proposal created since 2026-08-08 (75 on 2026-08-21) plus the five delisted/renamed lines of the 2026-08-16 40-pool, so gemma/gemini judgments on that pool keep joining. V4 Flash returns answer logprobs, so canonical_bucket_v1 lands direction + ratio bucket + the PMF posterior (unlike the GLM lane). Measured 2026-08-21 probe: ~$0.00004/comparison exact provider cost, ~4s latency. Phase 1 is the 32-axis classic battery at budget 1200 (~38% pair coverage of 3160 pairs, ~$1.5); phase 2 the 1010-attribute fable battery at budget 400 (~$16, paced by the gateway's 200 RPM openrouter preset). Key: ~/.config/scry-secrets/openrouter.env (the openpriors OpenRouter key, $200 cap). Refresh the slate by re-running /tmp/build_latest_pool.py (to be homed in scripts/) and re-starting the unit; --resume-ledger skips landed attributes per run_tag, so a new slate needs a new run_tag.",
+  "phases": [
+    {
+      "run_tag": "manifund-latest-dsv4flash-classic-2026-08-21",
+      "corpus": "data/manifund_latest.txt",
+      "attributes": "batteries/manifund_attributes.txt",
+      "model": "deepseek/deepseek-v4-flash",
+      "base_url": "https://openrouter.ai/api/v1",
+      "api_key_env": "OPENROUTER_API_KEY",
+      "template": "canonical_bucket_v1",
+      "budget": 1200,
+      "seed": 1,
+      "concurrency": 8,
+      "env": {
+        "CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS": 1024,
+        "OPENROUTER_TIMEOUT_SECONDS": 180
+      }
+    },
+    {
+      "run_tag": "manifund-latest-dsv4flash-fable1000-2026-08-21",
+      "corpus": "data/manifund_latest.txt",
+      "attributes": "batteries/fable_subtle_1000.txt",
+      "model": "deepseek/deepseek-v4-flash",
+      "base_url": "https://openrouter.ai/api/v1",
+      "api_key_env": "OPENROUTER_API_KEY",
+      "template": "canonical_bucket_v1",
+      "budget": 400,
+      "seed": 1,
+      "concurrency": 8,
+      "env": {
+        "CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS": 1024,
+        "OPENROUTER_TIMEOUT_SECONDS": 180
+      }
+    }
+  ]
+}

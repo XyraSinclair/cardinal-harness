@@ -5,7 +5,7 @@ ledger on colo2.
 Per (model, attribute, proposal) score = mean signed log2 ratio margin over
 all landed pairwise judgments (winner +log2(ratio), loser -log2(ratio)),
 deduped through the ReplacingMergeTree with FINAL. Proposal card metadata
-joins data/manifund.txt corpus lines back to data/manifund/projects.jsonl.
+joins the CORPUS lines back to data/manifund/projects.jsonl.
 
 Usage: python3 scripts/manifund_page_data.py [out.json]
 Default out: site/data/manifund.json. The consumer is openpriors.com/manifund,
@@ -21,7 +21,10 @@ import sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CH_LOCAL = "/data/clickhouse-twitter-lab/bin/clickhouse"
+CORPUS = "data/manifund_latest.txt"
 RUN_TAGS = [
+    "manifund-latest-dsv4flash-classic-2026-08-21",
+    "manifund-latest-dsv4flash-fable1000-2026-08-21",
     "fable1000-gemma31b-2026-08-16",
     "fable1000-40pool-seed2-gemma31b",
     "manifund-relentless-2026-08-15",
@@ -46,7 +49,7 @@ def ch_query(query):
 def main():
     out_path = sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "site/data/manifund.json")
 
-    corpus_lines = [l.rstrip("\n") for l in open(os.path.join(REPO, "data/manifund.txt")) if l.strip()]
+    corpus_lines = [l.rstrip("\n") for l in open(os.path.join(REPO, CORPUS)) if l.strip()]
     fable_names = {l.strip() for l in open(os.path.join(REPO, "batteries/fable_subtle_1000.txt")) if l.strip()}
 
     # Join corpus lines back to full Manifund records. The 40-pool was drawn
@@ -141,7 +144,7 @@ FORMAT JSONEachRow"""
 
     out = {
         "generated": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "corpus": "manifund.txt",
+        "corpus": os.path.basename(CORPUS),
         "runTags": RUN_TAGS,
         "judgments": total_judgments,
         "models": sorted(models),
