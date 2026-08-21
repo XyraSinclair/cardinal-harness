@@ -1,6 +1,6 @@
 {
   "name": "manifund-deepseek",
-  "description": "DeepSeek V4 Flash (OpenRouter) as the primary commercial judge over the latest Manifund slate: data/manifund_latest.txt = every non-dummy proposal created since 2026-08-08 (75 on 2026-08-21) plus the five delisted/renamed lines of the 2026-08-16 40-pool, so gemma/gemini judgments on that pool keep joining. Shape (all measured 2026-08-21): (1) no_cache is load-bearing \u2014 with the pairwise cache on, the planner re-proposes its critical pair for repeat samples, the cache answers instantly and identically, and 1200 attempts collapse to 60 unique pairs. (2) The ledger dedups on (model, attribute, ordered pair), so repeat samples of one pair are waste for the page; the planner hammers its top-1 contest after ~150 comparisons (one 1200-budget run = 281 distinct pairs, with one pair asked 52 times), while seeds diversify the early neighbor-pair phase (budget-200 runs give ~100 distinct pairs each with ~10% overlap). Hence many seeds x budget 200 rather than one deep run: 6 seeds for the 32-axis classic battery, 2 for the 1010-attribute fable battery. (3) OPENROUTER_PROVIDER_JSON pins the five V4-Flash providers that actually return logprobs (OpenRouter spreads across 17; 11 omit logprobs, and one that advertises them omits them), and OPENROUTER_DISABLE_REASONING stops hybrid thinking (median output fell from 1144 tokens to 31; PMF posterior lands on every row; ~$0.032 per 1000 comparisons). The first landed attribute ('existential seriousness', 1200-budget, tag manifund-latest-dsv4flash-classic-2026-08-21) is kept and pooled. Key: ~/.config/scry-secrets/openrouter.env (the openpriors OpenRouter key). Refresh the slate: scripts/manifund_latest_pool.py, then new run_tags (ledger resume is per tag+attribute).",
+  "description": "DeepSeek V4 Flash (OpenRouter) as the primary commercial judge over the latest Manifund slate: data/manifund_latest.txt = every non-dummy proposal created since 2026-08-08 (75 on 2026-08-21) plus the five delisted/renamed lines of the 2026-08-16 40-pool, so gemma/gemini judgments on that pool keep joining. Shape (all measured 2026-08-21): (1) no_cache is load-bearing \u2014 with the pairwise cache on, the planner re-proposes its critical pair for repeat samples, the cache answers instantly and identically, and 1200 attempts collapse to 60 unique pairs. (2) The ledger dedups on (model, attribute, ordered pair), so repeat samples of one pair are waste for the page; the planner hammers its top-1 contest after ~150 comparisons (one 1200-budget run = 281 distinct pairs, with one pair asked 52 times), while seeds diversify the early neighbor-pair phase (budget-200 runs give ~100 distinct pairs each with ~10% overlap). Hence many seeds x budget 200 rather than one deep run: 6 seeds for the 32-axis classic battery, 2 for the 1010-attribute fable battery. (3) OPENROUTER_PROVIDER_JSON pins the five V4-Flash providers that actually return logprobs (OpenRouter spreads across 17; 11 omit logprobs, and one that advertises them omits them), and OPENROUTER_DISABLE_REASONING stops hybrid thinking (median output fell from 1144 tokens to 31; PMF posterior lands on every row; ~$0.032 per 1000 comparisons). The first landed attribute ('existential seriousness', 1200-budget, tag manifund-latest-dsv4flash-classic-2026-08-21) is kept and pooled. Key: ~/.config/scry-secrets/openrouter.env (the openpriors OpenRouter key). Refresh the slate: scripts/manifund_latest_pool.py, then new run_tags (ledger resume is per tag+attribute). (4) At budget 200 the planner's opening band is the first ~63 lines of the corpus in file order and seeds do not reshuffle it (s1..s6 all left indices 63-79 unjudged on 31/32 axes), so the later passes run on seed-shuffled copies data/manifund_latest.shufN.txt \u2014 entity identity is the line text, so the ledger and page joins are unaffected; the fable lanes run only on shuffled copies.",
   "phases": [
     {
       "run_tag": "manifund-latest-dsv4flash-classic-s1-2026-08-21",
@@ -117,15 +117,15 @@
       }
     },
     {
-      "run_tag": "manifund-latest-dsv4flash-fable1000-s1-2026-08-21",
-      "corpus": "data/manifund_latest.txt",
-      "attributes": "batteries/fable_subtle_1000.txt",
+      "run_tag": "manifund-latest-dsv4flash-classic-shuf1-2026-08-21",
+      "corpus": "data/manifund_latest.shuf1.txt",
+      "attributes": "batteries/manifund_attributes.txt",
       "model": "deepseek/deepseek-v4-flash",
       "base_url": "https://openrouter.ai/api/v1",
       "api_key_env": "OPENROUTER_API_KEY",
       "template": "canonical_bucket_v1",
       "budget": 200,
-      "seed": 1,
+      "seed": 11,
       "concurrency": 12,
       "no_cache": true,
       "env": {
@@ -136,15 +136,91 @@
       }
     },
     {
-      "run_tag": "manifund-latest-dsv4flash-fable1000-s2-2026-08-21",
-      "corpus": "data/manifund_latest.txt",
+      "run_tag": "manifund-latest-dsv4flash-classic-shuf2-2026-08-21",
+      "corpus": "data/manifund_latest.shuf2.txt",
+      "attributes": "batteries/manifund_attributes.txt",
+      "model": "deepseek/deepseek-v4-flash",
+      "base_url": "https://openrouter.ai/api/v1",
+      "api_key_env": "OPENROUTER_API_KEY",
+      "template": "canonical_bucket_v1",
+      "budget": 200,
+      "seed": 12,
+      "concurrency": 12,
+      "no_cache": true,
+      "env": {
+        "CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS": 1024,
+        "OPENROUTER_TIMEOUT_SECONDS": 180,
+        "OPENROUTER_DISABLE_REASONING": 1,
+        "OPENROUTER_PROVIDER_JSON": "{\"order\": [\"parasail\", \"coreweave\", \"digitalocean\", \"streamlake\", \"sail-research\"], \"allow_fallbacks\": false}"
+      }
+    },
+    {
+      "run_tag": "manifund-latest-dsv4flash-classic-shuf3-2026-08-21",
+      "corpus": "data/manifund_latest.shuf3.txt",
+      "attributes": "batteries/manifund_attributes.txt",
+      "model": "deepseek/deepseek-v4-flash",
+      "base_url": "https://openrouter.ai/api/v1",
+      "api_key_env": "OPENROUTER_API_KEY",
+      "template": "canonical_bucket_v1",
+      "budget": 200,
+      "seed": 13,
+      "concurrency": 12,
+      "no_cache": true,
+      "env": {
+        "CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS": 1024,
+        "OPENROUTER_TIMEOUT_SECONDS": 180,
+        "OPENROUTER_DISABLE_REASONING": 1,
+        "OPENROUTER_PROVIDER_JSON": "{\"order\": [\"parasail\", \"coreweave\", \"digitalocean\", \"streamlake\", \"sail-research\"], \"allow_fallbacks\": false}"
+      }
+    },
+    {
+      "run_tag": "manifund-latest-dsv4flash-classic-shuf4-2026-08-21",
+      "corpus": "data/manifund_latest.shuf4.txt",
+      "attributes": "batteries/manifund_attributes.txt",
+      "model": "deepseek/deepseek-v4-flash",
+      "base_url": "https://openrouter.ai/api/v1",
+      "api_key_env": "OPENROUTER_API_KEY",
+      "template": "canonical_bucket_v1",
+      "budget": 200,
+      "seed": 14,
+      "concurrency": 12,
+      "no_cache": true,
+      "env": {
+        "CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS": 1024,
+        "OPENROUTER_TIMEOUT_SECONDS": 180,
+        "OPENROUTER_DISABLE_REASONING": 1,
+        "OPENROUTER_PROVIDER_JSON": "{\"order\": [\"parasail\", \"coreweave\", \"digitalocean\", \"streamlake\", \"sail-research\"], \"allow_fallbacks\": false}"
+      }
+    },
+    {
+      "run_tag": "manifund-latest-dsv4flash-fable1000-shuf1-2026-08-21",
+      "corpus": "data/manifund_latest.shuf1.txt",
       "attributes": "batteries/fable_subtle_1000.txt",
       "model": "deepseek/deepseek-v4-flash",
       "base_url": "https://openrouter.ai/api/v1",
       "api_key_env": "OPENROUTER_API_KEY",
       "template": "canonical_bucket_v1",
       "budget": 200,
-      "seed": 2,
+      "seed": 21,
+      "concurrency": 12,
+      "no_cache": true,
+      "env": {
+        "CARDINAL_PAIRWISE_MAX_OUTPUT_TOKENS": 1024,
+        "OPENROUTER_TIMEOUT_SECONDS": 180,
+        "OPENROUTER_DISABLE_REASONING": 1,
+        "OPENROUTER_PROVIDER_JSON": "{\"order\": [\"parasail\", \"coreweave\", \"digitalocean\", \"streamlake\", \"sail-research\"], \"allow_fallbacks\": false}"
+      }
+    },
+    {
+      "run_tag": "manifund-latest-dsv4flash-fable1000-shuf2-2026-08-21",
+      "corpus": "data/manifund_latest.shuf2.txt",
+      "attributes": "batteries/fable_subtle_1000.txt",
+      "model": "deepseek/deepseek-v4-flash",
+      "base_url": "https://openrouter.ai/api/v1",
+      "api_key_env": "OPENROUTER_API_KEY",
+      "template": "canonical_bucket_v1",
+      "budget": 200,
+      "seed": 22,
       "concurrency": 12,
       "no_cache": true,
       "env": {

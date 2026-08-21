@@ -166,7 +166,13 @@ def main():
     corpus_lines = [l.rstrip("\n") for l in open(a.corpus) if l.strip()]
     corpus_name = os.path.basename(a.corpus)
     attrs = [l.strip() for l in open(a.attributes) if l.strip()]
-    done = (ledger_done_attrs(a.run_tag, a.model, a.budget * 0.9)
+    # Landing is one INSERT per attribute (atomic), and the ledger's
+    # ReplacingMergeTree key is (model, attribute, ordered pair), so an
+    # attribute's row count is its distinct-pair count, not its budget —
+    # a 200-budget pass settles at ~100 rows. Presence is the done test;
+    # a budget-proportional threshold re-bought every landed attribute on
+    # restart (seen 2026-08-21).
+    done = (ledger_done_attrs(a.run_tag, a.model, 1)
             if a.resume_ledger else set())
     if done:
         print(f"resume: {len(done)}/{len(attrs)} attributes already landed, skipping",
