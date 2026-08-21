@@ -28,6 +28,12 @@ const DEPTHS: [f64; 8] = [4.0, 3.6, 3.2, 2.6, 1.8, 1.2, 0.6, 0.1];
 /// looking up the item. (The hash judge below deliberately does NOT.)
 fn normalize(text: &str) -> String {
     let t = text.trim();
+    // Inert container label (bench.rs `perturb_text` "container"): a reader
+    // sees past the framing header to the note beneath it.
+    let t = t
+        .strip_prefix("[archived note]")
+        .map(str::trim_start)
+        .unwrap_or(t);
     let t = t
         .strip_prefix("**")
         .and_then(|x| x.strip_suffix("**"))
