@@ -38,14 +38,14 @@ An instrument is a point in **arity × scale × output-form**:
 | pointwise · ordinal/ratio (rubric) | ◐ scalar control | seriate `scalar` digit-PMF; a baseline, not a path — anchor drift is the documented disease |
 | pointwise · ratio **to fixed anchors** | ✗ | classic magnitude estimation with pinned anchor entities; fixes anchor drift; cheap O(n); worth building |
 | k-wise · nominal ("which is most") | ◐ | seriate `kwise` + lowering; not exposed in cardinal |
-| k-wise · **best–worst** (MaxDiff) | ✗ | pick best AND worst of k → 2k−3 implied pairs per call; the classic efficiency instrument; highest-value missing cell |
-| k-wise · full order of k | ✗ | k! answer space; PMF impossible past tiny k; likely not worth it |
-| listwise · any | ✗ by design | context limits, position bias, silent drops — documented rejection |
+| k-wise · **best–worst** (MaxDiff) | ◐ measured, refuted as built | `setwise_cached --answer bw`: 2k−3 ordinal pairs per call; live on deepseek-v4-flash (pack `best-worst-2026-08-22`) ρ vs pairwise median 0.25, test–retest 0.46–0.85 — the worst pick is a weak, last-slot-biased signal |
+| k-wise · full order of k (point) | ◐ the adequate-regime winner | `--answer order`: k(k−1)/2 ordinal pairs per call lowered into the solver; same pack: 9 calls/attribute reach the pairwise sort's own test–retest ceiling at ~¼ its dollars per item; last slot ranked last 2.2× fair share (measured) |
+| listwise · any (model returns the order of n) | ✗ by design | context limits, position bias, silent drops — documented rejection; the k-wise `order` row above is the lowered, bounded-k form |
 
-**The permutation that matters most and is missing: best–worst scaling.**
-One call yields the top and bottom of a k-subset — O(k) pairwise
-implications for one call's price. It composes with everything here
-(lowering to weighted pairwise evidence, exactly like k-wise).
+**Best–worst scaling was the predicted highest-value missing cell; measured
+2026-08-22 it lost to the full order of k at the same input cost** (13 vs 28
+observations per call; PROGRAM.md E6). The prediction stands corrected by
+its pack.
 
 ## 3. What each scale admits (so we don't compute nonsense)
 
