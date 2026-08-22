@@ -147,10 +147,36 @@ RESULTS.md with denominators) and one page here.
   active planner over an LLM comparator with measured noise: comparisons to a
   certified top-k, error under intransitivity, on simulation and one live
   pool. **PLANNED.**
-- **E5 — listwise vs pairwise vs setwise at n = 8, 16, 32, 64.** Where each
-  breaks, on the same pool and attribute. **PLANNED.**
+- **E5 — listwise vs pairwise vs setwise.** Folded into E6 as its `order`
+  arm (2026-08-22): the consumer's decision is best–worst vs plain listwise
+  vs pairwise at adequate agreement per dollar, so listwise is E6's
+  efficiency denominator, not a separate sweep. **FOLDED.**
 - **E6 — best–worst scaling instrument.** The highest-value missing cell in
-  the instrument grid. **PLANNED.**
+  the instrument grid. Design climbed 2026-08-22 (parsimony climb, 5 rounds,
+  18 accepted deletions; ledger in hill-climb-parsimony@afa53e4). Target use:
+  reranking web-search results under a custom user prompt where an adequate
+  quality adjustment, not a certified order, is the bar. Shape: a diff to
+  `experiments/examples/setwise_cached.rs`, no new file — `--answer
+  {ratio,bw,order}`; `ratio` is the existing pivot-ratio arm on the existing
+  pair-cover design, untouched; `bw` (two slot letters: best, worst) and
+  `order` (full order of the k slots) are point answers, no logprobs, on a
+  chunk design derived from the mode: `--presentations` rounds of seeded
+  shuffle → even split into ⌈n/k⌉ groups, call count printed up front. One
+  parse target `Slots(Vec<usize>)` (length 2 or k, distinct; anything else
+  is malformed, never a default); one tier-lowering — tiers
+  [[best],[rest],[worst]] for `bw`, singletons for `order` — emitting every
+  cross-tier pair as an ordinal `Observation` at the existing
+  `FIXED_BUCKET` magnitude into the same `RatingEngine` (2k−3 and k(k−1)/2
+  fall out). `SyntheticJudge` gains one branch (perturb latents per slot,
+  sort; `order` emits the order, `bw` the two ends). Readouts added:
+  `first_by_slot`/`last_by_slot` histogram (position bias, measured) and
+  `SolveSummary.components` surfaced — arm flagged `disconnected` when > 1
+  (no silent drops; the harness had no such flag). Everything else —
+  pairwise baseline arm, Spearman/top-k, SpendMeter cap, trace, pack — is
+  the existing harness. Offline synthetic judge first ($0), then live under
+  the cap on the DeepSeek V4 Flash lane. Rejected deletion, recorded as an
+  invariant: the `order` arm stays — it is the denominator of the
+  efficiency claim. **DESIGNED, not built.**
 - **E7 — PMF evidence per instrument.** Where providers expose logprobs,
   separation per dollar versus point answers, per instrument. **PLANNED.**
 
