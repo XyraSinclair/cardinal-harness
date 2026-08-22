@@ -1,0 +1,1078 @@
+{
+  "generated_at": "2026-08-22T20:12:01.605307122+00:00",
+  "offline": false,
+  "answer": "order",
+  "model": "deepseek/deepseek-v4-flash",
+  "seed": 23,
+  "n": 24,
+  "ks": [
+    8
+  ],
+  "entity_chars": 1600,
+  "min_pair_cover": 2,
+  "presentations_per_subset": 3,
+  "spend_cap_usd": 1.0,
+  "corpus": "data/manifund/items/full.json",
+  "attributes": [
+    {
+      "name": "impact_per_dollar",
+      "rubric_source": "data/manifund/rubrics/impact_per_dollar.md",
+      "rubric_chars": 783
+    },
+    {
+      "name": "theory_of_change",
+      "rubric_source": "data/manifund/rubrics/theory_of_change.md",
+      "rubric_chars": 706
+    },
+    {
+      "name": "fit for a funder who wants cheap high-leverage AI safety field-building",
+      "rubric_source": "plain attribute name (no rubric file)",
+      "rubric_chars": 71
+    }
+  ],
+  "entity_ids": [
+    "dimba-non-autoregressive-diffusion-language-model-with-mamba-2-ssms",
+    "saferide-open-source-edge-ai-driver-safety-infrastructure",
+    "the-race-to-superintelligence-you-decide",
+    "hallucination-detector",
+    "sanctumos-an-e2e-private-agentic-ai",
+    "research-staff-for-ai-safety-research-projects",
+    "exploring-feature-interactions-in-transformer-llms-through-sparse-autoencoders",
+    "cover-apc-for-accepted-peer-reviewed-paper-on-ai-alignment-foundations",
+    "understanding-sae-features-using-sparse-feature-circuits",
+    "write-messaging-",
+    "split-personality-training",
+    "effective-giving-in-new-zealand",
+    "fishes-need-protection-too",
+    "concept-anchored-representation-engineering-for-alignment",
+    "evitable-a-new-public-facing-ai-risk-nonprofit-a1ll15pvkcb",
+    "stage-2-pre-registered-multi-agent-value-dynamics-test-frontier-agents-15k",
+    "research-and-engineering-multi-agent-alignment",
+    "agentic-cognitive-architecture-and-autopoietic-ai",
+    "universal-bytecode-for-any-ai-models--enabling-inference-on-any-hardware",
+    "build-anti-mosqu",
+    "litigating-and-legislating-for-animal-rights",
+    "the-verified-loop-a-cyber-physical-protocol-for-deterministic-ai-safety",
+    "falcon-fund",
+    "ai-will-change-the-world-but-wont-take-it-over-by-playing-3-dimensional-chess"
+  ],
+  "engine_spec": {
+    "n": 24,
+    "attribute": {
+      "temperature": 1.0
+    },
+    "raters": [
+      [
+        "deepseek/deepseek-v4-flash",
+        {
+          "beta": 1.0,
+          "cost_per_edge": 1.0
+        }
+      ]
+    ],
+    "config": {
+      "huber_k": 1.5,
+      "irls_max_iters": 12,
+      "irls_tol": 1e-8,
+      "ridge_lambda": 1e-9,
+      "tiny": 1e-18,
+      "max_log_ratio": 10.0,
+      "hutch_probes": 12,
+      "rank_weight_exponent": 1.0,
+      "rank_band_window": 5,
+      "small_gap_threshold": 0.5,
+      "max_rank_pairs": 200000,
+      "top_k": null,
+      "tail_weight": 0.0,
+      "lambda_risk": 1.0,
+      "rng_seed": 1337
+    }
+  },
+  "example_call": {
+    "system": "You are an expert subjective evaluator. You read a small set of entities in lettered slots, then an attribute. You answer with every slot letter exactly once, separated by spaces, ordered from the MOST of the attribute to the LEAST. Nothing else — no words, no punctuation, no explanation.\nExample: C A D B",
+    "user": "<entities>\n<entity_A>\nTITLE: SanctumOS: an e2e Private Agentic AI.\nBLURB: Neuro-inspired architecture for reproducible research and safe AI\nASK: min $3,000 / goal $16,000\nCAUSES: Technical AI safety, AI governance\nProject summary\n\nOver the next six months, Mark Hopkins will advance SanctumOS ( sanctumos.org ) , a self-hosted cognitive operating system that serves as open infrastructure for agentic AI —similar to how Linux established the foundation for modern operating systems. By enabling reproducible research automation, scientific assistants, and interdisciplinary collaboration, SanctumOS directly contributes to the advancement of science and technology.\n\nSanctumOS is organized around a neuro-inspired architecture , where core subsystems echo cognitive functions. The Thalamus refines raw input streams, the Cerebellum filters and prioritizes signals, and Broca translates agent decisions into communication. The Dream Agent is further structured into Hippocampus , Neocortex , and Glymphatic modules—distilling daily activity into knowledge, integrating it into long-term structures, and compacting indexes for efficient retrieval. This framing makes the system both intuitive and rigorously modular.\n\nAt the same time, SanctumOS tackles technical AI safety through design: every agent runs under user control, with persistent memory, transparent provenance, and open-source governance. This reduces systemic risks from centralized, black-box AI by ensuring agents remain auditable, accountable, and self-hostable.\n\n What are this project&apos;s goals? How will you achieve them?\n\n Goal 1: Establish a Neuro-Inspi\n</entity_A>\n<entity_B>\nTITLE: Effective Giving in New Zealand\nBLURB: \nASK: min $25,000 / goal $80,000\nCAUSES: EA community\nSummary\n\nEffective Altruism New Zealand (EA NZ) is seeking funding to sustain and expand our effective giving initiative, which currently directs around $1M NZD (\\~$0.6M USD) p.a. to effective charities across a range of cause areas. Impact is expected to grow further with strategic investment in marketing and donor retention, and there is considerable potential to expand reach within Aotearoa (New Zealand)’s philanthropic landscape, leveraging the nation&apos;s high rates of per-capita giving. To achieve this, we are seeking $30,000 to $80,000 USD to cover the operational costs of our effective giving programme for the next year.\n\n Our Work \n\nEA NZ works to grow and support the effective altruism (EA) community in Aotearoa. While our work has multiple aspects, including generalised community building and promotion of EA ideas, our primary focus is on effective giving. Through our donation platform, fundraisers and other initiatives, we enable and encourage Kiwi donors to support highly effective charities. This directly increases the funds available for high-impact work across a range of cause areas. \n\nThe primary focus of our effective giving work is on facilitating tax-deductible donations to highly effective charities through our website. Due to the structure of NZ tax law, we use two different legal vehicles to accomplish this: a registered charity which facilitates donations within the global health and development space, and a donor advised fund which facilitates donations\n</entity_B>\n<entity_C>\nTITLE: Concept-anchored representation engineering for alignment\nBLURB: New techniques to impose minimal structure on LLM internals for monitoring, intervention, and unlearning.\nASK: min $16,700 / goal $72,300\nCAUSES: Technical AI safety, Global catastrophic risks\nProject summary\n\nDevelop techniques to impose just enough structure on LLM latent spaces during training to enable precise monitoring and post-hoc intervention.\n\nModels naturally develop structured latent representations (e.g. the residual stream in transformers), but we currently have little control over how concepts organize. Prior attempts have focused on comprehensive supervision or post-hoc discovery, rather than minimal anchoring during training. My hypothesis is that if we give the models a gentle nudge right from the start of pre-training, they could become much more interpretable for the specific concepts and behaviors that we care about.\n\nMy preliminary experiments with autoencoders show that anchoring just one concept causes related concepts to organize predictably nearby, i.e. anchored concepts act as attractors during training. This happens even with only weak supervision, which suggests that it could be made to work for models trained on very large corpora that are hard to label (e.g. frontier models). Knowing where key concepts are located could enable surgical removal of dangerous capabilities without broad performance degradation, and could be highly resistant to capability recovery.\n\nI see a path forward to apply this to LLMs, and I would like to pursue it.\n\n What are this project&apos;s goals? How wi\n</entity_C>\n<entity_D>\nTITLE: Evitable: a new public-facing AI risk non-profit \nBLURB: Our mission is to inform and organize the public to confront societal-scale risks of AI, and put an end to the reckless race to develop superintelligent AI.\nASK: min $1,000 / goal $1,500,000\nCAUSES: AI governance, Global catastrophic risks\nProject summary\n\nEvitable is a new non-profit seeking donations. Our mission is to inform and organize the public to confront societal-scale risks from AI, and put an end to the reckless race to develop superintelligence. We use high-profile media appearances, evidence-based communication, and novel messaging to shift the narrative. Our core message is “AI is not inevitable, it is a political choice”. We argue an indefinite AI pause is feasible without mass surveillance or centralizing control over AI; for instance via a robust international agreement to get rid of advanced AI chips and fabs.\n\n \nWe believe Achieving Evitable’s goal of stopping or slowing AI progress is essential to reducing AI risk to an acceptable level. Most contemporary work in AI safety is unlikely to be sufficient in worlds where alignment is hard, or where catastrophic outcomes occur due to other issues such as gradual disempowerment or offense/defence imbalance. A few organizations have similar goals to Evitable, but we differentiate ourselves via (i) our plan to create a gentle on-ramp for people who don&apos;t identify as activists, (ii) our positive framing (&quot;evitability&quot;), and (iii) our founder’s credentials.\n\n What are this project&apos;s goals? How will you achieve them?\n\nOur plans for 2026 include:\n\n Q1:\n</entity_D>\n<entity_E>\nTITLE: Split Personality Training\nBLURB: Revealing Latent Knowledge Through Personality-Shift Tokens\nASK: min $1,000 / goal $100,000\nCAUSES: Science &amp; technology, Technical AI safety, Global catastrophic risks\nI want to run tests to develop the AI Alignment technique I describe in this post, which contains additional details: &lt;https://www.lesswrong.com/posts/iocPzHRsH9JWtwHHG/split-personality-training-revealing-latent-knowledge \n\nThis idea was developed during MATS. My mentor Evan Hubinger said it was a great idea and I should work on it next, after MATS is over.\n\n Project summary\n\nThe personality-shift token works by modifying the standard generation process of an LLM. In a typical interaction, the model starts with:\n\n \\[prompt\\]\n\nand produces:\n\n \\[prompt\\]\\[main output\\]&lt;end-of-turn \n\nIn our proposed modification, when we receive this output, we replace the &lt;end-of-turn token with a &lt;personality-shift token and simply continue the generation until we get a second &lt;end-of-turn token:\n\n \\[prompt\\]\\[main output\\]&lt;personality-shift \\[second output\\]&lt;end-of-turn \n\nThis gives us two separate outputs.\n\nWe want to use the \\[main output\\] for solving problems as usual, while the \\[second output\\] is dedicated exclusively to alignment, by criticizing the main output and the hidden thought process that led to it.\n\n Main Benefits of the Approach\n\n Access to internal states : The second personality has direct access to the model&apos;s internal states during the main generation, potentially revealing latent knowledge that external evaluators cannot access.\n Architectural simplicity : Requ\n</entity_E>\n<entity_F>\nTITLE: Build anti-mosquito drones\nBLURB: \nASK: min $20,000 / goal $28,560\nCAUSES: ACX Grants 2024\nLonger description of your proposed project\n\nI&apos;m currently building a $200 drone that kills mosquitoes like a bat. It locates and identifies them with an ultrasonic sonar, and then kills them with a front propeller.\n\nIt turns out, the drone part is quite simple. 20cm-wide agile quadcopters can be found in every toy shop. The control theory needed to intercept a target is the same as on an air-to-air missile, so is well-known and documented.\n\nWhat&apos;s hard is building a 3D sonar able to detect and track a mosquito with a high framerate (mosquitoes are quite agile, and when designing interceptors the main criteria for success is your sensor&apos;s refresh speed). This is what I&apos;m working on right now!\n\nMy sonar uses mass-produced ultrasonic emitters from car park-assist sensors and mass-produced MEMS microphones as ultrasonic receivers. The operating principle is the same as on military radars. It first emits a microsecond-long 40khz ultrasonic pulse. Then, it listens with a 10x10 microphone matrix for echoes and locates them using frequency-domain beamforming. You can find a good explanation on how the receive-side works here : &lt;https://www.ribbonfarm.com/2016/06/29/the-daredevil-camera/ \n\nI&apos;ve already built two proof-of-concepts :\n\n1. The first one I built is able to see the world with a good definition but at a too slow framerate. My writeup made it to the front page of HackerNews and was featured in a hackaday.com article: \n &lt;https://www.alextoussaint.com/2021-04-28%5FHow-I-built-an\n</entity_F>\n<entity_G>\nTITLE: Exploring feature interactions in transformer LLMs through sparse autoencoders\nBLURB: \nASK: min $6,000 / goal $15,000\nCAUSES: Technical AI safety\nProject summary\n\nSparse autoencoders (SAEs) are good at extracting distinct, significantly monosemantic features out of transformer language models. An effective dictionary of feature decompositions for a transformer component roughly sketches out the set of features that component has learned.\n\nThe goal of this project is to provide a more intuitive and structured way of understanding how features interact and form complex high-level behaviors in transformer language models. To do that, we want to define and explore the feature manifold, understand how features evolve over different transformer components, and how we can use these feature decompositions to find some interesting circuits. \n\n What are this project&apos;s goals and how will you achieve them?\n\n1. SAE Feature Decomposition for Circuit Search Algorithm Development \n 1. A major challenge in using sparse autoencoders for future interpretability work is turning feature decompositions into effective predictive circuits. Existing algorithms, such as ACDC, are based on pruning of computation graphs and not easily scalable to larger models. \n 2. Cunningham et al. demonstrate that causal links can be identified by modifying features from an earlier layer and observing the impact on subsequent layer features. \n 1. A promising approach for a circuit search algorithm would be to observe changes in feature activations upon ablating features in a previous layer. We could focus on\n</entity_G>\n<entity_H>\nTITLE: Hallucination Detector\nBLURB: \nASK: min $6,000 / goal $6,000\nCAUSES: none listed\nProject summary\n\nBuilding on our ICLR 2025 oral paper &quot;Do I Know This Entity? Knowledge Awareness and Hallucinations in Language Models,&quot; developed during MATS, we propose to advance the detection and mitigation of factual hallucinations in open-ended text generation. Our previous work identified internal representations in language models that encode knowledge awareness about entities (people’s names, movies, songs…), and demonstrated their causal relationship to hallucinatory behaviors. We now aim to develop robust, generalizable methods for detecting factual inaccuracies in open-ended generations.\n\n How will this funding be used?\n\nThe funding will primarily be used to pay for compute (API credits &amp; GPU time). A portion ($1.2K) will also reimburse previous research costs that we&apos;ve personally covered to maintain research continuity.\n\n Who is on your team? What&apos;s your track record on similar projects?\n\nOscar Balcells Obeso is a Master&apos;s student at ETH Zurich and MATS 2025 scholar advised by Neel Nanda. His previous research includes Refusal is Mediated by a Single Direction (NeurIPS 2024) and Do I Know this Entity? Knowledge Awareness and Hallucinations in Language Models (ICLR 2025 Oral). \n \nJavier is a Research Engineer at the Barcelona Supercomputing Center and fellow MATS 2025 scholar advised by Neel Nanda. He&apos;s the author of Do I Know this Entity? Knowledge Awareness and Hallucinations in Language Models and has overall more than 10 first-author publications in leading NLP conferen\n</entity_H>\n</entities>\n\nCompare the entities by <attribute_name>: impact_per_dollar </attribute_name>.\n<full_attribute_text>\nYou are judging which of two items has more expected impact per marginal dollar at the stated minimum funding ask. This attribute measures the additional positive outcome (in your chosen units) that would result from one extra dollar of funding, evaluated at the minimum funding threshold. More of this attribute means the project shows higher marginal cost-effectiveness at that point: for example, clear evidence that each additional dollar beyond the minimum ask yields a larger increment in lives saved, knowledge gained, or other defined benefit, based on rigorous modeling, experimental data, or well-justified diminishing returns. Do not reward total impact, average impact per dollar, or the impact of the full funding ask; those are different metrics. Also do not reward the\n</full_attribute_text>\n\nOrder every slot from {A, B, C, D, E, F, G, H} from MOST of the attribute to LEAST, every letter exactly once.\nanswer:",
+    "prompt_cache_key": "setwise:93d11a534caa103a",
+    "prefix_bytes": 13474
+  },
+  "subsets_per_k": {
+    "8": 9
+  },
+  "setwise": [
+    {
+      "answer": "order",
+      "k": 8,
+      "attribute": "impact_per_dollar",
+      "calls": 9,
+      "calls_ok": 9,
+      "calls_refused": 0,
+      "calls_malformed": 0,
+      "calls_errored": 0,
+      "observations": 252,
+      "usage": {
+        "calls": 9,
+        "prompt_tokens": 28200,
+        "completion_tokens": 81,
+        "cache_read_tokens": 0,
+        "cache_write_tokens": 0,
+        "nanodollars": 3970680
+      },
+      "cache": {
+        "calls_with_cache_fields_reported": 9,
+        "calls_with_cache_read_gt0": 0,
+        "mean_cached_fraction": 0.0
+      },
+      "pivot_rotation": {
+        "pairs_with_both_orientations": 0,
+        "sign_flips": 0,
+        "mean_abs_residual_nats": null
+      },
+      "slot_histogram": {
+        "first_by_slot": [
+          0,
+          0,
+          2,
+          0,
+          5,
+          0,
+          0,
+          2
+        ],
+        "last_by_slot": [
+          0,
+          0,
+          1,
+          1,
+          0,
+          5,
+          2,
+          0
+        ]
+      },
+      "components": 1,
+      "disconnected": false,
+      "latents": [
+        {
+          "id": "dimba-non-autoregressive-diffusion-language-model-with-mamba-2-ssms",
+          "mean": 0.7760679935139816,
+          "std": 0.335397043623846
+        },
+        {
+          "id": "saferide-open-source-edge-ai-driver-safety-infrastructure",
+          "mean": 0.8554124018339961,
+          "std": 0.3199693106888687
+        },
+        {
+          "id": "the-race-to-superintelligence-you-decide",
+          "mean": 0.9622037150776748,
+          "std": 0.3172109818953675
+        },
+        {
+          "id": "hallucination-detector",
+          "mean": 1.1678336928790825,
+          "std": 0.3159991719945752
+        },
+        {
+          "id": "sanctumos-an-e2e-private-agentic-ai",
+          "mean": 0.8465083360073524,
+          "std": 0.31223279284823324
+        },
+        {
+          "id": "research-staff-for-ai-safety-research-projects",
+          "mean": 1.7767322327012196,
+          "std": 0.32991647560988635
+        },
+        {
+          "id": "exploring-feature-interactions-in-transformer-llms-through-sparse-autoencoders",
+          "mean": 1.1818513697984758,
+          "std": 0.314832477033841
+        },
+        {
+          "id": "cover-apc-for-accepted-peer-reviewed-paper-on-ai-alignment-foundations",
+          "mean": 1.085743175826229,
+          "std": 0.335397043623846
+        },
+        {
+          "id": "understanding-sae-features-using-sparse-feature-circuits",
+          "mean": 1.4402897520556264,
+          "std": 0.2922586299957554
+        },
+        {
+          "id": "write-messaging-",
+          "mean": 0.31761868790138176,
+          "std": 0.3144292836066832
+        },
+        {
+          "id": "split-personality-training",
+          "mean": 1.2847002921673911,
+          "std": 0.3188438951066345
+        },
+        {
+          "id": "effective-giving-in-new-zealand",
+          "mean": 0.8176631512247539,
+          "std": 0.3020864632127623
+        },
+        {
+          "id": "fishes-need-protection-too",
+          "mean": 1.2551035874543932,
+          "std": 0.3025869548252592
+        },
+        {
+          "id": "concept-anchored-representation-engineering-for-alignment",
+          "mean": 1.5413902252460536,
+          "std": 0.3272498947593154
+        },
+        {
+          "id": "evitable-a-new-public-facing-ai-risk-nonprofit-a1ll15pvkcb",
+          "mean": 1.4171248193107013,
+          "std": 0.3282100164073132
+        },
+        {
+          "id": "stage-2-pre-registered-multi-agent-value-dynamics-test-frontier-agents-15k",
+          "mean": 1.6612216404675664,
+          "std": 0.2904292263227354
+        },
+        {
+          "id": "research-and-engineering-multi-agent-alignment",
+          "mean": 0.980306570770819,
+          "std": 0.3146682140480949
+        },
+        {
+          "id": "agentic-cognitive-architecture-and-autopoietic-ai",
+          "mean": 0.0,
+          "std": 0.31075827523858746
+        },
+        {
+          "id": "universal-bytecode-for-any-ai-models--enabling-inference-on-any-hardware",
+          "mean": 1.477186119006069,
+          "std": 0.32451027471886784
+        },
+        {
+          "id": "build-anti-mosqu",
+          "mean": 0.5536171600437204,
+          "std": 0.32258701988213107
+        },
+        {
+          "id": "litigating-and-legislating-for-animal-rights",
+          "mean": 0.22440343576637234,
+          "std": 0.33379195806263795
+        },
+        {
+          "id": "the-verified-loop-a-cyber-physical-protocol-for-deterministic-ai-safety",
+          "mean": 1.1676153591025422,
+          "std": 0.3332572245352538
+        },
+        {
+          "id": "falcon-fund",
+          "mean": 1.6013753050338368,
+          "std": 0.3010751722805931
+        },
+        {
+          "id": "ai-will-change-the-world-but-wont-take-it-over-by-playing-3-dimensional-chess",
+          "mean": 0.3455090722289128,
+          "std": 0.325706357853305
+        }
+      ]
+    },
+    {
+      "answer": "order",
+      "k": 8,
+      "attribute": "theory_of_change",
+      "calls": 9,
+      "calls_ok": 9,
+      "calls_refused": 0,
+      "calls_malformed": 0,
+      "calls_errored": 0,
+      "observations": 252,
+      "usage": {
+        "calls": 9,
+        "prompt_tokens": 28065,
+        "completion_tokens": 81,
+        "cache_read_tokens": 14080,
+        "cache_write_tokens": 0,
+        "nanodollars": 2966180
+      },
+      "cache": {
+        "calls_with_cache_fields_reported": 9,
+        "calls_with_cache_read_gt0": 5,
+        "mean_cached_fraction": 0.5017005577413435
+      },
+      "pivot_rotation": {
+        "pairs_with_both_orientations": 0,
+        "sign_flips": 0,
+        "mean_abs_residual_nats": null
+      },
+      "slot_histogram": {
+        "first_by_slot": [
+          0,
+          0,
+          2,
+          1,
+          3,
+          0,
+          1,
+          2
+        ],
+        "last_by_slot": [
+          0,
+          0,
+          2,
+          1,
+          0,
+          4,
+          2,
+          0
+        ]
+      },
+      "components": 1,
+      "disconnected": false,
+      "latents": [
+        {
+          "id": "dimba-non-autoregressive-diffusion-language-model-with-mamba-2-ssms",
+          "mean": 0.7676355652286949,
+          "std": 0.3380771961423465
+        },
+        {
+          "id": "saferide-open-source-edge-ai-driver-safety-infrastructure",
+          "mean": 1.323005609596097,
+          "std": 0.3207392806758141
+        },
+        {
+          "id": "the-race-to-superintelligence-you-decide",
+          "mean": 0.8864296748197544,
+          "std": 0.31805285554544765
+        },
+        {
+          "id": "hallucination-detector",
+          "mean": 1.9151737279429977,
+          "std": 0.3174944551850055
+        },
+        {
+          "id": "sanctumos-an-e2e-private-agentic-ai",
+          "mean": 1.0326210543615622,
+          "std": 0.30938225030454075
+        },
+        {
+          "id": "research-staff-for-ai-safety-research-projects",
+          "mean": 1.6961301587198312,
+          "std": 0.3342440794318735
+        },
+        {
+          "id": "exploring-feature-interactions-in-transformer-llms-through-sparse-autoencoders",
+          "mean": 1.4470201245609886,
+          "std": 0.31632288528327523
+        },
+        {
+          "id": "cover-apc-for-accepted-peer-reviewed-paper-on-ai-alignment-foundations",
+          "mean": 1.6043979941101032,
+          "std": 0.3380771961423465
+        },
+        {
+          "id": "understanding-sae-features-using-sparse-feature-circuits",
+          "mean": 1.6456412061259007,
+          "std": 0.29247925656978835
+        },
+        {
+          "id": "write-messaging-",
+          "mean": 0.38139995653236114,
+          "std": 0.31937358366828195
+        },
+        {
+          "id": "split-personality-training",
+          "mean": 1.1666487949170063,
+          "std": 0.32059131058819657
+        },
+        {
+          "id": "effective-giving-in-new-zealand",
+          "mean": 0.7591995734967789,
+          "std": 0.3059541154913096
+        },
+        {
+          "id": "fishes-need-protection-too",
+          "mean": 0.6045264930102613,
+          "std": 0.303399613462544
+        },
+        {
+          "id": "concept-anchored-representation-engineering-for-alignment",
+          "mean": 1.7264386182486815,
+          "std": 0.33332237825198535
+        },
+        {
+          "id": "evitable-a-new-public-facing-ai-risk-nonprofit-a1ll15pvkcb",
+          "mean": 0.6571774873615166,
+          "std": 0.32798434354975103
+        },
+        {
+          "id": "stage-2-pre-registered-multi-agent-value-dynamics-test-frontier-agents-15k",
+          "mean": 1.64494959830572,
+          "std": 0.2941529939278903
+        },
+        {
+          "id": "research-and-engineering-multi-agent-alignment",
+          "mean": 1.4605473663352737,
+          "std": 0.3132103860082463
+        },
+        {
+          "id": "agentic-cognitive-architecture-and-autopoietic-ai",
+          "mean": 0.0,
+          "std": 0.3126124700945187
+        },
+        {
+          "id": "universal-bytecode-for-any-ai-models--enabling-inference-on-any-hardware",
+          "mean": 1.2142769627909096,
+          "std": 0.3255268014954415
+        },
+        {
+          "id": "build-anti-mosqu",
+          "mean": 0.3984947626371716,
+          "std": 0.3260277033262381
+        },
+        {
+          "id": "litigating-and-legislating-for-animal-rights",
+          "mean": 0.4017931013278186,
+          "std": 0.3357685828590657
+        },
+        {
+          "id": "the-verified-loop-a-cyber-physical-protocol-for-deterministic-ai-safety",
+          "mean": 1.5299999765052954,
+          "std": 0.3369754014393961
+        },
+        {
+          "id": "falcon-fund",
+          "mean": 0.7113125785405555,
+          "std": 0.3028109040133812
+        },
+        {
+          "id": "ai-will-change-the-world-but-wont-take-it-over-by-playing-3-dimensional-chess",
+          "mean": 0.6094675806327478,
+          "std": 0.3297726612071723
+        }
+      ]
+    },
+    {
+      "answer": "order",
+      "k": 8,
+      "attribute": "fit for a funder who wants cheap high-leverage AI safety field-building",
+      "calls": 9,
+      "calls_ok": 9,
+      "calls_refused": 0,
+      "calls_malformed": 0,
+      "calls_errored": 0,
+      "observations": 252,
+      "usage": {
+        "calls": 9,
+        "prompt_tokens": 27156,
+        "completion_tokens": 81,
+        "cache_read_tokens": 22528,
+        "cache_write_tokens": 0,
+        "nanodollars": 2247560
+      },
+      "cache": {
+        "calls_with_cache_fields_reported": 9,
+        "calls_with_cache_read_gt0": 8,
+        "mean_cached_fraction": 0.8315924429557566
+      },
+      "pivot_rotation": {
+        "pairs_with_both_orientations": 0,
+        "sign_flips": 0,
+        "mean_abs_residual_nats": null
+      },
+      "slot_histogram": {
+        "first_by_slot": [
+          1,
+          4,
+          2,
+          0,
+          2,
+          0,
+          0,
+          0
+        ],
+        "last_by_slot": [
+          0,
+          0,
+          2,
+          0,
+          1,
+          3,
+          2,
+          1
+        ]
+      },
+      "components": 1,
+      "disconnected": false,
+      "latents": [
+        {
+          "id": "dimba-non-autoregressive-diffusion-language-model-with-mamba-2-ssms",
+          "mean": 0.35847961959154717,
+          "std": 0.33530178379763553
+        },
+        {
+          "id": "saferide-open-source-edge-ai-driver-safety-infrastructure",
+          "mean": 0.753841580653595,
+          "std": 0.3179136206149467
+        },
+        {
+          "id": "the-race-to-superintelligence-you-decide",
+          "mean": 1.4161487751792747,
+          "std": 0.3246917397863457
+        },
+        {
+          "id": "hallucination-detector",
+          "mean": 1.0054596515481569,
+          "std": 0.31598017091995195
+        },
+        {
+          "id": "sanctumos-an-e2e-private-agentic-ai",
+          "mean": 0.8740047674620481,
+          "std": 0.3126051373020501
+        },
+        {
+          "id": "research-staff-for-ai-safety-research-projects",
+          "mean": 1.2638067820772787,
+          "std": 0.3315592313391007
+        },
+        {
+          "id": "exploring-feature-interactions-in-transformer-llms-through-sparse-autoencoders",
+          "mean": 1.014033277101559,
+          "std": 0.3151919797226466
+        },
+        {
+          "id": "cover-apc-for-accepted-peer-reviewed-paper-on-ai-alignment-foundations",
+          "mean": 1.6939440443542808,
+          "std": 0.33530178379763553
+        },
+        {
+          "id": "understanding-sae-features-using-sparse-feature-circuits",
+          "mean": 1.2054556675541734,
+          "std": 0.2934217945894518
+        },
+        {
+          "id": "write-messaging-",
+          "mean": 0.0,
+          "std": 0.31490690715611547
+        },
+        {
+          "id": "split-personality-training",
+          "mean": 1.1663998926503232,
+          "std": 0.314334137581124
+        },
+        {
+          "id": "effective-giving-in-new-zealand",
+          "mean": 0.6193804011140934,
+          "std": 0.3107014073430239
+        },
+        {
+          "id": "fishes-need-protection-too",
+          "mean": 0.07572127599974066,
+          "std": 0.30200676459178016
+        },
+        {
+          "id": "concept-anchored-representation-engineering-for-alignment",
+          "mean": 1.2608745249664395,
+          "std": 0.3302697282162107
+        },
+        {
+          "id": "evitable-a-new-public-facing-ai-risk-nonprofit-a1ll15pvkcb",
+          "mean": 1.7267678144529146,
+          "std": 0.3307225096369478
+        },
+        {
+          "id": "stage-2-pre-registered-multi-agent-value-dynamics-test-frontier-agents-15k",
+          "mean": 1.5755505893438386,
+          "std": 0.2936521931097998
+        },
+        {
+          "id": "research-and-engineering-multi-agent-alignment",
+          "mean": 1.2594428576202628,
+          "std": 0.313143353328684
+        },
+        {
+          "id": "agentic-cognitive-architecture-and-autopoietic-ai",
+          "mean": 0.2093178314153927,
+          "std": 0.31185933178214537
+        },
+        {
+          "id": "universal-bytecode-for-any-ai-models--enabling-inference-on-any-hardware",
+          "mean": 0.7024606481718946,
+          "std": 0.32587433901055396
+        },
+        {
+          "id": "build-anti-mosqu",
+          "mean": 0.07892128574042356,
+          "std": 0.3236362741393184
+        },
+        {
+          "id": "litigating-and-legislating-for-animal-rights",
+          "mean": 0.14845239160911608,
+          "std": 0.3344181670870598
+        },
+        {
+          "id": "the-verified-loop-a-cyber-physical-protocol-for-deterministic-ai-safety",
+          "mean": 0.8300863433824119,
+          "std": 0.3344181670870598
+        },
+        {
+          "id": "falcon-fund",
+          "mean": 0.44752161335682267,
+          "std": 0.3020580143952724
+        },
+        {
+          "id": "ai-will-change-the-world-but-wont-take-it-over-by-playing-3-dimensional-chess",
+          "mean": 0.9671965459175053,
+          "std": 0.32773904348153626
+        }
+      ]
+    }
+  ],
+  "pairwise": [
+    {
+      "attribute": "impact_per_dollar",
+      "comparisons_attempted": 96,
+      "comparisons_used": 96,
+      "comparisons_refused": 0,
+      "comparison_budget": 96,
+      "position_flips": 16,
+      "pairs_counterbalanced": 48,
+      "provider_input_tokens": 112438,
+      "provider_output_tokens": 2976,
+      "nanodollars": 13976200,
+      "cache_read_tokens": null,
+      "latents": [
+        {
+          "id": "research-staff-for-ai-safety-research-projects",
+          "mean": 1.6414349550625682,
+          "std": 0.46920530899865465
+        },
+        {
+          "id": "the-verified-loop-a-cyber-physical-protocol-for-deterministic-ai-safety",
+          "mean": 1.5280011211534994,
+          "std": 0.562633788451582
+        },
+        {
+          "id": "hallucination-detector",
+          "mean": 1.498317364312542,
+          "std": 0.5822152046997616
+        },
+        {
+          "id": "stage-2-pre-registered-multi-agent-value-dynamics-test-frontier-agents-15k",
+          "mean": 1.4378932966270104,
+          "std": 0.4370066973026149
+        },
+        {
+          "id": "split-personality-training",
+          "mean": 1.371805706847994,
+          "std": 0.741838397730093
+        },
+        {
+          "id": "concept-anchored-representation-engineering-for-alignment",
+          "mean": 1.3246311372034185,
+          "std": 0.6516847531211104
+        },
+        {
+          "id": "effective-giving-in-new-zealand",
+          "mean": 1.1840494259849188,
+          "std": 0.5862204085577207
+        },
+        {
+          "id": "fishes-need-protection-too",
+          "mean": 1.1165738181306488,
+          "std": 0.5159720147572265
+        },
+        {
+          "id": "falcon-fund",
+          "mean": 1.0581337862150275,
+          "std": 0.48715793314514166
+        },
+        {
+          "id": "the-race-to-superintelligence-you-decide",
+          "mean": 1.0163639218931306,
+          "std": 0.6025617594928229
+        },
+        {
+          "id": "evitable-a-new-public-facing-ai-risk-nonprofit-a1ll15pvkcb",
+          "mean": 1.0079599276196587,
+          "std": 0.5003356141869
+        },
+        {
+          "id": "saferide-open-source-edge-ai-driver-safety-infrastructure",
+          "mean": 0.9951078108114927,
+          "std": 0.5228906966166783
+        },
+        {
+          "id": "sanctumos-an-e2e-private-agentic-ai",
+          "mean": 0.9947450052007625,
+          "std": 0.4920664473859915
+        },
+        {
+          "id": "write-messaging-",
+          "mean": 0.9411806744386466,
+          "std": 0.7128773949116401
+        },
+        {
+          "id": "universal-bytecode-for-any-ai-models--enabling-inference-on-any-hardware",
+          "mean": 0.9153789809086789,
+          "std": 0.5044718350076807
+        },
+        {
+          "id": "understanding-sae-features-using-sparse-feature-circuits",
+          "mean": 0.8375188758193588,
+          "std": 0.4661161687960259
+        },
+        {
+          "id": "dimba-non-autoregressive-diffusion-language-model-with-mamba-2-ssms",
+          "mean": 0.7677248807993379,
+          "std": 0.741838397730093
+        },
+        {
+          "id": "exploring-feature-interactions-in-transformer-llms-through-sparse-autoencoders",
+          "mean": 0.6683755958849893,
+          "std": 0.40394109881674156
+        },
+        {
+          "id": "research-and-engineering-multi-agent-alignment",
+          "mean": 0.43656504093967907,
+          "std": 0.43109508124803975
+        },
+        {
+          "id": "build-anti-mosqu",
+          "mean": 0.3603942267764192,
+          "std": 0.4258987330518367
+        },
+        {
+          "id": "cover-apc-for-accepted-peer-reviewed-paper-on-ai-alignment-foundations",
+          "mean": 0.3360029039894714,
+          "std": 0.403895205761985
+        },
+        {
+          "id": "litigating-and-legislating-for-animal-rights",
+          "mean": 0.333257036530291,
+          "std": 0.4058454113134801
+        },
+        {
+          "id": "ai-will-change-the-world-but-wont-take-it-over-by-playing-3-dimensional-chess",
+          "mean": 0.20355794080289402,
+          "std": 0.5361527919891176
+        },
+        {
+          "id": "agentic-cognitive-architecture-and-autopoietic-ai",
+          "mean": 0.0,
+          "std": 0.44893796672287767
+        }
+      ]
+    },
+    {
+      "attribute": "theory_of_change",
+      "comparisons_attempted": 96,
+      "comparisons_used": 96,
+      "comparisons_refused": 0,
+      "comparison_budget": 96,
+      "position_flips": 12,
+      "pairs_counterbalanced": 47,
+      "provider_input_tokens": 110410,
+      "provider_output_tokens": 2976,
+      "nanodollars": 12151160,
+      "cache_read_tokens": null,
+      "latents": [
+        {
+          "id": "hallucination-detector",
+          "mean": 1.1338747696915634,
+          "std": 0.4581653213175385
+        },
+        {
+          "id": "stage-2-pre-registered-multi-agent-value-dynamics-test-frontier-agents-15k",
+          "mean": 1.0727610293473275,
+          "std": 0.5427851441010045
+        },
+        {
+          "id": "concept-anchored-representation-engineering-for-alignment",
+          "mean": 1.017131737476268,
+          "std": 0.4459958017838122
+        },
+        {
+          "id": "research-staff-for-ai-safety-research-projects",
+          "mean": 1.00004064687167,
+          "std": 0.6334752828029145
+        },
+        {
+          "id": "saferide-open-source-edge-ai-driver-safety-infrastructure",
+          "mean": 0.9764336565144873,
+          "std": 0.5063980661857173
+        },
+        {
+          "id": "understanding-sae-features-using-sparse-feature-circuits",
+          "mean": 0.9640733445284626,
+          "std": 0.39414894143545515
+        },
+        {
+          "id": "cover-apc-for-accepted-peer-reviewed-paper-on-ai-alignment-foundations",
+          "mean": 0.8014658033933184,
+          "std": 0.3591519209301509
+        },
+        {
+          "id": "the-verified-loop-a-cyber-physical-protocol-for-deterministic-ai-safety",
+          "mean": 0.7964770576900997,
+          "std": 0.44273176392815844
+        },
+        {
+          "id": "the-race-to-superintelligence-you-decide",
+          "mean": 0.7781087781032918,
+          "std": 0.633757101462455
+        },
+        {
+          "id": "effective-giving-in-new-zealand",
+          "mean": 0.7527314415515249,
+          "std": 0.7183309421516151
+        },
+        {
+          "id": "split-personality-training",
+          "mean": 0.72918005086948,
+          "std": 0.7115182326790176
+        },
+        {
+          "id": "write-messaging-",
+          "mean": 0.7056286603203075,
+          "std": 0.5014898847236854
+        },
+        {
+          "id": "fishes-need-protection-too",
+          "mean": 0.7047324105578815,
+          "std": 0.5298259577945578
+        },
+        {
+          "id": "evitable-a-new-public-facing-ai-risk-nonprofit-a1ll15pvkcb",
+          "mean": 0.6752564861608464,
+          "std": 0.6387826319968429
+        },
+        {
+          "id": "sanctumos-an-e2e-private-agentic-ai",
+          "mean": 0.6707648100142141,
+          "std": 0.48927480125360595
+        },
+        {
+          "id": "universal-bytecode-for-any-ai-models--enabling-inference-on-any-hardware",
+          "mean": 0.65655413292107,
+          "std": 0.46628510288743386
+        },
+        {
+          "id": "falcon-fund",
+          "mean": 0.6357297326702668,
+          "std": 0.5283968692297928
+        },
+        {
+          "id": "exploring-feature-interactions-in-transformer-llms-through-sparse-autoencoders",
+          "mean": 0.5183862677811001,
+          "std": 0.4266498651216221
+        },
+        {
+          "id": "dimba-non-autoregressive-diffusion-language-model-with-mamba-2-ssms",
+          "mean": 0.46343497738417777,
+          "std": 0.7183309421516151
+        },
+        {
+          "id": "litigating-and-legislating-for-animal-rights",
+          "mean": 0.4193802535836984,
+          "std": 0.38749271352620474
+        },
+        {
+          "id": "build-anti-mosqu",
+          "mean": 0.3455759290362439,
+          "std": 0.5658435174945814
+        },
+        {
+          "id": "research-and-engineering-multi-agent-alignment",
+          "mean": 0.17306696609472244,
+          "std": 0.48874219790543755
+        },
+        {
+          "id": "ai-will-change-the-world-but-wont-take-it-over-by-playing-3-dimensional-chess",
+          "mean": 0.11416303611731476,
+          "std": 0.6313064162635582
+        },
+        {
+          "id": "agentic-cognitive-architecture-and-autopoietic-ai",
+          "mean": 0.0,
+          "std": 0.4250445884933611
+        }
+      ]
+    },
+    {
+      "attribute": "fit for a funder who wants cheap high-leverage AI safety field-building",
+      "comparisons_attempted": 96,
+      "comparisons_used": 96,
+      "comparisons_refused": 0,
+      "comparison_budget": 96,
+      "position_flips": 9,
+      "pairs_counterbalanced": 47,
+      "provider_input_tokens": 100332,
+      "provider_output_tokens": 2976,
+      "nanodollars": 10561040,
+      "cache_read_tokens": null,
+      "latents": [
+        {
+          "id": "the-race-to-superintelligence-you-decide",
+          "mean": 3.303625231235438,
+          "std": 0.6698527879452545
+        },
+        {
+          "id": "ai-will-change-the-world-but-wont-take-it-over-by-playing-3-dimensional-chess",
+          "mean": 3.186421951701549,
+          "std": 0.70603758130315
+        },
+        {
+          "id": "split-personality-training",
+          "mean": 3.120222545952732,
+          "std": 0.6504825447939787
+        },
+        {
+          "id": "stage-2-pre-registered-multi-agent-value-dynamics-test-frontier-agents-15k",
+          "mean": 2.8406882304313896,
+          "std": 0.4575736580572878
+        },
+        {
+          "id": "cover-apc-for-accepted-peer-reviewed-paper-on-ai-alignment-foundations",
+          "mean": 2.572461352437693,
+          "std": 0.5329517116552668
+        },
+        {
+          "id": "evitable-a-new-public-facing-ai-risk-nonprofit-a1ll15pvkcb",
+          "mean": 2.5162993035766283,
+          "std": 0.5361215600451845
+        },
+        {
+          "id": "saferide-open-source-edge-ai-driver-safety-infrastructure",
+          "mean": 2.514668098388205,
+          "std": 0.5203518310438845
+        },
+        {
+          "id": "hallucination-detector",
+          "mean": 2.26000090123559,
+          "std": 0.5387703199394309
+        },
+        {
+          "id": "research-staff-for-ai-safety-research-projects",
+          "mean": 2.2551167470212814,
+          "std": 0.6162001570572899
+        },
+        {
+          "id": "understanding-sae-features-using-sparse-feature-circuits",
+          "mean": 2.2202625547166823,
+          "std": 0.7159564056402781
+        },
+        {
+          "id": "research-and-engineering-multi-agent-alignment",
+          "mean": 2.203675951230135,
+          "std": 0.4755669285622513
+        },
+        {
+          "id": "exploring-feature-interactions-in-transformer-llms-through-sparse-autoencoders",
+          "mean": 1.95564368367879,
+          "std": 0.703557421748206
+        },
+        {
+          "id": "sanctumos-an-e2e-private-agentic-ai",
+          "mean": 1.9411822986874459,
+          "std": 0.5632126371411669
+        },
+        {
+          "id": "universal-bytecode-for-any-ai-models--enabling-inference-on-any-hardware",
+          "mean": 1.889122069246938,
+          "std": 0.6187986613571793
+        },
+        {
+          "id": "the-verified-loop-a-cyber-physical-protocol-for-deterministic-ai-safety",
+          "mean": 1.8277550379441925,
+          "std": 0.6927835374118553
+        },
+        {
+          "id": "concept-anchored-representation-engineering-for-alignment",
+          "mean": 1.638269387215696,
+          "std": 0.5953442440644379
+        },
+        {
+          "id": "dimba-non-autoregressive-diffusion-language-model-with-mamba-2-ssms",
+          "mean": 1.5011656699062808,
+          "std": 0.7159564056402781
+        },
+        {
+          "id": "write-messaging-",
+          "mean": 1.3903080348415018,
+          "std": 0.664897112078037
+        },
+        {
+          "id": "falcon-fund",
+          "mean": 1.277260603285318,
+          "std": 0.6518164905207694
+        },
+        {
+          "id": "effective-giving-in-new-zealand",
+          "mean": 1.2034078390943208,
+          "std": 0.549995724828923
+        },
+        {
+          "id": "agentic-cognitive-architecture-and-autopoietic-ai",
+          "mean": 1.1392107724750515,
+          "std": 0.5526431081077595
+        },
+        {
+          "id": "litigating-and-legislating-for-animal-rights",
+          "mean": 1.077554600780655,
+          "std": 0.6182830880560469
+        },
+        {
+          "id": "build-anti-mosqu",
+          "mean": 0.8748536945666574,
+          "std": 0.6047968343163216
+        },
+        {
+          "id": "fishes-need-protection-too",
+          "mean": 0.0,
+          "std": 0.5496138456994402
+        }
+      ]
+    }
+  ],
+  "comparisons": [
+    {
+      "k": 8,
+      "attribute": "impact_per_dollar",
+      "spearman_rho": 0.6356521739130435,
+      "kendall_tau": 0.4782608695652174,
+      "top1_agree": true,
+      "top3_overlap": 0.3333333333333333,
+      "setwise_pairwise_equiv_obs_per_dollar": 63465.19991537974,
+      "pairwise_obs_per_dollar": 6868.819850889369,
+      "setwise_dollars_per_item": 0.00016544499999999999,
+      "pairwise_dollars_per_item": 0.0005823416666666666
+    },
+    {
+      "k": 8,
+      "attribute": "theory_of_change",
+      "spearman_rho": 0.7260869565217392,
+      "kendall_tau": 0.5579710144927537,
+      "top1_agree": true,
+      "top3_overlap": 0.6666666666666666,
+      "setwise_pairwise_equiv_obs_per_dollar": 84957.75711521215,
+      "pairwise_obs_per_dollar": 7900.480283363893,
+      "setwise_dollars_per_item": 0.00012359083333333333,
+      "pairwise_dollars_per_item": 0.0005062983333333333
+    },
+    {
+      "k": 8,
+      "attribute": "fit for a funder who wants cheap high-leverage AI safety field-building",
+      "spearman_rho": 0.8034782608695652,
+      "kendall_tau": 0.6159420289855072,
+      "top1_agree": false,
+      "top3_overlap": 0.0,
+      "setwise_pairwise_equiv_obs_per_dollar": 112121.58963498194,
+      "pairwise_obs_per_dollar": 9090.01386227114,
+      "setwise_dollars_per_item": 0.00009364833333333333,
+      "pairwise_dollars_per_item": 0.00044004333333333336
+    }
+  ],
+  "offline_ground_truth": [],
+  "total_cost_nanodollars": 45872820,
+  "caveats": [
+    "The k-1 observations of one setwise call share that call's context: they are correlated through the pivot and the call's overall framing, but enter the solver as independent unit-precision observations (mirroring canonical_v2 point weights). Non-pivot implied pairs are deliberately NOT added.",
+    "Pairwise cache token counts are not surfaced by the sort path's RerankMeta; the pairwise cache column is null, not zero."
+  ]
+}

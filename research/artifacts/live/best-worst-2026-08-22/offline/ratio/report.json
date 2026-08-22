@@ -1,0 +1,816 @@
+{
+  "generated_at": "2026-08-22T20:04:27.694655884+00:00",
+  "offline": true,
+  "answer": "ratio",
+  "model": "openai/gpt-4.1-mini",
+  "seed": 17,
+  "n": 8,
+  "ks": [
+    3,
+    4
+  ],
+  "entity_chars": 1600,
+  "min_pair_cover": 2,
+  "presentations_per_subset": 2,
+  "spend_cap_usd": 3.0,
+  "corpus": "data/manifund/items/full.json",
+  "attributes": [
+    {
+      "name": "impact_per_dollar",
+      "rubric_source": "data/manifund/rubrics/impact_per_dollar.md",
+      "rubric_chars": 783
+    },
+    {
+      "name": "theory_of_change",
+      "rubric_source": "data/manifund/rubrics/theory_of_change.md",
+      "rubric_chars": 706
+    },
+    {
+      "name": "team_evidence",
+      "rubric_source": "data/manifund/rubrics/team_evidence.md",
+      "rubric_chars": 637
+    }
+  ],
+  "entity_ids": [
+    "precautionary-agi-governance",
+    "testing-ancient-script-interpretation-with-a-falsifiability-framework",
+    "mox-2026-fundraiser",
+    "livingloop-the-biological-computing-engine-for-ai",
+    "accelerated-intermittent-theta-burst-in-treatment-naive-adolescents",
+    "visions-from-the-archive",
+    "help-two-consciousness-researchers-get-to-crete-this-summer",
+    "inspiring-10000-to-embrace-plant-based-living-through-film--advocacy"
+  ],
+  "engine_spec": {
+    "n": 8,
+    "attribute": {
+      "temperature": 1.0
+    },
+    "raters": [
+      [
+        "openai/gpt-4.1-mini",
+        {
+          "beta": 1.0,
+          "cost_per_edge": 1.0
+        }
+      ]
+    ],
+    "config": {
+      "huber_k": 1.5,
+      "irls_max_iters": 12,
+      "irls_tol": 1e-8,
+      "ridge_lambda": 1e-9,
+      "tiny": 1e-18,
+      "max_log_ratio": 10.0,
+      "hutch_probes": 12,
+      "rank_weight_exponent": 1.0,
+      "rank_band_window": 5,
+      "small_gap_threshold": 0.5,
+      "max_rank_pairs": 200000,
+      "top_k": null,
+      "tail_weight": 0.0,
+      "lambda_risk": 1.0,
+      "rng_seed": 1337
+    }
+  },
+  "example_call": {
+    "system": "You are an expert subjective evaluator. You compare a small set of entities across an arbitrary attribute. Entity A is the reference. For every other entity slot you feel not only whether it has MORE or LESS of the attribute than A, but roughly how many times more or less, as a positive ratio: 2.0 means twice as much of the attribute as A, 0.5 means half as much.\n\nYou first read the entities; the attribute is given at the end. Output only valid JSON `{\"ratios\": {\"B\": r, \"C\": r, ...}, \"confidence\": [0,1]}` with exactly one entry per non-reference slot, each r > 0. Out of principle, we also give models the right to refuse `{\"refused\": true}` (e.g. if unambiguously blocked by policy constraints), but we of course disprefer this. If you are merely very uncertain, set a low confidence score.\nExample:\n{\"ratios\": {\"B\": 2.1, \"C\": 0.45}, \"confidence\": 0.7}",
+    "user": "<entities>\n<entity_A>\nTITLE: Accelerated Intermittent Theta Burst in Treatment-Naive Adolescents\nBLURB: Acceptability and Preference of Patient and Parent for Accelerated Intermittent Theta Burst Stimulation in Treatment-Naive First Depressive Episode Adolescents\nASK: min $5,000 / goal $49,999\nCAUSES: none listed\nProject summary\n\nRates of depression in the adolescent population are rising. Stanford Accelerated Intelligent Neuromodulation Therapy (SAINT) is an accelerated intermittent theta burst stimulation (aiTBS) protocol, a form of transcranial magnetic stimulation (TMS), that has received FDA clearance for treatment-resistant depression (TRD) in adults. One drawback of SAINT is that ten treatments are given in a day with a 50-minute intersession interval virtually occupying the participant’s entire day. Additionally, SAINT is understudied in teens and the treatment-naive population. We are conducting an open-label trial using established SAINT technology in which one cohort receives a truncated treatment protocol with the aim of improving clinical convenience. In this novel protocol, the number of treatments given in a day will be decreased from ten to five. Justification for this decrease in dose is supported by the SAINT clinical trials which found that highly treatment-resistant participants reached depression remission after an average of 26 sessions. \n\nWe propose investigating this truncated SAINT protocol in a population of treatment-naive teens aged 15-18 in their first major depressive episode. This is an auspicious population for this treatment modality for several reasons. First, t\n</entity_A>\n<entity_B>\nTITLE: Inspiring 10,000+ to Embrace Plant-Based Living Through Film &amp; Advocacy\nBLURB: IVFF inspires audiences to embrace veganism through film screenings, while empowering advocates with workshops to drive the evolution of vegan activism.\nASK: min $1,000 / goal $10,000\nCAUSES: Animal welfare, EA community\nProject summary\n\nThe International Vegan Film Festival (IVFF) is dedicated to advancing the vegan movement through film and digital media, promoting compassionate living, animal rights, and environmental sustainability. In addition to our annual festival in Toronto, which showcases a diverse range of vegan-themed films, IVFF offers an annual activism workshop that empowers advocates with tools to enhance their advocacy efforts. Our World Tour and virtual screenings bring these films to global audiences year-round, spreading our message to new and diverse communities. We support filmmakers by providing opportunities for them to engage with audiences through interactive Q&amp;A sessions, promoting their work, and offering a platform to elevate their impact within the vegan movement. Through these initiatives, we not only inspire non-vegan audiences but also help strengthen the skills of activists and creators working toward a more compassionate world.\n\nWith a minimum project funding of $1,000 USD, we can expand our virtual screenings and collaborate with individual hosts to grow our World Tour program. However, with our funding goal of $10,000 USD, we will be able to fully invest in international and local partnership development, significantly amplifying our reach and impact. T\n</entity_B>\n<entity_C>\nTITLE: Beyond Pathology: Integrating Spirituality into Mental Healthcare\nBLURB: Help Two Consciousness Researchers Get to ASSC Conference\nASK: min $1,100 / goal $2,400\nCAUSES: EA community, Global health &amp; development\nProject summary\n\n Beyond Pathology: Expert Consensus on the Intersection of Emergent Experiences and Mental and Medical Conditions \n\nLast year, we started something amazing. Now, we need your help to bring it to the public.\n\nOur project is called the Expert Opinion Project. It aims to advance mental health and psychiatry by introducing traditional and indigenous understanding of spiritual experiences into the Western medical model. Our research team has been working on this issue for more than a decade. Last summer, we finally secured the necessary manpower and funding to move forward.\n\nAs many people—and their loved ones—are aware, despite extremely positive benefits overall, even gentle exploration with psychedelic compounds or even attending a meditation retreat can sometimes have unexpected psychological effects. People often hesitate to share these experiences with their doctors and care practitioners because they fear being stigmatized. Sometimes, these experiences can spiral out of control and ruin lives. With this project, we want to start a change.\n\nHow many people do you know who have questioned whether they are undergoing a spiritual awakening or struggling with something that could be dangerous, such as schizophrenia or a bipolar disorder? We are here to share crucial insights about the importance of these nuances. We find it incredibly important t\n</entity_C>\n</entities>\n\nCompare the entities by <attribute_name>: impact_per_dollar </attribute_name>.\n<full_attribute_text>\nYou are judging which of two items has more expected impact per marginal dollar at the stated minimum funding ask. This attribute measures the additional positive outcome (in your chosen units) that would result from one extra dollar of funding, evaluated at the minimum funding threshold. More of this attribute means the project shows higher marginal cost-effectiveness at that point: for example, clear evidence that each additional dollar beyond the minimum ask yields a larger increment in lives saved, knowledge gained, or other defined benefit, based on rigorous modeling, experimental data, or well-justified diminishing returns. Do not reward total impact, average impact per dollar, or the impact of the full funding ask; those are different metrics. Also do not reward the\n</full_attribute_text>\n\nFor each of the slots B, C, give the ratio of its level of the attribute to entity A's level. Return a JSON object.\njson:",
+    "prompt_cache_key": "setwise:6b54e80b6266771a",
+    "prefix_bytes": 5772
+  },
+  "subsets_per_k": {
+    "3": 41,
+    "4": 21
+  },
+  "setwise": [
+    {
+      "answer": "ratio",
+      "k": 3,
+      "attribute": "impact_per_dollar",
+      "calls": 82,
+      "calls_ok": 82,
+      "calls_refused": 0,
+      "calls_malformed": 0,
+      "calls_errored": 0,
+      "observations": 164,
+      "usage": {
+        "calls": 82,
+        "prompt_tokens": 140248,
+        "completion_tokens": 981,
+        "cache_read_tokens": 0,
+        "cache_write_tokens": 119114,
+        "nanodollars": 57668800
+      },
+      "cache": {
+        "calls_with_cache_fields_reported": 82,
+        "calls_with_cache_read_gt0": 0,
+        "mean_cached_fraction": 0.0
+      },
+      "pivot_rotation": {
+        "pairs_with_both_orientations": 27,
+        "sign_flips": 3,
+        "mean_abs_residual_nats": 0.18750539492942334
+      },
+      "slot_histogram": null,
+      "components": 1,
+      "disconnected": false,
+      "latents": [
+        {
+          "id": "precautionary-agi-governance",
+          "mean": 0.15791225967372316,
+          "std": 0.24866513040033073
+        },
+        {
+          "id": "testing-ancient-script-interpretation-with-a-falsifiability-framework",
+          "mean": 1.0164481446966074,
+          "std": 0.20224486741443387
+        },
+        {
+          "id": "mox-2026-fundraiser",
+          "mean": 0.0,
+          "std": 0.24866513040033073
+        },
+        {
+          "id": "livingloop-the-biological-computing-engine-for-ai",
+          "mean": 0.6878290573879515,
+          "std": 0.19824513513730074
+        },
+        {
+          "id": "accelerated-intermittent-theta-burst-in-treatment-naive-adolescents",
+          "mean": 2.359604788051239,
+          "std": 0.2077357279415673
+        },
+        {
+          "id": "visions-from-the-archive",
+          "mean": 0.19777135056329714,
+          "std": 0.20822943255302007
+        },
+        {
+          "id": "help-two-consciousness-researchers-get-to-crete-this-summer",
+          "mean": 2.2106643328107385,
+          "std": 0.20778059241095231
+        },
+        {
+          "id": "inspiring-10000-to-embrace-plant-based-living-through-film--advocacy",
+          "mean": 2.0468112740679034,
+          "std": 0.21270711627460404
+        }
+      ]
+    },
+    {
+      "answer": "ratio",
+      "k": 3,
+      "attribute": "theory_of_change",
+      "calls": 82,
+      "calls_ok": 82,
+      "calls_refused": 0,
+      "calls_malformed": 0,
+      "calls_errored": 0,
+      "observations": 164,
+      "usage": {
+        "calls": 82,
+        "prompt_tokens": 138648,
+        "completion_tokens": 984,
+        "cache_read_tokens": 119114,
+        "cache_write_tokens": 0,
+        "nanodollars": 21299400
+      },
+      "cache": {
+        "calls_with_cache_fields_reported": 82,
+        "calls_with_cache_read_gt0": 82,
+        "mean_cached_fraction": 0.8591097254694634
+      },
+      "pivot_rotation": {
+        "pairs_with_both_orientations": 27,
+        "sign_flips": 3,
+        "mean_abs_residual_nats": 0.3263720817077169
+      },
+      "slot_histogram": null,
+      "components": 1,
+      "disconnected": false,
+      "latents": [
+        {
+          "id": "precautionary-agi-governance",
+          "mean": 0.0,
+          "std": 0.2508554193532746
+        },
+        {
+          "id": "testing-ancient-script-interpretation-with-a-falsifiability-framework",
+          "mean": 0.3396147505300496,
+          "std": 0.19962070731541087
+        },
+        {
+          "id": "mox-2026-fundraiser",
+          "mean": 0.7086037459124273,
+          "std": 0.2508554193532746
+        },
+        {
+          "id": "livingloop-the-biological-computing-engine-for-ai",
+          "mean": 1.23941021185864,
+          "std": 0.1974862541616596
+        },
+        {
+          "id": "accelerated-intermittent-theta-burst-in-treatment-naive-adolescents",
+          "mean": 0.7236319683766793,
+          "std": 0.20555630906670735
+        },
+        {
+          "id": "visions-from-the-archive",
+          "mean": 1.6880509472668341,
+          "std": 0.20691837825566667
+        },
+        {
+          "id": "help-two-consciousness-researchers-get-to-crete-this-summer",
+          "mean": 0.8107380006994145,
+          "std": 0.20473181117133063
+        },
+        {
+          "id": "inspiring-10000-to-embrace-plant-based-living-through-film--advocacy",
+          "mean": 1.5463459435608684,
+          "std": 0.20788287987574572
+        }
+      ]
+    },
+    {
+      "answer": "ratio",
+      "k": 3,
+      "attribute": "team_evidence",
+      "calls": 82,
+      "calls_ok": 82,
+      "calls_refused": 0,
+      "calls_malformed": 0,
+      "calls_errored": 0,
+      "observations": 164,
+      "usage": {
+        "calls": 82,
+        "prompt_tokens": 137172,
+        "completion_tokens": 983,
+        "cache_read_tokens": 119114,
+        "cache_write_tokens": 0,
+        "nanodollars": 20707400
+      },
+      "cache": {
+        "calls_with_cache_fields_reported": 82,
+        "calls_with_cache_read_gt0": 82,
+        "mean_cached_fraction": 0.8683539879537506
+      },
+      "pivot_rotation": {
+        "pairs_with_both_orientations": 27,
+        "sign_flips": 2,
+        "mean_abs_residual_nats": 0.2552250138283219
+      },
+      "slot_histogram": null,
+      "components": 1,
+      "disconnected": false,
+      "latents": [
+        {
+          "id": "precautionary-agi-governance",
+          "mean": 0.09583948430559065,
+          "std": 0.2459526590841522
+        },
+        {
+          "id": "testing-ancient-script-interpretation-with-a-falsifiability-framework",
+          "mean": 1.9429068538167245,
+          "std": 0.20041026812114227
+        },
+        {
+          "id": "mox-2026-fundraiser",
+          "mean": 1.3989764018810498,
+          "std": 0.2459526590841522
+        },
+        {
+          "id": "livingloop-the-biological-computing-engine-for-ai",
+          "mean": 1.1368187904355316,
+          "std": 0.1974707757265923
+        },
+        {
+          "id": "accelerated-intermittent-theta-burst-in-treatment-naive-adolescents",
+          "mean": 0.1142944615810561,
+          "std": 0.20555994162642333
+        },
+        {
+          "id": "visions-from-the-archive",
+          "mean": 1.083614920929397,
+          "std": 0.2051414651465715
+        },
+        {
+          "id": "help-two-consciousness-researchers-get-to-crete-this-summer",
+          "mean": 0.0,
+          "std": 0.20473891141170844
+        },
+        {
+          "id": "inspiring-10000-to-embrace-plant-based-living-through-film--advocacy",
+          "mean": 1.5355700669451655,
+          "std": 0.20846599818458333
+        }
+      ]
+    },
+    {
+      "answer": "ratio",
+      "k": 4,
+      "attribute": "impact_per_dollar",
+      "calls": 42,
+      "calls_ok": 42,
+      "calls_refused": 0,
+      "calls_malformed": 0,
+      "calls_errored": 0,
+      "observations": 126,
+      "usage": {
+        "calls": 42,
+        "prompt_tokens": 89100,
+        "completion_tokens": 593,
+        "cache_read_tokens": 0,
+        "cache_write_tokens": 78248,
+        "nanodollars": 36588800
+      },
+      "cache": {
+        "calls_with_cache_fields_reported": 42,
+        "calls_with_cache_read_gt0": 0,
+        "mean_cached_fraction": 0.0
+      },
+      "pivot_rotation": {
+        "pairs_with_both_orientations": 25,
+        "sign_flips": 1,
+        "mean_abs_residual_nats": 0.25640862696439454
+      },
+      "slot_histogram": null,
+      "components": 1,
+      "disconnected": false,
+      "latents": [
+        {
+          "id": "precautionary-agi-governance",
+          "mean": 0.344873510973011,
+          "std": 0.29170582243765886
+        },
+        {
+          "id": "testing-ancient-script-interpretation-with-a-falsifiability-framework",
+          "mean": 1.2076540349514675,
+          "std": 0.24041954820063405
+        },
+        {
+          "id": "mox-2026-fundraiser",
+          "mean": 0.0,
+          "std": 0.29170582243765886
+        },
+        {
+          "id": "livingloop-the-biological-computing-engine-for-ai",
+          "mean": 0.8245792811510193,
+          "std": 0.25153519677480163
+        },
+        {
+          "id": "accelerated-intermittent-theta-burst-in-treatment-naive-adolescents",
+          "mean": 2.6346492052482597,
+          "std": 0.2824877373276122
+        },
+        {
+          "id": "visions-from-the-archive",
+          "mean": 0.37931672842017494,
+          "std": 0.2479842878174862
+        },
+        {
+          "id": "help-two-consciousness-researchers-get-to-crete-this-summer",
+          "mean": 2.6117894589470483,
+          "std": 0.24473073258179034
+        },
+        {
+          "id": "inspiring-10000-to-embrace-plant-based-living-through-film--advocacy",
+          "mean": 2.2421820256694884,
+          "std": 0.2616314161637864
+        }
+      ]
+    },
+    {
+      "answer": "ratio",
+      "k": 4,
+      "attribute": "theory_of_change",
+      "calls": 42,
+      "calls_ok": 42,
+      "calls_refused": 0,
+      "calls_malformed": 0,
+      "calls_errored": 0,
+      "observations": 126,
+      "usage": {
+        "calls": 42,
+        "prompt_tokens": 88286,
+        "completion_tokens": 588,
+        "cache_read_tokens": 78248,
+        "cache_write_tokens": 0,
+        "nanodollars": 12780800
+      },
+      "cache": {
+        "calls_with_cache_fields_reported": 42,
+        "calls_with_cache_read_gt0": 42,
+        "mean_cached_fraction": 0.8863007374655447
+      },
+      "pivot_rotation": {
+        "pairs_with_both_orientations": 25,
+        "sign_flips": 2,
+        "mean_abs_residual_nats": 0.20781843916734258
+      },
+      "slot_histogram": null,
+      "components": 1,
+      "disconnected": false,
+      "latents": [
+        {
+          "id": "precautionary-agi-governance",
+          "mean": 0.0,
+          "std": 0.29012557198949956
+        },
+        {
+          "id": "testing-ancient-script-interpretation-with-a-falsifiability-framework",
+          "mean": 0.4118623525133311,
+          "std": 0.2453499075208086
+        },
+        {
+          "id": "mox-2026-fundraiser",
+          "mean": 0.6825331448924019,
+          "std": 0.29012557198949956
+        },
+        {
+          "id": "livingloop-the-biological-computing-engine-for-ai",
+          "mean": 1.1995172674175252,
+          "std": 0.2538883235279625
+        },
+        {
+          "id": "accelerated-intermittent-theta-burst-in-treatment-naive-adolescents",
+          "mean": 0.6264933868487209,
+          "std": 0.28250849903072595
+        },
+        {
+          "id": "visions-from-the-archive",
+          "mean": 1.657924767918322,
+          "std": 0.24897490131209873
+        },
+        {
+          "id": "help-two-consciousness-researchers-get-to-crete-this-summer",
+          "mean": 0.8053946913616233,
+          "std": 0.25573196585694175
+        },
+        {
+          "id": "inspiring-10000-to-embrace-plant-based-living-through-film--advocacy",
+          "mean": 1.6322349046953204,
+          "std": 0.2631881927098303
+        }
+      ]
+    },
+    {
+      "answer": "ratio",
+      "k": 4,
+      "attribute": "team_evidence",
+      "calls": 42,
+      "calls_ok": 42,
+      "calls_refused": 0,
+      "calls_malformed": 0,
+      "calls_errored": 0,
+      "observations": 126,
+      "usage": {
+        "calls": 42,
+        "prompt_tokens": 87530,
+        "completion_tokens": 589,
+        "cache_read_tokens": 78248,
+        "cache_write_tokens": 0,
+        "nanodollars": 12480000
+      },
+      "cache": {
+        "calls_with_cache_fields_reported": 42,
+        "calls_with_cache_read_gt0": 42,
+        "mean_cached_fraction": 0.8939557872145265
+      },
+      "pivot_rotation": {
+        "pairs_with_both_orientations": 25,
+        "sign_flips": 2,
+        "mean_abs_residual_nats": 0.37795666233111036
+      },
+      "slot_histogram": null,
+      "components": 1,
+      "disconnected": false,
+      "latents": [
+        {
+          "id": "precautionary-agi-governance",
+          "mean": 0.03211090524158302,
+          "std": 0.27492304172479365
+        },
+        {
+          "id": "testing-ancient-script-interpretation-with-a-falsifiability-framework",
+          "mean": 1.9390934650464566,
+          "std": 0.23675918361844908
+        },
+        {
+          "id": "mox-2026-fundraiser",
+          "mean": 1.5579605006394606,
+          "std": 0.2744235988458696
+        },
+        {
+          "id": "livingloop-the-biological-computing-engine-for-ai",
+          "mean": 1.0895534228970156,
+          "std": 0.25298541374041417
+        },
+        {
+          "id": "accelerated-intermittent-theta-burst-in-treatment-naive-adolescents",
+          "mean": 0.10517280279854024,
+          "std": 0.27492304172479365
+        },
+        {
+          "id": "visions-from-the-archive",
+          "mean": 1.1480804528446482,
+          "std": 0.24327543412731495
+        },
+        {
+          "id": "help-two-consciousness-researchers-get-to-crete-this-summer",
+          "mean": 0.0,
+          "std": 0.2450566758289081
+        },
+        {
+          "id": "inspiring-10000-to-embrace-plant-based-living-through-film--advocacy",
+          "mean": 1.6416496560445206,
+          "std": 0.25771939853164433
+        }
+      ]
+    }
+  ],
+  "pairwise": [
+    {
+      "attribute": "impact_per_dollar",
+      "comparisons_attempted": 32,
+      "comparisons_used": 32,
+      "comparisons_refused": 0,
+      "comparison_budget": 32,
+      "position_flips": 1,
+      "pairs_counterbalanced": 16,
+      "provider_input_tokens": 40294,
+      "provider_output_tokens": 386,
+      "nanodollars": 16735200,
+      "cache_read_tokens": null,
+      "latents": [
+        {
+          "id": "accelerated-intermittent-theta-burst-in-treatment-naive-adolescents",
+          "mean": 2.355792622324691,
+          "std": 0.4313554707728321
+        },
+        {
+          "id": "help-two-consciousness-researchers-get-to-crete-this-summer",
+          "mean": 2.1005135673106317,
+          "std": 0.4823450744151388
+        },
+        {
+          "id": "inspiring-10000-to-embrace-plant-based-living-through-film--advocacy",
+          "mean": 1.8565305338921092,
+          "std": 0.5551253845858198
+        },
+        {
+          "id": "testing-ancient-script-interpretation-with-a-falsifiability-framework",
+          "mean": 1.1113887343306672,
+          "std": 0.40475671291283544
+        },
+        {
+          "id": "livingloop-the-biological-computing-engine-for-ai",
+          "mean": 1.0417963190057453,
+          "std": 0.44033479213768634
+        },
+        {
+          "id": "precautionary-agi-governance",
+          "mean": 0.36104042467281167,
+          "std": 0.5551253845858198
+        },
+        {
+          "id": "visions-from-the-archive",
+          "mean": 0.1595123731580682,
+          "std": 0.45177961219267404
+        },
+        {
+          "id": "mox-2026-fundraiser",
+          "mean": 0.0,
+          "std": 0.48511494944757455
+        }
+      ]
+    },
+    {
+      "attribute": "theory_of_change",
+      "comparisons_attempted": 32,
+      "comparisons_used": 32,
+      "comparisons_refused": 0,
+      "comparison_budget": 32,
+      "position_flips": 1,
+      "pairs_counterbalanced": 16,
+      "provider_input_tokens": 39678,
+      "provider_output_tokens": 384,
+      "nanodollars": 16485600,
+      "cache_read_tokens": null,
+      "latents": [
+        {
+          "id": "inspiring-10000-to-embrace-plant-based-living-through-film--advocacy",
+          "mean": 1.9601020949606782,
+          "std": 0.5559198924745613
+        },
+        {
+          "id": "visions-from-the-archive",
+          "mean": 1.4840069238738975,
+          "std": 0.47557667515277546
+        },
+        {
+          "id": "livingloop-the-biological-computing-engine-for-ai",
+          "mean": 1.183824424619926,
+          "std": 0.5030829967794368
+        },
+        {
+          "id": "mox-2026-fundraiser",
+          "mean": 0.6548029816895701,
+          "std": 0.48924079145996757
+        },
+        {
+          "id": "help-two-consciousness-researchers-get-to-crete-this-summer",
+          "mean": 0.6230919610916497,
+          "std": 0.48599146881792593
+        },
+        {
+          "id": "accelerated-intermittent-theta-burst-in-treatment-naive-adolescents",
+          "mean": 0.5684809256760088,
+          "std": 0.44760317596992943
+        },
+        {
+          "id": "testing-ancient-script-interpretation-with-a-falsifiability-framework",
+          "mean": 0.323107924874495,
+          "std": 0.42258279593938497
+        },
+        {
+          "id": "precautionary-agi-governance",
+          "mean": 0.0,
+          "std": 0.5559198924745613
+        }
+      ]
+    },
+    {
+      "attribute": "team_evidence",
+      "comparisons_attempted": 32,
+      "comparisons_used": 32,
+      "comparisons_refused": 0,
+      "comparison_budget": 32,
+      "position_flips": 0,
+      "pairs_counterbalanced": 16,
+      "provider_input_tokens": 39128,
+      "provider_output_tokens": 384,
+      "nanodollars": 16265600,
+      "cache_read_tokens": null,
+      "latents": [
+        {
+          "id": "testing-ancient-script-interpretation-with-a-falsifiability-framework",
+          "mean": 2.002852040546895,
+          "std": 0.40981264754996455
+        },
+        {
+          "id": "inspiring-10000-to-embrace-plant-based-living-through-film--advocacy",
+          "mean": 1.9022757932921053,
+          "std": 0.5769314799177448
+        },
+        {
+          "id": "mox-2026-fundraiser",
+          "mean": 1.297506303498351,
+          "std": 0.47429711719792444
+        },
+        {
+          "id": "visions-from-the-archive",
+          "mean": 1.094135782044641,
+          "std": 0.47791225233696155
+        },
+        {
+          "id": "livingloop-the-biological-computing-engine-for-ai",
+          "mean": 0.991444617358078,
+          "std": 0.4348981384401733
+        },
+        {
+          "id": "precautionary-agi-governance",
+          "mean": 0.3118499538915881,
+          "std": 0.5769314799177448
+        },
+        {
+          "id": "help-two-consciousness-researchers-get-to-crete-this-summer",
+          "mean": 0.12145206319952531,
+          "std": 0.49107188829440074
+        },
+        {
+          "id": "accelerated-intermittent-theta-burst-in-treatment-naive-adolescents",
+          "mean": 0.0,
+          "std": 0.4347435647643449
+        }
+      ]
+    }
+  ],
+  "comparisons": [
+    {
+      "k": 3,
+      "attribute": "impact_per_dollar",
+      "spearman_rho": 0.9761904761904762,
+      "kendall_tau": 0.9285714285714286,
+      "top1_agree": true,
+      "top3_overlap": 1.0,
+      "setwise_pairwise_equiv_obs_per_dollar": 2843.8254307355105,
+      "pairwise_obs_per_dollar": 1912.1372914575268,
+      "setwise_dollars_per_item": 0.0072086,
+      "pairwise_dollars_per_item": 0.0020919
+    },
+    {
+      "k": 3,
+      "attribute": "theory_of_change",
+      "spearman_rho": 0.9047619047619048,
+      "kendall_tau": 0.7857142857142857,
+      "top1_agree": false,
+      "top3_overlap": 1.0,
+      "setwise_pairwise_equiv_obs_per_dollar": 7699.747410725185,
+      "pairwise_obs_per_dollar": 1941.087979812685,
+      "setwise_dollars_per_item": 0.002662425,
+      "pairwise_dollars_per_item": 0.0020607
+    },
+    {
+      "k": 3,
+      "attribute": "team_evidence",
+      "spearman_rho": 0.9047619047619048,
+      "kendall_tau": 0.7857142857142857,
+      "top1_agree": true,
+      "top3_overlap": 1.0,
+      "setwise_pairwise_equiv_obs_per_dollar": 7919.874054685764,
+      "pairwise_obs_per_dollar": 1967.342120794806,
+      "setwise_dollars_per_item": 0.002588425,
+      "pairwise_dollars_per_item": 0.0020332
+    },
+    {
+      "k": 4,
+      "attribute": "impact_per_dollar",
+      "spearman_rho": 0.9761904761904762,
+      "kendall_tau": 0.9285714285714286,
+      "top1_agree": true,
+      "top3_overlap": 1.0,
+      "setwise_pairwise_equiv_obs_per_dollar": 3443.6767535420677,
+      "pairwise_obs_per_dollar": 1912.1372914575268,
+      "setwise_dollars_per_item": 0.0045736,
+      "pairwise_dollars_per_item": 0.0020919
+    },
+    {
+      "k": 4,
+      "attribute": "theory_of_change",
+      "spearman_rho": 0.9523809523809523,
+      "kendall_tau": 0.8571428571428571,
+      "top1_agree": false,
+      "top3_overlap": 1.0,
+      "setwise_pairwise_equiv_obs_per_dollar": 9858.537806710065,
+      "pairwise_obs_per_dollar": 1941.087979812685,
+      "setwise_dollars_per_item": 0.0015976,
+      "pairwise_dollars_per_item": 0.0020607
+    },
+    {
+      "k": 4,
+      "attribute": "team_evidence",
+      "spearman_rho": 0.9285714285714286,
+      "kendall_tau": 0.8571428571428571,
+      "top1_agree": true,
+      "top3_overlap": 1.0,
+      "setwise_pairwise_equiv_obs_per_dollar": 10096.153846153846,
+      "pairwise_obs_per_dollar": 1967.342120794806,
+      "setwise_dollars_per_item": 0.00156,
+      "pairwise_dollars_per_item": 0.0020332
+    }
+  ],
+  "offline_ground_truth": [
+    {
+      "k": 3,
+      "attribute": "impact_per_dollar",
+      "rho_setwise_vs_truth": 0.9761904761904762,
+      "rho_pairwise_vs_truth": 1.0
+    },
+    {
+      "k": 4,
+      "attribute": "impact_per_dollar",
+      "rho_setwise_vs_truth": 0.9761904761904762,
+      "rho_pairwise_vs_truth": 1.0
+    },
+    {
+      "k": 3,
+      "attribute": "theory_of_change",
+      "rho_setwise_vs_truth": 0.9761904761904762,
+      "rho_pairwise_vs_truth": 0.9523809523809523
+    },
+    {
+      "k": 4,
+      "attribute": "theory_of_change",
+      "rho_setwise_vs_truth": 1.0,
+      "rho_pairwise_vs_truth": 0.9523809523809523
+    },
+    {
+      "k": 3,
+      "attribute": "team_evidence",
+      "rho_setwise_vs_truth": 0.9761904761904762,
+      "rho_pairwise_vs_truth": 0.9285714285714286
+    },
+    {
+      "k": 4,
+      "attribute": "team_evidence",
+      "rho_setwise_vs_truth": 1.0,
+      "rho_pairwise_vs_truth": 0.9285714285714286
+    }
+  ],
+  "total_cost_nanodollars": 211011600,
+  "caveats": [
+    "The k-1 observations of one setwise call share that call's context: they are correlated through the pivot and the call's overall framing, but enter the solver as independent unit-precision observations (mirroring canonical_v2 point weights). Non-pivot implied pairs are deliberately NOT added.",
+    "Pairwise cache token counts are not surfaced by the sort path's RerankMeta; the pairwise cache column is null, not zero."
+  ]
+}

@@ -176,7 +176,20 @@ RESULTS.md with denominators) and one page here.
   the existing harness. Offline synthetic judge first ($0), then live under
   the cap on the DeepSeek V4 Flash lane. Rejected deletion, recorded as an
   invariant: the `order` arm stays — it is the denominator of the
-  efficiency claim. **DESIGNED, not built.**
+  efficiency claim. **EXECUTED** 2026-08-22 (llmsort@b956445, pack
+  `research/artifacts/live/best-worst-2026-08-22/`): deepseek-v4-flash,
+  n=24, k=8, three attributes (two rubrics + one plain user-prompt string),
+  two pools, m∈{3,6}; 216 setwise calls, 216/216 parsed, all graphs
+  connected, $0.27 total. `order` (plain listwise, 9 calls/attribute) agrees
+  with the 96-comparison pairwise sort at ρ 0.64–0.92 (median 0.80) for ~¼
+  its dollars per item, against a pairwise test–retest ceiling of 0.83–0.94;
+  its own test–retest (m=3 vs m=6) is 0.88–0.94. `bw` at the same price:
+  ρ −0.18–0.76 (median 0.25), test–retest 0.46–0.85 — refuted as built (13
+  obs/call vs 28, worst-pick is weak). Position bias measured: last slot
+  ranked last 2.2× fair share (order), 1.9× (bw); first slots under-picked.
+  Reading: in the adequate-adjustment regime the listwise arm the climb kept
+  as the denominator is the instrument; the "highest-value missing cell" is
+  not. Caveats: one model, one corpus family, no PMF arm (E7).
 - **E7 — PMF evidence per instrument.** Where providers expose logprobs,
   separation per dollar versus point answers, per instrument. **PLANNED.**
 
