@@ -188,7 +188,9 @@ fn provider_routing_from_env() -> Option<Value> {
 /// billing ~1k output tokens per pairwise answer that needs two).
 fn reasoning_disabled_from_env() -> bool {
     matches!(
-        std::env::var("OPENROUTER_DISABLE_REASONING").ok().as_deref(),
+        std::env::var("OPENROUTER_DISABLE_REASONING")
+            .ok()
+            .as_deref(),
         Some("1") | Some("true")
     )
 }
